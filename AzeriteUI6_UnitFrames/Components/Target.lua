@@ -36,31 +36,6 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
--- Make the portrait look better for offline or invisible units.
-local Portrait_PostUpdate = function(element, unit, hasStateChanged)
-	if (not element.state) then
-		element:ClearModel()
-		if (not element.fallback2DTexture) then
-			element.fallback2DTexture = element:CreateTexture()
-			element.fallback2DTexture:SetDrawLayer("ARTWORK")
-			element.fallback2DTexture:SetAllPoints()
-			element.fallback2DTexture:SetTexCoord(.1, .9, .1, .9)
-		end
-		SetPortraitTexture(element.fallback2DTexture, unit)
-		element.fallback2DTexture:Show()
-	else
-		if (element.fallback2DTexture) then
-			element.fallback2DTexture:Hide()
-		end
-		element:SetCamDistanceScale(element.distanceScale or 1)
-		element:SetPortraitZoom(1)
-		element:SetPosition(element.positionX or 0, element.positionY or 0, element.positionZ or 0)
-		element:SetRotation(element.rotation and element.rotation*degToRad or 0)
-		element:ClearModel()
-		element:SetUnit(unit)
-		element.guid = guid
-	end
-end
 
 -- Setup the unitframe
 local style = function(self, unit)
@@ -82,12 +57,11 @@ local style = function(self, unit)
 	health:SetPoint("TOPRIGHT", -140, -66)
 	health:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
 	health:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
+	health:SetReverseFill(true)
 
 	-- Fake health texture, needed for reversed bars as blizz does texcoords wrong
 	local healthTex = health:CreateTexture(nil, "ARTWORK", nil, 0)
-	healthTex:SetPoint("BOTTOM", 0, 0)
-	healthTex:SetPoint("RIGHT", 0, 0)
-	healthTex:SetPoint("TOP", 0, 0)
+	healthTex:SetAllPoints(health:GetStatusBarTexture())
 	healthTex:SetTexture(GetMedia("hp_cap_bar"))
 
 	-- Health backdrop
@@ -110,7 +84,7 @@ local style = function(self, unit)
 	healthValue:SetJustifyH("RIGHT")
 	healthValue:SetJustifyV("MIDDLE")
 
-	-- Forward color updates to our flipped texture
+	-- Forward color updates to our flipped health bar texture
 	health.PostUpdateColor = function(element, unit, color)
 		if (color) then
 			healthTex:SetVertexColor(color:GetRGB())
@@ -121,28 +95,36 @@ local style = function(self, unit)
 	local hMin, hMax
 	health:SetScript("OnMinMaxChanged", function(self, min, max) 
 		hMin, hMax = min, max
-		-- Do we actually need to do anything more here? 
 	end)
 
 	-- This will be called when the value changes, 
 	-- and it's allowed access to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	health:SetScript("OnValueChanged", function(self, val) 
-		if (val and hMax) then
-			healthValue:SetText(hMax > 0 and AbbreviateNumber(val) or "")
-			healthTex:SetTexCoord(val/hMax, 0, 0, 1) -- flip the t extures
-			healthTex:SetPoint("LEFT", (hMax-val)/hMax * 386, 0)
+		if (val and hMin and hMax and hMax > 0) then
+			if (UnitIsDeadOrGhost(unit)) then
+				healthValue:SetText(DEAD)
+			else
+				healthValue:SetText(AbbreviateNumber(val))
+			end
+			-- Adjust our reversed texture, since nobody else will do it.
+			healthTex:SetTexCoord((val - hMin)/(hMax - hMin), 0, 0, 1) -- flip the textures
 		else
+			-- Reset tex if no data is available
+			healthTex:SetTexCoord(1, 0, 0, 1) -- flip the textures
 			healthValue:SetText("")
 		end
 	end)
 
 	-- Options
-	health.colorTapping = true
 	health.colorDisconnected = true
+	health.colorTapping = true
+	health.colorThreat = true
 	health.colorClass = true
 	health.colorReaction = true
-	health.colorHealth = true
+
+	-- This does not work with our reversed bars yet. 
+	--health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut -- Make the bar move smoothly 
 
 	-- Register it with oUF
 	self.Health = health
@@ -163,40 +145,26 @@ local style = function(self, unit)
 	--healingAll:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
 	--healingAll:SetWidth(385)
 
+	-- The target frame is reversed, 
+	-- so the absorb bar becomes a regular non-reversed bar here. 
 	local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
 	damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	--damageAbsorb:SetStatusBarTexture(GetMedia("blank"))
 	damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
 	damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
 	damageAbsorb:SetSize(386, 40)
-	--damageAbsorb:SetPoint("TOP", self.Health, "TOP")
-	--damageAbsorb:SetPoint("BOTTOM", self.Health, "BOTTOM")
-	--damageAbsorb:SetPoint("RIGHT", self.Health, "RIGHT")
 	damageAbsorb:SetAllPoints(self.Health)
-	--damageAbsorb:SetReverseFill(true)
-
-	-- Fake absorb texture, needed for reversed bars
-	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
-	--damageAbsorbTex:SetPoint("BOTTOM", 0, 0)
-	--damageAbsorbTex:SetPoint("RIGHT", 0, 0)
-	--damageAbsorbTex:SetPoint("TOP", 0, 0)
-	--damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))
-	--damageAbsorbTex:SetVertexColor(1, 1, 1, .35)
 
 	local aMin, aMax
 	damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
 		aMin, aMax = min, max
-		-- Do we actually need to do anything more here? 
 	end)
 
 	-- This will be called when the value changes, 
 	-- and it's allowed access to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	damageAbsorb:SetScript("OnValueChanged", function(self, val) 
-		if (val and aMax) then
-			--absorbValue:SetText(aMax > 0 and AbbreviateNumber(val) or "")
-			--damageAbsorbTex:SetTexCoord((aMax-val)/aMax, 1, 0, 1)
-			--damageAbsorbTex:SetPoint("LEFT", (aMax-val)/aMax * 386, 0)
+		if (val and aMax and aMax > 0) then
+			--absorbValue:SetText(AbbreviateNumber(val))
 		else
 			--absorbValue:SetText("")
 		end
@@ -307,6 +275,32 @@ local style = function(self, unit)
 	portraitBorder:SetTexture(GetMedia("portrait_frame_hi"))
 	portraitBorder:SetVertexColor(192/255, 192/255, 192/255)
 
+	-- Make the portrait look better for offline or invisible units.
+	local Portrait_PostUpdate = function(element, unit, hasStateChanged)
+		if (not element.state) then
+			element:ClearModel()
+			if (not element.fallback2DTexture) then
+				element.fallback2DTexture = element:CreateTexture()
+				element.fallback2DTexture:SetDrawLayer("ARTWORK")
+				element.fallback2DTexture:SetAllPoints()
+				element.fallback2DTexture:SetTexCoord(.1, .9, .1, .9)
+			end
+			SetPortraitTexture(element.fallback2DTexture, unit)
+			element.fallback2DTexture:Show()
+		else
+			if (element.fallback2DTexture) then
+				element.fallback2DTexture:Hide()
+			end
+			element:SetCamDistanceScale(element.distanceScale or 1)
+			element:SetPortraitZoom(1)
+			element:SetPosition(element.positionX or 0, element.positionY or 0, element.positionZ or 0)
+			element:SetRotation(element.rotation and element.rotation*degToRad or 0)
+			element:ClearModel()
+			element:SetUnit(unit)
+			element.guid = guid
+		end
+	end
+
 	self.Portrait = portrait
 	self.Portrait.Bg = portraitBg
 	self.Portrait.Shade = portraitShade
@@ -353,7 +347,7 @@ local style = function(self, unit)
 	-- and it's allowed access to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	power:SetScript("OnValueChanged", function(self, val) 
-		if (val and pMax) then
+		if (val and pMax and pMax > 0) then
 			powerTex:SetTexCoord(50/255, 206/255, 37/255 + (1 - val/pMax)*((219-37)/255), 219/255)
 			powerTex:SetPoint("TOP", 0, (- (pMax-val)/pMax * 140))
 		end

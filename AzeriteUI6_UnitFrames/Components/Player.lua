@@ -29,7 +29,11 @@ local oUF = ns.oUF
 local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {} }
+local defaults = { profile = {
+	useIceCrystal = true
+}}
+
+local db -- will be assigned a utility function returning the profile settings/defaults during initialization
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -79,15 +83,18 @@ local style = function(self, unit)
 	local hMin, hMax
 	health:SetScript("OnMinMaxChanged", function(self, min, max) 
 		hMin, hMax = min, max
-		-- Do we actually need to do anything more here? 
 	end)
 
 	-- This will be called when the value changes, 
 	-- and it's allowed access to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	health:SetScript("OnValueChanged", function(self, val) 
-		if (val and hMax) then
-			healthValue:SetText(hMax > 0 and AbbreviateNumber(val) or "")
+		if (val and hMax and hMax > 0) then
+			if (UnitIsDeadOrGhost(unit)) then
+				healthValue:SetText(DEAD)
+			else
+				healthValue:SetText(AbbreviateNumber(val))
+			end 
 		else
 			healthValue:SetText("")
 		end
@@ -99,6 +106,11 @@ local style = function(self, unit)
 	health.colorClass = false
 	health.colorReaction = false
 	health.colorHealth = false
+
+	-- Make the bar move smoothly 
+	-- *Note that this fails for reversed bars
+	--  do to how blizzard handles texcoords.
+	health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut 
 
 	-- Register it with oUF
 	self.Health = health
@@ -119,16 +131,16 @@ local style = function(self, unit)
 	--healingAll:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
 	--healingAll:SetWidth(385)
 
+	-- This frame needs to be reversed, 
+	-- so we need to apply some trickery to make it work.
 	local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
 	damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	damageAbsorb:SetStatusBarTexture(GetMedia("blank"))
-	--damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
-	--damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
 	damageAbsorb:SetSize(386, 40)
-	--damageAbsorb:SetPoint("TOP", self.Health, "TOP")
-	--damageAbsorb:SetPoint("BOTTOM", self.Health, "BOTTOM")
-	--damageAbsorb:SetPoint("RIGHT", self.Health, "RIGHT")
-	damageAbsorb:SetAllPoints(self.Health)
+	damageAbsorb:SetPoint("TOP")
+	damageAbsorb:SetPoint("BOTTOM")
+	damageAbsorb:SetPoint("RIGHT")
+	damageAbsorb:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
+	damageAbsorb:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
 	damageAbsorb:SetReverseFill(true)
 
 	-- Fake absorb texture, needed for reversed bars
@@ -142,17 +154,21 @@ local style = function(self, unit)
 	local aMin, aMax
 	damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
 		aMin, aMax = min, max
-		-- Do we actually need to do anything more here? 
 	end)
 
 	-- This will be called when the value changes, 
 	-- and it's allowed access to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
-	damageAbsorb:SetScript("OnValueChanged", function(self, val) 
-		if (val and aMax) then
-			--absorbValue:SetText(aMax > 0 and AbbreviateNumber(val) or "")
-			damageAbsorbTex:SetTexCoord((aMax-val)/aMax, 1, 0, 1)
-			damageAbsorbTex:SetPoint("LEFT", (aMax-val)/aMax * 386, 0)
+	damageAbsorb:SetScript("OnValueChanged", function(element, val) 
+		if (val and aMin and aMax and aMax > 0) then
+			-- This can bug out if we don't specifically check. 
+			-- Experienced this with some mini-games that have 
+			-- their own set of actionbars, but lacks the "player" unitframe. 
+			--if (UnitExists("player") or UnitExists("vehicle")) then
+				--absorbValue:SetText(AbbreviateNumber(val))
+				damageAbsorbTex:SetPoint("LEFT", ((aMax - aMin)-val)/(aMax - aMin) * 386, 0)
+				damageAbsorbTex:SetTexCoord((val - aMin)/(aMax - aMin), 0, 0, 1) -- flip the textures
+			--end
 		else
 			--absorbValue:SetText("")
 		end
@@ -193,9 +209,7 @@ local style = function(self, unit)
 	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
 	powerBg:SetSize(196, 196)
 	powerBg:SetPoint("CENTER", 0, 0)
-	powerBg:SetTexture(GetMedia("power-crystal-ice-back"))
-	--powerBg:SetTexture(GetMedia("power_crystal_back"))
-	--powerBg:SetIgnoreParentAlpha(true)
+	powerBg:SetTexture(db().useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
 
 	-- Fake powerbar texture, needed for our vertical bars
 	local powerTex = power:CreateTexture(nil, "BACKGROUND", nil, -6)
@@ -203,11 +217,24 @@ local style = function(self, unit)
 	powerTex:SetPoint("LEFT", 0, 0)
 	powerTex:SetPoint("RIGHT", 0, 0)
 	powerTex:SetPoint("TOP", 0, 0)
-	powerTex:SetTexture(GetMedia("power-crystal-ice-front")) 
-	--powerTex:SetTexture(GetMedia("power_crystal_front"))
-	--powerTex:SetVertexColor(0/255, 208/255, 176/255) 
-	--powerTex:SetIgnoreParentAlpha(true)
-	powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+
+	if (db().useIceCrystal) then
+		powerTex:SetTexture(GetMedia("power-crystal-ice-front")) 
+		powerTex:SetVertexColor(1, 1, 1) 
+		powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+	else
+		powerTex:SetTexture(GetMedia("power_crystal_front")) 
+		powerTex:SetVertexColor(0/255, 208/255, 176/255) 
+		powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+	end
+
+	-- Power Value
+	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
+	powerValue:SetPoint("CENTER", 0, -16)
+	powerValue:SetFontObject(GetFont(18, true))
+	powerValue:SetTextColor(250/255, 250/255, 250/255, .75)
+	powerValue:SetJustifyH("CENTER")
+	powerValue:SetJustifyV("MIDDLE")
 
 	local pMin, pMax
 	power:SetScript("OnMinMaxChanged", function(self, min, max) 
@@ -219,7 +246,12 @@ local style = function(self, unit)
 	-- and it's allowed access to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	power:SetScript("OnValueChanged", function(self, val) 
-		if (val and pMax) then
+		if (val and pMax and pMax > 0) then
+			if (not UnitIsDeadOrGhost(unit)) then
+				powerValue:SetText(AbbreviateNumber(val))
+			else
+				powerValue:SetText("")
+			end
 			powerTex:SetTexCoord(50/255, 206/255, 37/255 + (1 - val/pMax)*((219-37)/255), 219/255)
 			powerTex:SetPoint("TOP", 0, (- (pMax-val)/pMax * 140))
 		end
@@ -231,15 +263,15 @@ local style = function(self, unit)
 	powerFg:SetPoint("BOTTOM", 7, -51)
 	powerFg:SetTexture(GetMedia("pw_crystal_case"))
 	powerFg:SetVertexColor(192/255, 192/255, 192/255)
-	--powerFg:SetIgnoreParentAlpha(true)
 
 	-- Options
-	power.colorPower = false -- true to follow default coloring, false to never modify
+	power.colorPower = false -- true to follow default coloring, false to never/manually modify
 	power.displayAltPower = true -- allow this to be used for altpower from quests and various
 	power.frequentUpdates = true -- update often
 
 	-- Register it with oUF
 	self.Power = power
+	self.Power.Value = powerValue
 
 
 end
@@ -261,6 +293,15 @@ Player.OnInitialize = function(self)
 	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Utility function to get saved settings or defaults
+	-- *Will default to defaults if the saved settings above don't exist (during development)
+	db = function(forceDefaults)
+		if (forceDefaults) then 
+			return defaults.profile
+		end
+		return self.db and self.db.profile or defaults.profile
+	end
 end
 
 Player.OnEnable = function(self)
