@@ -26,6 +26,7 @@
 ## X-SlashCmdList: /lock
 ## X-SavedVariables: AzeriteUI6_UnitFrames_Positions_DB
 
+Fontstyles.xml
 Libs\Libs.xml
 Core\Core.xml
 Components\Components.xml

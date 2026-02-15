@@ -23,4 +23,378 @@
 	SOFTWARE.
 
 --]]
-local _, ns = ...
+local addonName, ns = ...
+local oUF = ns.oUF
+
+local Target = ns:NewModule("Target", nil, "LibMoreEvents-1.0")
+
+-- Declare module defaults
+local defaults = { profile = {} }
+
+-- Custom API locals
+local AbbreviateNumber = ns.AbbreviateNumber
+local GetFont = ns.GetFont
+local GetMedia = ns.GetMedia
+
+-- Make the portrait look better for offline or invisible units.
+local Portrait_PostUpdate = function(element, unit, hasStateChanged)
+	if (not element.state) then
+		element:ClearModel()
+		if (not element.fallback2DTexture) then
+			element.fallback2DTexture = element:CreateTexture()
+			element.fallback2DTexture:SetDrawLayer("ARTWORK")
+			element.fallback2DTexture:SetAllPoints()
+			element.fallback2DTexture:SetTexCoord(.1, .9, .1, .9)
+		end
+		SetPortraitTexture(element.fallback2DTexture, unit)
+		element.fallback2DTexture:Show()
+	else
+		if (element.fallback2DTexture) then
+			element.fallback2DTexture:Hide()
+		end
+		element:SetCamDistanceScale(element.distanceScale or 1)
+		element:SetPortraitZoom(1)
+		element:SetPosition(element.positionX or 0, element.positionY or 0, element.positionZ or 0)
+		element:SetRotation(element.rotation and element.rotation*degToRad or 0)
+		element:ClearModel()
+		element:SetUnit(unit)
+		element.guid = guid
+	end
+end
+
+-- Setup the unitframe
+local style = function(self, unit)
+
+	-- General frame settings
+	self:SetSize(550, 210)
+	self:SetHitRectInsets(0, 0, 0, 60)
+
+	-- Frame for font Overlays
+	local overlay = CreateFrame("Frame", nil, self)
+	overlay:SetFrameLevel(self:GetFrameLevel() + 7)
+	overlay:SetAllPoints()
+
+
+	-- Health bar
+	--------------------------------------------
+	local health = CreateFrame("StatusBar", nil, self)
+	health:SetSize(385, 40) -- 385, 37
+	health:SetPoint("TOPRIGHT", -140, -66)
+	health:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
+	health:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
+
+	-- Fake health texture, needed for reversed bars as blizz does texcoords wrong
+	local healthTex = health:CreateTexture(nil, "ARTWORK", nil, 0)
+	healthTex:SetPoint("BOTTOM", 0, 0)
+	healthTex:SetPoint("RIGHT", 0, 0)
+	healthTex:SetPoint("TOP", 0, 0)
+	healthTex:SetTexture(GetMedia("hp_cap_bar"))
+
+	-- Health backdrop
+	local healthBg = health:CreateTexture(nil, "BORDER", nil, 0)
+	healthBg:SetSize(716, 188)
+	healthBg:SetPoint("TOPRIGHT", self, "TOPRIGHT", 23, 8)
+	healthBg:SetTexture(GetMedia("hp_cap_case"))
+	healthBg:SetTexCoord(1, 0, 0, 1) -- Horizontally flip the texture
+	healthBg:SetVertexColor(192/255, 192/255, 192/255)
+
+	-- Health overlay for fonts and icons
+	local healthOverlay = CreateFrame("Frame", nil, overlay)
+	healthOverlay:SetAllPoints(health)
+
+	-- Health Value
+	local healthValue = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	healthValue:SetPoint("RIGHT", -27, 4)
+	healthValue:SetFontObject(GetFont(18, true))
+	healthValue:SetTextColor(250/255, 250/255, 250/255, .5)
+	healthValue:SetJustifyH("RIGHT")
+	healthValue:SetJustifyV("MIDDLE")
+
+	-- Forward color updates to our flipped texture
+	health.PostUpdateColor = function(element, unit, color)
+		if (color) then
+			healthTex:SetVertexColor(color:GetRGB())
+		end
+	end
+
+	-- Store values to get flipped textures correct
+	local hMin, hMax
+	health:SetScript("OnMinMaxChanged", function(self, min, max) 
+		hMin, hMax = min, max
+		-- Do we actually need to do anything more here? 
+	end)
+
+	-- This will be called when the value changes, 
+	-- and it's allowed access to min/max/cur values of the bar.
+	-- This script handler is one of the only ones that are allowed to do that in WoW12.
+	health:SetScript("OnValueChanged", function(self, val) 
+		if (val and hMax) then
+			healthValue:SetText(hMax > 0 and AbbreviateNumber(val) or "")
+			healthTex:SetTexCoord(val/hMax, 0, 0, 1) -- flip the t extures
+			healthTex:SetPoint("LEFT", (hMax-val)/hMax * 386, 0)
+		else
+			healthValue:SetText("")
+		end
+	end)
+
+	-- Options
+	health.colorTapping = true
+	health.colorDisconnected = true
+	health.colorClass = true
+	health.colorReaction = true
+	health.colorHealth = true
+
+	-- Register it with oUF
+	self.Health = health
+	self.Health.Value = healthValue
+
+
+	-- Health Prediction
+	--------------------------------------------
+	-- This looks really bad in retail now.
+	--local healingAll = CreateFrame("StatusBar", nil, self.Health)
+	--healingAll:SetFrameLevel(self.Health:GetFrameLevel() + 3)
+	--healingAll:SetStatusBarTexture(GetMedia("plain"))
+	--healingAll:SetStatusBarColor(1, 1, 1, .25)
+	--healingAll:SetPoint("TOP", 0, -.95)
+	--healingAll:SetPoint("BOTTOM",0, 8.25)
+	-- We can't read health values from within the healpredict element,
+	-- so we cannot adjust the texcoords of the healpredict properly.
+	--healingAll:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
+	--healingAll:SetWidth(385)
+
+	local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
+	damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
+	--damageAbsorb:SetStatusBarTexture(GetMedia("blank"))
+	damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
+	damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
+	damageAbsorb:SetSize(386, 40)
+	--damageAbsorb:SetPoint("TOP", self.Health, "TOP")
+	--damageAbsorb:SetPoint("BOTTOM", self.Health, "BOTTOM")
+	--damageAbsorb:SetPoint("RIGHT", self.Health, "RIGHT")
+	damageAbsorb:SetAllPoints(self.Health)
+	--damageAbsorb:SetReverseFill(true)
+
+	-- Fake absorb texture, needed for reversed bars
+	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
+	--damageAbsorbTex:SetPoint("BOTTOM", 0, 0)
+	--damageAbsorbTex:SetPoint("RIGHT", 0, 0)
+	--damageAbsorbTex:SetPoint("TOP", 0, 0)
+	--damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))
+	--damageAbsorbTex:SetVertexColor(1, 1, 1, .35)
+
+	local aMin, aMax
+	damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
+		aMin, aMax = min, max
+		-- Do we actually need to do anything more here? 
+	end)
+
+	-- This will be called when the value changes, 
+	-- and it's allowed access to min/max/cur values of the bar.
+	-- This script handler is one of the only ones that are allowed to do that in WoW12.
+	damageAbsorb:SetScript("OnValueChanged", function(self, val) 
+		if (val and aMax) then
+			--absorbValue:SetText(aMax > 0 and AbbreviateNumber(val) or "")
+			--damageAbsorbTex:SetTexCoord((aMax-val)/aMax, 1, 0, 1)
+			--damageAbsorbTex:SetPoint("LEFT", (aMax-val)/aMax * 386, 0)
+		else
+			--absorbValue:SetText("")
+		end
+	end)
+
+	-- Register with oUF
+	self.HealthPrediction = {
+		--healingAll = healingAll, 
+		damageAbsorb = damageAbsorb,
+		damageAbsorbClampMode = 0,
+		incomingHealClampMode = 0,
+		incomingHealOverflow = 1
+	}
+
+
+	-- Overlayed Castbar
+	--------------------------------------------
+	local castbar = CreateFrame("StatusBar", nil, self)
+	castbar:SetFrameLevel(self:GetFrameLevel() + 5)
+	castbar:SetStatusBarTexture(GetMedia("blank"))
+	castbar:GetStatusBarTexture():SetVertexColor(0, 0, 0, 0)
+	castbar:SetReverseFill(true)
+	castbar:SetAllPoints(self.Health)
+	castbar:SetSize(self.Health:GetSize())
+
+	local castbarTex = castbar:CreateTexture(nil, "ARTWORK", nil, 0)
+	castbarTex:SetTexture(GetMedia("hp_cap_bar_highlight"))
+	castbarTex:SetVertexColor(1, 1, 1, .35)  
+	castbarTex:SetTexCoord(1, 0, 0, 1)
+	castbarTex:SetBlendMode("ADD")
+	castbarTex:SetAllPoints(castbar:GetStatusBarTexture()) -- this is the trick to avoiding math on secret values
+
+	-- Custom castbar update to get our flipped textures
+	local CastBar_OnUpdate = function(self, elapsed)
+		if (self.casting or self.channeling or self.empowering) then
+			local durationObject = self:GetTimerDuration()
+			local elapsedPercent = durationObject:GetElapsedPercent(0)
+
+			-- Simple flip of the texture, do no math.
+			-- This is how we avoid errors on secret values.
+			-- Note that this bug does not fire for the player, 
+			-- only for other targets.
+			castbarTex:SetTexCoord(elapsedPercent, 0, 0, 1) 
+
+		-- The rest here is just a copy of oUF's code, 
+		-- since we're replacing it with this function.
+		elseif (self.holdTime > 0) then
+			self.holdTime = self.holdTime - elapsed
+		else
+			self.castID = nil
+			self.casting = nil
+			self.channeling = nil
+			self.empowering = nil
+			self.notInterruptible = nil
+			self.spellID = nil
+			self.spellName = nil
+
+			for _, pip in next, self.Pips do
+				pip:Hide()
+			end
+
+			self:Hide()
+		end
+
+	end
+
+	-- Register it with oUF
+	self.Castbar = castbar
+	self.Castbar.OnUpdate = CastBar_OnUpdate
+
+
+	-- Portrait
+	--------------------------------------------
+	local portraitFrame = CreateFrame("Frame", nil, self)
+	portraitFrame:SetFrameLevel(self:GetFrameLevel() - 2)
+	portraitFrame:SetAllPoints()
+
+	local portrait = CreateFrame("PlayerModel", nil, portraitFrame)
+	portrait:SetFrameLevel(portraitFrame:GetFrameLevel())
+	portrait:SetPoint("TOPRIGHT", -40, -31)
+	portrait:SetSize(85, 85)
+	portrait:SetAlpha(.85)
+
+	local portraitBg = portraitFrame:CreateTexture(nil, "BACKGROUND", nil, 0)
+	portraitBg:SetPoint("TOPRIGHT", 3, 16)
+	portraitBg:SetSize(173, 173)
+	portraitBg:SetTexture(GetMedia("party_portrait_back"))
+	portraitBg:SetVertexColor(.5, .5, .5)
+
+	local portraitOverlayFrame = nil
+	portraitOverlayFrame = CreateFrame("Frame", nil, self, "PingReceiverAttributeTemplate")
+
+	Mixin(portraitOverlayFrame, PingableTypeMixin)
+
+	portraitOverlayFrame.GetContextualPingType = function(self) return PingUtil:GetContextualPingTypeForUnit(self:GetTargetPingGUID()) end
+	portraitOverlayFrame.GetTargetPingGUID = function(self) return UnitGUID(unit) end
+	portraitOverlayFrame:SetFrameLevel(self:GetFrameLevel() - 1)
+	portraitOverlayFrame:SetAllPoints()
+
+	local portraitShade = portraitOverlayFrame:CreateTexture(nil, "BACKGROUND", nil, -1)
+	portraitShade:SetPoint("TOPRIGHT", -30, -18)
+	portraitShade:SetSize(107, 107)
+	portraitShade:SetTexture(GetMedia("shade-circle"))
+
+	local portraitBorder = portraitOverlayFrame:CreateTexture(nil, "BACKGROUND", nil, 0)
+	portraitBorder:SetPoint("TOPRIGHT", 10, 22)
+	portraitBorder:SetSize(187, 187)
+	portraitBorder:SetTexture(GetMedia("portrait_frame_hi"))
+	portraitBorder:SetVertexColor(192/255, 192/255, 192/255)
+
+	self.Portrait = portrait
+	self.Portrait.Bg = portraitBg
+	self.Portrait.Shade = portraitShade
+	self.Portrait.Border = portraitBorder
+	self.Portrait.PostUpdate = Portrait_PostUpdate
+
+
+	-- Power Crystal
+	--------------------------------------------
+	--[[
+	local power = CreateFrame("StatusBar", nil, self)
+	power:SetSize(120,140)
+	power:SetPoint("BOTTOMLEFT", 20, 38)
+	power:SetStatusBarTexture(GetMedia("blank"))
+	power:GetStatusBarTexture():SetVertexColor(0, 0, 0, 0) -- hide statusbar tex, not the bar
+
+	-- Power Crystal backdrop
+	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
+	powerBg:SetSize(196, 196)
+	powerBg:SetPoint("CENTER", 0, 0)
+	powerBg:SetTexture(GetMedia("power-crystal-ice-back"))
+	--powerBg:SetTexture(GetMedia("power_crystal_back"))
+	--powerBg:SetIgnoreParentAlpha(true)
+
+	-- Fake powerbar texture, needed for our vertical bars
+	local powerTex = power:CreateTexture(nil, "BACKGROUND", nil, -6)
+	powerTex:SetPoint("BOTTOM", 0, 0)
+	powerTex:SetPoint("LEFT", 0, 0)
+	powerTex:SetPoint("RIGHT", 0, 0)
+	powerTex:SetPoint("TOP", 0, 0)
+	powerTex:SetTexture(GetMedia("power-crystal-ice-front")) 
+	--powerTex:SetTexture(GetMedia("power_crystal_front"))
+	--powerTex:SetVertexColor(0/255, 208/255, 176/255) 
+	--powerTex:SetIgnoreParentAlpha(true)
+	powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+
+	local pMin, pMax
+	power:SetScript("OnMinMaxChanged", function(self, min, max) 
+		pMin, pMax = min, max
+		-- Do we actually need to do anything more here? 
+	end)
+
+	-- This will be called when the value changes, 
+	-- and it's allowed access to min/max/cur values of the bar.
+	-- This script handler is one of the only ones that are allowed to do that in WoW12.
+	power:SetScript("OnValueChanged", function(self, val) 
+		if (val and pMax) then
+			powerTex:SetTexCoord(50/255, 206/255, 37/255 + (1 - val/pMax)*((219-37)/255), 219/255)
+			powerTex:SetPoint("TOP", 0, (- (pMax-val)/pMax * 140))
+		end
+	end)
+
+	-- Options
+	power.colorPower = false -- true to follow default coloring, false to never modify
+	power.displayAltPower = true -- allow this to be used for altpower from quests and various
+	power.frequentUpdates = true -- update often
+
+	-- Register it with oUF
+	self.Power = power
+	--]]
+
+end
+
+-- This is called by the options menu on settings changes,
+-- and by the modules themselves on enabling and combat end.
+Target.UpdateSettings = function(self)
+end
+
+-- This is called by the addon on full profile changes,
+-- and should call a full settings update.
+Target.RefreshConfig = function(self)
+	self:UpdateSettings()
+end
+
+Target.OnInitialize = function(self)
+	-- Let's not do these until the addon is more stable
+	--self.db = ns.db:RegisterNamespace("Target", defaults)
+	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+end
+
+Target.OnEnable = function(self)
+	oUF:RegisterStyle("AzeriteUnitFrameTarget", style)
+	oUF:Factory(function(self) 
+		self:SetActiveStyle("AzeriteUnitFrameTarget") -- Set the current oUF style
+		-- Note that this is the default position,
+		-- it will be overwritten by saved positions.
+		self:Spawn("target"):SetPoint("TOPRIGHT", -40, -40)
+	end)
+end
