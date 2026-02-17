@@ -1,5 +1,5 @@
 ## Interface: 120001, 120000
-## IconTexture: Interface\Addons\AzeriteUI6_UnitFrames\Assets\power-crystal-ice-icon.tga
+## IconTexture: Interface\Addons\AzeriteUI6\Assets\power-crystal-ice-icon.tga
 
 ## Title: AzeriteUI
 ## Author: Lars Norberg, Daniel Troko
@@ -7,20 +7,21 @@
 ## Version: 1.0.0-Alpha
 ## OptionalDeps: Ace3, oUF, Clique
 
-## Category: Unit Frames
-## Category-deDE: Einheitenfenster
-## Category-esES: Marcos de unidades
-## Category-esMX: Marcos de unidades
-## Category-frFR: Portraits d'unités
-## Category-itIT: Riquadri delle unità
-## Category-koKR: 유닛프레임
-## Category-ptBR: Quadros de unidade
-## Category-ruRU: Рамки юнитов
-## Category-zhCN: 单位框体
-## Category-zhTW: 單位框架
-
 ## SavedVariables: AzeriteUI6_DB, AzeriteUI6_Positions_DB
 ## LoadSavedVariablesFirst: 1
+
+# https://warcraft.wiki.gg/wiki/Addon_Categories
+## Category: UI Overhaul
+## Category-deDE: UI-Überholung
+## Category-esES: Renovación de la Interfaz de Usuario
+## Category-esMX: Renovación de la Interfaz de Usuario
+## Category-frFR: Révision de l'Interface Utilisateur
+## Category-itIT: Revisione dell'interfaccia utente
+## Category-koKR: UI 개조
+## Category-ptBR: Reformulação da Interface do Usuário
+## Category-ruRU: Переработка интерфейса
+## Category-zhCN: UI重构
+## Category-zhTW: UI重構
 
 ## X-Curse-Project-ID: 
 ## X-oUF-MovableFrames-Title: Azerite UnitFrames
