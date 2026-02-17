@@ -5,7 +5,9 @@
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
 ## Version: 1.0.0-Alpha
-## OptionalDeps: Ace3, oUF, Clique
+## OptionalDeps: Ace3, Clique
+
+## X-Curse-Project-ID: 
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul
@@ -20,8 +22,19 @@
 ## Category-zhCN: UI重构
 ## Category-zhTW: UI重構
 
-## X-Curse-Project-ID: 
+# https://warcraft.wiki.gg/wiki/Addon_Categories
 ## X-oUF-MovableFrames-Title: Azerite UnitFrames
+## X-oUF-MovableFrames-Title-deDE: Azerite Einheitenfenster
+## X-oUF-MovableFrames-Title-esES: Azerite Marcos de unidades
+## X-oUF-MovableFrames-Title-esMX: Azerite Marcos de unidades
+## X-oUF-MovableFrames-Title-frFR: Azerite Portraits d'unités
+## X-oUF-MovableFrames-Title-itIT: Azerite Riquadri delle unità
+## X-oUF-MovableFrames-Title-koKR: Azerite 유닛프레임
+## X-oUF-MovableFrames-Title-ptBR: Azerite Quadros de unidade
+## X-oUF-MovableFrames-Title-ruRU: Azerite Рамки юнитов
+## X-oUF-MovableFrames-Title-zhCN: Azerite 单位框体
+## X-oUF-MovableFrames-Title-zhTW: Azerite 單位框架
+
 ## X-oUF-MovableFrames-SlashCmdList: /lock
 ## X-oUF-MovableFrames-SavedVariables: AzeriteUI6_Positions_DB
 

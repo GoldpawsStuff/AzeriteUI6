@@ -1,6 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<!-- ActionBars -->
-	<!-- ChatFrames -->
+	<!-- Chat -->
 	<!-- Minimap -->
 	<!-- UnitFrames-->
 	<Script file="UnitFrames\Player.lua"/>
