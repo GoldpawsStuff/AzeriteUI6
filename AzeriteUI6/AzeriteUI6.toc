@@ -7,9 +7,6 @@
 ## Version: 1.0.0-Alpha
 ## OptionalDeps: Ace3, oUF, Clique
 
-## SavedVariables: AzeriteUI6_DB, AzeriteUI6_Positions_DB
-## LoadSavedVariablesFirst: 1
-
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul
 ## Category-deDE: UI-Überholung
@@ -27,6 +24,9 @@
 ## X-oUF-MovableFrames-Title: Azerite UnitFrames
 ## X-oUF-MovableFrames-SlashCmdList: /lock
 ## X-oUF-MovableFrames-SavedVariables: AzeriteUI6_Positions_DB
+
+## SavedVariables: AzeriteUI6_DB, AzeriteUI6_Positions_DB
+## LoadSavedVariablesFirst: 1
 
 Fontstyles.xml
 Libs\Libs.xml
