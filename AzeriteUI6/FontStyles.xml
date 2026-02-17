@@ -2,7 +2,7 @@
 ..\FrameXML\UI.xsd">
 
 	<!-- Normal -->
-	<FontFamily name="AzeriteUnitFrameFont11" virtual="true">
+	<FontFamily name="AzeriteUI6Font11" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="11">
 				<Shadow>
@@ -56,7 +56,7 @@
 	</FontFamily>
 
 	<!-- Normal Outlined -->
-	<FontFamily name="AzeriteUnitFrameFont11Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font11Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="11" outline="NORMAL"/>
 		</Member>
@@ -75,7 +75,7 @@
 	</FontFamily>
 
 	<!-- Normal -->
-	<FontFamily name="AzeriteUnitFrameFont12" virtual="true">
+	<FontFamily name="AzeriteUI6Font12" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="12">
 				<Shadow>
@@ -129,7 +129,7 @@
 	</FontFamily>
 
 	<!-- Normal Outlined -->
-	<FontFamily name="AzeriteUnitFrameFont12Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font12Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="12" outline="NORMAL"/>
 		</Member>
@@ -147,7 +147,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont13Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font13Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="13" outline="NORMAL"/>
 		</Member>
@@ -165,7 +165,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont14Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font14Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="14" outline="NORMAL"/>
 		</Member>
@@ -183,7 +183,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont15Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font15Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="15" outline="NORMAL"/>
 		</Member>
@@ -201,7 +201,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont16Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font16Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="16" outline="NORMAL"/>
 		</Member>
@@ -219,7 +219,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont17Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font17Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="17" outline="NORMAL"/>
 		</Member>
@@ -237,7 +237,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont18Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font18Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="18" outline="NORMAL"/>
 		</Member>
@@ -255,7 +255,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont19Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font19Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="19" outline="NORMAL"/>
 		</Member>
@@ -273,7 +273,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont20Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font20Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="20" outline="NORMAL"/>
 		</Member>
@@ -291,7 +291,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont21Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font21Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="21" outline="NORMAL"/>
 		</Member>
@@ -309,7 +309,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont22Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font22Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="22" outline="NORMAL"/>
 		</Member>
@@ -327,7 +327,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont23Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font23Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="23" outline="NORMAL"/>
 		</Member>
@@ -345,7 +345,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont24Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font24Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="24" outline="NORMAL"/>
 		</Member>
@@ -363,7 +363,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont25Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font25Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="25" outline="NORMAL"/>
 		</Member>
@@ -381,7 +381,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont26Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font26Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="26" outline="NORMAL"/>
 		</Member>
@@ -399,7 +399,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont27Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font27Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="27" outline="NORMAL"/>
 		</Member>
@@ -417,7 +417,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont28Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font28Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="28" outline="NORMAL"/>
 		</Member>
@@ -435,7 +435,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont29Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font29Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="29" outline="NORMAL"/>
 		</Member>
@@ -453,7 +453,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont30Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font30Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="30" outline="NORMAL"/>
 		</Member>
@@ -471,7 +471,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont31Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font31Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="31" outline="NORMAL"/>
 		</Member>
@@ -489,7 +489,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont32Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font32Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="32" outline="NORMAL"/>
 		</Member>
@@ -507,7 +507,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont33Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font33Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="33" outline="NORMAL"/>
 		</Member>
@@ -525,7 +525,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFont34Outline" virtual="true">
+	<FontFamily name="AzeriteUI6Font34Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\FRIZQT__.TTF" height="34" outline="NORMAL"/>
 		</Member>
@@ -544,7 +544,7 @@
 	</FontFamily>
 
 	<!-- Chat -->
-	<FontFamily name="AzeriteUnitFrameFontChat14" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat14" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="14">
 				<Shadow>
@@ -598,7 +598,7 @@
 	</FontFamily>
 
 	<!-- Chat Outlined -->
-	<FontFamily name="AzeriteUnitFrameFontChat12Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat12Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="12" outline="NORMAL"/>
 		</Member>
@@ -616,7 +616,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat13Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat13Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="13" outline="NORMAL"/>
 		</Member>
@@ -634,7 +634,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat14Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat14Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="14" outline="NORMAL"/>
 		</Member>
@@ -652,7 +652,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat15Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat15Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="15" outline="NORMAL"/>
 		</Member>
@@ -670,7 +670,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat16Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat16Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
 		</Member>
@@ -688,7 +688,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat17Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat17Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="17" outline="NORMAL"/>
 		</Member>
@@ -706,7 +706,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat18Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat18Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="18" outline="NORMAL"/>
 		</Member>
@@ -724,7 +724,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat19Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat19Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="19" outline="NORMAL"/>
 		</Member>
@@ -742,7 +742,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat20Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat20Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="20" outline="NORMAL"/>
 		</Member>
@@ -760,7 +760,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat21Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat21Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="21" outline="NORMAL"/>
 		</Member>
@@ -778,7 +778,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat22Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat22Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="22" outline="NORMAL"/>
 		</Member>
@@ -796,7 +796,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat23Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat23Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="23" outline="NORMAL"/>
 		</Member>
@@ -814,7 +814,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat24Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat24Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="24" outline="NORMAL"/>
 		</Member>
@@ -832,7 +832,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat25Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat25Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="25" outline="NORMAL"/>
 		</Member>
@@ -850,7 +850,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat26Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat26Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="26" outline="NORMAL"/>
 		</Member>
@@ -868,7 +868,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat27Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat27Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="27" outline="NORMAL"/>
 		</Member>
@@ -886,7 +886,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat28Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat28Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="28" outline="NORMAL"/>
 		</Member>
@@ -904,7 +904,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat29Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat29Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="29" outline="NORMAL"/>
 		</Member>
@@ -922,7 +922,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat30Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat30Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="30" outline="NORMAL"/>
 		</Member>
@@ -940,7 +940,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat31Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat31Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="31" outline="NORMAL"/>
 		</Member>
@@ -958,7 +958,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat32Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat32Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="32" outline="NORMAL"/>
 		</Member>
@@ -976,7 +976,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat33Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat33Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="33" outline="NORMAL"/>
 		</Member>
@@ -994,7 +994,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontChat34Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontChat34Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="34" outline="NORMAL"/>
 		</Member>
@@ -1013,7 +1013,7 @@
 	</FontFamily>
 
 	<!-- Number -->
-	<FontFamily name="AzeriteUnitFrameFontNumber12" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber12" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="12">
 				<Shadow>
@@ -1067,7 +1067,7 @@
 	</FontFamily>
 
 	<!-- Number Outlined -->
-	<FontFamily name="AzeriteUnitFrameFontNumber12Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber12Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="12" outline="NORMAL"/>
 		</Member>
@@ -1085,7 +1085,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber13Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber13Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="13" outline="NORMAL"/>
 		</Member>
@@ -1103,7 +1103,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber14Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber14Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="14" outline="NORMAL"/>
 		</Member>
@@ -1121,7 +1121,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber15Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber15Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="15" outline="NORMAL"/>
 		</Member>
@@ -1139,7 +1139,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber16Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber16Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
 		</Member>
@@ -1157,7 +1157,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber17Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber17Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="17" outline="NORMAL"/>
 		</Member>
@@ -1175,7 +1175,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber18Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber18Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="18" outline="NORMAL"/>
 		</Member>
@@ -1193,7 +1193,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber19Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber19Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="19" outline="NORMAL"/>
 		</Member>
@@ -1211,7 +1211,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber20Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber20Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="20" outline="NORMAL"/>
 		</Member>
@@ -1229,7 +1229,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber21Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber21Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="21" outline="NORMAL"/>
 		</Member>
@@ -1247,7 +1247,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber22Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber22Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="22" outline="NORMAL"/>
 		</Member>
@@ -1265,7 +1265,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber23Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber23Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="23" outline="NORMAL"/>
 		</Member>
@@ -1283,7 +1283,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber24Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber24Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="24" outline="NORMAL"/>
 		</Member>
@@ -1301,7 +1301,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber25Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber25Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="25" outline="NORMAL"/>
 		</Member>
@@ -1319,7 +1319,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber26Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber26Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="26" outline="NORMAL"/>
 		</Member>
@@ -1337,7 +1337,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber27Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber27Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="27" outline="NORMAL"/>
 		</Member>
@@ -1355,7 +1355,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber28Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber28Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="28" outline="NORMAL"/>
 		</Member>
@@ -1373,7 +1373,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber29Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber29Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="29" outline="NORMAL"/>
 		</Member>
@@ -1391,7 +1391,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber30Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber30Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="30" outline="NORMAL"/>
 		</Member>
@@ -1409,7 +1409,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber31Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber31Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="31" outline="NORMAL"/>
 		</Member>
@@ -1427,7 +1427,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber32Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber32Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="32" outline="NORMAL"/>
 		</Member>
@@ -1445,7 +1445,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber33Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber33Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="33" outline="NORMAL"/>
 		</Member>
@@ -1463,7 +1463,7 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="AzeriteUnitFrameFontNumber34Outline" virtual="true">
+	<FontFamily name="AzeriteUI6FontNumber34Outline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="34" outline="NORMAL"/>
 		</Member>

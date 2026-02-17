@@ -70,7 +70,7 @@ for _,fontType in next,{ "Normal", "Chat", "Number" } do
 		for fontSize = 1,34 do -- iterate all commonly used sizes
 			local namedType = fontType == "Normal" and "" or fontType
 			local namedStyle = fontStyle == "None" and "" or fontStyle
-			local fontObject = _G["AzeriteUnitFrameFont"..namedType..fontSize..namedStyle]
+			local fontObject = _G["AzeriteUI6Font"..namedType..fontSize..namedStyle]
 			if (fontObject) then -- only put actual fontobjects into the table
 				Fonts[fontType][fontStyle][fontSize] = fontObject
 			end

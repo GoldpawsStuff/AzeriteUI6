@@ -16,7 +16,7 @@
 	<Include file="AceSerializer-3.0\AceSerializer-3.0.xml"/>
 	@end-do-not-package@-->
 	<Include file="oUF\oUF.xml"/>
-	<Script file="oUF_MovableFrames\movable.lua"/>
+	<Script file="oUF_MovableFrames\oUF_MovableFrames.lua"/>
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
 	<Script file="LibMoreEvents-1.0\LibMoreEvents-1.0.lua"/>
 	<Script file="LibFadingFrames-1.0\LibFadingFrames-1.0.lua"/>

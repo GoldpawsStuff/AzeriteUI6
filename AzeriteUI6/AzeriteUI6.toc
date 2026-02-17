@@ -1,7 +1,7 @@
 ## Interface: 120001, 120000
 ## IconTexture: Interface\Addons\AzeriteUI6_UnitFrames\Assets\power-crystal-ice-icon.tga
 
-## Title: AzeriteUI 6.0
+## Title: AzeriteUI
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
 ## Version: 1.0.0-Alpha
@@ -23,8 +23,9 @@
 ## LoadSavedVariablesFirst: 1
 
 ## X-Curse-Project-ID: 
-## X-SlashCmdList: /lock
-## X-SavedVariables: AzeriteUI6_Positions_DB
+## X-oUF-MovableFrames-Title: Azerite UnitFrames
+## X-oUF-MovableFrames-SlashCmdList: /lock
+## X-oUF-MovableFrames-SavedVariables: AzeriteUI6_Positions_DB
 
 Fontstyles.xml
 Libs\Libs.xml
