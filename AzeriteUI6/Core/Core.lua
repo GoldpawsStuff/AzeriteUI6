@@ -29,7 +29,7 @@ ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
 -- Saved variables global
-local AzeriteUI6_UnitFrames_Positions_DB = {}
+local AzeriteUI6_DB = {}
 
 -- Addon defaults
 local defaults = { profile = {} }
@@ -203,7 +203,7 @@ ns.OnEnable = function(self)
 end
 
 ns.OnInitialize = function(self)
-	--self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_UnitFrames_DB", defaults, true)
+	--self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, true)
 	--self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
 	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")

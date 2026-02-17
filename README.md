@@ -1,4 +1,4 @@
-# AzeriteUnitFrames
+# AzeriteUI6
 
 ## Connect
 - X: [@goldpawsstuff](https://x.com/goldpawsstuff)
