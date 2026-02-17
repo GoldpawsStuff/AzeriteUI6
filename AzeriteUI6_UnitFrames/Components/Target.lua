@@ -130,10 +130,47 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 
+	-- CombatFeedback
+	--------------------------------------------
+	local combatFeedback = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 7)
+	combatFeedback:SetPoint("CENTER", 0, 4)
+	combatFeedback:SetJustifyH("CENTER")
+	combatFeedback:SetJustifyV("MIDDLE")
+
+	-- Options
+	combatFeedback.feedbackFont = GetFont(20, true)
+	combatFeedback.feedbackFontLarge = GetFont(24, true)
+	combatFeedback.feedbackFontSmall = GetFont(18, true)
+	combatFeedback.maxAlpha = .9
+	combatFeedback.colors = {
+		STANDARD = { 214/255, 191/255, 165/255 },
+		IMMUNE = { 214/255, 191/255, 165/255 },
+		DAMAGE = { 176/255, 79/255, 79/255 },
+		CRUSHING = { 176/255, 79/255, 79/255 },
+		CRITICAL = { 176/255, 79/255, 79/255 },
+		GLANCING = { 176/255, 79/255, 79/255 },
+		ABSORB = { 214/255, 191/255, 165/255 },
+		BLOCK = { 214/255, 191/255, 165/255 },
+		RESIST = { 214/255, 191/255, 165/255 },
+		MISS = { 214/255, 191/255, 165/255 },
+		HEAL = { 84/255, 150/255, 84/255 },
+		CRITHEAL = { 84/255, 150/255, 84/255 },
+		ENERGIZE = { 79/255, 114/255, 160/255 },
+		CRITENERGIZE = { 79/255, 114/255, 160/255 }
+	}
+
+	self.CombatFeedback = combatFeedback
+
 
 	-- Health Prediction
 	--------------------------------------------
 	-- This looks really bad in retail now.
+	-- The problems is how WoW statusbars textures are rendered, 
+	-- where they always start from the left and crop the right, 
+	-- even when the bars grow from the right. 
+	-- It is also fully impossible to adjust the health prediction 
+	-- with the new secure values, as you cannot know both the health value 
+	-- and absorb value at the same time, let alone do math on these numbers.
 	--local healingAll = CreateFrame("StatusBar", nil, self.Health)
 	--healingAll:SetFrameLevel(self.Health:GetFrameLevel() + 3)
 	--healingAll:SetStatusBarTexture(GetMedia("plain"))
@@ -231,9 +268,58 @@ local style = function(self, unit)
 
 	end
 
+	-- Cast Name
+	local castbarText = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	castbarText:SetPoint("RIGHT", -27, 4)
+	castbarText:SetSize(250, 40)
+	castbarText:SetFontObject(GetFont(16, true))
+	castbarText:SetTextColor(250/255, 250/255, 250/255, .5)
+	castbarText:SetJustifyH("RIGHT")
+	castbarText:SetJustifyV("MIDDLE")
+	castbarText:Hide()
+
+	-- Cast Time
+	-- *Not showing for anybody but the player unit in Midnight?
+	local castbarTime = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	castbarTime:SetPoint("LEFT", 27, 4)
+	castbarTime:SetFontObject(GetFont(18, true))
+	castbarTime:SetTextColor(250/255, 250/255, 250/255, .5)
+	castbarTime:SetJustifyH("CENTER")
+	castbarTime:SetJustifyV("MIDDLE")
+	castbarTime:Hide()
+
+	-- Toggle cast info and health info when castbar is visible.
+	local Castbar_PostUpdateTexts = function(element)
+		if (element:IsShown()) then
+			element.Text:Show()
+			element.Time:Show()
+			element.__owner.Health.Value:Hide()
+		else
+			element.Text:Hide()
+			element.Time:Hide()
+			element.__owner.Health.Value:Show()
+		end
+	end
+
+	-- Toggle cast text color on protected casts.
+	local Castbar_PostCastInterruptible = function(element, unit)
+		if (element.notInterruptible) then
+			element.Text:SetTextColor(229/255, 178/255, 38/255, .75)
+		else
+			element.Text:SetTextColor(250/255, 250/255, 250/255, .5)
+		end
+	end
+
+	-- Attach scripts
+	castbar:HookScript("OnShow", Castbar_PostUpdateTexts)
+	castbar:HookScript("OnHide", Castbar_PostUpdateTexts)
+
 	-- Register it with oUF
 	self.Castbar = castbar
 	self.Castbar.OnUpdate = CastBar_OnUpdate
+	self.Castbar.Text = castbarText
+	self.Castbar.Time = castbarTime
+	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
 
 
 	-- Portrait

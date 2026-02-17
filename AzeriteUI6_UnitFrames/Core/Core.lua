@@ -41,7 +41,7 @@ local alias = {
 	["plain"] = [[Interface\ChatFrame\ChatFrameBackground]]
 }
 
--- Full cache that spawns new objects on-the-fly.
+-- Font cache that spawns new objects on-the-fly.
 local count, font_mt = 0, nil
 font_mt = {
 	__index = function(t,k)
@@ -53,7 +53,7 @@ font_mt = {
 		-- Create a new font object
 		elseif (type(k) == "number") then
 			count = count + 1
-			local new = CreateFont(string_format("AzeriteUnitFrameFont%d", count))
+			local new = CreateFont(string.format("AzeriteUnitFrameFont%d", count))
 			new:SetJustifyH("LEFT") -- new fonts appear to be centered after 9.1.5
 			rawset(t,k,new)
 			return new
@@ -64,6 +64,7 @@ font_mt = {
 local Fonts = setmetatable({}, font_mt)
 
 -- Put our global fontobjects into our table.
+-- These are defined in our FontStyles.xml and support all locales.
 for _,fontType in next,{ "Normal", "Chat", "Number" } do
 	for _,fontStyle in next,{ "None", "Outline" } do
 		for fontSize = 1,34 do -- iterate all commonly used sizes
@@ -111,13 +112,13 @@ ns.AbbreviateNumberBalanced = function(value)
 	value = tonumber(value)
 	if (not value) then return "" end
 	if (value >= 1e8) then
-		return string_format("%.0fm", value/1e6) -- 100m, 1000m, 2300m, etc
+		return string.format("%.0fm", value/1e6) -- 100m, 1000m, 2300m, etc
 	elseif (value >= 1e6) then
-		return string_format("%.1fm", value/1e6) -- 1.0m - 99.9m
+		return string.format("%.1fm", value/1e6) -- 1.0m - 99.9m
 	elseif (value >= 1e5) then
-		return string_format("%.0fk", value/1e3) -- 100k - 999k
+		return string.format("%.0fk", value/1e3) -- 100k - 999k
 	elseif (value >= 1e3) then
-		return string_format("%.1fk", value/1e3) -- 1.0k - 99.9k
+		return string.format("%.1fk", value/1e3) -- 1.0k - 99.9k
 	elseif (value > 0) then
 		return ""..math.floor(value) -- 1 - 999
 	else
