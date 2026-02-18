@@ -25,41 +25,22 @@
 --]]
 local addonName, ns = ...
 
-ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0")
-ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
-
--- Saved variables global
-local AzeriteUI6_DB = {}
-
--- Addon defaults (just the core)
-local defaults = { profile = {} }
-
-ns.RefreshConfig = function(self, event, ...)
-	if (event == "OnNewProfile") then
-		--local db, profileKey = ...
-
-	elseif (event == "OnProfileChanged") then
-		local db, newProfileKey = ...
-
-		db.char.profile = newProfileKey
-
-	elseif (event == "OnProfileCopied") then
-		--local db, sourceProfileKey = ...
-
-	elseif (event == "OnProfileReset") then
-		--local db = ...
-
+-- Returns a format string and input values
+local DAY, HOUR, MINUTE = 86400, 3600, 60
+ns.AbbreviateTime = function(secs)
+	if (secs > DAY) then -- more than a day
+		return "%.0f%s", math.ceil(secs / DAY), "d"
+	elseif (secs > HOUR) then -- more than an hour
+		return "%.0f%s", math.ceil(secs / HOUR), "h"
+	elseif (secs > MINUTE) then -- more than a minute
+		return "%.0f%s", math.ceil(secs / MINUTE), "m"
+	elseif (secs > 5) then
+		return "%.0f", math.ceil(secs)
+	elseif (secs > .9) then
+		return "|cffff8800%.0f|r", math.ceil(secs)
+	elseif (secs > .05) then
+		return "|cffff0000%.0f|r", secs*10 - secs*10%1
+	else
+		return ""
 	end
-end
-
-ns.OnEnable = function(self)
-	--self.db:SetProfile(self.db.char.profile)
-end
-
-ns.OnInitialize = function(self)
-	--self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, true)
-	--self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end

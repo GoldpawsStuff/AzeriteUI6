@@ -25,41 +25,13 @@
 --]]
 local addonName, ns = ...
 
-ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0")
-ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
+-- Add some aliases for blizzard artwork.
+local alias = {
+	["plain"] = [[Interface\ChatFrame\ChatFrameBackground]]
+}
 
--- Saved variables global
-local AzeriteUI6_DB = {}
-
--- Addon defaults (just the core)
-local defaults = { profile = {} }
-
-ns.RefreshConfig = function(self, event, ...)
-	if (event == "OnNewProfile") then
-		--local db, profileKey = ...
-
-	elseif (event == "OnProfileChanged") then
-		local db, newProfileKey = ...
-
-		db.char.profile = newProfileKey
-
-	elseif (event == "OnProfileCopied") then
-		--local db, sourceProfileKey = ...
-
-	elseif (event == "OnProfileReset") then
-		--local db = ...
-
-	end
-end
-
-ns.OnEnable = function(self)
-	--self.db:SetProfile(self.db.char.profile)
-end
-
-ns.OnInitialize = function(self)
-	--self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, true)
-	--self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+-- Retrieve an asset from the media asset folder.
+-- This is just a proxy function to work with shorter paths.
+ns.GetMedia = function(name, type)
+	return alias[name] or string.format([[Interface\AddOns\%s\Assets\%s.%s]], addonName, name, type or "tga")
 end
