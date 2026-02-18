@@ -36,6 +36,117 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
+-- Toggle cast text color on protected casts.
+local Castbar_PostCastInterruptible = function(element, unit)
+	if (element.notInterruptible) then
+		element.Text:SetTextColor(229/255, 178/255, 38/255, .75)
+	else
+		element.Text:SetTextColor(250/255, 250/255, 250/255, .5)
+	end
+end
+
+-- Toggle cast info and health info when castbar is visible.
+local Castbar_PostUpdateTexts = function(element)
+	if (element:IsShown()) then
+		element.Text:Show()
+		element.Time:Show()
+		element.__owner.Health.Value:Hide()
+	else
+		element.Text:Hide()
+		element.Time:Hide()
+		element.__owner.Health.Value:Show()
+	end
+end
+
+-- Custom castbar update to get our flipped textures
+local CastBar_OnUpdate = function(element, elapsed)
+	if (element.casting or element.channeling or element.empowering) then
+		local durationObject = element:GetTimerDuration()
+		local elapsedPercent = durationObject:GetElapsedPercent(0)
+
+		-- Simple flip of the texture, do no math.
+		-- This is how we avoid errors on secret values.
+		-- Note that this bug does not fire for the player, 
+		-- only for other targets.
+		element.Texture:SetTexCoord(elapsedPercent, 0, 0, 1) 
+
+	-- The rest here is just a copy of oUF's code, 
+	-- since we're replacing it with this function.
+	elseif (element.holdTime > 0) then
+		element.holdTime = element.holdTime - elapsed
+	else
+		element.castID = nil
+		element.casting = nil
+		element.channeling = nil
+		element.empowering = nil
+		element.notInterruptible = nil
+		element.spellID = nil
+		element.spellName = nil
+
+		for _, pip in next, element.Pips do
+			pip:Hide()
+		end
+
+		element:Hide()
+	end
+end
+
+-- Store values to get flipped textures correct
+local Health_OnMinMaxChanged = function(element, min, max) 
+	element.min, element.max = min, max
+end
+
+-- This will be called when the value changes, 
+-- and it's allowed access to min/max/cur values of the bar.
+-- This script handler is one of the only ones that are allowed to do that in WoW12.
+local Health_OnValueChanged = function(element, val) 
+	if (val and element.min and element.max and element.max > 0) then
+		if (UnitIsDeadOrGhost(element.__owner.unit)) then
+			element.Value:SetText(DEAD)
+		else
+			element.Value:SetText(AbbreviateNumber(val))
+		end
+		-- Adjust our reversed texture, since nobody else will do it.
+		element.Texture:SetTexCoord((val - element.min)/(element.max - element.min), 0, 0, 1) -- flip the textures
+	else
+		-- Reset tex if no data is available
+		element.Texture:SetTexCoord(1, 0, 0, 1) -- flip the textures
+		element.Value:SetText("")
+	end
+end
+
+-- Forward color updates to our flipped health bar texture
+local Health_PostUpdateColor = function(element, unit, color)
+	if (color) then
+		element.Texture:SetVertexColor(color:GetRGB())
+	end
+end
+
+-- Make the portrait look better for offline or invisible units.
+local Portrait_PostUpdate = function(element, unit, hasStateChanged)
+	if (not element.state) then
+		element:ClearModel()
+		if (not element.fallback2DTexture) then
+			element.fallback2DTexture = element:CreateTexture()
+			element.fallback2DTexture:SetDrawLayer("ARTWORK")
+			element.fallback2DTexture:SetAllPoints()
+			element.fallback2DTexture:SetTexCoord(.1, .9, .1, .9)
+		end
+		SetPortraitTexture(element.fallback2DTexture, unit)
+		element.fallback2DTexture:Show()
+	else
+		if (element.fallback2DTexture) then
+			element.fallback2DTexture:Hide()
+		end
+		element:SetCamDistanceScale(element.distanceScale or 1)
+		element:SetPortraitZoom(1)
+		element:SetPosition(element.positionX or 0, element.positionY or 0, element.positionZ or 0)
+		element:SetRotation(element.rotation and element.rotation*degToRad or 0)
+		element:ClearModel()
+		element:SetUnit(unit)
+		element.guid = guid
+	end
+end
 
 -- Setup the unitframe
 local style = function(self, unit)
@@ -84,37 +195,9 @@ local style = function(self, unit)
 	healthValue:SetJustifyH("RIGHT")
 	healthValue:SetJustifyV("MIDDLE")
 
-	-- Forward color updates to our flipped health bar texture
-	health.PostUpdateColor = function(element, unit, color)
-		if (color) then
-			healthTex:SetVertexColor(color:GetRGB())
-		end
-	end
-
-	-- Store values to get flipped textures correct
-	local hMin, hMax
-	health:SetScript("OnMinMaxChanged", function(self, min, max) 
-		hMin, hMax = min, max
-	end)
-
-	-- This will be called when the value changes, 
-	-- and it's allowed access to min/max/cur values of the bar.
-	-- This script handler is one of the only ones that are allowed to do that in WoW12.
-	health:SetScript("OnValueChanged", function(self, val) 
-		if (val and hMin and hMax and hMax > 0) then
-			if (UnitIsDeadOrGhost(unit)) then
-				healthValue:SetText(DEAD)
-			else
-				healthValue:SetText(AbbreviateNumber(val))
-			end
-			-- Adjust our reversed texture, since nobody else will do it.
-			healthTex:SetTexCoord((val - hMin)/(hMax - hMin), 0, 0, 1) -- flip the textures
-		else
-			-- Reset tex if no data is available
-			healthTex:SetTexCoord(1, 0, 0, 1) -- flip the textures
-			healthValue:SetText("")
-		end
-	end)
+	-- Apply scripts	
+	health:SetScript("OnMinMaxChanged", Health_OnMinMaxChanged)
+	health:SetScript("OnValueChanged", Health_OnValueChanged)
 
 	-- Options
 	health.colorDisconnected = true
@@ -129,6 +212,8 @@ local style = function(self, unit)
 	-- Register it with oUF
 	self.Health = health
 	self.Health.Value = healthValue
+	self.Health.Texture = healthTex
+	self.Health.PostUpdateColor = Health_PostUpdateColor
 
 	
 	-- CombatFeedback
@@ -220,49 +305,15 @@ local style = function(self, unit)
 	castbarTex:SetBlendMode("ADD")
 	castbarTex:SetAllPoints(castbar:GetStatusBarTexture()) -- this is the trick to avoiding math on secret values
 
-	-- Custom castbar update to get our flipped textures
-	local CastBar_OnUpdate = function(self, elapsed)
-		if (self.casting or self.channeling or self.empowering) then
-			local durationObject = self:GetTimerDuration()
-			local elapsedPercent = durationObject:GetElapsedPercent(0)
-
-			-- Simple flip of the texture, do no math.
-			-- This is how we avoid errors on secret values.
-			-- Note that this bug does not fire for the player, 
-			-- only for other targets.
-			castbarTex:SetTexCoord(elapsedPercent, 0, 0, 1) 
-
-		-- The rest here is just a copy of oUF's code, 
-		-- since we're replacing it with this function.
-		elseif (self.holdTime > 0) then
-			self.holdTime = self.holdTime - elapsed
-		else
-			self.castID = nil
-			self.casting = nil
-			self.channeling = nil
-			self.empowering = nil
-			self.notInterruptible = nil
-			self.spellID = nil
-			self.spellName = nil
-
-			for _, pip in next, self.Pips do
-				pip:Hide()
-			end
-
-			self:Hide()
-		end
-
-	end
-
 	-- Cast Name
-	local castbarText = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
-	castbarText:SetPoint("RIGHT", -27, 4)
-	castbarText:SetSize(250, 40)
-	castbarText:SetFontObject(GetFont(16, true))
-	castbarText:SetTextColor(250/255, 250/255, 250/255, .5)
-	castbarText:SetJustifyH("RIGHT")
-	castbarText:SetJustifyV("MIDDLE")
-	castbarText:Hide()
+	local castName = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	castName:SetPoint("RIGHT", -27, 4)
+	castName:SetSize(250, 40)
+	castName:SetFontObject(GetFont(16, true))
+	castName:SetTextColor(250/255, 250/255, 250/255, .5)
+	castName:SetJustifyH("RIGHT")
+	castName:SetJustifyV("MIDDLE")
+	castName:Hide()
 
 	-- Cast Time
 	-- *Not showing for anybody but the player unit in Midnight?
@@ -274,37 +325,16 @@ local style = function(self, unit)
 	castbarTime:SetJustifyV("MIDDLE")
 	castbarTime:Hide()
 
-	-- Toggle cast info and health info when castbar is visible.
-	local Castbar_PostUpdateTexts = function(element)
-		if (element:IsShown()) then
-			element.Text:Show()
-			element.Time:Show()
-			element.__owner.Health.Value:Hide()
-		else
-			element.Text:Hide()
-			element.Time:Hide()
-			element.__owner.Health.Value:Show()
-		end
-	end
-
-	-- Toggle cast text color on protected casts.
-	local Castbar_PostCastInterruptible = function(element, unit)
-		if (element.notInterruptible) then
-			element.Text:SetTextColor(229/255, 178/255, 38/255, .75)
-		else
-			element.Text:SetTextColor(250/255, 250/255, 250/255, .5)
-		end
-	end
-
 	-- Attach scripts
 	castbar:HookScript("OnShow", Castbar_PostUpdateTexts)
 	castbar:HookScript("OnHide", Castbar_PostUpdateTexts)
 
 	-- Register it with oUF
 	self.Castbar = castbar
-	self.Castbar.OnUpdate = CastBar_OnUpdate
-	self.Castbar.Text = castbarText
+	self.Castbar.Texture = castbarTex
+	self.Castbar.Text = castName
 	self.Castbar.Time = castbarTime
+	self.Castbar.OnUpdate = CastBar_OnUpdate
 	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
 
 
@@ -346,32 +376,6 @@ local style = function(self, unit)
 	portraitBorder:SetSize(187, 187)
 	portraitBorder:SetTexture(GetMedia("portrait_frame_hi"))
 	portraitBorder:SetVertexColor(192/255, 192/255, 192/255)
-
-	-- Make the portrait look better for offline or invisible units.
-	local Portrait_PostUpdate = function(element, unit, hasStateChanged)
-		if (not element.state) then
-			element:ClearModel()
-			if (not element.fallback2DTexture) then
-				element.fallback2DTexture = element:CreateTexture()
-				element.fallback2DTexture:SetDrawLayer("ARTWORK")
-				element.fallback2DTexture:SetAllPoints()
-				element.fallback2DTexture:SetTexCoord(.1, .9, .1, .9)
-			end
-			SetPortraitTexture(element.fallback2DTexture, unit)
-			element.fallback2DTexture:Show()
-		else
-			if (element.fallback2DTexture) then
-				element.fallback2DTexture:Hide()
-			end
-			element:SetCamDistanceScale(element.distanceScale or 1)
-			element:SetPortraitZoom(1)
-			element:SetPosition(element.positionX or 0, element.positionY or 0, element.positionZ or 0)
-			element:SetRotation(element.rotation and element.rotation*degToRad or 0)
-			element:ClearModel()
-			element:SetUnit(unit)
-			element.guid = guid
-		end
-	end
 
 	self.Portrait = portrait
 	self.Portrait.Bg = portraitBg
