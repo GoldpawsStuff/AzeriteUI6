@@ -26,17 +26,6 @@
 local _, ns = ...
 local oUF = ns.oUF
 
--- Lua API
-local math_floor = math.floor
-local next = next
-local pairs = pairs
-local string_format = string.format
-local tonumber = tonumber
-local tostring = tostring
-
--- WoW API
-local GetTime = GetTime
-
 local damage_format = '-%s'
 local heal_format = '+%s'
 local maxAlpha = .6
@@ -50,20 +39,20 @@ local HOLDTIME = COMBATFEEDBACK_HOLDTIME -- 0.7
 local FADEOUTTIME = COMBATFEEDBACK_FADEOUTTIME -- 0.3
 
 local colors = {
-	STANDARD		= { 1, 1, 1 },
-	IMMUNE			= { 1, 1, 1 },
-	DAMAGE			= { 1, 0, 0 },
-	CRUSHING		= { 1, 0, 0 },
-	CRITICAL		= { 1, 0, 0 },
-	GLANCING		= { 1, 0, 0 },
-	ABSORB			= { 1, 1, 1 },
-	BLOCK			= { 1, 1, 1 },
-	RESIST			= { 1, 1, 1 },
-	MISS			= { 1, 1, 1 },
-	HEAL			= { 0, 1, 0 },
-	CRITHEAL		= { 0, 1, 0 },
-	ENERGIZE		= { .41, .8, .94 },
-	CRITENERGIZE	= { .41, .8, .94 }
+	STANDARD = oUF:CreateColor(1, 1, 1),
+	IMMUNE = oUF:CreateColor(1, 1, 1),
+	DAMAGE = oUF:CreateColor(1, 0, 0),
+	CRUSHING = oUF:CreateColor(1, 0, 0),
+	CRITICAL = oUF:CreateColor(1, 0, 0),
+	GLANCING = oUF:CreateColor(1, 0, 0),
+	ABSORB = oUF:CreateColor(1, 1, 1),
+	BLOCK = oUF:CreateColor(1, 1, 1),
+	RESIST = oUF:CreateColor(1, 1, 1),
+	MISS = oUF:CreateColor(1, 1, 1),
+	HEAL = oUF:CreateColor(0, 1, 0),
+	CRITHEAL = oUF:CreateColor(0, 1, 0),
+	ENERGIZE = oUF:CreateColor(.41, .8, .94),
+	CRITENERGIZE = oUF:CreateColor(.41, .8, .94)
 }
 
 local function large(value)
@@ -71,11 +60,11 @@ local function large(value)
 	if (not value) then
 		return ""
 	end
-	if (value >= 1e8) then 		return string_format("%.0fm", value/1e6) 	-- 100m, 1000m, 2300m, etc
-	elseif (value >= 1e6) then 	return string_format("%.1fm", value/1e6) 	-- 1.0m - 99.9m
-	elseif (value >= 1e5) then 	return string_format("%.0fk", value/1e3) 	-- 100k - 999k
-	elseif (value >= 1e3) then 	return string_format("%.1fk", value/1e3) 	-- 1.0k - 99.9k
-	elseif (value > 0) then 	return tostring(math_floor(value))			-- 1 - 999
+	if (value >= 1e8) then 		return string.format("%.0fm", value/1e6) 	-- 100m, 1000m, 2300m, etc
+	elseif (value >= 1e6) then 	return string.format("%.1fm", value/1e6) 	-- 1.0m - 99.9m
+	elseif (value >= 1e5) then 	return string.format("%.0fk", value/1e3) 	-- 100k - 999k
+	elseif (value >= 1e3) then 	return string.format("%.1fk", value/1e3) 	-- 1.0k - 99.9k
+	elseif (value > 0) then 	return tostring(math.floor(value))			-- 1 - 999
 	else 						return ""
 	end
 end
@@ -88,7 +77,7 @@ local function short(value)
 	if (value >= 1e9) then							return ("%.1fb"):format(value / 1e9):gsub("%.?0+([kmb])$", "%1")
 	elseif (value >= 1e6) then 						return ("%.1fm"):format(value / 1e6):gsub("%.?0+([kmb])$", "%1")
 	elseif (value >= 1e3) or (value <= -1e3) then 	return ("%.1fk"):format(value / 1e3):gsub("%.?0+([kmb])$", "%1")
-	elseif (value > 0) then							return tostring(math_floor(value))
+	elseif (value > 0) then							return tostring(math.floor(value))
 	else 											return ""
 	end
 end
@@ -99,9 +88,9 @@ if (GetLocale() == "zhCN") then
 		if (not value) then
 			return ""
 		end
-		if (value >= 1e8) then 							return string_format("%.2f亿", value/1e8)
-		elseif (value >= 1e4) then 						return string_format("%.2f万", value/1e4)
-		elseif (value > 0) then 						return tostring(math_floor(value))
+		if (value >= 1e8) then 							return string.format("%.2f亿", value/1e8)
+		elseif (value >= 1e4) then 						return string.format("%.2f万", value/1e4)
+		elseif (value > 0) then 						return tostring(math.floor(value))
 		else 											return ""
 		end
 	end
@@ -112,7 +101,7 @@ if (GetLocale() == "zhCN") then
 		end
 		if (value >= 1e8) then							return ("%.2f亿"):format(value / 1e8):gsub("%.?0+([km])$", "%1")
 		elseif (value >= 1e4) or (value <= -1e3) then	return ("%.2f万"):format(value / 1e4):gsub("%.?0+([km])$", "%1")
-		elseif (value > 0) then 						return tostring(math_floor(value))
+		elseif (value > 0) then 						return tostring(math.floor(value))
 		else 											return ""
 		end
 	end
@@ -259,7 +248,7 @@ local function Update(self, event, unit, ...)
 			element.fontType = fontType
 		end
 		element:SetFormattedText(text, arg)
-		element:SetTextColor(unpack(color or colors.STANDARD))
+		element:SetTextColor((color or colors.STANDARD):GetRGB())
 		element:SetAlpha(0)
 		element:Show()
 		feedback[self] = GetTime()

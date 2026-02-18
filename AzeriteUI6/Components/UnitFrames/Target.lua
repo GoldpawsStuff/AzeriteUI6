@@ -130,6 +130,7 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 
+	
 	-- CombatFeedback
 	--------------------------------------------
 	local combatFeedback = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 7)
@@ -142,22 +143,7 @@ local style = function(self, unit)
 	combatFeedback.feedbackFontLarge = GetFont(24, true)
 	combatFeedback.feedbackFontSmall = GetFont(18, true)
 	combatFeedback.maxAlpha = .9
-	combatFeedback.colors = {
-		STANDARD = { 214/255, 191/255, 165/255 },
-		IMMUNE = { 214/255, 191/255, 165/255 },
-		DAMAGE = { 176/255, 79/255, 79/255 },
-		CRUSHING = { 176/255, 79/255, 79/255 },
-		CRITICAL = { 176/255, 79/255, 79/255 },
-		GLANCING = { 176/255, 79/255, 79/255 },
-		ABSORB = { 214/255, 191/255, 165/255 },
-		BLOCK = { 214/255, 191/255, 165/255 },
-		RESIST = { 214/255, 191/255, 165/255 },
-		MISS = { 214/255, 191/255, 165/255 },
-		HEAL = { 84/255, 150/255, 84/255 },
-		CRITHEAL = { 84/255, 150/255, 84/255 },
-		ENERGIZE = { 79/255, 114/255, 160/255 },
-		CRITENERGIZE = { 79/255, 114/255, 160/255 }
-	}
+	combatFeedback.colors = oUF.colors.combatfeedback 
 
 	self.CombatFeedback = combatFeedback
 

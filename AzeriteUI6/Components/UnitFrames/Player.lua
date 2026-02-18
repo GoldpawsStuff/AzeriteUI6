@@ -30,7 +30,7 @@ local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
-	useIceCrystal = true
+	useIceCrystal -- = true
 }}
 
 local db -- will be assigned a utility function returning the profile settings/defaults during initialization
@@ -129,22 +129,7 @@ local style = function(self, unit)
 	combatFeedback.feedbackFontLarge = GetFont(24, true)
 	combatFeedback.feedbackFontSmall = GetFont(18, true)
 	combatFeedback.maxAlpha = .9
-	combatFeedback.colors = {
-		STANDARD = { 214/255, 191/255, 165/255 },
-		IMMUNE = { 214/255, 191/255, 165/255 },
-		DAMAGE = { 176/255, 79/255, 79/255 },
-		CRUSHING = { 176/255, 79/255, 79/255 },
-		CRITICAL = { 176/255, 79/255, 79/255 },
-		GLANCING = { 176/255, 79/255, 79/255 },
-		ABSORB = { 214/255, 191/255, 165/255 },
-		BLOCK = { 214/255, 191/255, 165/255 },
-		RESIST = { 214/255, 191/255, 165/255 },
-		MISS = { 214/255, 191/255, 165/255 },
-		HEAL = { 84/255, 150/255, 84/255 },
-		CRITHEAL = { 84/255, 150/255, 84/255 },
-		ENERGIZE = { 79/255, 114/255, 160/255 },
-		CRITENERGIZE = { 79/255, 114/255, 160/255 }
-	}
+	combatFeedback.colors = oUF.colors.combatfeedback 
 
 	self.CombatFeedback = combatFeedback
 
@@ -195,7 +180,7 @@ local style = function(self, unit)
 	end)
 
 	-- This will be called when the value changes, 
-	-- and it's allowed access to min/max/cur values of the bar.
+	-- and it's allowed access and do math to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	damageAbsorb:SetScript("OnValueChanged", function(element, val) 
 		if (val and aMin and aMax and aMax > 0) then
@@ -328,7 +313,7 @@ local style = function(self, unit)
 	end)
 
 	-- This will be called when the value changes, 
-	-- and it's allowed access to min/max/cur values of the bar.
+	-- and it's allowed access and do math to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
 	power:SetScript("OnValueChanged", function(self, val) 
 		if (val and pMax and pMax > 0) then
@@ -349,15 +334,64 @@ local style = function(self, unit)
 	powerFg:SetTexture(GetMedia("pw_crystal_case"))
 	powerFg:SetVertexColor(192/255, 192/255, 192/255)
 
+	-- Partly sourced from oUF's power element's coloring function
+	local Power_UpdateColor = function(self, event, unit)
+		if (self.unit ~= unit) then return end
+		local element = self.Power
+
+		if (db().useIceCrystal) then
+			powerTex:SetVertexColor(1, 1, 1) 
+		else
+			local r, g, b, color
+			if (element.colorPower) then
+				if (not color) then
+					local pType, pToken, altR, altG, altB = UnitPowerType(unit)
+					color = self.colors.power[pToken]
+
+					if (not color and altR) then
+						r, g, b = altR, altG, altB
+						if (r > 1 or g > 1 or b > 1) then
+							-- BUG: As of 7.0.3, altR, altG, altB may be in 0-1 or 0-255 range.
+							r, g, b = r / 255, g / 255, b / 255
+						end
+					else
+						color = self.colors.power[pToken.."_CRYSTAL"] or self.colors.power[pType] or self.colors.power.MANA
+					end
+				end
+			end
+
+			-- it's done this way so that only non-standard powers have r, g, b values
+			if (b) then
+				powerTex:SetVertexColor(r, g, b)
+			elseif(color) then
+				powerTex:SetVertexColor(color:GetRGB())
+			end
+		end
+
+		--[[ Callback: Power:PostUpdateColor(unit, color, altR, altG, altB)
+		Called after the element color has been updated.
+
+		* self  - the Power element
+		* unit  - the unit for which the update has been triggered (string)
+		* color - the used ColorMixin-based object (table?)
+		* altR  - the red component of the used alternative color (number?)[0-1]
+		* altG  - the green component of the used alternative color (number?)[0-1]
+		* altB  - the blue component of the used alternative color (number?)[0-1]
+		--]]
+		if (element.PostUpdateColor) then
+			element:PostUpdateColor(unit, color, r, g, b)
+		end
+	end
+	power.UpdateColor = Power_UpdateColor
+
 	-- Options
-	power.colorPower = false -- true to follow default coloring, false to never/manually modify
+	power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
 	power.displayAltPower = true -- allow this to be used for altpower from quests and various
 	power.frequentUpdates = true -- update often
 
 	-- Register it with oUF
 	self.Power = power
 	self.Power.Value = powerValue
-
 
 end
 
