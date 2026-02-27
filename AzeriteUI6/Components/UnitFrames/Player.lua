@@ -30,7 +30,7 @@ local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
-	useIceCrystal -- = true
+	useIceCrystal --= true
 }}
 
 local db -- will be assigned a utility function returning the profile settings/defaults during initialization
@@ -63,53 +63,14 @@ local Castbar_PostCastInterruptible = function(element, unit)
 	end
 end
 
--- Primarily called to store the max value for the value update.
-local Health_OnMinMaxChanged = function(element, min, max) 
-	element.min, element.max = min, max
-end
-
--- This will be called when the value changes, 
--- and it's allowed access to min/max/cur values of the bar.
--- This script handler is one of the only ones that are allowed to do that in WoW12.
-local Health_OnValueChanged = function(element, val) 
-	if (val and element.max and element.max > 0) then
-		if (UnitIsDeadOrGhost(element.__owner.unit)) then
-			element.Value:SetText(DEAD)
-		else
-			element.Value:SetText(AbbreviateNumber(val))
-		end 
-	else
-		element.Value:SetText("")
-	end
-end
-
--- Primarily called to store the max value for the value update.
-local Power_OnMinMaxChanged = function(element, min, max) 
-	element.min, element.max = min, max
-end
-
--- This will be called when the value changes, 
--- and it's allowed access and do math to min/max/cur values of the bar.
--- This script handler is one of the only ones that are allowed to do that in WoW12.
-local Power_OnValueChanged = function(element, val) 
-	if (val and element.max and element.max > 0) then
-		if (not UnitIsDeadOrGhost(element.__owner.unit)) then
-			element.Value:SetText(AbbreviateNumber(val))
-		else
-			element.Value:SetText("")
-		end
-		element.Texture:SetTexCoord(50/255, 206/255, 37/255 + (1 - val/element.max)*((219-37)/255), 219/255)
-		element.Texture:SetPoint("TOP", 0, (- (element.max-val)/element.max * 140))
-	end
-end
-
 -- Partly sourced from oUF's power element's coloring function
 local Power_UpdateColor = function(self, event, unit)
 	if (self.unit ~= unit) then return end
 	local element = self.Power
 
 	if (db.useIceCrystal) then
-		element.Texture:SetVertexColor(1, 1, 1) 
+		--element.Texture:SetVertexColor(1, 1, 1) 
+		element:SetStatusBarColor(1, 1, 1) 
 	else
 		local r, g, b, color
 		if (element.colorPower) then
@@ -131,9 +92,11 @@ local Power_UpdateColor = function(self, event, unit)
 
 		-- it's done this way so that only non-standard powers have r, g, b values
 		if (b) then
-			element.Texture:SetVertexColor(r, g, b)
+			--element.Texture:SetVertexColor(r, g, b)
+			element:SetStatusBarColor(r, g, b)
 		elseif(color) then
-			element.Texture:SetVertexColor(color:GetRGB())
+			--element.Texture:SetVertexColor(color:GetRGB())
+			element:SetStatusBarColor(color:GetRGB())
 		end
 	end
 
@@ -183,7 +146,6 @@ local style = function(self, unit)
 	local healthOverlay = CreateFrame("Frame", nil, overlay)
 	healthOverlay:SetAllPoints(health)
 
-	-- Health Value
 	local healthValue = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	healthValue:SetPoint("LEFT", 27, 4)
 	healthValue:SetFontObject(GetFont(18, true))
@@ -191,8 +153,7 @@ local style = function(self, unit)
 	healthValue:SetJustifyH("LEFT")
 	healthValue:SetJustifyV("MIDDLE")
 
-	health:SetScript("OnMinMaxChanged", Health_OnMinMaxChanged)
-	health:SetScript("OnValueChanged", Health_OnValueChanged)
+	self:Tag(healthValue, "[azui:shorthealth]")
 
 	-- Options
 	health.colorTapping = false
@@ -250,51 +211,51 @@ local style = function(self, unit)
 
 	-- This frame needs to be reversed, 
 	-- so we need to apply some trickery to make it work.
-	local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
-	damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	damageAbsorb:SetSize(386, 40)
-	damageAbsorb:SetPoint("TOP")
-	damageAbsorb:SetPoint("BOTTOM")
-	damageAbsorb:SetPoint("RIGHT")
-	damageAbsorb:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
-	damageAbsorb:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
-	damageAbsorb:SetReverseFill(true)
+	--local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
+	--damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
+	--damageAbsorb:SetSize(386, 40)
+	--damageAbsorb:SetPoint("TOP")
+	--damageAbsorb:SetPoint("BOTTOM")
+	--damageAbsorb:SetPoint("RIGHT")
+	--damageAbsorb:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
+	--damageAbsorb:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
+	--damageAbsorb:SetReverseFill(true)
 
 	-- Fake absorb texture, needed for reversed bars
-	local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
-	damageAbsorbTex:SetPoint("BOTTOM", 0, 0)
-	damageAbsorbTex:SetPoint("RIGHT", 0, 0)
-	damageAbsorbTex:SetPoint("TOP", 0, 0)
-	damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))
-	damageAbsorbTex:SetVertexColor(1, 1, 1, .35)
+	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
+	--damageAbsorbTex:SetPoint("BOTTOM", 0, 0)
+	--damageAbsorbTex:SetPoint("RIGHT", 0, 0)
+	--damageAbsorbTex:SetPoint("TOP", 0, 0)
+	--damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))
+	--damageAbsorbTex:SetVertexColor(1, 1, 1, .35)
 
-	local aMin, aMax
-	damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
-		aMin, aMax = min, max
-	end)
+	--local aMin, aMax
+	--damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
+	--	aMin, aMax = min, max
+	--end)
 
 	-- This will be called when the value changes, 
 	-- and it's allowed access and do math to min/max/cur values of the bar.
 	-- This script handler is one of the only ones that are allowed to do that in WoW12.
-	damageAbsorb:SetScript("OnValueChanged", function(element, val) 
-		if (val and aMin and aMax and aMax > 0) then
-			-- This can bug out if we don't specifically check. 
-			-- Experienced this with some mini-games that have 
-			-- their own set of actionbars, but lacks the "player" unitframe. 
-			--if (UnitExists("player") or UnitExists("vehicle")) then
-				--absorbValue:SetText(AbbreviateNumber(val))
-				damageAbsorbTex:SetPoint("LEFT", ((aMax - aMin)-val)/(aMax - aMin) * 386, 0)
-				damageAbsorbTex:SetTexCoord((val - aMin)/(aMax - aMin), 0, 0, 1) -- flip the textures
-			--end
-		else
-			--absorbValue:SetText("")
-		end
-	end)
+	--damageAbsorb:SetScript("OnValueChanged", function(element, val) 
+	--	if (val and aMin and aMax and aMax > 0) then
+	--		-- This can bug out if we don't specifically check. 
+	--		-- Experienced this with some mini-games that have 
+	--		-- their own set of actionbars, but lacks the "player" unitframe. 
+	--		--if (UnitExists("player") or UnitExists("vehicle")) then
+	--			--absorbValue:SetText(AbbreviateNumber(val))
+	--			damageAbsorbTex:SetPoint("LEFT", ((aMax - aMin)-val)/(aMax - aMin) * 386, 0)
+	--			damageAbsorbTex:SetTexCoord((val - aMin)/(aMax - aMin), 0, 0, 1) -- flip the textures
+	--		--end
+	--	else
+	--		--absorbValue:SetText("")
+	--	end
+	--end)
 
 	-- Register with oUF
 	self.HealthPrediction = {
 		--healingAll = healingAll, 
-		damageAbsorb = damageAbsorb,
+		--damageAbsorb = damageAbsorb,
 		damageAbsorbClampMode = 0,
 		incomingHealClampMode = 0,
 		incomingHealOverflow = 1
@@ -342,10 +303,12 @@ local style = function(self, unit)
 	-- Power Crystal
 	--------------------------------------------
 	local power = CreateFrame("StatusBar", nil, self)
-	power:SetSize(120,140)
-	power:SetPoint("BOTTOMLEFT", 20, 38)
-	power:SetStatusBarTexture(GetMedia("blank"))
-	power:GetStatusBarTexture():SetVertexColor(0, 0, 0, 0) -- hide statusbar tex, not the bar
+	power:SetSize(144,144) -- 120,140
+	power:SetPoint("BOTTOMLEFT", 18, 32) -- 20,38
+	power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+	power:SetOrientation("VERTICAL")
+	power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+	--power:GetStatusBarTexture():SetAlpha(.5)
 
 	-- Power Crystal backdrop
 	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
@@ -353,21 +316,13 @@ local style = function(self, unit)
 	powerBg:SetPoint("CENTER", 0, 0)
 	powerBg:SetTexture(db.useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
 
-	-- Fake powerbar texture, needed for our vertical bars
-	local powerTex = power:CreateTexture(nil, "BACKGROUND", nil, -6)
-	powerTex:SetPoint("BOTTOM", 0, 0)
-	powerTex:SetPoint("LEFT", 0, 0)
-	powerTex:SetPoint("RIGHT", 0, 0)
-	powerTex:SetPoint("TOP", 0, 0)
-
 	if (db.useIceCrystal) then
-		powerTex:SetTexture(GetMedia("power-crystal-ice-front")) 
-		powerTex:SetVertexColor(1, 1, 1) 
-		powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+		power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
+		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+		power:SetStatusBarColor(1, 1, 1) 
 	else
-		powerTex:SetTexture(GetMedia("power_crystal_front")) 
-		powerTex:SetVertexColor(0/255, 208/255, 176/255) 
-		powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+		power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
 	end
 
 	-- Power Value
@@ -378,16 +333,14 @@ local style = function(self, unit)
 	powerValue:SetJustifyH("CENTER")
 	powerValue:SetJustifyV("MIDDLE")
 
+	self:Tag(powerValue, "[azui:shortpower]")
+
 	-- Power foreground. The "case" of the power crystal.
 	local powerFg = power:CreateTexture(nil, "BACKGROUND", nil, -5)
 	powerFg:SetSize(198,98)
 	powerFg:SetPoint("BOTTOM", 7, -51)
 	powerFg:SetTexture(GetMedia("pw_crystal_case"))
 	powerFg:SetVertexColor(192/255, 192/255, 192/255)
-
-	-- Attach scripts
-	power:SetScript("OnMinMaxChanged", Power_OnMinMaxChanged)
-	power:SetScript("OnValueChanged", Power_OnValueChanged)
 
 	-- Options
 	power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
@@ -397,7 +350,6 @@ local style = function(self, unit)
 	-- Register it with oUF
 	self.Power = power
 	self.Power.Value = powerValue
-	self.Power.Texture = powerTex
 	self.Power.UpdateColor = Power_UpdateColor
 
 end

@@ -60,15 +60,18 @@ end
 
 -- Custom castbar update to get our flipped textures
 local CastBar_OnUpdate = function(element, elapsed)
-	if (element.casting or element.channeling or element.empowering) then
-		local durationObject = element:GetTimerDuration()
-		local elapsedPercent = durationObject:GetElapsedPercent(0)
 
-		-- Simple flip of the texture, do no math.
-		-- This is how we avoid errors on secret values.
-		-- Note that this bug does not fire for the player, 
-		-- only for other targets.
-		element.Texture:SetTexCoord(elapsedPercent, 0, 0, 1) 
+	if (element.casting or element.empowering) then
+		local durationObject = element:GetTimerDuration()
+		local perc = durationObject:GetElapsedPercent(0)
+
+		element.Texture:SetTexCoord(perc, 0, 0, 1)
+
+	elseif (element.channeling) then
+		local durationObject = element:GetTimerDuration()
+		local perc = durationObject:GetRemainingPercent(0)
+
+		element.Texture:SetTexCoord(perc, 0, 0, 1) 
 
 	-- The rest here is just a copy of oUF's code, 
 	-- since we're replacing it with this function.
@@ -91,27 +94,12 @@ local CastBar_OnUpdate = function(element, elapsed)
 	end
 end
 
--- Store values to get flipped textures correct
-local Health_OnMinMaxChanged = function(element, min, max) 
-	element.min, element.max = min, max
-end
-
--- This will be called when the value changes, 
--- and it's allowed access to min/max/cur values of the bar.
--- This script handler is one of the only ones that are allowed to do that in WoW12.
 local Health_OnValueChanged = function(element, val) 
-	if (val and element.min and element.max and element.max > 0) then
-		if (UnitIsDeadOrGhost(element.__owner.unit)) then
-			element.Value:SetText(DEAD)
-		else
-			element.Value:SetText(AbbreviateNumber(val))
-		end
-		-- Adjust our reversed texture, since nobody else will do it.
-		element.Texture:SetTexCoord((val - element.min)/(element.max - element.min), 0, 0, 1) -- flip the textures
+	if (val) then
+		local perc = UnitHealthPercent(element.__owner.unit, true, CurveConstants.ZeroToOne)
+		element.Texture:SetTexCoord(perc, 0, 0, 1)
 	else
-		-- Reset tex if no data is available
-		element.Texture:SetTexCoord(1, 0, 0, 1) -- flip the textures
-		element.Value:SetText("")
+		element.Texture:SetTexCoord(1, 0, 0, 1)
 	end
 end
 
@@ -166,14 +154,15 @@ local style = function(self, unit)
 	local health = CreateFrame("StatusBar", nil, self)
 	health:SetSize(385, 40) -- 385, 37
 	health:SetPoint("TOPRIGHT", -140, -66)
-	health:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
+	health:SetStatusBarTexture(GetMedia("hp_cap_bar")) 
 	health:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
 	health:SetReverseFill(true)
 
-	-- Fake health texture, needed for reversed bars as blizz does texcoords wrong
 	local healthTex = health:CreateTexture(nil, "ARTWORK", nil, 0)
+	healthTex:SetSize(385, 40)
 	healthTex:SetAllPoints(health:GetStatusBarTexture())
 	healthTex:SetTexture(GetMedia("hp_cap_bar"))
+	healthTex:SetTexCoord(1, 0, 0, 1)
 
 	-- Health backdrop
 	local healthBg = health:CreateTexture(nil, "BORDER", nil, 0)
@@ -195,9 +184,17 @@ local style = function(self, unit)
 	healthValue:SetJustifyH("RIGHT")
 	healthValue:SetJustifyV("MIDDLE")
 
-	-- Apply scripts	
-	health:SetScript("OnMinMaxChanged", Health_OnMinMaxChanged)
-	health:SetScript("OnValueChanged", Health_OnValueChanged)
+	self:Tag(healthValue, "[azui:shorthealth]")
+
+	local healthPerc = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	healthPerc:SetPoint("LEFT", 27, 4)
+	healthPerc:SetFontObject(GetFont(18, true))
+	healthPerc:SetTextColor(250/255, 250/255, 250/255, .4)
+	healthPerc:SetJustifyH("LEFT")
+	healthPerc:SetJustifyV("MIDDLE")
+
+	self:Tag(healthPerc, "[perhp]")
+
 
 	-- Options
 	health.colorDisconnected = true
@@ -214,6 +211,9 @@ local style = function(self, unit)
 	self.Health.Value = healthValue
 	self.Health.Texture = healthTex
 	self.Health.PostUpdateColor = Health_PostUpdateColor
+
+	-- Apply scripts that update our reversed bar texture.
+	self.Health:SetScript("OnValueChanged", Health_OnValueChanged)
 
 	
 	-- CombatFeedback
@@ -261,22 +261,6 @@ local style = function(self, unit)
 	damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
 	damageAbsorb:SetSize(386, 40)
 	damageAbsorb:SetAllPoints(self.Health)
-
-	local aMin, aMax
-	damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
-		aMin, aMax = min, max
-	end)
-
-	-- This will be called when the value changes, 
-	-- and it's allowed access to min/max/cur values of the bar.
-	-- This script handler is one of the only ones that are allowed to do that in WoW12.
-	damageAbsorb:SetScript("OnValueChanged", function(self, val) 
-		if (val and aMax and aMax > 0) then
-			--absorbValue:SetText(AbbreviateNumber(val))
-		else
-			--absorbValue:SetText("")
-		end
-	end)
 
 	-- Register with oUF
 	self.HealthPrediction = {

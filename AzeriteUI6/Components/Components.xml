@@ -1,8 +1,14 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
 	<!-- ActionBars -->
+	<Script file="ActionBars\HideBlizzard.lua"/>
+
 	<!-- Chat -->
+
 	<!-- Minimap -->
+
 	<!-- UnitFrames-->
+	<Script file="UnitFrames\Tags.lua"/>
 	<Script file="UnitFrames\Player.lua"/>
 	<Script file="UnitFrames\Pet.lua"/>
 	<Script file="UnitFrames\Target.lua"/>
@@ -12,4 +18,5 @@
 	<Script file="UnitFrames\Raid.lua"/>
 	<Script file="UnitFrames\ArenaPrep.lua"/>
 	<Script file="UnitFrames\ArenaEnemy.lua"/>
+	
 </Ui>

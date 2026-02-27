@@ -85,18 +85,25 @@ oUF.colors.reaction[8] = oUF:CreateColor(64, 171, 131)
 oUF.colors.reaction.civilian = oUF:CreateColor(64, 161, 38)
 
 -- selection colors
-oUF.colors[oUF.Enum.SelectionType.Hostile] = oUF:CreateColor(205, 46, 36)
-oUF.colors[oUF.Enum.SelectionType.Unfriendly] = oUF:CreateColor(192, 98, 0)
-oUF.colors[oUF.Enum.SelectionType.Neutral] = oUF:CreateColor(249, 225, 55) -- (249, 188, 55)
-oUF.colors[oUF.Enum.SelectionType.Friendly] = oUF:CreateColor(64, 131, 38)
-oUF.colors[oUF.Enum.SelectionType.PlayerSimple] = oUF:CreateColor(0, 0, 255)
-oUF.colors[oUF.Enum.SelectionType.PlayerExtended] = oUF:CreateColor(96, 96, 255)
-oUF.colors[oUF.Enum.SelectionType.Party] = oUF:CreateColor(170, 170, 255)
-oUF.colors[oUF.Enum.SelectionType.PartyPvP] = oUF:CreateColor(170, 255, 170)
-oUF.colors[oUF.Enum.SelectionType.Friend] = oUF:CreateColor(83, 201, 255)
-oUF.colors[oUF.Enum.SelectionType.Dead] = oUF:CreateColor(121, 101, 96)
-oUF.colors[oUF.Enum.SelectionType.PartyPvPInBattleground] = oUF:CreateColor(0, 153, 0)
-oUF.colors[oUF.Enum.SelectionType.RecentAlly] = oUF:CreateColor(83, 201, 255)
+oUF.colors.selection[oUF.Enum.SelectionType.Hostile] = oUF:CreateColor(205, 46, 36)
+oUF.colors.selection[oUF.Enum.SelectionType.Unfriendly] = oUF:CreateColor(192, 98, 0)
+oUF.colors.selection[oUF.Enum.SelectionType.Neutral] = oUF:CreateColor(249, 225, 55) -- (249, 188, 55)
+oUF.colors.selection[oUF.Enum.SelectionType.Friendly] = oUF:CreateColor(64, 131, 38)
+oUF.colors.selection[oUF.Enum.SelectionType.PlayerSimple] = oUF:CreateColor(0, 0, 255)
+oUF.colors.selection[oUF.Enum.SelectionType.PlayerExtended] = oUF:CreateColor(96, 96, 255)
+oUF.colors.selection[oUF.Enum.SelectionType.Party] = oUF:CreateColor(170, 170, 255)
+oUF.colors.selection[oUF.Enum.SelectionType.PartyPvP] = oUF:CreateColor(170, 255, 170)
+oUF.colors.selection[oUF.Enum.SelectionType.Friend] = oUF:CreateColor(83, 201, 255)
+oUF.colors.selection[oUF.Enum.SelectionType.Dead] = oUF:CreateColor(121, 101, 96)
+oUF.colors.selection[oUF.Enum.SelectionType.PartyPvPInBattleground] = oUF:CreateColor(0, 153, 0)
+oUF.colors.selection[oUF.Enum.SelectionType.RecentAlly] = oUF:CreateColor(83, 201, 255)
+
+-- threat coloring
+oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
+oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
+oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro
+oUF.colors.threat[3] = oUF.colors.reaction[1] -- securely tanking, or totally fucked :)
+
 
 -- power colors
 oUF.colors.power.MANA = oUF:CreateColor(80, 116, 255)

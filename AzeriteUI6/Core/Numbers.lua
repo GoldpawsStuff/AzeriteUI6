@@ -26,7 +26,7 @@
 local addonName, ns = ...
 
 -- Shorten as much as possible.
-ns.AbbreviateNumber = function(value)
+ns.AbbreviateNumber = function(value) do return end
 	value = tonumber(value)
 	if (not value) then return "" end
 	if (value >= 1e9) then
