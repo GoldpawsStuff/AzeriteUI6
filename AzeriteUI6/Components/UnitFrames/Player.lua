@@ -308,7 +308,6 @@ local style = function(self, unit)
 	power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
 	power:SetOrientation("VERTICAL")
 	power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
-	--power:GetStatusBarTexture():SetAlpha(.5)
 
 	-- Power Crystal backdrop
 	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)

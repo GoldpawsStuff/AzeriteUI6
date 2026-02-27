@@ -29,13 +29,47 @@ local addonName, ns = ...
 -- for all colors in the entire user interface.
 local oUF = ns.oUF
 
--- Various status colors
+-- unit specifics
+oUF.colors.health = oUF:CreateColor(245, 0, 45)
+oUF.colors.cast = oUF:CreateColor(70, 255, 131)
 oUF.colors.disconnected = oUF:CreateColor(120, 120, 120)
 oUF.colors.tapped = oUF:CreateColor(121, 101, 96)
+oUF.colors.dead = oUF:CreateColor(121, 101, 96)
+
+-- xp, rep and artifact coloring
+oUF.colors.xp = oUF:CreateColor(116, 23, 229) -- xp bar
+oUF.colors.xpValue = oUF:CreateColor(145, 77, 229) -- xp bar text
+oUF.colors.rested = oUF:CreateColor(163, 23, 229) -- xp bar while being rested
+oUF.colors.restedValue = oUF:CreateColor(203, 77, 229) -- xp bar text while being rested
+oUF.colors.restedBonus = oUF:CreateColor(69, 17, 134) -- rested bonus bar
+oUF.colors.artifact = oUF:CreateColor(229, 204, 127)
+
+-- quest difficulty
+oUF.colors.quest = {}
+oUF.colors.quest.red = oUF:CreateColor(204, 26, 26)
+oUF.colors.quest.orange = oUF:CreateColor(255, 106, 26)
+oUF.colors.quest.yellow = oUF:CreateColor(255, 178, 38)
+oUF.colors.quest.green = oUF:CreateColor(89, 201, 89)
+oUF.colors.quest.gray = oUF:CreateColor(120, 120, 120)
+
+-- debuffs
+oUF.colors.debuff = {}
+oUF.colors.debuff.none = oUF:CreateColor(204, 0, 0)
+oUF.colors.debuff.Magic = oUF:CreateColor(51, 153, 255)
+oUF.colors.debuff.Curse = oUF:CreateColor(204, 0, 255)
+oUF.colors.debuff.Disease = oUF:CreateColor(153, 102, 0)
+oUF.colors.debuff.Poison = oUF:CreateColor(0, 153, 0)
+oUF.colors.debuff[""] = oUF:CreateColor(0, 0, 0)
+
+-- faction
+oUF.colors.faction = {}
+oUF.colors.faction.Alliance = oUF:CreateColor(74, 84, 232)
+oUF.colors.faction.Horde = oUF:CreateColor(229, 13, 18)
+oUF.colors.faction.Neutral = oUF:CreateColor(249, 158, 35)
 
 -- These are our custom colors. 
 -- They're more moderate than the default ones.
-oUF.colors.combatfeedback = oUF.colors.combatfeedback or {} -- shouldn't exist
+oUF.colors.combatfeedback = {} -- shouldn't exist
 oUF.colors.combatfeedback.STANDARD = oUF:CreateColor(214, 191, 165)
 oUF.colors.combatfeedback.IMMUNE = oUF:CreateColor(214, 191, 165)
 oUF.colors.combatfeedback.DAMAGE = oUF:CreateColor(176, 79, 79)
@@ -50,6 +84,46 @@ oUF.colors.combatfeedback.HEAL = oUF:CreateColor(84, 150, 84)
 oUF.colors.combatfeedback.CRITHEAL = oUF:CreateColor(84, 150, 84)
 oUF.colors.combatfeedback.ENERGIZE = oUF:CreateColor(79, 114, 160)
 oUF.colors.combatfeedback.CRITENERGIZE = oUF:CreateColor(79, 114, 160)
+
+-- zone names
+oUF.colors.zone = {}
+oUF.colors.zone.arena = oUF:CreateColor(175, 76, 56)
+oUF.colors.zone.combat = oUF:CreateColor(175, 76, 56)
+oUF.colors.zone.contested = oUF:CreateColor(229, 159, 28)
+oUF.colors.zone.friendly = oUF:CreateColor(64, 175, 38)
+oUF.colors.zone.hostile = oUF:CreateColor(175, 76, 56)
+oUF.colors.zone.sanctuary = oUF:CreateColor(104, 204, 239)
+oUF.colors.zone.unknown = oUF:CreateColor(255, 234, 137) -- instances, bgs, contested zones on pve realms
+
+-- blizzard item rarity colors
+oUF.colors.blizzquality = {}
+for i,v in pairs(ITEM_QUALITY_COLORS) do
+	oUF.colors.blizzquality[i] = oUF:CreateColor(v)
+end
+
+-- indexed item rarity colors
+oUF.colors.quality = {}
+oUF.colors.quality[0] = oUF:CreateColor(157, 157, 157) -- Poor
+oUF.colors.quality[1] = oUF:CreateColor(240, 240, 240) -- Common
+oUF.colors.quality[2] = oUF:CreateColor(30, 198, 0) -- Uncommon
+oUF.colors.quality[3] = oUF:CreateColor(0, 112, 221) -- Rare
+oUF.colors.quality[4] = oUF:CreateColor(163, 53, 238) -- Epic
+oUF.colors.quality[5] = oUF:CreateColor(225, 96, 0) -- Legendary
+oUF.colors.quality[6] = oUF:CreateColor(229, 204, 127) -- Artifact
+oUF.colors.quality[7] = oUF:CreateColor(79, 196, 225) -- Heirloom
+oUF.colors.quality[8] = oUF:CreateColor(79, 196, 225) -- Blizzard
+
+-- named item rarity colors
+oUF.colors.quality.Poor = oUF.colors.quality[0]
+oUF.colors.quality.Common = oUF.colors.quality[1]
+oUF.colors.quality.Uncommon = oUF.colors.quality[2]
+oUF.colors.quality.Rare = oUF.colors.quality[3]
+oUF.colors.quality.Epic = oUF.colors.quality[4]
+oUF.colors.quality.Legendary = oUF.colors.quality[5]
+oUF.colors.quality.Artifact = oUF.colors.quality[6]
+oUF.colors.quality.Heirloom = oUF.colors.quality[7]
+oUF.colors.quality.WoWToken = oUF.colors.quality[8]
+oUF.colors.quality.Blizard = oUF.colors.quality[8]
 
 -- class colors
 -- *Don't worry if some colors appear to be missing, 
@@ -69,7 +143,7 @@ oUF.colors.class.WARLOCK = oUF:CreateColor(128,110, 181)
 oUF.colors.class.WARRIOR = oUF:CreateColor(229,156, 110)
 oUF.colors.class.UNKNOWN = oUF:CreateColor(195,202, 217)
 
--- blizzard's colors, extracted in-game
+-- blizzard's new colors, extracted in-game, leaving here for reference
 --oUF.colors.class.ADVENTURER = oUF:CreateColor(170, 211, 114) 
 --oUF.colors.class.TRAVELER = oUF:CreateColor(102, 153, 153) 
 
@@ -103,7 +177,6 @@ oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
 oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
 oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro
 oUF.colors.threat[3] = oUF.colors.reaction[1] -- securely tanking, or totally fucked :)
-
 
 -- power colors
 oUF.colors.power.MANA = oUF:CreateColor(80, 116, 255)
@@ -158,3 +231,17 @@ oUF.colors.power[Enum.PowerType.Chi or 12] = oUF.colors.power.CHI
 oUF.colors.power[Enum.PowerType.ArcaneCharges or 16] = oUF.colors.power.ARCANE_CHARGES
 oUF.colors.power[Enum.PowerType.Essence or 19] = oUF.colors.power.ESSENCE
 oUF.colors.power[Enum.PowerType.Alternate or 10] = oUF.colors.power.ALTERNATE
+
+-- are death runes still a thing?
+oUF.colors.runes[1] = oUF:CreateColor(196, 31, 60) -- blood
+oUF.colors.runes[2] = oUF:CreateColor(63, 103, 154) -- frost
+oUF.colors.runes[3] = oUF:CreateColor(73, 180, 28) -- unholy
+oUF.colors.runes[4] = oUF:CreateColor(173, 62, 145) -- death
+
+-- timers (breath, fatigue, etc)
+oUF.colors.timer = {}
+oUF.colors.timer.UNKNOWN = oUF:CreateColor(179, 77, 0) -- fallback for timers and unknowns
+oUF.colors.timer.EXHAUSTION = oUF:CreateColor(179, 77, 0)
+oUF.colors.timer.BREATH = oUF:CreateColor(0, 128, 255)
+oUF.colors.timer.DEATH = oUF:CreateColor(217, 90, 0)
+oUF.colors.timer.FEIGNDEATH = oUF:CreateColor(217, 90, 0)
