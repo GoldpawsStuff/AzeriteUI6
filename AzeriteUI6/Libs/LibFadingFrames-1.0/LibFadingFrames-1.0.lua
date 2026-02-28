@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 40
+local MINOR_VERSION = 41
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
@@ -95,9 +95,11 @@ local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 local isTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
---local isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATA_CLASSIC or 99) -- NYI in first build
-local isCata = (version >= 40400) and (version < 50000)
+local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
+local isMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
 local WoW10 = version >= 100000
+local WoW11 = version >= 110000
+local WoW12 = version >= 120000
 
 -- Frame Metamethods
 local setAlpha = getmetatable(CreateFrame("Frame")).__index.SetAlpha
@@ -324,7 +326,7 @@ lib.RegisterFrameForFading = function(_, frame, fadeGroup, ...)
 
 		-- Keep track of the flyout handlers.
 		if (not lib.flyoutHandler) then
-			local flyoutHandler = WoW10 and LAB10GEFlyoutHandlerFrame or SpellFlyout
+			local flyoutHandler = ((WoW10 or WoW11 or WoW12) and LAB10GEFlyoutHandlerFrame) or SpellFlyout
 			if (flyoutHandler) then
 				lib:HookScript(flyoutHandler, "OnShow", "UpdateFlyout")
 				lib:HookScript(flyoutHandler, "OnHide", "UpdateFlyout")

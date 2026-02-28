@@ -143,6 +143,8 @@ local style = function(self, unit)
 	self:SetSize(550, 210)
 	self:SetHitRectInsets(0, 0, 0, 60)
 
+	ns.ApplyUnitFrameScriptsTo(self)
+
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)
 	overlay:SetFrameLevel(self:GetFrameLevel() + 7)

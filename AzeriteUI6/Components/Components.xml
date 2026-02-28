@@ -6,11 +6,13 @@
 	<!-- Chat -->
 
 	<!-- Minimap -->
+	<Script file="Minimap\Minimap.lua"/>
 
 	<!-- Trackers -->
 	<Script file="Trackers\ObjectiveTracker.lua"/>
 
 	<!-- UnitFrames-->
+	<Script file="UnitFrames\Shared.lua"/>
 	<Script file="UnitFrames\Tags.lua"/>
 	<Script file="UnitFrames\Player.lua"/>
 	<Script file="UnitFrames\Pet.lua"/>

@@ -98,7 +98,7 @@ oUF.colors.zone.unknown = oUF:CreateColor(255, 234, 137) -- instances, bgs, cont
 -- blizzard item rarity colors
 oUF.colors.blizzquality = {}
 for i,v in pairs(ITEM_QUALITY_COLORS) do
-	oUF.colors.blizzquality[i] = oUF:CreateColor(v)
+	oUF.colors.blizzquality[i] = oUF:CreateColor(v.r, v.g, v.b)
 end
 
 -- indexed item rarity colors
