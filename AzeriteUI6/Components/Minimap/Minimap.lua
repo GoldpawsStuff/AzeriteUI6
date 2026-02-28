@@ -39,7 +39,7 @@ local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
 local Minimap_OnMouseUp = function(self, button)
-	if (button == "RightButton") then
+	if (button == "MiddleButton") then
 		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
 	end
@@ -80,22 +80,9 @@ MinimapModule.StyleMinimap = function(self)
 	Minimap:SetArchBlobRingScalar(0)
 	Minimap:SetQuestBlobRingScalar(0)
 
-	-- add the tracking menu on right-click
+	-- add the tracking menu on middle-click
 	Minimap:HookScript("OnMouseUp", Minimap_OnMouseUp)
 
-end
-
-MinimapModule.UpdateClutter = function(self)
-	if (db.fadeClutter) then
-		-- minimap clutter
-		self:RegisterFrameForFading(AddonCompartmentFrame, "MinimapClutter")
-		self:RegisterFrameForFading(TimeManagerClockButton, "MinimapClutter")
-		self:RegisterFrameForFading(MinimapCluster.Tracking, "MinimapClutter")
-		self:RegisterFrameForFading(MinimapCluster.BorderTop, "MinimapClutter")
-		self:RegisterFrameForFading(MinimapCluster.ZoneTextButton, "MinimapClutter")
-		self:RegisterFrameForFading(GameTimeFrame, "MinimapClutter")
-	else
-	end
 end
 
 -- This is called by the options menu on settings changes,
@@ -111,8 +98,6 @@ end
 
 MinimapModule.OnEnable = function(self)
 	self:StyleMinimap()
-	-- Doing this manually until we enable settings profiles
-	self:UpdateClutter()
 end
 
 MinimapModule.OnInitialize = function(self)
