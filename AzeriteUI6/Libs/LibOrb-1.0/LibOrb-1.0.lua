@@ -302,7 +302,7 @@ end
 
 Orb.SetSparkTexture = function(self, path)
 	Orbs[self].spark:SetTexture(path)
-	Update(self)
+	Update(self) -- this is the only time this is called?
 end
 
 Orb.SetSparkColor = function(self, ...)
@@ -366,7 +366,7 @@ Orb.SetMinMaxValues = function(self, min, max, overrideSmoothing)
 	if (nativeBar) then
 		nativeBar:SetMinMaxValues(min, max)
 	end
-	
+
 	-- Store values (may be secret)
 	data.barMin = min
 	data.barMax = max
