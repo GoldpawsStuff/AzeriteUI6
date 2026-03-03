@@ -26,7 +26,7 @@
 local addonName, ns = ...
 local oUF = ns.oUF
 
-local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0")
+local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0", "LibOrb-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
@@ -304,54 +304,64 @@ local style = function(self, unit)
 
 	-- Power Crystal
 	--------------------------------------------
-	local power = CreateFrame("StatusBar", nil, self)
-	power:SetSize(144,144) -- 120,140
-	power:SetPoint("BOTTOMLEFT", 18, 32) -- 20,38
-	power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
-	power:SetOrientation("VERTICAL")
-	power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
-
-	-- Power Crystal backdrop
-	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
-	powerBg:SetSize(196, 196)
-	powerBg:SetPoint("CENTER", 0, 0)
-	powerBg:SetTexture(db.useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
-
-	if (db.useIceCrystal) then
-		power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
-		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
-		power:SetStatusBarColor(1, 1, 1) 
-	else
+	do 
+		local power = CreateFrame("StatusBar", nil, self)
+		power:SetSize(144,144) -- 120,140
+		power:SetPoint("BOTTOMLEFT", 18, 32) -- 20,38
 		power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+		power:SetOrientation("VERTICAL")
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+
+		-- Power Crystal backdrop
+		local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
+		powerBg:SetSize(196, 196)
+		powerBg:SetPoint("CENTER", 0, 0)
+		powerBg:SetTexture(db.useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
+
+		if (db.useIceCrystal) then
+			power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
+			power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+			power:SetStatusBarColor(1, 1, 1) 
+		else
+			power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+			power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+		end
+
+		-- Power Value
+		local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
+		powerValue:SetPoint("CENTER", 0, -16)
+		powerValue:SetFontObject(GetFont(18, true))
+		powerValue:SetTextColor(250/255, 250/255, 250/255, .75)
+		powerValue:SetJustifyH("CENTER")
+		powerValue:SetJustifyV("MIDDLE")
+
+		self:Tag(powerValue, "[azui:shortpower]")
+
+		-- Power foreground. The "case" of the power crystal.
+		local powerFg = power:CreateTexture(nil, "BACKGROUND", nil, -5)
+		powerFg:SetSize(198,98)
+		powerFg:SetPoint("BOTTOM", 7, -51)
+		powerFg:SetTexture(GetMedia("pw_crystal_case"))
+		powerFg:SetVertexColor(192/255, 192/255, 192/255)
+
+		-- Options
+		power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
+		power.displayAltPower = true -- allow this to be used for altpower from quests and various
+		power.frequentUpdates = true -- update often
+
+		-- Register it with oUF
+		self.Power = power
+		self.Power.Value = powerValue
+		self.Power.UpdateColor = Power_UpdateColor
+
+		self.Crystal = self.Power
 	end
 
-	-- Power Value
-	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
-	powerValue:SetPoint("CENTER", 0, -16)
-	powerValue:SetFontObject(GetFont(18, true))
-	powerValue:SetTextColor(250/255, 250/255, 250/255, .75)
-	powerValue:SetJustifyH("CENTER")
-	powerValue:SetJustifyV("MIDDLE")
+	-- Mana Orb
+	--------------------------------------------
+	do 
 
-	self:Tag(powerValue, "[azui:shortpower]")
-
-	-- Power foreground. The "case" of the power crystal.
-	local powerFg = power:CreateTexture(nil, "BACKGROUND", nil, -5)
-	powerFg:SetSize(198,98)
-	powerFg:SetPoint("BOTTOM", 7, -51)
-	powerFg:SetTexture(GetMedia("pw_crystal_case"))
-	powerFg:SetVertexColor(192/255, 192/255, 192/255)
-
-	-- Options
-	power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
-	power.displayAltPower = true -- allow this to be used for altpower from quests and various
-	power.frequentUpdates = true -- update often
-
-	-- Register it with oUF
-	self.Power = power
-	self.Power.Value = powerValue
-	self.Power.UpdateColor = Power_UpdateColor
+	end
 
 end
 

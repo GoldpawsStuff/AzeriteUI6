@@ -20,4 +20,5 @@
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
 	<Script file="LibMoreEvents-1.0\LibMoreEvents-1.0.lua"/>
 	<Script file="LibFadingFrames-1.0\LibFadingFrames-1.0.lua"/>
+	<Script file="LibOrb-1.0\LibOrb-1.0.lua"/>
 </Ui>

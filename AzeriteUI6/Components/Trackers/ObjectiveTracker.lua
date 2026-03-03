@@ -30,8 +30,7 @@ local db -- will be assigned a utility function returning the profile settings/d
 
 -- Declare module defaults
 local defaults = { profile = {
-	fadeOutTracker = true,
-	fadeOutBlizzard = true
+	fadeOutTracker = true
 }}
 
 Trackers.UpdateObjectiveTrackerFading = function(self)
@@ -39,28 +38,6 @@ Trackers.UpdateObjectiveTrackerFading = function(self)
 		self:RegisterFrameForFading(ObjectiveTrackerFrame, "Trackers")
 	else
 		self:UnregisterFrameForFading(ObjectiveTrackerFrame)
-	end
-	if (db.fadeOutBlizzard) then
-
-		-- primary action bar
-		for i = 1,12 do
-			self:RegisterFrameForFading(_G["ActionButton"..i], "ActionBars")
-		end
-		
-		-- pet action bar
-		for i = 1,10 do
-			self:RegisterFrameForFading(_G["StanceButton"..i], "StanceBars")
-		end
-
-		-- buffs and debuffs
-		self:RegisterFrameForFading(BuffFrame, "PlayerAuras")
-		self:RegisterFrameForFading(DebuffFrame, "PlayerAuras")
-
-		-- bags bar and micro menu
-		self:RegisterFrameForFading(BagsBar, "BagsBar")
-		self:RegisterFrameForFading(MicroMenu, "MicroMenu")
-		self:RegisterFrameForFading(MicroMenuContainer, "MicroMenu")
-	else
 	end
 end
 

@@ -24,3 +24,10 @@
 
 --]]
 local _, ns = ...
+
+local HideBlizzardActionBars = ns:NewModule("HideBlizzardActionBars", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+
+HideBlizzardActionBars.OnInitialize = function(self)
+
+end
+

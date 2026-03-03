@@ -25,7 +25,7 @@
 --]]
 local addonName, ns = ...
 
-ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0")
+ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
 -- Saved variables global
@@ -33,6 +33,39 @@ local AzeriteUI6_DB = {}
 
 -- Addon defaults (just the core)
 local defaults = { profile = {} }
+
+-- Temporary solution while developing. 
+-- *Doesn't actually hide anything, just adds hover visibility.
+ns.HideBlizzard = function(self)
+
+	-- buffs and debuffs
+	self:RegisterFrameForFading(BuffFrame, "PlayerAuras")
+	self:RegisterFrameForFading(DebuffFrame, "PlayerAuras")
+
+	-- bags bar and micro menu
+	self:RegisterFrameForFading(BagsBar, "BagsBar")
+	self:RegisterFrameForFading(MicroMenu, "MicroMenu")
+	self:RegisterFrameForFading(MicroMenuContainer, "MicroMenu")
+
+	-- standard action bars
+	for i = 1,12 do
+		self:RegisterFrameForFading(_G["ActionButton"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBarBottomLeftButton"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBarBottomRightButton"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBarRightButton"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBarLeftButton"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBar5Button"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBar6Button"..i], "ActionBars")
+		self:RegisterFrameForFading(_G["MultiBar7Button"..i], "ActionBars")
+	end
+	
+	-- stance and pet action bar
+	for i = 1,10 do
+		self:RegisterFrameForFading(_G["PetActionButton"..i], "PetBars")
+		self:RegisterFrameForFading(_G["StanceButton"..i], "StanceBars")
+	end
+
+end
 
 ns.RefreshConfig = function(self, event, ...)
 	if (event == "OnNewProfile") then
@@ -54,6 +87,9 @@ end
 
 ns.OnEnable = function(self)
 	--self.db:SetProfile(self.db.char.profile)
+
+	-- Temporary solution to clean things up during development.
+	self:HideBlizzard()
 end
 
 ns.OnInitialize = function(self)
