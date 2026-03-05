@@ -26,11 +26,13 @@
 local addonName, ns = ...
 local oUF = ns.oUF
 
-local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0", "LibOrb-1.0")
+local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0")
+local LibOrb = LibStub("LibOrb-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
-	useIceCrystal --= true
+	alwaysUseCrystal = false,
+	useIceCrystal = false
 }}
 
 local db -- will be assigned a utility function returning the profile settings/defaults during initialization
@@ -39,6 +41,9 @@ local db -- will be assigned a utility function returning the profile settings/d
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
+
+-- We'll update this when entering world or changing specs
+local playerIsRetribution = UnitClassBase("player") == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
 
 
 -- Toggle cast info and health info when castbar is visible.
@@ -60,6 +65,127 @@ local Castbar_PostCastInterruptible = function(element, unit)
 		element.Text:SetTextColor(229/255, 178/255, 38/255, .75)
 	else
 		element.Text:SetTextColor(250/255, 250/255, 250/255, .5)
+	end
+end
+
+local Mana_Override = function(self, event, unit)
+	if(self.unit ~= unit) then return end
+	local element = self.AdditionalPower
+
+	--[[ Callback: Power:PreUpdate(unit)
+	Called before the element has been updated.
+
+	* self - the Power element
+	* unit - the unit for which the update has been triggered (string)
+	--]]
+	if (element.PreUpdate) then
+		element:PreUpdate(unit)
+	end
+
+	-- Different GUID means a different player or NPC,
+	-- so we want updates to be instant, not smoothed.
+	local guid = UnitGUID(unit)
+	local forced = (guid ~= element.guid) or (UnitIsDeadOrGhost(unit))
+	element.guid = guid
+
+	local displayType, min
+	if (element.displayAltPower and oUF.isRetail) then
+		displayType, min = element:GetDisplayPower()
+	end
+
+	local cur, max = UnitPower(unit, displayType), UnitPowerMax(unit, displayType)
+	element:SetMinMaxValues(min or 0, max)
+
+	if (UnitIsConnected(unit)) then
+		element:SetValue(cur, forced)
+	else
+		element:SetValue(max, forced)
+	end
+
+	element.cur = cur
+	element.min = min
+	element.max = max
+	element.displayType = displayType
+
+	--[[ Callback: Power:PostUpdate(unit, cur, min, max)
+	Called after the element has been updated.
+
+	* self - the Power element
+	* unit - the unit for which the update has been triggered (string)
+	* cur  - the unit's current power value (number)
+	* min  - the unit's minimum possible power value (number)
+	* max  - the unit's maximum possible power value (number)
+	--]]
+	if (element.PostUpdate) then
+		element:PostUpdate(unit, cur, min, max)
+	end
+end
+
+-- Only show mana orb when mana is the primary resource.
+local Mana_UpdateVisibility = function(self, event, unit)
+	local element = self.AdditionalPower
+
+	-- There is a short period when entering vehicles where the player unit does not exist.
+	-- We don't want the mana orb accidentially popping up during this period.
+	local shouldEnable = not playerIsRetribution and not db.alwaysUseCrystal and UnitExists("player") and not UnitHasVehicleUI("player") and UnitPowerType(unit) == Enum.PowerType.Mana
+	local isEnabled = element.__isEnabled
+
+	if (shouldEnable and not isEnabled) then
+
+		if (element.frequentUpdates) then
+			self:RegisterEvent("UNIT_POWER_FREQUENT", element.Override)
+		else
+			self:RegisterEvent("UNIT_POWER_UPDATE", element.Override)
+		end
+
+		self:RegisterEvent("UNIT_MAXPOWER", element.Override)
+
+		element:Show()
+
+		element.__isEnabled = true
+		element.Override(self, "ElementEnable", "player", "MANA")
+
+		--[[ Callback: AdditionalPower:PostVisibility(isVisible)
+		Called after the element's visibility has been changed.
+
+		* self      - the AdditionalPower element
+		* isVisible - the current visibility state of the element (boolean)
+		--]]
+		if (element.PostVisibility) then
+			element:PostVisibility(true)
+		end
+
+	elseif (not shouldEnable and (isEnabled or isEnabled == nil)) then
+
+		self:UnregisterEvent("UNIT_MAXPOWER", element.Override)
+		self:UnregisterEvent("UNIT_POWER_FREQUENT", element.Override)
+		self:UnregisterEvent("UNIT_POWER_UPDATE", element.Override)
+
+		element:Hide()
+
+		element.__isEnabled = false
+		element.Override(self, "ElementDisable", "player", "MANA")
+
+		if (element.PostVisibility) then
+			element:PostVisibility(false)
+		end
+
+	elseif (shouldEnable and isEnabled) then
+		element.Override(self, event, unit, "MANA")
+	end
+end
+
+-- Hide power crystal when mana is the primary resource.
+local Power_UpdateVisibility = function(element, unit, cur, min, max)
+	if (playerIsRetribution or db.alwaysUseCrystal) then
+		element:Show()
+	else
+		local powerType = UnitPowerType(unit)
+		if (powerType == Enum.PowerType.Mana and not UnitHasVehicleUI("player")) then
+			element:Hide()
+		else
+			element:Show()
+		end
 	end
 end
 
@@ -112,6 +238,20 @@ local Power_UpdateColor = function(self, event, unit)
 	--]]
 	if (element.PostUpdateColor) then
 		element:PostUpdateColor(unit, color, r, g, b)
+	end
+end
+
+local UnitFrame_OnEvent = function(self, event, unit, ...)
+	if (event == "PLAYER_ENTERING_WORLD") then
+		playerIsRetribution = playerClass == "PALADIN" and (ns.IsRetail and GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+
+		self.Power:ForceUpdate()
+		self.AdditionalPower:ForceUpdate()
+
+	elseif (event == "PLAYER_SPECIALIZATION_CHANGED") then
+		playerIsRetribution = playerClass == "PALADIN" and (ns.IsRetail and GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+
+		self.Power:ForceUpdate()
 	end
 end
 
@@ -304,64 +444,117 @@ local style = function(self, unit)
 
 	-- Power Crystal
 	--------------------------------------------
-	do 
-		local power = CreateFrame("StatusBar", nil, self)
-		power:SetSize(144,144) -- 120,140
-		power:SetPoint("BOTTOMLEFT", 18, 32) -- 20,38
-		power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
-		power:SetOrientation("VERTICAL")
+	local power = CreateFrame("StatusBar", nil, self)
+	power:SetSize(144,144) -- 120,140
+	power:SetPoint("BOTTOMLEFT", 8, 32) -- 20,38
+	power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+	power:SetOrientation("VERTICAL")
+	power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+
+	-- Power Crystal backdrop
+	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
+	powerBg:SetSize(196, 196)
+	powerBg:SetPoint("CENTER", 0, 0)
+	powerBg:SetTexture(db.useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
+
+	if (db.useIceCrystal) then
+		power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
-
-		-- Power Crystal backdrop
-		local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
-		powerBg:SetSize(196, 196)
-		powerBg:SetPoint("CENTER", 0, 0)
-		powerBg:SetTexture(db.useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
-
-		if (db.useIceCrystal) then
-			power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
-			power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
-			power:SetStatusBarColor(1, 1, 1) 
-		else
-			power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
-			power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
-		end
-
-		-- Power Value
-		local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
-		powerValue:SetPoint("CENTER", 0, -16)
-		powerValue:SetFontObject(GetFont(18, true))
-		powerValue:SetTextColor(250/255, 250/255, 250/255, .75)
-		powerValue:SetJustifyH("CENTER")
-		powerValue:SetJustifyV("MIDDLE")
-
-		self:Tag(powerValue, "[azui:shortpower]")
-
-		-- Power foreground. The "case" of the power crystal.
-		local powerFg = power:CreateTexture(nil, "BACKGROUND", nil, -5)
-		powerFg:SetSize(198,98)
-		powerFg:SetPoint("BOTTOM", 7, -51)
-		powerFg:SetTexture(GetMedia("pw_crystal_case"))
-		powerFg:SetVertexColor(192/255, 192/255, 192/255)
-
-		-- Options
-		power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
-		power.displayAltPower = true -- allow this to be used for altpower from quests and various
-		power.frequentUpdates = true -- update often
-
-		-- Register it with oUF
-		self.Power = power
-		self.Power.Value = powerValue
-		self.Power.UpdateColor = Power_UpdateColor
-
-		self.Crystal = self.Power
+		power:SetStatusBarColor(1, 1, 1) 
+	else
+		power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
 	end
+
+	-- Power Value
+	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
+	powerValue:SetPoint("CENTER", 0, -16)
+	powerValue:SetFontObject(GetFont(18, true))
+	powerValue:SetTextColor(250/255, 250/255, 250/255, .75)
+	powerValue:SetJustifyH("CENTER")
+	powerValue:SetJustifyV("MIDDLE")
+
+	self:Tag(powerValue, "[azui:shortpower]")
+
+	-- Power foreground. The "case" of the power crystal.
+	local powerFg = power:CreateTexture(nil, "BACKGROUND", nil, -5)
+	powerFg:SetSize(198,98)
+	powerFg:SetPoint("BOTTOM", 7, -44) -- 7, -51
+	powerFg:SetTexture(GetMedia("pw_crystal_case"))
+	powerFg:SetVertexColor(192/255, 192/255, 192/255)
+
+	-- Options
+	power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
+	power.displayAltPower = true -- allow this to be used for altpower from quests and various
+	power.frequentUpdates = true -- update often
+
+	-- Register it with oUF
+	self.Power = power
+	self.Power.Value = powerValue
+	self.Power.UpdateColor = Power_UpdateColor
+	self.Power.PostUpdate = Power_UpdateVisibility
+	
 
 	-- Mana Orb
 	--------------------------------------------
-	do 
+	local mana = LibOrb:CreateOrb(nil, self)
+	mana:SetFrameLevel(self:GetFrameLevel() - 2) -- get it below health
+	mana:SetPoint("BOTTOMLEFT", 29, 29) -- 29, 27
+	mana:SetSize(103, 103)
+	mana:SetStatusBarTexture(GetMedia("orb2"), GetMedia("orb2"))
+	mana:SetStatusBarColor(135/255, 125/255, 255/255)
 
-	end
+	mana.displayPairs = {} -- disable oUFs own enabling
+	mana.frequentUpdates = true
+
+	-- orb backdrop
+	local manaBackdrop = mana:CreateTexture(nil, "BACKGROUND", nil, -2)
+	manaBackdrop:SetPoint("CENTER", 0, 0)
+	manaBackdrop:SetSize(180, 180)
+	manaBackdrop:SetTexture(GetMedia("orb-backdrop2"))
+
+	-- content holder for overlays
+	local manaCaseFrame = CreateFrame("Frame", nil, mana)
+	manaCaseFrame:SetFrameLevel(mana:GetFrameLevel() + 1)
+	manaCaseFrame:SetAllPoints()
+
+	-- a little shading to give more depth
+	local manaShade = manaCaseFrame:CreateTexture(nil, "ARTWORK", nil, 1)
+	manaShade:SetPoint("CENTER", 0, 0)
+	manaShade:SetSize(127, 127)
+	manaShade:SetTexture(GetMedia("shade-circle"))
+	manaShade:SetVertexColor(0, 0, 0, 1)
+
+	-- orb case in the foreground
+	local manaCase = manaCaseFrame:CreateTexture(nil, "ARTWORK", nil, 2)
+	manaCase:SetPoint("CENTER", 0, 0)
+	manaCase:SetSize(188, 188)
+	manaCase:SetTexture(GetMedia("orb_case_hi"))
+	manaCase:SetVertexColor(192/255, 192/255, 192/255)
+
+	-- mana Orb Value
+	local manaValue = manaCaseFrame:CreateFontString(nil, "OVERLAY", nil, 1)
+	manaValue:SetPoint("CENTER", 3, 0)
+	manaValue:SetFontObject(GetFont(18, true))
+	manaValue:SetTextColor(250/255, 250/255, 250/255, .4)
+	manaValue:SetJustifyH("CENTER")
+	manaValue:SetJustifyV("MIDDLE")
+
+	self:Tag(manaValue, "[azui:shortmana]")
+
+	self.AdditionalPower = mana
+	self.AdditionalPower.Backdrop = manaBackdrop
+	self.AdditionalPower.Shade = manaShade
+	self.AdditionalPower.Case = manaCase
+	self.AdditionalPower.Value = manaValue
+	self.AdditionalPower.Override = Mana_Override
+	self.AdditionalPower.OverrideVisibility = Mana_UpdateVisibility
+
+
+	-- Register events to handle custom element changes
+	self:RegisterEvent("PLAYER_ALIVE", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", UnitFrame_OnEvent)
 
 end
 
@@ -395,8 +588,25 @@ Player.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteUnitFramePlayer", style)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFramePlayer") -- Set the current oUF style
+
 		-- Note that this is the default position,
 		-- it will be overwritten by saved positions.
-		self:Spawn("player"):SetPoint("BOTTOMLEFT", 46, 100)
+		local frame = self:Spawn("player")
+		frame:SetPoint("BOTTOMLEFT", 46, 100)
+
+		frame.Enable = function(self)
+			RegisterAttributeDriver(self, "unit", "[vehicleui]vehicle; player")
+			self:Show()
+		end
+
+		frame.Disable = function(self)
+			UnregisterAttributeDriver(self, "unit")
+			self:Hide()
+		end
+
+		-- Disable WoWs own handling
+		UnregisterUnitWatch(self.frame)
+		frame:SetAttribute("toggleForVehicle", false)
+
 	end)
 end

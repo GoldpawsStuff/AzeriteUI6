@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibOrb-1.0"
-local MINOR_VERSION = 8
+local MINOR_VERSION = 10
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")
@@ -88,178 +88,20 @@ Orb.SetStatusBarAtlas = noop
 Orb.SetStatusBarColor = noop
 Orb.SetStatusBarTexture = noop
 
-local smoothingMinValue = 1 -- if a value is lower than this, we won't smoothe
-local smoothingFrequency = .5 -- time for the smooth transition to complete
-local smoothingLimit = 1/60 -- max updates per second
-
-local Update = function(self, elapsed)
-	local data = Orbs[self]
-	local value = data.disableSmoothing and data.barValue or data.barDisplayValue
-	local min, max = data.barMin, data.barMax
-	local orientation = data.orbOrientation
-	local width, height = self:GetSize()
-	local spark = data.spark
-	if value > max then
-		value = max
-	elseif value < min then
-		value = min
-	end
-
-	local newHeight
-	if value > 0 and value > min and max > min then
-		newHeight = (value-min)/(max-min) * height
-	else
-		newHeight = 0
-	end
-
-	if (value <= min) or (max == min) then
-		data.scrollframe:Hide()
-	else
-
-		local newSize, mult
-		if (max > min) then
-			mult = (value-min)/(max-min)
-			newSize = mult * width
-		else
-			newSize = 0.0001
-			mult = 0.0001
-		end
-		local displaySize = math_max(newSize, 0.0001) -- sizes can't be 0 in Legion
-
-		data.scrollframe:SetHeight(displaySize)
-		data.scrollframe:SetVerticalScroll(height - newHeight)
-		if (not data.scrollframe:IsShown()) then
-			data.scrollframe:Show()
-		end
-		if (data.OnDisplayValueChanged) then
-			data.OnDisplayValueChanged(self, value)
-		end
-	end
-
-	if (value == max) or (value == min) or (value/max >= data.sparkMaxPercent) or (value/max <= data.sparkMinPercent) then
-		if spark:IsShown() then
-			spark:Hide()
-		end
-	else
-		local scrollframe = data.scrollframe
-		local sparkOffsetY = data.sparkOffset
-		local sparkHeight = data.sparkHeight
-		local leftCrop = data.barLeftCrop
-		local rightCrop = data.barRightCrop
-
-		local sparkWidth = math_sqrt((height/2)^2 - (math_abs((height/2) - newHeight))^2) * 2
-		local sparkOffsetX = (height - sparkWidth)/2
-		local sparkOffsetY = data.sparkOffset * sparkHeight
-		local freeSpace = height - leftCrop - rightCrop
-
-		if sparkWidth > freeSpace then
-			spark:SetSize(freeSpace, sparkHeight)
-			spark:ClearAllPoints()
-
-			if (leftCrop > freeSpace/2) then
-				spark:SetPoint("LEFT", scrollframe, "TOPLEFT", leftCrop, sparkOffsetY)
-			else
-				spark:SetPoint("LEFT", scrollframe, "TOPLEFT", sparkOffsetX, sparkOffsetY)
-			end
-
-			if (rightCrop > freeSpace/2) then
-				spark:SetPoint("RIGHT", scrollframe, "TOPRIGHT", -rightCrop, sparkOffsetY)
-			else
-				spark:SetPoint("RIGHT", scrollframe, "TOPRIGHT", -sparkOffsetX, sparkOffsetY)
-			end
-
-		else
-			-- fixing the stupid Legion no zero size problem
-			if (sparkWidth == 0) then
-				sparkWidth = 0.0001
-			end
-
-			spark:SetSize(sparkWidth, sparkHeight)
-			spark:ClearAllPoints()
-			spark:SetPoint("LEFT", scrollframe, "TOPLEFT", sparkOffsetX, sparkOffsetY)
-			spark:SetPoint("RIGHT", scrollframe, "TOPRIGHT", -sparkOffsetX, sparkOffsetY)
-
-		end
-		if (not spark:IsShown()) then
-			spark:Show()
-		end
-	end
-end
-
--- Doesn't appear to ever be called anymore?
-local OnUpdate = function(self, elapsed)
-	local data = Orbs[self]
-	data.elapsed = (data.elapsed or 0) + elapsed
-	if (data.elapsed < smoothingLimit) then
-		return
-	end
-
-	if (data.disableSmoothing) then
-		if (data.barValue <= data.barMin) or (data.barValue >= data.barMax) then
-			Orig_SetScript(self, "OnUpdate", nil)
-		end
-	elseif (data.smoothing) then
-		if (math_abs(data.barDisplayValue - data.barValue) < smoothingMinValue) then
-			data.barDisplayValue = data.barValue
-			data.smoothing = nil
-		else
-			-- The fraction of the total bar this total animation should cover
-			local animsize = (data.barValue - data.smoothingInitialValue)/(data.barMax - data.barMin)
-
-			-- Points per second on average for the whole bar
-			local pps = (data.barMax - data.barMin)/(data.smoothingFrequency or smoothingFrequency)
-
-			-- Position in time relative to the length of the animation, scaled from 0 to 1
-			local position = (GetTime() - data.smoothingStart)/(data.smoothingFrequency or smoothingFrequency)
-			if (position < 1) then
-				-- The change needed when using average speed
-				local average = pps * animsize * data.elapsed -- can and should be negative
-
-				-- Tha change relative to point in time and distance passed
-				local change = 2*(3 * ( 1 - position )^2 * position) * average*2 --  y = 3 * (1 − t)^2 * t  -- quad bezier fast ascend + slow descend
-
-				-- If there's room for a change in the intended direction, apply it, otherwise finish the animation
-				if ( (data.barValue > data.barDisplayValue) and (data.barValue > data.barDisplayValue + change) )
-				or ( (data.barValue < data.barDisplayValue) and (data.barValue < data.barDisplayValue + change) ) then
-					data.barDisplayValue = data.barDisplayValue + change
-				else
-					data.barDisplayValue = data.barValue
-					data.smoothing = nil
-				end
-			else
-				data.barDisplayValue = data.barValue
-				data.smoothing = nil
-			end
-		end
-	else
-		if (data.barDisplayValue <= data.barMin) or (data.barDisplayValue >= data.barMax) or (not data.smoothing) then
-			Orig_SetScript(self, "OnUpdate", nil)
-		end
-	end
-
-	Update(self, elapsed)
-
-	if (data.OnUpdate) then
-		data.OnUpdate(data.orb, data.elapsed)
-	end
-
-	data.elapsed = 0
-end
-
 local OnSizeChanged = function(self, width, height)
 	local data = Orbs[self]
 	local leftCrop = data.barLeftCrop
 	local rightCrop = data.barRightCrop
 	self:SetHitRectInsets(leftCrop, rightCrop, 0, 0)
 
-	-- WoW 12.0.1: contentHolder (scrollchild) needs full orb height
+	-- WoW 12.0.1: contentHolder needs full orb height
 	-- It's anchored to BOTTOM of clipFrame, so we set explicit height
-	local contentHolder = data.scrollchild
+	local contentHolder = data.contentHolder
 	contentHolder:SetHeight(height)
 	contentHolder:SetWidth(width)
 
-	-- clipFrame (scrollframe) anchors
-	local clipFrame = data.scrollframe
+	-- clipFrame anchors
+	local clipFrame = data.clipFrame
 	clipFrame:ClearAllPoints()
 	clipFrame:SetPoint("BOTTOM", leftCrop/2 - rightCrop/2, 0)
 	clipFrame:SetPoint("LEFT", leftCrop, 0)
@@ -270,7 +112,7 @@ local OnSizeChanged = function(self, width, height)
 	if (nativeBar) then
 		clipFrame:SetPoint("TOP", nativeBar:GetStatusBarTexture(), "TOP")
 	end
-	data.sparkHeight = height/4 >= 8 and height/4 or 8
+	
 	if (data.OnSizeChanged) then
 		data.OnSizeChanged(self, width, height)
 	end
@@ -279,14 +121,6 @@ end
 ----------------------------------------------------------------
 -- Custom API
 ----------------------------------------------------------------
-Orb.SetSmoothHZ = function(self, smoothingFrequency)
-	Orbs[self].smoothingFrequency = smoothingFrequency
-end
-
-Orb.DisableSmoothing = function(self, disableSmoothing)
-	Orbs[self].disableSmoothing = disableSmoothing
-end
-
 -- forces a hard reset to zero
 Orb.Clear = function(self)
 	local data = Orbs[self]
@@ -298,38 +132,6 @@ Orb.Clear = function(self)
 	if (nativeBar) then
 		nativeBar:SetValue(0, Enum.StatusBarInterpolation.Immediate)
 	end
-end
-
-Orb.SetSparkTexture = function(self, path)
-	Orbs[self].spark:SetTexture(path)
-	Update(self) -- this is the only time this is called?
-end
-
-Orb.SetSparkColor = function(self, ...)
-	Orbs[self].spark:SetVertexColor(...)
-end
-
-Orb.SetSparkMinMaxPercent = function(self, min, max)
-	local data = Orbs[self]
-	data.sparkMinPercent = min
-	data.sparkMinPercent = max
-end
-
-Orb.SetSparkBlendMode = function(self, blendMode)
-	Orbs[self].spark:SetBlendMode(blendMode)
-end
-
--- Fancy method allowing us to crop the orb's sides
-Orb.SetCrop = function(self, leftCrop, rightCrop)
-	local data = Orbs[self]
-	data.barLeftCrop = leftCrop
-	data.barRightCrop = rightCrop
-	self:SetSize(data.scrollchild:GetSize())
-end
-
-Orb.GetCrop = function(self)
-	local data = Orbs[self]
-	return data.barLeftCrop, data.barRightCrop
 end
 
 ----------------------------------------------------------------
@@ -388,7 +190,6 @@ Orb.SetStatusBarColor = function(self, ...)
 	data.layer2:SetVertexColor(r * 4/5, g * 4/5 * 3/4, b * 4/5)
 	data.layer3:SetVertexColor(r * 3/4, g * 3/4 * 2/3, b * 3/4)
 	data.layer4:SetVertexColor(r * 2/3, g * 2/3 * 1/2, b * 2/3)
-	data.spark:SetVertexColor(r, g *3/4, b)
 end
 
 Orb.GetStatusBarColor = function(self, id)
@@ -451,8 +252,8 @@ Orb.GetScript = function(self, ...)
 	end
 end
 
-Orb.GetAnchor = function(self) return Orbs[self].scrollframe end
-Orb.GetOverlay = function(self) return Orbs[self].scrollframe end
+Orb.GetAnchor = function(self) return Orbs[self].clipFrame end
+Orb.GetOverlay = function(self) return Orbs[self].clipFrame end
 Orb.GetObjectType = function(self) return "StatusBar" end
 Orb.IsObjectType = function(self, type) return type == "Orb" or type == "StatusBar" or type == "Frame" end
 Orb.IsForbidden = function(self) return true end
@@ -477,7 +278,7 @@ lib.CreateOrb = function(self, name, parent, template, rotateClockwise, speedMod
 	-- WoW 12.0.1: Use clipping frame instead of ScrollFrame
 	-- clipFrame clips content, its height follows native statusbar
 	local clipFrame = CreateFrame("Frame", nil, orb)
-	clipFrame:SetFrameLevel(orb:GetFrameLevel())
+	--clipFrame:SetFrameLevel(orb:GetFrameLevel()) -- seems to be too low?
 	clipFrame:SetClipsChildren(true)
 	clipFrame:SetPoint("BOTTOM")
 	clipFrame:SetPoint("LEFT")
@@ -494,28 +295,19 @@ lib.CreateOrb = function(self, name, parent, template, rotateClockwise, speedMod
 	contentHolder:SetPoint("RIGHT")
 	-- Height will be set by OnSizeChanged to match orb height
 
-	-- For compatibility, keep scrollframe/scrollchild names
-	local scrollframe = clipFrame
-	local scrollchild = contentHolder
-
-	-- The overlay is meant to hold overlay textures like the spark.
-	local overlay = CreateFrame("Frame", nil, scrollframe)
-	overlay:SetFrameLevel(scrollframe:GetFrameLevel() + 2)
-	overlay:SetAllPoints(orb)
-
-	local orbTex1 = scrollchild:CreateTexture()
+	local orbTex1 = contentHolder:CreateTexture()
 	orbTex1:SetDrawLayer("BACKGROUND", 0)
 	orbTex1:SetAllPoints()
 
-	local orbTex2 = scrollchild:CreateTexture()
+	local orbTex2 = contentHolder:CreateTexture()
 	orbTex2:SetDrawLayer("BACKGROUND", -1)
 	orbTex2:SetAllPoints()
 
-	local orbTex3 = scrollchild:CreateTexture()
+	local orbTex3 = contentHolder:CreateTexture()
 	orbTex3:SetDrawLayer("BACKGROUND", -2)
 	orbTex3:SetAllPoints()
 
-	local orbTex4 = scrollchild:CreateTexture()
+	local orbTex4 = contentHolder:CreateTexture()
 	orbTex4:SetDrawLayer("BACKGROUND", -3)
 	orbTex4:SetAllPoints()
 
@@ -578,25 +370,11 @@ lib.CreateOrb = function(self, name, parent, template, rotateClockwise, speedMod
 	t2ag2:SetLooping("REPEAT")
 	t2ag2:Play()
 
-	-- The spark will be cropped,
-	-- and only what's in the filled part of the orb will be visible.
-	local spark = scrollchild:CreateTexture()
-	spark:SetDrawLayer("BORDER", 1)
-	spark:SetPoint("TOPLEFT", scrollframe, "TOPLEFT", 0, 0)
-	spark:SetPoint("TOPRIGHT", scrollframe, "TOPRIGHT", 0, 0)
-	spark:SetSize(1,1)
-	spark:SetAlpha(.6)
-	spark:SetBlendMode("ADD")
-	spark:SetTexture([[Interface\CastingBar\UI-CastingBar-Spark]]) -- 32x32, centered vertical spark being 32x9px, from 0,11px to 32,19px
-	spark:SetTexCoord(1,11/32,0,11/32,1,19/32,0,19/32)-- ULx,ULy,LLx,LLy,URx,URy,LRx,LRy
-	spark:Hide()
-
 	local data = {}
 
 	-- framework
-	data.scrollchild = scrollchild
-	data.scrollframe = scrollframe
-	data.overlay = overlay
+	data.contentHolder = contentHolder
+	data.clipFrame = clipFrame
 	data.nativeStatusBar = nativeStatusBar
 
 	-- layers
@@ -604,7 +382,6 @@ lib.CreateOrb = function(self, name, parent, template, rotateClockwise, speedMod
 	data.layer2 = orbTex2
 	data.layer3 = orbTex3
 	data.layer4 = orbTex4
-	data.spark = spark
 
 	data.barMin = 0 -- min value
 	data.barMax = 1 -- max value
@@ -614,15 +391,10 @@ lib.CreateOrb = function(self, name, parent, template, rotateClockwise, speedMod
 	data.barRightCrop = 0 -- percentage of the orb cropped from the right
 	data.barSmoothingMode = "bezier-fast-in-slow-out"
 
-	data.sparkHeight = 8
-	data.sparkOffset = 1/32
-	data.sparkMinPercent = 1/100
-	data.sparkMaxPercent = 99/100
-
 	Orbs[orb] = data
 
-	-- Initial state - scrollframe anchored to statusbar texture handles filling
-	scrollframe:Show()
+	-- Initial state - clipFrame anchored to statusbar texture handles filling
+	clipFrame:Show()
 
 	return orb
 end

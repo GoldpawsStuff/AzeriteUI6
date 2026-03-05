@@ -60,3 +60,19 @@ oUF.Tags.Methods["azui:shortpower"] = function(unit, realUnit)
 		end
 	end
 end
+
+oUF.Tags.Events["azui:shortmana"] = "UNIT_MAXPOWER UNIT_POWER_UPDATE"
+oUF.Tags.Methods["azui:shortmana"] = function(unit, realUnit)
+	local val = UnitPower(unit, Enum.PowerType.Mana)
+	if (val) then
+		if (not UnitIsDeadOrGhost(unit)) then
+			local secretFuckingNumber = AbbreviateNumbers(val)
+			if (secretFuckingNumber == 0) then 
+				return ""
+			else
+				return secretFuckingNumber
+			end
+			return secretFuckingNumber
+		end
+	end
+end
