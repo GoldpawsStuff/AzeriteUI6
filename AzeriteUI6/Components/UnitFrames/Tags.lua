@@ -36,7 +36,12 @@ oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 	elseif (UnitIsDead(unit)) then
 		return DEAD
 	else
-		return AbbreviateNumbers(UnitHealth(unit))
+		local secretFuckingNumber = AbbreviateNumbers(UnitHealth(unit))
+		if (secretFuckingNumber == 0) then 
+			return ""
+		else
+			return secretFuckingNumber
+		end
 	end
 end
 
@@ -45,7 +50,13 @@ oUF.Tags.Methods["azui:shortpower"] = function(unit, realUnit)
 	local val = UnitPower(unit)
 	if (val) then
 		if (not UnitIsDeadOrGhost(unit)) then
-			return AbbreviateNumbers(val)
+			local secretFuckingNumber = AbbreviateNumbers(val)
+			if (secretFuckingNumber == 0) then 
+				return ""
+			else
+				return secretFuckingNumber
+			end
+			return secretFuckingNumber
 		end
 	end
 end
