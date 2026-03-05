@@ -62,12 +62,55 @@ end
 -- Toggle cast text color on protected casts.
 local Castbar_PostCastInterruptible = function(element, unit)
 	if (element.notInterruptible) then
-		element.Text:SetTextColor(229/255, 178/255, 38/255, .75)
+		element.Text:SetTextColor(self.colors.normal:GetRGB())
+		element.Text:SetAlpha(.75)
 	else
-		element.Text:SetTextColor(250/255, 250/255, 250/255, .5)
+		element.Text:SetTextColor(self.colors.highlight:GetRGB())
+		element.Text:SetAlpha(.5)
 	end
 end
 
+-- Trigger PvPIndicator post update when combat status is toggled.
+local CombatIndicator_PostUpdate = function(element, inCombat)
+	element.__owner.PvPIndicator:ForceUpdate()
+end
+
+-- Only show Horde/Alliance badges, and hide them in combat.
+local PvPIndicator_Override = function(self, event, unit)
+	if (unit and unit ~= self.unit) then return end
+
+	local element = self.PvPIndicator
+	unit = unit or self.unit
+
+	local status
+	local factionGroup = UnitFactionGroup(unit) or "Neutral"
+
+	if (factionGroup ~= "Neutral") then
+		if (UnitIsPVPFreeForAll(unit)) then
+		elseif (UnitIsPVP(unit)) then
+			-- Mercenaries fight for the opposite team, 
+			-- happens all the time in battlegrounds.
+			if (unit == "player" and UnitIsMercenary(unit)) then
+				if (factionGroup == "Horde") then
+					factionGroup = "Alliance"
+				elseif (factionGroup == "Alliance") then
+					factionGroup = "Horde"
+				end
+			end
+			status = factionGroup
+		end
+	end
+
+	if (status and not self.CombatIndicator:IsShown()) then
+		element:SetTexture(element[status])
+		element:Show()
+	else
+		element:Hide()
+	end
+
+end
+
+-- We need to override this update
 local Mana_Override = function(self, event, unit)
 	if(self.unit ~= unit) then return end
 	local element = self.AdditionalPower
@@ -241,17 +284,19 @@ local Power_UpdateColor = function(self, event, unit)
 	end
 end
 
+-- Primarily needed to update orb/crystal visibilities
 local UnitFrame_OnEvent = function(self, event, unit, ...)
 	if (event == "PLAYER_ENTERING_WORLD") then
-		playerIsRetribution = playerClass == "PALADIN" and (ns.IsRetail and GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+		playerIsRetribution = playerClass == "PALADIN" and GetSpecialization() == SPEC_PALADIN_RETRIBUTION
 
 		self.Power:ForceUpdate()
 		self.AdditionalPower:ForceUpdate()
 
 	elseif (event == "PLAYER_SPECIALIZATION_CHANGED") then
-		playerIsRetribution = playerClass == "PALADIN" and (ns.IsRetail and GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+		playerIsRetribution = playerClass == "PALADIN" and GetSpecialization() == SPEC_PALADIN_RETRIBUTION
 
 		self.Power:ForceUpdate()
+		self.AdditionalPower:ForceUpdate()
 	end
 end
 
@@ -275,14 +320,14 @@ local style = function(self, unit)
 	health:SetSize(386, 40)
 	health:SetPoint("BOTTOMLEFT", 148, 27)
 	health:SetStatusBarTexture(GetMedia("hp_cap_bar"))
-	health:SetStatusBarColor(245/255, 0/255, 45/255)
+	health:SetStatusBarColor(self.colors.health:GetRGB())
 
 	-- Health backdrop
 	local healthBg = health:CreateTexture(nil, "BORDER", nil, 0)
 	healthBg:SetSize(716, 188)
 	healthBg:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -15, -47)
 	healthBg:SetTexture(GetMedia("hp_cap_case"))
-	healthBg:SetVertexColor(192/255, 192/255, 192/255)
+	healthBg:SetVertexColor(self.colors.ui:GetRGB())
 
 	-- Health overlay for fonts and icons
 	local healthOverlay = CreateFrame("Frame", nil, overlay)
@@ -291,7 +336,8 @@ local style = function(self, unit)
 	local healthValue = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	healthValue:SetPoint("LEFT", 27, 4)
 	healthValue:SetFontObject(GetFont(18, true))
-	healthValue:SetTextColor(250/255, 250/255, 250/255, .5)
+	healthValue:SetTextColor(self.colors.highlight:GetRGB())
+	healthValue:SetAlpha(.5)
 	healthValue:SetJustifyH("LEFT")
 	healthValue:SetJustifyV("MIDDLE")
 
@@ -417,7 +463,8 @@ local style = function(self, unit)
 	local castbarText = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	castbarText:SetPoint("LEFT", 27, 4)
 	castbarText:SetFontObject(GetFont(16, true))
-	castbarText:SetTextColor(250/255, 250/255, 250/255, .5)
+	castbarText:SetTextColor(self.colors.highlight:GetRGB())
+	castbarText:SetAlpha(.5)
 	castbarText:SetJustifyH("LEFT")
 	castbarText:SetJustifyV("MIDDLE")
 	castbarText:Hide()
@@ -426,7 +473,8 @@ local style = function(self, unit)
 	local castbarTime = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	castbarTime:SetPoint("RIGHT", -27, 4)
 	castbarTime:SetFontObject(GetFont(18, true))
-	castbarTime:SetTextColor(250/255, 250/255, 250/255, .5)
+	castbarTime:SetTextColor(self.colors.highlight:GetRGB())
+	castbarTime:SetAlpha(.5)
 	castbarTime:SetJustifyH("CENTER")
 	castbarTime:SetJustifyV("MIDDLE")
 	castbarTime:Hide()
@@ -470,7 +518,8 @@ local style = function(self, unit)
 	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
 	powerValue:SetPoint("CENTER", 0, -16)
 	powerValue:SetFontObject(GetFont(18, true))
-	powerValue:SetTextColor(250/255, 250/255, 250/255, .75)
+	powerValue:SetTextColor(self.colors.highlight:GetRGB())
+	powerValue:SetAlpha(.75)
 	powerValue:SetJustifyH("CENTER")
 	powerValue:SetJustifyV("MIDDLE")
 
@@ -481,7 +530,7 @@ local style = function(self, unit)
 	powerFg:SetSize(198,98)
 	powerFg:SetPoint("BOTTOM", 7, -44) -- 7, -51
 	powerFg:SetTexture(GetMedia("pw_crystal_case"))
-	powerFg:SetVertexColor(192/255, 192/255, 192/255)
+	powerFg:SetVertexColor(self.colors.ui:GetRGB())
 
 	-- Options
 	power.colorPower = true -- false -- true to follow default coloring, false to never/manually modify
@@ -502,7 +551,7 @@ local style = function(self, unit)
 	mana:SetPoint("BOTTOMLEFT", 29, 29) -- 29, 27
 	mana:SetSize(103, 103)
 	mana:SetStatusBarTexture(GetMedia("orb2"), GetMedia("orb2"))
-	mana:SetStatusBarColor(135/255, 125/255, 255/255)
+	mana:SetStatusBarColor(self.colors.power.MANA_ORB:GetRGB())
 
 	mana.displayPairs = {} -- disable oUFs own enabling
 	mana.frequentUpdates = true
@@ -530,13 +579,14 @@ local style = function(self, unit)
 	manaCase:SetPoint("CENTER", 0, 0)
 	manaCase:SetSize(188, 188)
 	manaCase:SetTexture(GetMedia("orb_case_hi"))
-	manaCase:SetVertexColor(192/255, 192/255, 192/255)
+	manaCase:SetVertexColor(self.colors.ui:GetRGB())
 
 	-- mana Orb Value
 	local manaValue = manaCaseFrame:CreateFontString(nil, "OVERLAY", nil, 1)
 	manaValue:SetPoint("CENTER", 3, 0)
 	manaValue:SetFontObject(GetFont(18, true))
-	manaValue:SetTextColor(250/255, 250/255, 250/255, .4)
+	manaValue:SetTextColor(self.colors.highlight:GetRGB())
+	manaValue:SetAlpha(.4)
 	manaValue:SetJustifyH("CENTER")
 	manaValue:SetJustifyV("MIDDLE")
 
@@ -549,6 +599,58 @@ local style = function(self, unit)
 	self.AdditionalPower.Value = manaValue
 	self.AdditionalPower.Override = Mana_Override
 	self.AdditionalPower.OverrideVisibility = Mana_UpdateVisibility
+
+
+	-- Combat Indicator
+	--------------------------------------------
+	local combatIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
+	combatIndicator:SetSize(80,80)
+	combatIndicator:SetPoint("BOTTOMLEFT", 42, -16) -- 40,-18
+	combatIndicator:SetTexture(GetMedia("icon-combat"))
+	combatIndicator:SetVertexColor(self.colors.uidark:GetRGB())
+
+	self.CombatIndicator = combatIndicator
+	self.CombatIndicator.PostUpdate = CombatIndicator_PostUpdate
+
+
+	-- PvP Indicator
+	--------------------------------------------
+	local PvPIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
+	PvPIndicator:SetSize(84, 84)
+	PvPIndicator:SetPoint("BOTTOMLEFT", 42, -16) -- 40,-18
+	PvPIndicator.Alliance = GetMedia("icon_badges_alliance")
+	PvPIndicator.Horde = GetMedia("icon_badges_horde")
+
+	self.PvPIndicator = PvPIndicator
+	self.PvPIndicator.Override = PvPIndicator_Override
+
+
+	-- Auras
+	--------------------------------------------
+	local auras = CreateFrame("Frame", nil, self)
+	auras:SetSize(40*8 - 4, 40*2 - 4)
+	auras:SetPoint("BOTTOMLEFT", 158, 91)
+
+	auras.size = 36
+	auras.spacing = 4
+	auras.numTotal = 16
+	auras.disableMouse = false
+	auras.disableCooldown = false
+	auras.initialAnchor = "BOTTOMLEFT"
+	auras.spacingX = 4
+	auras.spacingY = 4
+	auras.growthX = "RIGHT"
+	auras.growthY = "UP"
+	auras.tooltipAnchor = "ANCHOR_TOPLEFT"
+	auras.sortMethod = "TIME_REMAINING"
+	auras.sortDirection = "DESCENDING"
+	auras.reanchorIfVisibleChanged = true
+	auras.buffFilter = "HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT"
+	auras.debuffFilter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE"
+
+	self.Auras = auras
+	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
+	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdatePlayer
 
 
 	-- Register events to handle custom element changes

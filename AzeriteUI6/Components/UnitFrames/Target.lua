@@ -424,6 +424,34 @@ local style = function(self, unit)
 	self.Power = power
 	--]]
 
+	-- Auras
+	--------------------------------------------
+	local auras = CreateFrame("Frame", nil, self)
+	auras:SetSize(316, 76)
+	auras:SetPoint("TOPRIGHT", -150, -126)
+
+	auras.size = 36
+	auras.spacing = 4
+	auras.numTotal = 16
+	auras.disableMouse = false
+	auras.disableCooldown = false
+	auras.onlyShowPlayer = false
+	auras.initialAnchor = "TOPRIGHT"
+	auras.spacingX = 4
+	auras.spacingY = 4
+	auras.growthX = "LEFT"
+	auras.growthY = "DOWN"
+	auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
+	auras.sortMethod = "TIME_REMAINING"
+	auras.sortDirection = "DESCENDING"
+	auras.reanchorIfVisibleChanged = true
+	auras.buffFilter = "HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT"
+	auras.debuffFilter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY"
+
+	self.Auras = auras
+	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
+	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget
+
 end
 
 -- This is called by the options menu on settings changes,

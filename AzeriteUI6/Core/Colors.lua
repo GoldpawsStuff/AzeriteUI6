@@ -29,12 +29,25 @@ local addonName, ns = ...
 -- for all colors in the entire user interface.
 local oUF = ns.oUF
 
--- unit specifics
-oUF.colors.health = oUF:CreateColor(245, 0, 45)
-oUF.colors.cast = oUF:CreateColor(70, 255, 131)
-oUF.colors.disconnected = oUF:CreateColor(120, 120, 120)
-oUF.colors.tapped = oUF:CreateColor(121, 101, 96)
-oUF.colors.dead = oUF:CreateColor(121, 101, 96)
+-- general interface colors
+oUF.colors.normal = oUF:CreateColor(229, 178, 38)
+oUF.colors.highlight = oUF:CreateColor(250, 250, 250)
+oUF.colors.title = oUF:CreateColor(255, 234, 137)
+oUF.colors.white = oUF:CreateColor(220, 220, 220)
+oUF.colors.offwhite = oUF:CreateColor(196, 196, 196)
+oUF.colors.green = oUF:CreateColor(25, 178, 25)
+oUF.colors.red = oUF:CreateColor(204, 25, 25)
+oUF.colors.darkred = oUF:CreateColor(179, 25, 25)
+oUF.colors.palered = oUF:CreateColor(204, 68, 68)
+oUF.colors.paleblue = oUF:CreateColor(25, 125, 205)
+oUF.colors.brightred = oUF:CreateColor(249, 68, 68)
+oUF.colors.brightblue = oUF:CreateColor(178, 178, 249)
+oUF.colors.gray = oUF:CreateColor(128, 128, 128)
+oUF.colors.darkgray = oUF:CreateColor(89, 79, 69)
+oUF.colors.verydarkgray = oUF:CreateColor(49, 39, 29) -- 69, 59, 49
+oUF.colors.ui = oUF:CreateColor(192, 192, 192)
+oUF.colors.uidark = oUF:CreateColor(144, 144, 144)
+oUF.colors.aura = oUF:CreateColor(251, 120, 29)
 
 -- xp, rep and artifact coloring
 oUF.colors.xp = oUF:CreateColor(116, 23, 229) -- xp bar
@@ -43,6 +56,13 @@ oUF.colors.rested = oUF:CreateColor(163, 23, 229) -- xp bar while being rested
 oUF.colors.restedValue = oUF:CreateColor(203, 77, 229) -- xp bar text while being rested
 oUF.colors.restedBonus = oUF:CreateColor(69, 17, 134) -- rested bonus bar
 oUF.colors.artifact = oUF:CreateColor(229, 204, 127)
+
+-- unit specifics
+oUF.colors.health = oUF:CreateColor(245, 0, 45)
+oUF.colors.cast = oUF:CreateColor(70, 255, 131)
+oUF.colors.disconnected = oUF:CreateColor(120, 120, 120)
+oUF.colors.tapped = oUF:CreateColor(121, 101, 96)
+oUF.colors.dead = oUF:CreateColor(121, 101, 96)
 
 -- quest difficulty
 oUF.colors.quest = {}
