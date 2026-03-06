@@ -6,47 +6,47 @@ If you choose to download and manually install directly from GitHub, you'll need
 - [Ace3](https://www.curseforge.com/wow/addons/ace3)
 
 ## Configuring the UI
-- **/lock**     Toggles the movable frame anchors for this user interface. *(Note that most of the default Blizzard elements are controlled by the game's own EditMode, so you need to enter it to move or scale these.)*
+- **/lock** Toggles the movable frame anchors for this user interface. *(Note that most of the default Blizzard elements are controlled by the game's own EditMode, so you need to enter it to move or scale these.)*
 
 ## Development Status
-    🔁 UnitFrames  
-      🔁 Player  
-      🔳 Pet  
-      🔁 Target  
-      🔳 Target of Target  
-      🔳 Focus  
-      🔳 Boss  
-      🔳 Party  
-      🚫 ~~Raid~~  
-      🚫 ~~Arena Enemy~~  
-      ✅ Movable/scalable UnitFrames  
-    🔳 ActionBars  
-      🔳 Primary Bar  
-        🔳 Page Switching **(Stance/Possess/Vehicle)**  
-      🔳 Bar 2  
-      🔳 Bar 3  
-      🔳 Bar 4  
-      🔳 Bar 5  
-      🔳 Bar 6  
-      🔳 Bar 7  
-      🔳 Bar 8  
-      🔳 Stance Bar  
-      🔳 Pet Action Bar  
-      🔳 Extra Abilities Bar  
-      🔳 Zone Abilities Bar  
-      🔳 Encounter Bar  
-      🚫 ~~Possess Bar~~ **(using primary bar paging)**  
-      🔳 Micro Menu  
-    🔳 Player Buffs & Debuffs  
-    🔳 Chat Frames (styling)  
-      🔳 Background Removal  
-      🔳 Hover functionality for clutter  
-    🔁 Minimap  
-      ✅ Border  
-        🔳 North tag  
-        🔳 Groupfinder eye  
-        🔳 Grouptype banners  
-    🔳 Options Menu  
+- 🔁 UnitFrames  
+  - 🔁 Player  
+  - 🔳 Pet  
+  - 🔁 Target  
+  - 🔳 Target of Target  
+  - 🔳 Focus  
+  - 🔳 Boss Frames  
+  - 🔳 Party Frames   
+  - 🚫 ~~Raid~~  
+  - 🚫 ~~Arena Enemy~~  
+  - ✅ Movable/scalable UnitFrames  
+- 🔳 ActionBars  
+  - 🔳 Primary Bar  
+    - 🔳 Page Switching *(Stance/Possess/Vehicle)*  
+  - 🔳 Bar 2  
+  - 🔳 Bar 3  
+  - 🔳 Bar 4  
+  - 🔳 Bar 5  
+  - 🔳 Bar 6  
+  - 🔳 Bar 7  
+  - 🔳 Bar 8  
+  - 🔳 Stance Bar  
+  - 🔳 Pet Action Bar  
+  - 🔳 Extra Abilities Bar  
+  - 🔳 Zone Abilities Bar  
+  - 🔳 Encounter Bar  
+  - 🚫 ~~Possess Bar~~ *(using primary bar paging)*  
+  - 🔳 Micro Menu  
+- 🔳 Player Buffs & Debuffs  
+- 🔳 Chat Frames *(styling)*  
+  - 🔳 Background Removal  
+  - 🔳 Hover functionality for clutter  
+- 🔁 Minimap  
+  - ✅ Border  
+  - 🔳 Compass North tag  
+  - 🔳 Groupfinder eye  
+  - 🔳 Grouptype banners  
+- 🔳 Options Menu  
 
 ✅ = Finished  
 🔁 = In progress  
@@ -55,10 +55,10 @@ If you choose to download and manually install directly from GitHub, you'll need
 
 ### Sponsor
 Note the amount of people visibly and monthly pledging is directly equivalent to the amount of time and effort I put into investigating bugs and adding features that does not affect me personally. You're dedicated, I'm dedicated.
-- GitHub: [github.com/sponsors/goldpawsstuff](https://github.com/sponsors/goldpawsstuff)
-- Patreon: [patreon.com/goldpawsstuff](https://www.patreon.com/goldpawsstuff)
-- Paypal: [paypal.me/goldpawsstuff](https://www.paypal.me/goldpawsstuff)
+- **GitHub:** [github.com/sponsors/goldpawsstuff](https://github.com/sponsors/goldpawsstuff)
+- **Patreon:** [patreon.com/goldpawsstuff](https://www.patreon.com/goldpawsstuff)
+- **Paypal:** [paypal.me/goldpawsstuff](https://www.paypal.me/goldpawsstuff)
 
 ### Connect
-- X: [@goldpawsstuff](https://x.com/goldpawsstuff)
-- Discord: [discord.gg/RwcSm8V3Dy](https://discord.gg/RwcSm8V3Dy)
+- **X:** [@goldpawsstuff](https://x.com/goldpawsstuff)
+- **Discord:** [discord.gg/RwcSm8V3Dy](https://discord.gg/RwcSm8V3Dy)
