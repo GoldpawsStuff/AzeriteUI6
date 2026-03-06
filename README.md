@@ -19,10 +19,10 @@ If you choose to download and manually install directly from GitHub, you'll need
       🔳 Party  
       🚫 ~~Raid~~  
       🚫 ~~Arena Enemy~~  
-      ✅ Movable UnitFrames  
-    ⏳ ActionBars  
+      ✅ Movable/scalable UnitFrames  
+    🔳 ActionBars  
       🔳 Primary Bar  
-        🔳 Page Switching (Stance/Possess/Vehicle)  
+        🔳 Page Switching **(Stance/Possess/Vehicle)**  
       🔳 Bar 2  
       🔳 Bar 3  
       🔳 Bar 4  
@@ -33,11 +33,12 @@ If you choose to download and manually install directly from GitHub, you'll need
       🔳 Stance Bar  
       🔳 Pet Action Bar  
       🔳 Extra Abilities Bar  
+      🔳 Zone Abilities Bar  
       🔳 Encounter Bar  
-      🚫 ~~Possess Bar~~(using paging on primary)  
+      🚫 ~~Possess Bar~~ **(using primary bar paging)**  
       🔳 Micro Menu  
-    ⏳ Player Buffs & Debuffs  
-    ⏳ Chat Frames (styling)  
+    🔳 Player Buffs & Debuffs  
+    🔳 Chat Frames (styling)  
       🔳 Background Removal  
       🔳 Hover functionality for clutter  
     🔁 Minimap  
@@ -45,11 +46,10 @@ If you choose to download and manually install directly from GitHub, you'll need
         🔳 North tag  
         🔳 Groupfinder eye  
         🔳 Grouptype banners  
-    ⏳ Options Menu  
+    🔳 Options Menu  
 
-🔁 = In progress  
 ✅ = Finished  
-⏳ = Waiting
+🔁 = In progress  
 ⛔ = Blocked
 🚫 = Cancelled
 
