@@ -9,18 +9,18 @@ If you choose to download and manually install directly from GitHub, you'll need
 - **/lock** - Toggles the movable frame anchors for this user interface. *(Note that most of the default Blizzard elements are controlled by the game's own EditMode, so you need to enter it to move or scale these.)*
 
 ## Development Status
-- [ ] Unitframes
-  - [*] Player 
+- [ ] UnitFrames 
+  - 🔁 Player  
   - [ ] Pet 
-  - [*] Target 
+  - 🔁 Target 
   - [ ] Target of Target 
   - [ ] Focus 
   - [ ] Boss 
   - [ ] Party 
-  - [x] Movable Frames
-- [ ] Actionbars
+  - ✅ Movable UnitFrames
+- [ ] ActionBars
   - [ ] Primary Bar
-    - [ ] Page Switching (Stance/Form/Vehicle)
+    - [ ] Page Switching (Stance/Possess/Vehicle)
   - [ ] Bar 2
   - [ ] Bar 3
   - [ ] Bar 4
@@ -32,22 +32,18 @@ If you choose to download and manually install directly from GitHub, you'll need
   - [ ] Pet Action Bar 
   - [ ] Extra Abilities Bar
   - [ ] Encounter Bar
-  - [ ] Possess Bar 
+  - ⛔ ~~Possess Bar~~ 
   - [ ] Micro Menu
 - [ ] Player Buffs & Debuffs
 - [ ] Chat Frames (styling) 
   - [ ] Background Removal
   - [ ] Hover functionality for clutter
-- [ ] Minimap
-  - [x] Border
+- [ ] Minimap 
+  - ✅ Border
   - [ ] North tag
   - [ ] Groupfinder eye
   - [ ] Grouptype banners
 - [ ] Options Menu
-
-[ ] = Unfinished  
-[*] = In progress  
-[x] = Finished  
 
 ### Sponsor
 Note the amount of people visibly and monthly pledging is directly equivalent to the amount of time and effort I put into investigating bugs and adding features that does not affect me personally. You're dedicated, I'm dedicated.
