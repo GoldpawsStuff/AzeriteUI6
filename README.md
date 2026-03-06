@@ -50,8 +50,8 @@ If you choose to download and manually install directly from GitHub, you'll need
 
 ✅ = Finished  
 🔁 = In progress  
-⛔ = Blocked
-🚫 = Cancelled
+⛔ = Blocked  
+🚫 = Cancelled  
 
 ### Sponsor
 Note the amount of people visibly and monthly pledging is directly equivalent to the amount of time and effort I put into investigating bugs and adding features that does not affect me personally. You're dedicated, I'm dedicated.
