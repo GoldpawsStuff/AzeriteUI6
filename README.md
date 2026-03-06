@@ -9,10 +9,10 @@ If you choose to download and manually install directly from GitHub, you'll need
 - **/lock** - Toggles the movable frame anchors for this user interface. *(Note that most of the default Blizzard elements are controlled by the game's own EditMode, so you need to enter it to move or scale these.)*
 
 ## Development Status
-- [/] Unitframes
-  - [/] Player 
+- [ ] Unitframes
+  - [*] Player 
   - [ ] Pet 
-  - [/] Target 
+  - [*] Target 
   - [ ] Target of Target 
   - [ ] Focus 
   - [ ] Boss 
@@ -38,7 +38,7 @@ If you choose to download and manually install directly from GitHub, you'll need
 - [ ] Chat Frames (styling) 
   - [ ] Background Removal
   - [ ] Hover functionality for clutter
-- [/] Minimap
+- [ ] Minimap
   - [x] Border
   - [ ] North tag
   - [ ] Groupfinder eye
@@ -46,7 +46,7 @@ If you choose to download and manually install directly from GitHub, you'll need
 - [ ] Options Menu
 
 [ ] = Unfinished  
-[/] = In progress  
+[*] = In progress  
 [x] = Finished  
 
 ### Sponsor
