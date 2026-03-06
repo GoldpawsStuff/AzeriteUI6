@@ -8,12 +8,53 @@ If you choose to download and manually install directly from GitHub, you'll need
 ## Configuring the UI
 - **/lock** - Toggles the movable frame anchors for this user interface. *(Note that most of the default Blizzard elements are controlled by the game's own EditMode, so you need to enter it to move or scale these.)*
 
-## Sponsor
+## Development Status
+- [/] Unitframes
+  - [/] Player 
+  - [ ] Pet 
+  - [/] Target 
+  - [ ] Target of Target 
+  - [ ] Focus 
+  - [ ] Boss 
+  - [ ] Party 
+  - [x] Movable Frames
+- [ ] Actionbars
+  - [ ] Primary Bar
+    - [ ] Page Switching (Stance/Form/Vehicle)
+  - [ ] Bar 2
+  - [ ] Bar 3
+  - [ ] Bar 4
+  - [ ] Bar 5
+  - [ ] Bar 6
+  - [ ] Bar 7
+  - [ ] Bar 8
+  - [ ] Stance Bar 
+  - [ ] Pet Action Bar 
+  - [ ] Extra Abilities Bar
+  - [ ] Encounter Bar
+  - [ ] Possess Bar 
+  - [ ] Micro Menu
+- [ ] Player Buffs & Debuffs
+- [ ] Chat Frames (styling) 
+  - [ ] Background Removal
+  - [ ] Hover functionality for clutter
+- [/] Minimap
+  - [x] Border
+  - [ ] North tag
+  - [ ] Groupfinder eye
+  - [ ] Grouptype banners
+- [ ] Options Menu
+
+[ ] = Unfinished  
+[/] = In progress  
+[x] = Finished  
+
+### Sponsor
 Note the amount of people visibly and monthly pledging is directly equivalent to the amount of time and effort I put into investigating bugs and adding features that does not affect me personally. You're dedicated, I'm dedicated.
 - GitHub: [github.com/sponsors/goldpawsstuff](https://github.com/sponsors/goldpawsstuff)
 - Patreon: [patreon.com/goldpawsstuff](https://www.patreon.com/goldpawsstuff)
 - Paypal: [paypal.me/goldpawsstuff](https://www.paypal.me/goldpawsstuff)
 
-## Connect
+### Connect
 - X: [@goldpawsstuff](https://x.com/goldpawsstuff)
 - Discord: [discord.gg/RwcSm8V3Dy](https://discord.gg/RwcSm8V3Dy)
