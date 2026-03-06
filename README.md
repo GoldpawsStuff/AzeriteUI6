@@ -10,14 +10,14 @@ If you choose to download and manually install directly from GitHub, you'll need
 
 ## Development Status
 - [ ] UnitFrames 
-  - 🔁 Player  
+  🔁 Player  
   - [ ] Pet 
-  - 🔁 Target 
+  🔁 Target 
   - [ ] Target of Target 
   - [ ] Focus 
   - [ ] Boss 
   - [ ] Party 
-  - ✅ Movable UnitFrames
+  ✅ Movable UnitFrames
 - [ ] ActionBars
   - [ ] Primary Bar
     - [ ] Page Switching (Stance/Possess/Vehicle)
@@ -32,14 +32,14 @@ If you choose to download and manually install directly from GitHub, you'll need
   - [ ] Pet Action Bar 
   - [ ] Extra Abilities Bar
   - [ ] Encounter Bar
-  - ⛔ ~~Possess Bar~~ 
+  ⛔ ~~Possess Bar~~ 
   - [ ] Micro Menu
 - [ ] Player Buffs & Debuffs
 - [ ] Chat Frames (styling) 
   - [ ] Background Removal
   - [ ] Hover functionality for clutter
 - [ ] Minimap 
-  - ✅ Border
+  ✅ Border
   - [ ] North tag
   - [ ] Groupfinder eye
   - [ ] Grouptype banners
