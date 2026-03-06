@@ -11,12 +11,12 @@ If you choose to download and manually install directly from GitHub, you'll need
 ## Development Status
 - [ ] UnitFrames  
   🔁 Player  
-  - [ ] Pet  
+  [ ] Pet  
   🔁 Target  
-  - [ ] Target of Target  
-  - [ ] Focus  
-  - [ ] Boss  
-  - [ ] Party  
+  [ ] Target of Target  
+  [ ] Focus  
+  [ ] Boss  
+  [ ] Party  
   🚫 ~~Raid~~  
   🚫 ~~Arena Enemy~~  
   ✅ Movable UnitFrames  
