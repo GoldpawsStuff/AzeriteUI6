@@ -555,7 +555,6 @@ local style = function(self, unit)
 	self.Power.PostUpdate = Power_UpdateVisibility
 
 	--[[-- 
-
 	-- Energy systems which regenerate OOC
 	Enum.PowerType.Energy
 	Enum.PowerType.Focus
