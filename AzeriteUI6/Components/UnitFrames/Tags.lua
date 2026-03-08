@@ -120,8 +120,10 @@ oUF.Tags.Methods["azui:shortmana"] = function(unit, realUnit)
 end
 
 -- Name function that accepts max length
-oUF.Tags.Methods['azui:name'] = function(unit, realUnit, ...)
-	local name = _TAGS['name'](unit, realUnit)
+-- self:Tag(fontString, "[azui:name(maxLength)]")
+oUF.Tags.Events["azui:name"] = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
+oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
+	local name = _TAGS["name"](unit, realUnit)
 	local length = tonumber(getargs(...))
 	if (length) then
 		return name:utf8sub(1, length)
@@ -130,8 +132,10 @@ oUF.Tags.Methods['azui:name'] = function(unit, realUnit, ...)
 	end
 end
 
--- Show level or icon when appropriate
-oUF.Tags.Methods['azui:level'] = function(unit, realUnit, ...)
+-- Show level when appropriate
+-- self:Tag(fontString, "[azui:level(reversed)]")
+oUF.Tags.Events["azui:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
+oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 	local level = UnitEffectiveLevel(realUnit or unit)
 	if (level and level > 0) then
 		local color = GetDifficultyColor(level)

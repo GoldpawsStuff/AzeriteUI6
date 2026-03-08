@@ -682,9 +682,10 @@ local style = function(self, unit)
 	-- Register events to handle custom element changes
 	self:RegisterEvent("PLAYER_ALIVE", UnitFrame_OnEvent, true)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", UnitFrame_OnEvent, true)
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", UnitFrame_OnEvent, true)
-	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", UnitFrame_OnEvent)
+	--self:RegisterEvent("PLAYER_REGEN_DISABLED", UnitFrame_OnEvent, true)
+	--self:RegisterEvent("PLAYER_REGEN_ENABLED", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", UnitFrame_OnEvent) -- needed for paladin crystal changes
+	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", UnitFrame_OnEvent, true) -- needed for power updates when switching directly between forms
 
 end
 
