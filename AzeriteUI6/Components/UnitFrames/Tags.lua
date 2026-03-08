@@ -46,35 +46,28 @@ local getargs = function(...)
 end
 
 -- Unit difficulty coloring.
-local GetDifficultyColor = function(level, isScaling)
-	local colors = oUF.colors.quest
-	local levelDiff = level - UnitLevel("player")
-	if (isScaling) then
-		if (levelDiff > 5) then
-			return colors.red
-		elseif (levelDiff > 3) then
-			return colors.orange
-		elseif (levelDiff >= 0) then
-			return colors.yellow
-		elseif (-levelDiff <= GetScalingQuestGreenRange()) then
-			return colors.green
-		else
-			return colors.gray
-		end
+local GetDifficultyColorForUnit = function(unit)
+	-- 0 = Trivial 	
+	-- 1 = Easy 	
+	-- 2 = Fair 	
+	-- 3 = Difficult 	
+	-- 4 = Impossible 	
+	local difficulty = C_PlayerInfo.GetContentDifficultyCreatureForPlayer(unit)
+	if (difficulty == Enum.RelativeContentDifficulty.Trivial) then
+		return oUF.colors.quest.gray
+	elseif (difficulty == Enum.RelativeContentDifficulty.Easy) then
+		return oUF.colors.quest.green
+	elseif (difficulty == Enum.RelativeContentDifficulty.Fair) then
+		return oUF.colors.quest.yellow
+	elseif (difficulty == Enum.RelativeContentDifficulty.Difficult) then
+		return oUF.colors.quest.orange
+	elseif (difficulty == Enum.RelativeContentDifficulty.Impossible) then
+		return oUF.colors.quest.red
 	else
-		if (levelDiff > 5) then
-			return colors.red
-		elseif (levelDiff > 3) then
-			return colors.orange
-		elseif (levelDiff >= -2) then
-			return colors.yellow
-		elseif (-levelDiff <= GetQuestGreenRange()) then
-			return colors.green
-		else
-			return colors.gray
-		end
+		return oUF.colors.quest.yellow
 	end
 end
+
 
 oUF.Tags.Events["azui:shorthealth"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
 oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
@@ -138,7 +131,7 @@ oUF.Tags.Events["azui:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_
 oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 	local level = UnitEffectiveLevel(realUnit or unit)
 	if (level and level > 0) then
-		local color = GetDifficultyColor(level)
+		local color = GetDifficultyColorForUnit(unit)
 		local levelText = color:GenerateHexColorMarkup() .. level .. "|r"
 
 		local showLast = getargs(...)
