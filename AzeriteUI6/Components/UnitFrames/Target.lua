@@ -387,21 +387,32 @@ local style = function(self, unit)
 	--------------------------------------------
 	-- The target frame is reversed, 
 	-- so the absorb bar becomes a regular non-reversed bar here. 
-	local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
-	damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
-	damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
-	damageAbsorb:SetSize(386, 40)
-	damageAbsorb:SetAllPoints(self.Health)
+	--local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
+	--damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
+	--damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
+	--damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
+	--damageAbsorb:SetSize(386, 40)
+	--damageAbsorb:SetPoint("TOP")
+	--damageAbsorb:SetPoint("BOTTOM")
+	--damageAbsorb:SetPoint("LEFT")
+
+	-- Nothing appears. Must look into this later.
+	--local test = self:CreateTexture(nil, "OVERLAY", nil, 6)
+	--test:SetAllPoints(damageAbsorb)
+	--test:SetColorTexture(0, .7, 0, .3)
 
 	-- Register with oUF
-	self.HealthPrediction = {
-		healingAll = nil, 
-		damageAbsorb = damageAbsorb,
-		damageAbsorbClampMode = 0,
-		incomingHealClampMode = 0,
-		incomingHealOverflow = 1
-	}
+	--self.HealthPrediction = {
+	--	healingAll = nil, 
+	--	damageAbsorb = damageAbsorb,
+	--	damageAbsorbClampMode = 0,
+	--	incomingHealClampMode = 0,
+	--	incomingHealOverflow = 1,
+	--	--PostUpdate = function(element, unit)
+	--	--	print("fired for", unit) 
+	--	--	print(element.damageAbsorb:GetValue(), element.damageAbsorb:GetMinMaxValues())
+	--	--end
+	--}
 
 	-- Overlayed Castbar
 	--------------------------------------------

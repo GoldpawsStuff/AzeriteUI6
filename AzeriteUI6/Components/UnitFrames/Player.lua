@@ -404,7 +404,7 @@ local style = function(self, unit)
 	--damageAbsorb:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
 	--damageAbsorb:SetReverseFill(true)
 
-	local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
+	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
 	--damageAbsorbTex:SetSize(385, 40)
 	--damageAbsorbTex:SetAllPoints(damageAbsorb:GetStatusBarTexture())
 	--damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))

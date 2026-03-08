@@ -65,6 +65,9 @@ ns.HideBlizzard = function(self)
 		self:RegisterFrameForFading(_G["StanceButton"..i], "StanceBars")
 	end
 
+	-- xp- and reputation bars
+	self:RegisterFrameForFading(MainStatusTrackingBarContainer, "ActionBars")
+
 end
 
 ns.RefreshConfig = function(self, event, ...)
