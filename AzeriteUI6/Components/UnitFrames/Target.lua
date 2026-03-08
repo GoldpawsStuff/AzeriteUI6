@@ -36,6 +36,15 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
+-- Function to create an alpha curve based on min/max values.
+local createAlphaCurve = function(min, max)
+	local alphaCurve = C_CurveUtil.CreateColorCurve()  -- Returns ColorCurveObject
+	alphaCurve:SetType(Enum.LuaCurveType.Step) -- Step: instant jump at points
+	alphaCurve:AddPoint(0, CreateColor(1, 1, 1, min or 0)) -- At 0%: alpha=<min> (hide)
+	alphaCurve:AddPoint(.01, CreateColor(1, 1, 1, max or 1)) -- At 1%+: alpha=<max> (show)
+	return alphaCurve
+end
+
 -- Toggle cast text color on protected casts.
 local Castbar_PostCastInterruptible = function(element, unit)
 	if (element.notInterruptible) then
@@ -94,6 +103,34 @@ local CastBar_OnUpdate = function(element, elapsed)
 	end
 end
 
+-- Update NPC classification badge for rares, elites and bosses.
+local Classification_Update = function(self, event, unit, ...)
+	if (unit and unit ~= self.unit) then return end
+
+	local element = self.Classification
+	unit = unit or self.unit
+
+	if (UnitIsPlayer(unit)) then
+		return element:Hide()
+	end
+	local l = UnitEffectiveLevel(unit)
+	local c = (l and l < 1) and "worldboss" or UnitClassification(unit)
+	if (c == "boss" or c == "worldboss") then
+		element:SetTexture(element.bossTexture)
+		element:Show()
+
+	elseif (c == "elite") then
+		element:SetTexture(element.eliteTexture)
+		element:Show()
+
+	elseif (c == "rare" or c == "rareelite") then
+		element:SetTexture(element.rareTexture)
+		element:Show()
+	else
+		element:Hide()
+	end
+end
+
 local Health_OnValueChanged = function(element, val) 
 	if (val) then
 		local perc = UnitHealthPercent(element.__owner.unit, true, CurveConstants.ZeroToOne)
@@ -134,6 +171,118 @@ local Portrait_PostUpdate = function(element, unit, hasStateChanged)
 		element:SetUnit(unit)
 		element.guid = guid
 	end
+end
+
+-- Hide power crystal when no power exists.
+local Power_UpdateVisibility = function(element, unit, cur, min, max)
+	if (UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)) then
+		element:Hide()
+		element.Backdrop:Hide()
+		element.Value:Hide()
+	else
+		element:Show()
+		element.Backdrop:Show()
+		element.Value:Show()
+		if (element.alphaCurve) then
+			local ptype = UnitPowerType(unit)  -- Safe (non-secret)
+			local color = UnitPowerPercent(unit, ptype, true, element.alphaCurve)  -- Secret-safe!
+			local _, _, _, a = color:GetRGBA()  -- Safe number!
+			element:SetAlpha(a)
+		end
+	end
+end
+
+-- Only show Horde/Alliance badges,
+-- keep this hidding for rare-, elite- and boss NPCs.
+local PvPIndicator_Override = function(self, event, unit)
+	if (unit and unit ~= self.unit) then return end
+
+	local element = self.PvPIndicator
+	unit = unit or self.unit
+
+	local l = UnitEffectiveLevel(unit)
+	local c = (l and l < 1) and "worldboss" or UnitClassification(unit)
+	if (c == "boss" or c == "worldboss" or c == "elite" or c == "rare") then
+		return element:Hide()
+	end
+
+	local status
+	local factionGroup = UnitFactionGroup(unit) or "Neutral"
+	if (factionGroup ~= "Neutral") then
+		if (UnitIsPVPFreeForAll(unit)) then
+		elseif (UnitIsPVP(unit)) then
+			if (ns.IsRetail and UnitIsMercenary(unit)) then
+				if (factionGroup == "Horde") then
+					factionGroup = "Alliance"
+				elseif (factionGroup == "Alliance") then
+					factionGroup = "Horde"
+				end
+			end
+			status = factionGroup
+		end
+	end
+
+	if (status) then
+		element:SetTexture(element[status])
+		element:Show()
+	else
+		element:Hide()
+	end
+end
+
+-- Update target indicator texture.
+local TargetIndicator_Update = function(self, event, unit, ...)
+	if (unit and unit ~= self.unit) then return end
+
+	local element = self.TargetIndicator
+	unit = unit or self.unit
+
+	local target = unit .. "target"
+	if (not UnitExists(target) or UnitIsUnit(unit, "player")) then
+		return element:Hide()
+	end
+
+	if (UnitCanAttack("player", unit)) then
+		if (UnitIsUnit(target, "player")) then
+			element:SetTexture(element.enemyTexture)
+		elseif (UnitIsUnit(target, "pet")) then
+			element:SetTexture(element.petTexture)
+		else
+			return element:Hide()
+		end
+	elseif (UnitIsUnit(target, "player")) then
+		element:SetTexture(element.friendTexture)
+	else
+		return element:Hide()
+	end
+
+	element:Show()
+end
+
+local TargetIndicator_Start = function(self)
+	local targetIndicator = self.TargetIndicator
+	if (not targetIndicator.Ticker) then
+		targetIndicator.Ticker = C_Timer.NewTicker(.1, function() TargetIndicator_Update(self) end)
+	end
+end
+
+local TargetIndicator_Stop = function(self)
+	local targetIndicator = self.TargetIndicator
+	if (targetIndicator.Ticker) then
+		targetIndicator.Ticker:Cancel()
+		targetIndicator.Ticker = nil
+		targetIndicator:Hide()
+	end
+end
+
+local UnitFrame_PostUpdate = function(self)
+	Classification_Update(self)
+end
+
+-- Primarily needed to update orb/crystal visibilities
+local UnitFrame_OnEvent = function(self, event, unit, ...)
+	self.Power:ForceUpdate()
+	UnitFrame_PostUpdate(self)
 end
 
 -- Setup the unitframe
@@ -197,7 +346,6 @@ local style = function(self, unit)
 
 	self:Tag(healthPerc, "[perhp]")
 
-
 	-- Options
 	health.colorDisconnected = true
 	health.colorTapping = true
@@ -216,7 +364,6 @@ local style = function(self, unit)
 
 	-- Apply scripts that update our reversed bar texture.
 	self.Health:SetScript("OnValueChanged", Health_OnValueChanged)
-
 	
 	-- CombatFeedback
 	--------------------------------------------
@@ -273,7 +420,6 @@ local style = function(self, unit)
 		incomingHealOverflow = 1
 	}
 
-
 	-- Overlayed Castbar
 	--------------------------------------------
 	local castbar = CreateFrame("StatusBar", nil, self)
@@ -324,6 +470,53 @@ local style = function(self, unit)
 	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
 
 
+	-- Power Crystal
+	--------------------------------------------
+	-- *why did I create so many frames and layers here? 
+
+	local power = CreateFrame("StatusBar", nil, self)
+	power:SetFrameLevel(self:GetFrameLevel() + 5)
+	--power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+	power:SetPoint("TOPRIGHT", 8, -58)
+	power:SetSize(80, 80)
+	power:SetOrientation("VERTICAL")
+	power:SetStatusBarTexture(GetMedia("power_crystal_small_front"))
+	power:SetAlpha(.75)
+	power.alphaCurve = createAlphaCurve(0,1)
+	power.frequentUpdates = true
+	power.displayAltPower = true
+	power.colorPower = true
+
+	--local powerBackdropGroup = CreateFrame("Frame", nil, self)
+	--powerBackdropGroup:SetAllPoints(power)
+	--powerBackdropGroup:SetFrameLevel(power:GetFrameLevel())
+
+	local powerBackdrop = power:CreateTexture(nil, "BACKGROUND", nil, 0)
+	powerBackdrop:SetPoint("CENTER", 0, 0)
+	powerBackdrop:SetSize(80, 80)
+	powerBackdrop:SetTexture(GetMedia("power_crystal_small_back"))
+	powerBackdrop:SetVertexColor(1, 1, 1, .85)
+
+	-- Power Value Text
+	--local powerOverlayGroup = CreateFrame("Frame", nil, self)
+	--powerOverlayGroup:SetAllPoints(power)
+	--powerOverlayGroup:SetFrameLevel(power:GetFrameLevel() + 1)
+
+	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 0)
+	powerValue:SetPoint("CENTER", 0, -5)
+	powerValue:SetJustifyH("CENTER")
+	powerValue:SetJustifyV("MIDDLE")
+	powerValue:SetFontObject(GetFont(14, true))
+	powerValue:SetTextColor(self.colors.highlight:GetRGB())
+	powerValue:SetAlpha(.5)
+
+	self:Tag(powerValue, "[azui:shortpower]")
+
+	self.Power = power
+	self.Power.Value = powerValue
+	self.Power.Backdrop = powerBackdrop
+	self.Power.PostUpdate = Power_UpdateVisibility
+
 	-- Portrait
 	--------------------------------------------
 	local portraitFrame = CreateFrame("Frame", nil, self)
@@ -369,60 +562,41 @@ local style = function(self, unit)
 	self.Portrait.Border = portraitBorder
 	self.Portrait.PostUpdate = Portrait_PostUpdate
 
-
-	-- Power Crystal
+	-- PvP Indicator Badge
 	--------------------------------------------
-	--[[
-	local power = CreateFrame("StatusBar", nil, self)
-	power:SetSize(120,140)
-	power:SetPoint("BOTTOMLEFT", 20, 38)
-	power:SetStatusBarTexture(GetMedia("blank"))
-	power:GetStatusBarTexture():SetVertexColor(0, 0, 0, 0) -- hide statusbar tex, not the bar
+	local PvPIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
+	PvPIndicator:SetSize(84, 84)
+	PvPIndicator:SetPoint("TOPRIGHT", -41, -91)
+	PvPIndicator.Alliance = GetMedia("icon_badges_alliance")
+	PvPIndicator.Horde = GetMedia("icon_badges_horde")
 
-	-- Power Crystal backdrop
-	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
-	powerBg:SetSize(196, 196)
-	powerBg:SetPoint("CENTER", 0, 0)
-	powerBg:SetTexture(GetMedia("power-crystal-ice-back"))
-	--powerBg:SetTexture(GetMedia("power_crystal_back"))
-	--powerBg:SetIgnoreParentAlpha(true)
+	self.PvPIndicator = PvPIndicator
+	self.PvPIndicator.Override = PvPIndicator_Override
 
-	-- Fake powerbar texture, needed for our vertical bars
-	local powerTex = power:CreateTexture(nil, "BACKGROUND", nil, -6)
-	powerTex:SetPoint("BOTTOM", 0, 0)
-	powerTex:SetPoint("LEFT", 0, 0)
-	powerTex:SetPoint("RIGHT", 0, 0)
-	powerTex:SetPoint("TOP", 0, 0)
-	powerTex:SetTexture(GetMedia("power-crystal-ice-front")) 
-	--powerTex:SetTexture(GetMedia("power_crystal_front"))
-	--powerTex:SetVertexColor(0/255, 208/255, 176/255) 
-	--powerTex:SetIgnoreParentAlpha(true)
-	powerTex:SetTexCoord(50/255, 206/255, 37/255, 219/255)
+	-- Classification Badge
+	--------------------------------------------
+	local classification = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
+	classification:SetSize(84, 84)
+	classification:SetPoint("TOPRIGHT", -41, -91)
+	classification.bossTexture = GetMedia("icon_badges_boss")
+	classification.eliteTexture = GetMedia("icon_classification_elite")
+	classification.rareTexture = GetMedia("icon_classification_rare")
 
-	local pMin, pMax
-	power:SetScript("OnMinMaxChanged", function(self, min, max) 
-		pMin, pMax = min, max
-		-- Do we actually need to do anything more here? 
-	end)
+	self.Classification = classification
 
-	-- This will be called when the value changes, 
-	-- and it's allowed access to min/max/cur values of the bar.
-	-- This script handler is one of the only ones that are allowed to do that in WoW12.
-	power:SetScript("OnValueChanged", function(self, val) 
-		if (val and pMax and pMax > 0) then
-			powerTex:SetTexCoord(50/255, 206/255, 37/255 + (1 - val/pMax)*((219-37)/255), 219/255)
-			powerTex:SetPoint("TOP", 0, (- (pMax-val)/pMax * 140))
-		end
-	end)
+	-- Unit Name
+	--------------------------------------------
+	local name = self:CreateFontString(nil, "OVERLAY", nil, 1)
+	name:SetPoint("TOPRIGHT", -153, -21)
+	name:SetFontObject(GetFont(18, true))
+	name:SetTextColor(self.colors.highlight:GetRGB())
+	name:SetAlpha(.75)
+	name:SetJustifyH("RIGHT")
+	name:SetJustifyV("TOP")
 
-	-- Options
-	power.colorPower = false -- true to follow default coloring, false to never modify
-	power.displayAltPower = true -- allow this to be used for altpower from quests and various
-	power.frequentUpdates = true -- update often
+	self:Tag(name, "[azui:name(20)][azui:level(true)]") -- limit name to 20, align optional level to the right
 
-	-- Register it with oUF
-	self.Power = power
-	--]]
+	self.Name = name
 
 	-- Auras
 	--------------------------------------------
@@ -451,6 +625,8 @@ local style = function(self, unit)
 	self.Auras = auras
 	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
 	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget
+
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
 
 end
 

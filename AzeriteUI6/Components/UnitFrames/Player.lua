@@ -45,6 +45,14 @@ local GetMedia = ns.GetMedia
 -- We'll update this when entering world or changing specs
 local playerIsRetribution = UnitClassBase("player") == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
 
+-- Function to create an alpha curve based on min/max values.
+local createAlphaCurve = function(min, max)
+	local alphaCurve = C_CurveUtil.CreateColorCurve()  -- Returns ColorCurveObject
+	alphaCurve:SetType(Enum.LuaCurveType.Step) -- Step: instant jump at points
+	alphaCurve:AddPoint(0, CreateColor(1, 1, 1, min or 0)) -- At 0%: alpha=<min> (hide)
+	alphaCurve:AddPoint(.01, CreateColor(1, 1, 1, max or 1)) -- At 1%+: alpha=<max> (show)
+	return alphaCurve
+end
 
 -- Toggle cast info and health info when castbar is visible.
 local Castbar_PostUpdateTexts = function(element)
@@ -218,17 +226,28 @@ local Mana_UpdateVisibility = function(self, event, unit)
 	end
 end
 
--- Hide power crystal when mana is the primary resource.
+-- Hide power crystal when mana is the primary resource,
+-- also hide power value on systems that go to zero while out of combat. 
 local Power_UpdateVisibility = function(element, unit, cur, min, max)
+
+	-- power crystal visibility
+	local powerType = UnitPowerType(unit)
 	if (playerIsRetribution or db.alwaysUseCrystal) then
 		element:Show()
 	else
-		local powerType = UnitPowerType(unit)
 		if (powerType == Enum.PowerType.Mana and not UnitHasVehicleUI("player")) then
 			element:Hide()
 		else
 			element:Show()
 		end
+	end
+
+	-- power value visibility
+	if (element.Value.alphaCurve) then
+		local ptype = UnitPowerType(unit)  -- Safe (non-secret)
+		local color = UnitPowerPercent(unit, ptype, true, element.Value.alphaCurve)  -- Secret-safe!
+		local _, _, _, a = color:GetRGBA()  -- Safe number!
+		element.Value:SetAlpha(a)
 	end
 end
 
@@ -288,16 +307,12 @@ end
 local UnitFrame_OnEvent = function(self, event, unit, ...)
 	if (event == "PLAYER_ENTERING_WORLD") then
 		playerIsRetribution = playerClass == "PALADIN" and GetSpecialization() == SPEC_PALADIN_RETRIBUTION
-
-		self.Power:ForceUpdate()
-		self.AdditionalPower:ForceUpdate()
-
 	elseif (event == "PLAYER_SPECIALIZATION_CHANGED") then
 		playerIsRetribution = playerClass == "PALADIN" and GetSpecialization() == SPEC_PALADIN_RETRIBUTION
-
-		self.Power:ForceUpdate()
-		self.AdditionalPower:ForceUpdate()
 	end
+
+	self.Power:ForceUpdate()
+	self.AdditionalPower:ForceUpdate()
 end
 
 local style = function(self, unit)
@@ -312,7 +327,6 @@ local style = function(self, unit)
 	local overlay = CreateFrame("Frame", nil, self)
 	overlay:SetFrameLevel(self:GetFrameLevel() + 7)
 	overlay:SetAllPoints()
-
 
 	-- Health bar
 	--------------------------------------------
@@ -359,7 +373,6 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 
-
 	-- CombatFeedback
 	--------------------------------------------
 	local combatFeedback = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 7)
@@ -375,7 +388,6 @@ local style = function(self, unit)
 	combatFeedback.colors = oUF.colors.combatfeedback 
 
 	self.CombatFeedback = combatFeedback
-
 
 	-- Health Prediction
 	--------------------------------------------
@@ -449,7 +461,6 @@ local style = function(self, unit)
 		incomingHealOverflow = 1
 	}
 
-
 	-- Overlayed Castbar
 	--------------------------------------------
 	local castbar = CreateFrame("StatusBar", nil, self)
@@ -489,7 +500,6 @@ local style = function(self, unit)
 	self.Castbar.Time = castbarTime
 	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
 
-
 	-- Power Crystal
 	--------------------------------------------
 	local power = CreateFrame("StatusBar", nil, self)
@@ -516,12 +526,13 @@ local style = function(self, unit)
 
 	-- Power Value
 	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 1)
-	powerValue:SetPoint("CENTER", 0, -16)
+	powerValue:SetPoint("CENTER", power, "CENTER", 0, -16)
 	powerValue:SetFontObject(GetFont(18, true))
 	powerValue:SetTextColor(self.colors.highlight:GetRGB())
-	powerValue:SetAlpha(.75)
 	powerValue:SetJustifyH("CENTER")
 	powerValue:SetJustifyV("MIDDLE")
+	powerValue:SetAlpha(.75)
+	powerValue.alphaCurve = createAlphaCurve(0, .75)
 
 	self:Tag(powerValue, "[azui:shortpower]")
 
@@ -542,7 +553,26 @@ local style = function(self, unit)
 	self.Power.Value = powerValue
 	self.Power.UpdateColor = Power_UpdateColor
 	self.Power.PostUpdate = Power_UpdateVisibility
-	
+
+	--[[-- 
+
+	-- Energy systems which regenerate OOC
+	Enum.PowerType.Energy
+	Enum.PowerType.Focus
+
+	-- ComboPoint systems
+	Enum.PowerType.ArcaneCharges
+	Enum.PowerType.Chi
+	Enum.PowerType.ComboPoints
+	Enum.PowerType.Essence
+	Enum.PowerType.HolyPower
+	Enum.PowerType.Runes
+	Enum.PowerType.SoulShards
+
+	-- Aura based ComboPoint systems
+	--Enum.PowerType.SOUL_FRAGMENTS
+	--Enum.PowerType.STAGGER
+	--]]--
 
 	-- Mana Orb
 	--------------------------------------------
@@ -600,7 +630,6 @@ local style = function(self, unit)
 	self.AdditionalPower.Override = Mana_Override
 	self.AdditionalPower.OverrideVisibility = Mana_UpdateVisibility
 
-
 	-- Combat Indicator
 	--------------------------------------------
 	local combatIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
@@ -612,7 +641,6 @@ local style = function(self, unit)
 	self.CombatIndicator = combatIndicator
 	self.CombatIndicator.PostUpdate = CombatIndicator_PostUpdate
 
-
 	-- PvP Indicator
 	--------------------------------------------
 	local PvPIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
@@ -623,7 +651,6 @@ local style = function(self, unit)
 
 	self.PvPIndicator = PvPIndicator
 	self.PvPIndicator.Override = PvPIndicator_Override
-
 
 	-- Auras
 	--------------------------------------------
@@ -652,10 +679,11 @@ local style = function(self, unit)
 	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
 	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdatePlayer
 
-
 	-- Register events to handle custom element changes
 	self:RegisterEvent("PLAYER_ALIVE", UnitFrame_OnEvent, true)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", UnitFrame_OnEvent, true)
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", UnitFrame_OnEvent)
 
 end

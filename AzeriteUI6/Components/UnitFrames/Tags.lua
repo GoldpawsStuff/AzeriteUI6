@@ -26,8 +26,57 @@
 local addonName, ns = ...
 local oUF = ns.oUF
 
+-- Utility function to turn 'true','false' and 'nil' as text into actual booleans.
+local getargs = function(...)
+	local args = {}
+	for i = 1, select("#", ...) do
+		local arg = select(i, ...)
+		local num = tonumber(arg)
+		if (num) then
+			args[i] = num
+		elseif (arg == "true" or arg == true) then
+			args[i] = true
+		elseif (arg == "nil" or arg == "false" or not arg) then
+			args[i] = false
+		else
+			args[i] = arg
+		end
+	end
+	return unpack(args)
+end
 
-oUF.Tags.Events["azui:shorthealth"] = "UNIT_HEALTH UNIT_MAXHEALTH"
+-- Unit difficulty coloring.
+local GetDifficultyColor = function(level, isScaling)
+	local colors = oUF.colors.quest
+	local levelDiff = level - UnitLevel("player")
+	if (isScaling) then
+		if (levelDiff > 5) then
+			return colors.red
+		elseif (levelDiff > 3) then
+			return colors.orange
+		elseif (levelDiff >= 0) then
+			return colors.yellow
+		elseif (-levelDiff <= GetScalingQuestGreenRange()) then
+			return colors.green
+		else
+			return colors.gray
+		end
+	else
+		if (levelDiff > 5) then
+			return colors.red
+		elseif (levelDiff > 3) then
+			return colors.orange
+		elseif (levelDiff >= -2) then
+			return colors.yellow
+		elseif (-levelDiff <= GetQuestGreenRange()) then
+			return colors.green
+		else
+			return colors.gray
+		end
+	end
+end
+
+oUF.Tags.Events["azui:shorthealth"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
 oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 	if (not UnitIsConnected(unit)) then
 		return PLAYER_OFFLINE
@@ -36,43 +85,63 @@ oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 	elseif (UnitIsDead(unit)) then
 		return DEAD
 	else
-		local secretFuckingNumber = AbbreviateNumbers(UnitHealth(unit))
-		if (secretFuckingNumber == 0) then 
-			return ""
-		else
-			return secretFuckingNumber
-		end
+		return AbbreviateNumbers(UnitHealth(unit))
 	end
 end
 
-oUF.Tags.Events["azui:shortpower"] = "UNIT_MAXPOWER UNIT_POWER_UPDATE"
+-- Need the extra events for it to register on things like druid form changes
+oUF.Tags.Events["azui:shortpower"] = "UNIT_MAXPOWER UNIT_POWER_FREQUENT UNIT_POWER_UPDATE UNIT_DISPLAYPOWER UNIT_CONNECTION"
 oUF.Tags.Methods["azui:shortpower"] = function(unit, realUnit)
-	local val = UnitPower(unit)
-	if (val) then
-		if (not UnitIsDeadOrGhost(unit)) then
-			local secretFuckingNumber = AbbreviateNumbers(val)
-			if (secretFuckingNumber == 0) then 
-				return ""
-			else
-				return secretFuckingNumber
-			end
-			return secretFuckingNumber
+	if (not UnitIsConnected(unit) or UnitIsDeadOrGhost(unit)) then
+		return ""
+	else
+		local val = UnitPower(unit)
+		if (val) then
+			return AbbreviateNumbers(val)
+		else
+			return ""
 		end
 	end
 end
 
-oUF.Tags.Events["azui:shortmana"] = "UNIT_MAXPOWER UNIT_POWER_UPDATE"
+-- Need the extra events for it to register on things like druid form changes
+oUF.Tags.Events["azui:shortmana"] = "UNIT_MAXPOWER UNIT_POWER_FREQUENT UNIT_POWER_UPDATE UNIT_DISPLAYPOWER UNIT_CONNECTION"
 oUF.Tags.Methods["azui:shortmana"] = function(unit, realUnit)
-	local val = UnitPower(unit, Enum.PowerType.Mana)
-	if (val) then
-		if (not UnitIsDeadOrGhost(unit)) then
-			local secretFuckingNumber = AbbreviateNumbers(val)
-			if (secretFuckingNumber == 0) then 
-				return ""
-			else
-				return secretFuckingNumber
-			end
-			return secretFuckingNumber
+	if (not UnitIsConnected(unit) or UnitIsDeadOrGhost(unit)) then
+		return ""
+	else
+		local val = UnitPower(unit, Enum.PowerType.Mana)
+		if (val) then
+			return AbbreviateNumbers(val)
+		else
+			return ""
+		end
+	end
+end
+
+-- Name function that accepts max length
+oUF.Tags.Methods['azui:name'] = function(unit, realUnit, ...)
+	local name = _TAGS['name'](unit, realUnit)
+	local length = tonumber(getargs(...))
+	if (length) then
+		return name:utf8sub(1, length)
+	else
+		return name
+	end
+end
+
+-- Show level or icon when appropriate
+oUF.Tags.Methods['azui:level'] = function(unit, realUnit, ...)
+	local level = UnitEffectiveLevel(realUnit or unit)
+	if (level and level > 0) then
+		local color = GetDifficultyColor(level)
+		local levelText = color:GenerateHexColorMarkup() .. level .. "|r"
+
+		local showLast = getargs(...)
+		if (showLast) then
+			return " |cff888888:|r" .. levelText
+		else
+			return levelText .. "|cff888888:|r "
 		end
 	end
 end
