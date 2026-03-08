@@ -37,6 +37,7 @@ local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
 -- Function to create an alpha curve based on min/max values.
+-- Useful to hide elements when at (almost) zero.
 local createAlphaCurve = function(min, max)
 	local alphaCurve = C_CurveUtil.CreateColorCurve()  -- Returns ColorCurveObject
 	alphaCurve:SetType(Enum.LuaCurveType.Step) -- Step: instant jump at points
@@ -131,8 +132,10 @@ local Classification_Update = function(self, event, unit, ...)
 	end
 end
 
+-- API magic to reverse the bar texture.
 local Health_OnValueChanged = function(element, val) 
 	if (val) then
+		-- This returns the health as a value from 0 to 1. 
 		local perc = UnitHealthPercent(element.__owner.unit, true, CurveConstants.ZeroToOne)
 		element.Texture:SetTexCoord(perc, 0, 0, 1)
 	else
@@ -299,7 +302,6 @@ local style = function(self, unit)
 	overlay:SetFrameLevel(self:GetFrameLevel() + 7)
 	overlay:SetAllPoints()
 
-
 	-- Health bar
 	--------------------------------------------
 	local health = CreateFrame("StatusBar", nil, self)
@@ -376,32 +378,13 @@ local style = function(self, unit)
 	combatFeedback.feedbackFont = GetFont(20, true)
 	combatFeedback.feedbackFontLarge = GetFont(24, true)
 	combatFeedback.feedbackFontSmall = GetFont(18, true)
-	combatFeedback.maxAlpha = .9
 	combatFeedback.colors = oUF.colors.combatfeedback 
+	combatFeedback.maxAlpha = .9
 
 	self.CombatFeedback = combatFeedback
 
-
 	-- Health Prediction
 	--------------------------------------------
-	-- This looks really bad in retail now.
-	-- The problems is how WoW statusbars textures are rendered, 
-	-- where they always start from the left and crop the right, 
-	-- even when the bars grow from the right. 
-	-- It is also fully impossible to adjust the health prediction 
-	-- with the new secure values, as you cannot know both the health value 
-	-- and absorb value at the same time, let alone do math on these numbers.
-	--local healingAll = CreateFrame("StatusBar", nil, self.Health)
-	--healingAll:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	--healingAll:SetStatusBarTexture(GetMedia("plain"))
-	--healingAll:SetStatusBarColor(1, 1, 1, .25)
-	--healingAll:SetPoint("TOP", 0, -.95)
-	--healingAll:SetPoint("BOTTOM",0, 8.25)
-	-- We can't read health values from within the healpredict element,
-	-- so we cannot adjust the texcoords of the healpredict properly.
-	--healingAll:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
-	--healingAll:SetWidth(385)
-
 	-- The target frame is reversed, 
 	-- so the absorb bar becomes a regular non-reversed bar here. 
 	local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
@@ -413,7 +396,7 @@ local style = function(self, unit)
 
 	-- Register with oUF
 	self.HealthPrediction = {
-		--healingAll = healingAll, 
+		healingAll = nil, 
 		damageAbsorb = damageAbsorb,
 		damageAbsorbClampMode = 0,
 		incomingHealClampMode = 0,
@@ -469,7 +452,6 @@ local style = function(self, unit)
 	self.Castbar.OnUpdate = CastBar_OnUpdate
 	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
 
-
 	-- Power Crystal
 	--------------------------------------------
 	-- *why did I create so many frames and layers here? 
@@ -487,20 +469,11 @@ local style = function(self, unit)
 	power.displayAltPower = true
 	power.colorPower = true
 
-	--local powerBackdropGroup = CreateFrame("Frame", nil, self)
-	--powerBackdropGroup:SetAllPoints(power)
-	--powerBackdropGroup:SetFrameLevel(power:GetFrameLevel())
-
 	local powerBackdrop = power:CreateTexture(nil, "BACKGROUND", nil, 0)
 	powerBackdrop:SetPoint("CENTER", 0, 0)
 	powerBackdrop:SetSize(80, 80)
 	powerBackdrop:SetTexture(GetMedia("power_crystal_small_back"))
 	powerBackdrop:SetVertexColor(1, 1, 1, .85)
-
-	-- Power Value Text
-	--local powerOverlayGroup = CreateFrame("Frame", nil, self)
-	--powerOverlayGroup:SetAllPoints(power)
-	--powerOverlayGroup:SetFrameLevel(power:GetFrameLevel() + 1)
 
 	local powerValue = power:CreateFontString(nil, "OVERLAY", nil, 0)
 	powerValue:SetPoint("CENTER", 0, -5)
@@ -604,21 +577,26 @@ local style = function(self, unit)
 	auras:SetSize(316, 76)
 	auras:SetPoint("TOPRIGHT", -150, -126)
 
-	auras.size = 36
-	auras.spacing = 4
-	auras.numTotal = 16
+	-- settings
 	auras.disableMouse = false
 	auras.disableCooldown = false
 	auras.onlyShowPlayer = false
-	auras.initialAnchor = "TOPRIGHT"
+
+	-- layout
+	auras.size = 36
+	auras.spacing = 4
+	auras.numTotal = 16
 	auras.spacingX = 4
 	auras.spacingY = 4
+	auras.initialAnchor = "TOPRIGHT"
 	auras.growthX = "LEFT"
 	auras.growthY = "DOWN"
 	auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
+
+	-- sorting 
+	auras.reanchorIfVisibleChanged = true
 	auras.sortMethod = "TIME_REMAINING"
 	auras.sortDirection = "DESCENDING"
-	auras.reanchorIfVisibleChanged = true
 	auras.buffFilter = "HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT"
 	auras.debuffFilter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY"
 
@@ -626,6 +604,8 @@ local style = function(self, unit)
 	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
 	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget
 
+	-- Callbacks
+	--------------------------------------------
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
 
 end

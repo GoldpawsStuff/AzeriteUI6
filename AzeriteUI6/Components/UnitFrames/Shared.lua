@@ -31,21 +31,6 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
-local OnEnter = function(self)
-	if (GameTooltip:IsForbidden()) then
-		self.UpdateTooltip = nil
-	else
-		UnitFrame_OnEnter(self)
-	end
-end
-
-local OnLeave = function(self)
-	self.UpdateTooltip = nil
-	if (not GameTooltip:IsForbidden()) then
-		UnitFrame_OnLeave(self)
-	end
-end
-
 -- Auras
 -----------------------------------------
 ns.AuraButton_PostCreate = function(element, button)
@@ -167,109 +152,23 @@ ns.AuraButton_PostUpdateTarget = function(element, button, unit, data, position)
 
 end
 
--- https://warcraft.wiki.gg/wiki/Struct_AuraData
-ns.AuraButton_FilterPlayer = function(button, unit, data)
-	-- Every fucking thing fails here. What is the fucking point.
-	--return C_UnitAuras.DoesAuraHaveExpirationTime(unit, data.auraInstanceID)
-end
-
-ns.AuraButton_FilterTarget = function(button, unit, data)
-end
-
--- https://wowpedia.fandom.com/wiki/API_C_UnitAuras.GetAuraDataByAuraInstanceID
-local Aura_Sort = function(a, b)
-
-	-- Debuffs first
-	local aHarm = a.isHarmful
-	local bHarm = b.isHarmful
-	if (aHarm ~= bHarm) then
-		return aHarm
-	end
-
-	-- Show priority auras first
-	--local aPrio = a.spellId and Priority[a.spellId]
-	--local bPrio = b.spellId and Priority[b.spellId]
-	--if (aPrio ~= bPrio) then
-	--	return aPrio
-	--end
-
-	-- Player applied HoTs that we would display on nameplates
-	local aHoT = not a.isHarmful and a.isPlayerAura and a.canApplyAura
-	local bHoT = not b.isHarmful and b.isPlayerAura and b.canApplyAura
-	if (aHoT ~= bHoT) then
-		return aHoT
-	end
-
-	-- Playered applied debuffs that would display by default on nameplates
-	local aPlate = a.nameplateShowAll or (a.nameplateShowPersonal and a.isPlayerAura)
-	local bPlate = b.nameplateShowAll or (b.nameplateShowPersonal and b.isPlayerAura)
-	if (aPlate ~= bPlate) then
-		return aPlate
-	end
-
-	-- Player first, includes procs and zone buffs.
-	if (a.isPlayerAura ~= b.isPlayerAura) then
-		return a.isPlayerAura
-	end
-
-	-- No duration last, short times first.
-	local aTime = (not a.duration or a.duration == 0) and math_huge or a.expirationTime or -1
-	local bTime = (not b.duration or b.duration == 0) and math_huge or b.expirationTime or -1
-
-	if (aTime ~= bTime) then
-		return aTime < bTime
-	end
-
-	return a.auraInstanceID < b.auraInstanceID
-end
-
--- The alternate function is meant to mimic Blizzard sorting.
-local Aura_Sort_Alternate = function(a, b)
-
-	-- Player applied HoTs that we would display on nameplates
-	local aHoT = not a.isHarmful and a.isPlayerAura and a.canApplyAura
-	local bHoT = not b.isHarmful and b.isPlayerAura and b.canApplyAura
-	if (aHoT ~= bHoT) then
-		return aHoT
-	end
-
-	-- Playered applied debuffs that would display by default on nameplates
-	local aPlate = a.nameplateShowAll or (a.nameplateShowPersonal and a.isPlayerAura)
-	local bPlate = b.nameplateShowAll or (b.nameplateShowPersonal and b.isPlayerAura)
-	if (aPlate ~= bPlate) then
-		return aPlate
-	end
-
-	-- Player first, includes procs and zone buffs.
-	if (a.isPlayerAura ~= b.isPlayerAura) then
-		return a.isPlayerAura
-	end
-
-	-- No duration last, short times first.
-	--local aTime = (not a.duration or a.duration == 0) and math_huge or a.expirationTime or -1
-	--local bTime = (not b.duration or b.duration == 0) and math_huge or b.expirationTime or -1
-
-	--if (aTime ~= bTime) then
-	--	return aTime < bTime
-	--end
-
-	return a.auraInstanceID < b.auraInstanceID
-end
-
-ns.AuraSorts_AlternateFuncton = Aura_Sort_Alternate
-ns.AuraSorts_Alternate = function(element, max)
-	table.sort(element, ns.AuraSorts_AlternateFuncton)
-	return 1, #element
-end
-
-ns.AuraSorts_DefaultFunction = Aura_Sort
-ns.AuraSorts_Default = function(element, max)
-	table.sort(element, ns.AuraSorts_DefaultFunction)
-	return 1, #element
-end
-
 -- Hover Scripts
 -----------------------------------------
+local OnEnter = function(self)
+	if (GameTooltip:IsForbidden()) then
+		self.UpdateTooltip = nil
+	else
+		UnitFrame_OnEnter(self)
+	end
+end
+
+local OnLeave = function(self)
+	self.UpdateTooltip = nil
+	if (not GameTooltip:IsForbidden()) then
+		UnitFrame_OnLeave(self)
+	end
+end
+
 ns.ApplyUnitFrameScriptsTo = function(frame)
 	-- Enable clicks (required for both targeting and menus)
 	frame:RegisterForClicks("AnyUp")

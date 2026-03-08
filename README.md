@@ -11,8 +11,11 @@ If you choose to download and manually install directly from GitHub, you'll need
 ## Development Status
 - 🔁 UnitFrames  
   - 🔁 Player  
+    - ⛔ Absorb Bar (Reversed)
+	- ⛔ Incoming Heals
   - 🔳 Pet  
   - 🔁 Target  
+	- ⛔ Incoming Heals
   - 🔳 Target of Target  
   - 🔳 Focus  
   - 🔳 Boss Frames  

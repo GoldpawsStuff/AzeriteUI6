@@ -31,8 +31,8 @@ local LibOrb = LibStub("LibOrb-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
-	alwaysUseCrystal = false,
-	useIceCrystal = false
+	alwaysUseCrystal = false, -- always use crystal, never the mana orb
+	useIceCrystal = false -- use the special wotlk ice crystal instead
 }}
 
 local db -- will be assigned a utility function returning the profile settings/defaults during initialization
@@ -46,6 +46,7 @@ local GetMedia = ns.GetMedia
 local playerIsRetribution = UnitClassBase("player") == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
 
 -- Function to create an alpha curve based on min/max values.
+-- Useful to hide elements when at (almost) zero.
 local createAlphaCurve = function(min, max)
 	local alphaCurve = C_CurveUtil.CreateColorCurve()  -- Returns ColorCurveObject
 	alphaCurve:SetType(Enum.LuaCurveType.Step) -- Step: instant jump at points
@@ -391,24 +392,6 @@ local style = function(self, unit)
 
 	-- Health Prediction
 	--------------------------------------------
-	-- This looks really bad in retail now.
-	-- The problems is how WoW statusbars textures are rendered, 
-	-- where they always start from the left and crop the right, 
-	-- even when the bars grow from the right. 
-	-- It is also fully impossible to adjust the health prediction 
-	-- with the new secure values, as you cannot know both the health value 
-	-- and absorb value at the same time, let alone do math on these numbers.
-	--local healingAll = CreateFrame("StatusBar", nil, self.Health)
-	--healingAll:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	--healingAll:SetStatusBarTexture(GetMedia("plain"))
-	--healingAll:SetStatusBarColor(1, 1, 1, .25)
-	--healingAll:SetPoint("TOP", 0, -.95)
-	--healingAll:SetPoint("BOTTOM",0, 8.25)
-	-- We can't read health values from within the healpredict element,
-	-- so we cannot adjust the texcoords of the healpredict properly.
-	--healingAll:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
-	--healingAll:SetWidth(385)
-
 	-- This frame needs to be reversed, 
 	-- so we need to apply some trickery to make it work.
 	--local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
@@ -417,49 +400,46 @@ local style = function(self, unit)
 	--damageAbsorb:SetPoint("TOP")
 	--damageAbsorb:SetPoint("BOTTOM")
 	--damageAbsorb:SetPoint("RIGHT")
-	--damageAbsorb:SetStatusBarTexture(GetMedia("blank")) -- in theory enough
+	--damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
 	--damageAbsorb:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
 	--damageAbsorb:SetReverseFill(true)
 
-	-- Fake absorb texture, needed for reversed bars
-	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
-	--damageAbsorbTex:SetPoint("BOTTOM", 0, 0)
-	--damageAbsorbTex:SetPoint("RIGHT", 0, 0)
-	--damageAbsorbTex:SetPoint("TOP", 0, 0)
+	local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
+	--damageAbsorbTex:SetSize(385, 40)
+	--damageAbsorbTex:SetAllPoints(damageAbsorb:GetStatusBarTexture())
 	--damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))
+	--damageAbsorbTex:SetTexCoord(1, 0, 0, 1)
 	--damageAbsorbTex:SetVertexColor(1, 1, 1, .35)
 
-	--local aMin, aMax
-	--damageAbsorb:SetScript("OnMinMaxChanged", function(self, min, max) 
-	--	aMin, aMax = min, max
-	--end)
-
-	-- This will be called when the value changes, 
-	-- and it's allowed access and do math to min/max/cur values of the bar.
-	-- This script handler is one of the only ones that are allowed to do that in WoW12.
-	--damageAbsorb:SetScript("OnValueChanged", function(element, val) 
-	--	if (val and aMin and aMax and aMax > 0) then
-	--		-- This can bug out if we don't specifically check. 
-	--		-- Experienced this with some mini-games that have 
-	--		-- their own set of actionbars, but lacks the "player" unitframe. 
-	--		--if (UnitExists("player") or UnitExists("vehicle")) then
-	--			--absorbValue:SetText(AbbreviateNumber(val))
-	--			damageAbsorbTex:SetPoint("LEFT", ((aMax - aMin)-val)/(aMax - aMin) * 386, 0)
-	--			damageAbsorbTex:SetTexCoord((val - aMin)/(aMax - aMin), 0, 0, 1) -- flip the textures
-	--		--end
-	--	else
-	--		--absorbValue:SetText("")
-	--	end
-	--end)
+	-- Fake absorb texture, needed for reversed bars
+	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
+	--damageAbsorb.Texture = damageAbsorbTex
 
 	-- Register with oUF
-	self.HealthPrediction = {
-		--healingAll = healingAll, 
-		--damageAbsorb = damageAbsorb,
-		damageAbsorbClampMode = 0,
-		incomingHealClampMode = 0,
-		incomingHealOverflow = 1
-	}
+	--self.HealthPrediction = {
+	--	healingAll = nil, 
+	--	--damageAbsorb = damageAbsorb,
+	--	damageAbsorbClampMode = 0,
+	--	incomingHealClampMode = 0,
+	--	incomingHealOverflow = 1
+	--}
+
+	--local HealthPrediction_PostUpdate = function(element, unit)
+	--	local absorb = element.damageAbsorb
+	--	-- Is this considered secret?
+	--  -- Yes, it is. 
+	--	local min, max = absorb:GetMinMaxValues() -- secret
+	--	local val = absorb:GetValue() -- secret
+	--	if (val and min and max) then
+	--		perc = val/max -- this doesn't work, numbers are secret
+	--		absorb.Texture:SetTexCoord(perc, 0, 0, 1)
+	--		absorb.Texture:Show()
+	--	else
+	--		absorb.Texture:SetTexCoord(1, 0, 0, 1)
+	--		absorb.Texture:Hide()
+	--	end
+	--end
+	--self.HealthPrediction.PostUpdate = HealthPrediction_PostUpdate
 
 	-- Overlayed Castbar
 	--------------------------------------------
@@ -555,10 +535,6 @@ local style = function(self, unit)
 	self.Power.PostUpdate = Power_UpdateVisibility
 
 	--[[-- 
-	-- Energy systems which regenerate OOC
-	Enum.PowerType.Energy
-	Enum.PowerType.Focus
-
 	-- ComboPoint systems
 	Enum.PowerType.ArcaneCharges
 	Enum.PowerType.Chi
@@ -657,20 +633,26 @@ local style = function(self, unit)
 	auras:SetSize(40*8 - 4, 40*2 - 4)
 	auras:SetPoint("BOTTOMLEFT", 158, 91)
 
-	auras.size = 36
-	auras.spacing = 4
-	auras.numTotal = 16
+	-- settings
 	auras.disableMouse = false
 	auras.disableCooldown = false
-	auras.initialAnchor = "BOTTOMLEFT"
+	auras.onlyShowPlayer = false
+
+	-- layout
+	auras.size = 36
+	auras.spacing = 4
 	auras.spacingX = 4
 	auras.spacingY = 4
+	auras.numTotal = 16
+	auras.initialAnchor = "BOTTOMLEFT"
 	auras.growthX = "RIGHT"
 	auras.growthY = "UP"
 	auras.tooltipAnchor = "ANCHOR_TOPLEFT"
+
+	-- sorting 
+	auras.reanchorIfVisibleChanged = true
 	auras.sortMethod = "TIME_REMAINING"
 	auras.sortDirection = "DESCENDING"
-	auras.reanchorIfVisibleChanged = true
 	auras.buffFilter = "HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT"
 	auras.debuffFilter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE"
 
@@ -678,7 +660,8 @@ local style = function(self, unit)
 	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
 	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdatePlayer
 
-	-- Register events to handle custom element changes
+	-- Callbacks
+	--------------------------------------------
 	self:RegisterEvent("PLAYER_ALIVE", UnitFrame_OnEvent, true)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
 	--self:RegisterEvent("PLAYER_REGEN_DISABLED", UnitFrame_OnEvent, true)
