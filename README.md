@@ -11,7 +11,7 @@ If you choose to download and manually install directly from GitHub, you'll need
 ## Development Status
 - 🔁 UnitFrames  
   - 🔁 Player  
-    - ⛔ Absorb Bar *(Reversed)*  
+    - ⛔ Absorb Bar *(texcoord operation blocked by secrets)*  
 	- ✅ ClassPower  
 	  - 🔁 Death Knight Runes *(unverified)*  
 	  - 🔁 Monk Stagger *(unverified)*  
@@ -23,7 +23,7 @@ If you choose to download and manually install directly from GitHub, you'll need
   - 🔳 Party Frames   
   - 🚫 ~~Raid~~ *(will split into separate addon, or cancel)*  
   - 🚫 ~~Arena Enemy~~ *(will split into separate addon, or cancel)*  
-  - ⛔ Incoming Heals *(Attached to Health)*  
+  - ⛔ Incoming Heals *(texcoord operation blocked by secrets)*  
   - ✅ Movable/scalable UnitFrames  
 - 🔳 ActionBars  
   - 🔳 Primary Bar  
