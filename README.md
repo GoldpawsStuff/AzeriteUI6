@@ -11,17 +11,16 @@ If you choose to download and manually install directly from GitHub, you'll need
 ## Development Status
 - 🔁 UnitFrames  
   - 🔁 Player  
-    - ⛔ Absorb Bar (Reversed)
-	- ⛔ Incoming Heals
+    - ⛔ Absorb Bar *(Reversed)*  
   - 🔳 Pet  
   - 🔁 Target  
-	- ⛔ Incoming Heals
   - 🔳 Target of Target  
   - 🔳 Focus  
   - 🔳 Boss Frames  
   - 🔳 Party Frames   
-  - 🚫 ~~Raid~~  
-  - 🚫 ~~Arena Enemy~~  
+  - 🚫 ~~Raid~~ *(will split into separate addon, or cancel)*  
+  - 🚫 ~~Arena Enemy~~ *(will split into separate addon, or cancel)*  
+  - ⛔ Incoming Heals *(Attached to Health)*  
   - ✅ Movable/scalable UnitFrames  
 - 🔳 ActionBars  
   - 🔳 Primary Bar  
@@ -50,10 +49,11 @@ If you choose to download and manually install directly from GitHub, you'll need
   - 🔳 Groupfinder eye  
   - 🔳 Grouptype banners  
 - 🔳 Options Menu  
+- ✅ Movable UnitFrames Menu  
 
 ✅ = Finished  
 🔁 = In progress  
-⛔ = Blocked  
+⛔ = Incompatible  
 🚫 = Cancelled  
 
 ### Sponsor
