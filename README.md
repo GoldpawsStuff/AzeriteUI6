@@ -12,6 +12,9 @@ If you choose to download and manually install directly from GitHub, you'll need
 - 🔁 UnitFrames  
   - 🔁 Player  
     - ⛔ Absorb Bar *(Reversed)*  
+	- ✅ ClassPower  
+	  - 🔁 Death Knight Runes *(unverified)*  
+	  - 🔁 Monk Stagger *(unverified)*  
   - 🔳 Pet  
   - 🔁 Target  
   - 🔳 Target of Target  

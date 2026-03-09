@@ -15,6 +15,7 @@
 	<Script file="UnitFrames\Shared.lua"/>
 	<Script file="UnitFrames\Tags.lua"/>
 	<Script file="UnitFrames\Player.lua"/>
+	<Script file="UnitFrames\ClassPower.lua"/>
 	<Script file="UnitFrames\Pet.lua"/>
 	<Script file="UnitFrames\Target.lua"/>
 	<Script file="UnitFrames\ToT.lua"/>

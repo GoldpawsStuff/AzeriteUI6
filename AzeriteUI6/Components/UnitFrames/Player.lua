@@ -536,17 +536,17 @@ local style = function(self, unit)
 
 	--[[-- 
 	-- ComboPoint systems
-	Enum.PowerType.ArcaneCharges
-	Enum.PowerType.Chi
-	Enum.PowerType.ComboPoints
-	Enum.PowerType.Essence
-	Enum.PowerType.HolyPower
-	Enum.PowerType.Runes
-	Enum.PowerType.SoulShards
+	Enum.PowerType.ArcaneCharges 		-- 0-5
+	Enum.PowerType.Chi					-- 0-5
+	Enum.PowerType.ComboPoints			-- 0-5 (0-10)(rogues)
+	Enum.PowerType.Essence 				-- 0-6
+	Enum.PowerType.HolyPower 			-- 0-5
+	Enum.PowerType.Runes 				-- 6
+	Enum.PowerType.SoulShards 			-- 0-5
 
 	-- Aura based ComboPoint systems
-	--Enum.PowerType.SOUL_FRAGMENTS
-	--Enum.PowerType.STAGGER
+	--Enum.PowerType.SOUL_FRAGMENTS 	-- 
+	--Enum.PowerType.STAGGER 			-- 
 	--]]--
 
 	-- Mana Orb
