@@ -59,6 +59,7 @@ oUF.colors.artifact = oUF:CreateColor(229, 204, 127)
 
 -- unit specifics
 oUF.colors.health = oUF:CreateColor(245, 0, 45)
+oUF.colors.healthdark = oUF:CreateColor(195, 0, 45)
 oUF.colors.cast = oUF:CreateColor(70, 255, 131)
 oUF.colors.disconnected = oUF:CreateColor(120, 120, 120)
 oUF.colors.tapped = oUF:CreateColor(121, 101, 96)

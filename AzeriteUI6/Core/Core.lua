@@ -66,7 +66,7 @@ ns.HideBlizzard = function(self)
 	end
 
 	-- xp- and reputation bars
-	self:RegisterFrameForFading(MainStatusTrackingBarContainer, "ActionBars")
+	self:RegisterFrameForFading(MainStatusTrackingBarContainer, "StatusBars")
 
 end
 

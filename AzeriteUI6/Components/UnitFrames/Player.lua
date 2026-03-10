@@ -707,19 +707,19 @@ Player.OnEnable = function(self)
 		local frame = self:Spawn("player")
 		frame:SetPoint("BOTTOMLEFT", 46, 100)
 
-		frame.Enable = function(self)
-			RegisterAttributeDriver(self, "unit", "[vehicleui]vehicle; player")
-			self:Show()
-		end
+		--frame.Enable = function(self)
+		--	RegisterAttributeDriver(self, "unit", "[vehicleui]vehicle; player")
+		--	self:Show()
+		--end
 
-		frame.Disable = function(self)
-			UnregisterAttributeDriver(self, "unit")
-			self:Hide()
-		end
+		--frame.Disable = function(self)
+		--	UnregisterAttributeDriver(self, "unit")
+		--	self:Hide()
+		--end
 
 		-- Disable WoWs own handling
-		UnregisterUnitWatch(self.frame)
-		frame:SetAttribute("toggleForVehicle", false)
+		--UnregisterUnitWatch(frame)
+		--frame:SetAttribute("toggleForVehicle", false)
 
 	end)
 end
