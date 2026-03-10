@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 local oUF = ns.oUF
 
 local Target = ns:NewModule("Target", nil, "LibMoreEvents-1.0")

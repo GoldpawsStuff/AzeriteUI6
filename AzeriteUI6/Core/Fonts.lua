@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 
 -- Font cache that spawns new objects on-the-fly.
 local count, font_mt = 0, nil

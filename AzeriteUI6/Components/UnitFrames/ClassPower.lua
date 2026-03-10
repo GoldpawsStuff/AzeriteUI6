@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 local oUF = ns.oUF
 
 local ClassPower = ns:NewModule("ClassPower", nil, "LibMoreEvents-1.0")

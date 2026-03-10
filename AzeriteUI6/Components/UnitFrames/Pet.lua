@@ -182,23 +182,6 @@ Pet.OnEnable = function(self)
 
 		-- Note that this is the default position,
 		-- it will be overwritten by saved positions.
-		local frame = self:Spawn("pet")
-		frame:SetPoint("BOTTOMLEFT", 362, 102)
-
-		--frame.Enable = function(self)
-		--	RegisterAttributeDriver(self, "unit", "[vehicleui]player; pet")
-		--	RegisterAttributeDriver(self, "state-visibility", "[@pet,exists]show;hide")
-		--end
-
-		--frame.Disable = function(self)
-		--	UnregisterAttributeDriver(self, "unit")
-		--	UnregisterAttributeDriver(self, "state-visibility")
-		--	self:Hide()
-		--end
-
-		-- Disable WoWs own handling
-		--UnregisterUnitWatch(frame)
-		--frame:SetAttribute("toggleForVehicle", false)
-
+		local frame = self:Spawn("pet"):SetPoint("BOTTOMLEFT", 362, 102)
 	end)
 end

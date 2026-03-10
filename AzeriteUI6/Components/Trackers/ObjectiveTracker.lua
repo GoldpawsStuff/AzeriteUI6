@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 
 local Trackers = ns:NewModule("ObjectiveTracker", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 local db -- will be assigned a utility function returning the profile settings/defaults during initialization

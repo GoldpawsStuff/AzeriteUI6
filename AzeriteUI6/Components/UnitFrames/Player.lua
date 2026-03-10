@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 local oUF = ns.oUF
 
 local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0")
@@ -704,22 +704,6 @@ Player.OnEnable = function(self)
 
 		-- Note that this is the default position,
 		-- it will be overwritten by saved positions.
-		local frame = self:Spawn("player")
-		frame:SetPoint("BOTTOMLEFT", 46, 100)
-
-		--frame.Enable = function(self)
-		--	RegisterAttributeDriver(self, "unit", "[vehicleui]vehicle; player")
-		--	self:Show()
-		--end
-
-		--frame.Disable = function(self)
-		--	UnregisterAttributeDriver(self, "unit")
-		--	self:Hide()
-		--end
-
-		-- Disable WoWs own handling
-		--UnregisterUnitWatch(frame)
-		--frame:SetAttribute("toggleForVehicle", false)
-
+		local frame = self:Spawn("player"):SetPoint("BOTTOMLEFT", 46, 100)
 	end)
 end

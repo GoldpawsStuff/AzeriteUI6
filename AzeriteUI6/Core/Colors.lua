@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 
 -- We're just going to piggyback on oUF's color table
 -- for all colors in the entire user interface.

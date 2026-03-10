@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 local oUF = ns.oUF
 
 -- Utility function to turn 'true','false' and 'nil' as text into actual booleans.

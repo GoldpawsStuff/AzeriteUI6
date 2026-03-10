@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 
 -- Shorten as much as possible.
 ns.AbbreviateNumber = function(value) do return end

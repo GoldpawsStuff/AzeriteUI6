@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
+local _, ns = ...
 
 -- Returns a format string and input values
 local DAY, HOUR, MINUTE = 86400, 3600, 60
