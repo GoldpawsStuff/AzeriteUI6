@@ -49,9 +49,11 @@ end
 -- Toggle cast text color on protected casts.
 local Castbar_PostCastInterruptible = function(element, unit)
 	if (element.notInterruptible) then
-		element.Text:SetTextColor(229/255, 178/255, 38/255, .75)
+		element.Text:SetTextColor(element.__owner.colors.normal:GetRGB())
+		element.Text:SetAlpha(.75)
 	else
-		element.Text:SetTextColor(250/255, 250/255, 250/255, .5)
+		element.Text:SetTextColor(element.__owner.colors.highlight:GetRGB())
+		element.Text:SetAlpha(.5)
 	end
 end
 
@@ -323,7 +325,7 @@ local style = function(self, unit)
 	healthBg:SetPoint("TOPRIGHT", self, "TOPRIGHT", 23, 8)
 	healthBg:SetTexture(GetMedia("hp_cap_case"))
 	healthBg:SetTexCoord(1, 0, 0, 1) -- Horizontally flip the texture
-	healthBg:SetVertexColor(192/255, 192/255, 192/255)
+	healthBg:SetVertexColor(self.colors.ui:GetRGB())
 
 	-- Health overlay for fonts and icons
 	local healthOverlay = CreateFrame("Frame", nil, overlay)
@@ -333,7 +335,8 @@ local style = function(self, unit)
 	local healthValue = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	healthValue:SetPoint("RIGHT", -27, 4)
 	healthValue:SetFontObject(GetFont(18, true))
-	healthValue:SetTextColor(250/255, 250/255, 250/255, .5)
+	healthValue:SetTextColor(self.colors.highlight:GetRGB())
+	healthValue:SetAlpha(.5)
 	healthValue:SetJustifyH("RIGHT")
 	healthValue:SetJustifyV("MIDDLE")
 
@@ -342,7 +345,8 @@ local style = function(self, unit)
 	local healthPerc = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	healthPerc:SetPoint("LEFT", 27, 4)
 	healthPerc:SetFontObject(GetFont(18, true))
-	healthPerc:SetTextColor(250/255, 250/255, 250/255, .4)
+	healthPerc:SetTextColor(self.colors.highlight:GetRGB())
+	healthPerc:SetAlpha(.4)
 	healthPerc:SetJustifyH("LEFT")
 	healthPerc:SetJustifyV("MIDDLE")
 
@@ -436,7 +440,8 @@ local style = function(self, unit)
 	castName:SetPoint("RIGHT", -27, 4)
 	castName:SetSize(250, 40)
 	castName:SetFontObject(GetFont(16, true))
-	castName:SetTextColor(250/255, 250/255, 250/255, .5)
+	castName:SetTextColor(self.colors.highlight:GetRGB())
+	castName:SetAlpha(.5)
 	castName:SetJustifyH("RIGHT")
 	castName:SetJustifyV("MIDDLE")
 	castName:Hide()
@@ -446,7 +451,8 @@ local style = function(self, unit)
 	local castbarTime = healthOverlay:CreateFontString(nil, "OVERLAY", nil, 1)
 	castbarTime:SetPoint("LEFT", 27, 4)
 	castbarTime:SetFontObject(GetFont(18, true))
-	castbarTime:SetTextColor(250/255, 250/255, 250/255, .5)
+	castbarTime:SetTextColor(self.colors.highlight:GetRGB())
+	castbarTime:SetAlpha(.5)
 	castbarTime:SetJustifyH("CENTER")
 	castbarTime:SetJustifyV("MIDDLE")
 	castbarTime:Hide()
@@ -538,7 +544,7 @@ local style = function(self, unit)
 	portraitBorder:SetPoint("TOPRIGHT", 10, 22)
 	portraitBorder:SetSize(187, 187)
 	portraitBorder:SetTexture(GetMedia("portrait_frame_hi"))
-	portraitBorder:SetVertexColor(192/255, 192/255, 192/255)
+	portraitBorder:SetVertexColor(self.colors.ui:GetRGB())
 
 	self.Portrait = portrait
 	self.Portrait.Bg = portraitBg
