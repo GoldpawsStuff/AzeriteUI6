@@ -17,8 +17,8 @@ If you choose to download and manually install directly from GitHub, you'll need
 	  - 🔁 Monk Stagger *(unverified)*  
   - 🔁 Pet  
   - 🔁 Target  
-  - 🔳 Target of Target  
-  - 🔳 Focus  
+  - 🔁 Target of Target  
+  - 🔁 Focus  
   - 🔳 Boss Frames  
   - 🔳 Party Frames   
   - 🚫 ~~Raid~~ *(will split into separate addon, or cancel)*  
