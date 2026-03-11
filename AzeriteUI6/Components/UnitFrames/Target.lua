@@ -256,20 +256,29 @@ local TargetIndicator_Update = function(self, event, unit, ...)
 	local element = self.TargetIndicator
 	unit = unit or self.unit
 
-	-- welcome to the secret society!
-	local tot = unit .. "target" -- not UnitExists(target)
-	--if (AreUnitsSame(unit, "player")) then
-	--	return element:Hide()
-	--end
+	-- if we are targeting ourselves, hide the targeting eye
+	if (AreUnitsSame(unit, "player")) then
+		return element:Hide()
+	end
 
-	if (UnitCanAttack("player", unit)) then
+	-- get the ToT unit
+	local tot = unit .. "target" 
+
+	-- if our target is hostile
+	if (UnitExists(tot) and UnitCanAttack("player", unit)) then
+
+		-- if our hostile target is targeting us
 		if (AreUnitsSame(tot, "player")) then
 			element:SetTexture(element.enemyTexture)
+
+		-- if our hostile target is targeting our pet 
 		elseif (AreUnitsSame(tot, "pet")) then
 			element:SetTexture(element.petTexture)
 		else
 			return element:Hide()
 		end
+
+	-- if our target is friendly and targeting us
 	elseif (AreUnitsSame(tot, "player")) then
 		element:SetTexture(element.friendTexture)
 	else
