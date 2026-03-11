@@ -578,13 +578,13 @@ local style = function(self, unit)
 	--------------------------------------------
 	local name = self:CreateFontString(nil, "OVERLAY", nil, 1)
 	name:SetPoint("TOPRIGHT", -153, -21)
-	name:SetFontObject(GetFont(18, true))
+	name:SetFontObject(GetFont(16, true))
 	name:SetTextColor(self.colors.highlight:GetRGB())
 	name:SetAlpha(.75)
 	name:SetJustifyH("RIGHT")
 	name:SetJustifyV("TOP")
 
-	self:Tag(name, "[azui:name(20)][azui:level(true)]") -- limit name to 20, align optional level to the right
+	self:Tag(name, "[azui:name(32)][azui:level(true)]")
 
 	self.Name = name
 

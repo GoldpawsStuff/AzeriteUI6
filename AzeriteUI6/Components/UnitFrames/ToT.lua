@@ -72,31 +72,21 @@ end
 local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 	if (unit and unit ~= self.unit) then return end
 
-	print(event, unit, ...)
-
 	unit = unit or self.unit
 
-	local shouldHide = (db.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
-					or (db.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target"))
-
-	if (shouldHide == self.shouldHide) then
-		return
+	if (db.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
+	or (db.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
+		self:SetAlpha(0)
+	else
+		self:SetAlpha(1)
 	end
-
-	self.shouldHide = shouldHide
-	self:SetAlpha(shouldHide and 0 or 1)
-end
-
-local UnitFrame_PostUpdate = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
-
-	Unitframe_PostUpdateAlpha(self, event, unit, ...)
-	TargetHighlight_Update(self, event, unit, ...)
 end
 
 local UnitFrame_OnEvent = function(self, event, unit, ...)
-	print("OnEvent: event, unit, ...")
-	UnitFrame_PostUpdate(self, event, unit, ...)
+	if (unit and unit ~= self.unit) then return end
+
+	Unitframe_PostUpdateAlpha(self, event, unit, ...)
+	TargetHighlight_PostUpdate(self, event, unit, ...)
 end
 
 local style = function(self, unit)
@@ -166,13 +156,13 @@ local style = function(self, unit)
 	--------------------------------------------
 	local name = self:CreateFontString(nil, "OVERLAY", nil, 1)
 	name:SetPoint("BOTTOM", 0, 46)
-	name:SetFontObject(GetFont(14, true))
+	name:SetFontObject(GetFont(12, true))
 	name:SetTextColor(self.colors.highlight:GetRGB())
 	name:SetAlpha(.75)
 	name:SetJustifyH("RIGHT")
 	name:SetJustifyV("TOP")
 
-	self:Tag(name, "[azui:name(16)]") -- limit name to 16
+	self:Tag(name, "[azui:name(24)]")
 
 	self.Name = name
 
@@ -182,20 +172,23 @@ local style = function(self, unit)
 	targetHighlight:SetPoint("CENTER", 1, -2)
 	targetHighlight:SetSize(193,93)
 	targetHighlight:SetTexture(GetMedia("cast_back_outline"))
-	targetHighlight:SetVertexColor(144/255, 195/255, 255/255)
+	targetHighlight:SetVertexColor(144/255, 195/255, 255/255) -- only focus highlighting
 
 	self.TargetHighlight = targetHighlight
 
-	-- Textures need an update when frame is displayed.
-	self.PostUpdate = TargetHighlight_PostUpdate
-
-	-- Register events to handle additional texture updates.
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
-
-	-- These NEVER fire..?!
-	self:RegisterEvent("PLAYER_TARGET_CHANGED", UnitFrame_OnEvent, true)
-	self:RegisterEvent("PLAYER_FOCUS_CHANGED", UnitFrame_OnEvent, true)
-	self:RegisterEvent("UNIT_TARGET", UnitFrame_OnEvent)
+	-- Midnight-compatible ToT watcher
+	local ToTWatcher = CreateFrame("Frame")
+	ToTWatcher.unit = unit
+	ToTWatcher.frame = self
+	-- None of these appears to be passed to unittarget unitframes,
+	-- so we need a regular frame to monitor them. 
+	-- No idea why oUFs methods don't work for this anymore.
+	ToTWatcher:RegisterEvent("PLAYER_TARGET_CHANGED")
+	ToTWatcher:RegisterEvent("PLAYER_FOCUS_CHANGED")
+	ToTWatcher:RegisterUnitEvent("UNIT_TARGET", "target")
+	ToTWatcher:SetScript("OnEvent", function(self, event, unit, ...)
+		UnitFrame_OnEvent(self.frame, event, self.unit, ...)
+	end)
 
 end
 
