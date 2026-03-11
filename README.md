@@ -12,13 +12,13 @@ If you choose to download and manually install directly from GitHub, you'll need
 - 🔁 UnitFrames  
   - 🔁 Player  
     - ⛔ Absorb Bar *(texcoord operation blocked by secrets)*  
-	- ✅ ClassPower  
+	- 🔁 ClassPower  
 	  - 🔁 Death Knight Runes *(unverified)*  
 	  - 🔁 Monk Stagger *(unverified)*  
-  - 🔁 Pet  
+  - ✅ Pet  
   - 🔁 Target  
-  - 🔁 Target of Target  
-  - 🔁 Focus  
+  - ✅ Target of Target  
+  - ✅ Focus  
   - 🔳 Boss Frames  
   - 🔳 Party Frames   
   - 🚫 ~~Raid~~ *(will split into separate addon, or cancel)*  

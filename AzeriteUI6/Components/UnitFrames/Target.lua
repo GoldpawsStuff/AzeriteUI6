@@ -46,6 +46,20 @@ local createAlphaCurve = function(min, max)
 	return alphaCurve
 end
 
+-- Safely compare units
+local AreUnitsSame = function(u1, u2)
+	local g1 = UnitGUID(u1)
+	local g2 = UnitGUID(u2)
+
+	-- Bail if different secrecy levels (can't be equal, avoids mixed == error)
+	if (issecretvalue(g1) ~= issecretvalue(g2)) then
+		return false
+	end
+
+	-- Now safe: both non-secret or both secret
+	return g1 == g2
+end
+
 -- Toggle cast text color on protected casts.
 local Castbar_PostCastInterruptible = function(element, unit)
 	if (element.notInterruptible) then
@@ -242,20 +256,21 @@ local TargetIndicator_Update = function(self, event, unit, ...)
 	local element = self.TargetIndicator
 	unit = unit or self.unit
 
-	local target = unit .. "target"
-	if (not UnitExists(target) or UnitIsUnit(unit, "player")) then
-		return element:Hide()
-	end
+	-- welcome to the secret society!
+	local tot = unit .. "target" -- not UnitExists(target)
+	--if (AreUnitsSame(unit, "player")) then
+	--	return element:Hide()
+	--end
 
 	if (UnitCanAttack("player", unit)) then
-		if (UnitIsUnit(target, "player")) then
+		if (AreUnitsSame(tot, "player")) then
 			element:SetTexture(element.enemyTexture)
-		elseif (UnitIsUnit(target, "pet")) then
+		elseif (AreUnitsSame(tot, "pet")) then
 			element:SetTexture(element.petTexture)
 		else
 			return element:Hide()
 		end
-	elseif (UnitIsUnit(target, "player")) then
+	elseif (AreUnitsSame(tot, "player")) then
 		element:SetTexture(element.friendTexture)
 	else
 		return element:Hide()
@@ -280,14 +295,16 @@ local TargetIndicator_Stop = function(self)
 	end
 end
 
-local UnitFrame_PostUpdate = function(self)
+local UnitFrame_PostUpdate = function(self, event, unit, ...)
 	Classification_Update(self)
+	TargetIndicator_Update(self, event, unit, ...)
+	TargetIndicator_Start(self)
 end
 
 -- Primarily needed to update orb/crystal visibilities
 local UnitFrame_OnEvent = function(self, event, unit, ...)
 	self.Power:ForceUpdate()
-	UnitFrame_PostUpdate(self)
+	UnitFrame_PostUpdate(self, event, unit, ...)
 end
 
 -- Setup the unitframe
@@ -386,37 +403,6 @@ local style = function(self, unit)
 	combatFeedback.maxAlpha = .9
 
 	self.CombatFeedback = combatFeedback
-
-	-- Health Prediction
-	--------------------------------------------
-	-- The target frame is reversed, 
-	-- so the absorb bar becomes a regular non-reversed bar here. 
-	--local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
-	--damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	--damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
-	--damageAbsorb:SetStatusBarColor(1, 1, 1, .35)
-	--damageAbsorb:SetSize(386, 40)
-	--damageAbsorb:SetPoint("TOP")
-	--damageAbsorb:SetPoint("BOTTOM")
-	--damageAbsorb:SetPoint("LEFT")
-
-	-- Nothing appears. Must look into this later.
-	--local test = self:CreateTexture(nil, "OVERLAY", nil, 6)
-	--test:SetAllPoints(damageAbsorb)
-	--test:SetColorTexture(0, .7, 0, .3)
-
-	-- Register with oUF
-	--self.HealthPrediction = {
-	--	healingAll = nil, 
-	--	damageAbsorb = damageAbsorb,
-	--	damageAbsorbClampMode = 0,
-	--	incomingHealClampMode = 0,
-	--	incomingHealOverflow = 1,
-	--	--PostUpdate = function(element, unit)
-	--	--	print("fired for", unit) 
-	--	--	print(element.damageAbsorb:GetValue(), element.damageAbsorb:GetMinMaxValues())
-	--	--end
-	--}
 
 	-- Overlayed Castbar
 	--------------------------------------------
@@ -574,6 +560,18 @@ local style = function(self, unit)
 
 	self.Classification = classification
 
+	-- Target Indicator
+	--------------------------------------------
+	local targetIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
+	targetIndicator:SetPoint("TOPRIGHT", -75, -3)
+	targetIndicator:SetSize(96, 48)
+	targetIndicator:SetVertexColor(self.colors.ui:GetRGB())
+	targetIndicator.petTexture = GetMedia("icon_target_blue")
+	targetIndicator.enemyTexture = GetMedia("icon_target_red")
+	targetIndicator.friendTexture = GetMedia("icon_target_green")
+
+	self.TargetIndicator = targetIndicator
+
 	-- Unit Name
 	--------------------------------------------
 	local name = self:CreateFontString(nil, "OVERLAY", nil, 1)
@@ -621,9 +619,14 @@ local style = function(self, unit)
 	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
 	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget
 
+	-- General post update
+	self.PostUpdate = UnitFrame_PostUpdate
+
 	-- Callbacks
 	--------------------------------------------
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_TARGET_CHANGED", UnitFrame_OnEvent, true)
+	self:RegisterEvent("PLAYER_FOCUS_CHANGED", UnitFrame_OnEvent, true)
 
 end
 
