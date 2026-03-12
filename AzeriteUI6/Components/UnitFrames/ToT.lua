@@ -69,6 +69,7 @@ local TargetHighlight_PostUpdate = function(self, event, unit, ...)
 
 end
 
+-- Hide the ToT frame under certain conditions using alpha
 local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 	if (unit and unit ~= self.unit) then return end
 
@@ -76,7 +77,7 @@ local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 
 	if (db.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
 	or (db.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
-		--self:SetAlpha(0)
+		self:SetAlpha(0)
 	else
 		self:SetAlpha(1)
 	end
