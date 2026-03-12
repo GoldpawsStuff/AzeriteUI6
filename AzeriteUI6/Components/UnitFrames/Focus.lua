@@ -148,6 +148,15 @@ local style = function(self, unit)
 
 	self.Name = name
 
+	-- RaidTarget Indicator
+	--------------------------------------------
+	local raidTargetIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, 2)
+	raidTargetIndicator:SetSize(24, 24)
+	raidTargetIndicator:SetPoint("RIGHT", self.Name, "LEFT", 0, 0)
+	raidTargetIndicator:SetTexture(GetMedia("raid_target_icons_small"))
+
+	self.RaidTargetIndicator = raidTargetIndicator
+
 	-- Target highlight
 	--------------------------------------------
 	local targetHighlight = overlay:CreateTexture(nil, "BACKGROUND", nil, -2)

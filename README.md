@@ -51,6 +51,8 @@ If you choose to download and manually install directly from GitHub, you'll need
   - 🔳 Compass North tag  
   - 🔳 Groupfinder eye  
   - 🔳 Grouptype banners  
+  - 🔳 Mail Frame
+  - 🔳 Exit Flight Button
 - 🔳 Options Menu  
 - ✅ Movable UnitFrames Menu  
 

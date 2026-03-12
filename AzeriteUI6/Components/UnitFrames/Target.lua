@@ -595,6 +595,15 @@ local style = function(self, unit)
 
 	self.Name = name
 
+	-- RaidTarget Indicator
+	--------------------------------------------
+	local raidTargetIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, 2)
+	raidTargetIndicator:SetSize(32, 32)
+	raidTargetIndicator:SetPoint("RIGHT", self.Name, "LEFT", -2, 2)
+	raidTargetIndicator:SetTexture(GetMedia("raid_target_icons"))
+
+	self.RaidTargetIndicator = raidTargetIndicator
+
 	-- Auras
 	--------------------------------------------
 	local auras = CreateFrame("Frame", nil, self)

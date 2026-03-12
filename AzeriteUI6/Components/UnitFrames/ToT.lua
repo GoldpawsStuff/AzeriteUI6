@@ -76,7 +76,7 @@ local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 
 	if (db.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
 	or (db.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
-		self:SetAlpha(0)
+		--self:SetAlpha(0)
 	else
 		self:SetAlpha(1)
 	end
@@ -165,6 +165,15 @@ local style = function(self, unit)
 	self:Tag(name, "[azui:name(24)]")
 
 	self.Name = name
+
+	-- RaidTarget Indicator
+	--------------------------------------------
+	local raidTargetIndicator = overlay:CreateTexture(nil, "OVERLAY", nil, 2)
+	raidTargetIndicator:SetSize(24, 24)
+	raidTargetIndicator:SetPoint("RIGHT", self.Name, "LEFT", 0, 0)
+	raidTargetIndicator:SetTexture(GetMedia("raid_target_icons_small"))
+
+	self.RaidTargetIndicator = raidTargetIndicator
 
 	-- Target highlight
 	--------------------------------------------
