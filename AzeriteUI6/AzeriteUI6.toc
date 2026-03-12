@@ -7,7 +7,7 @@
 ## Version: 1.0.0-Alpha
 ## OptionalDeps: Ace3, Clique
 
-## X-Curse-Project-ID: 
+## X-Curse-Project-ID: 1484064
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul
