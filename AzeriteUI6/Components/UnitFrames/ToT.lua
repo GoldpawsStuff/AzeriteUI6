@@ -229,12 +229,11 @@ ToT.OnInitialize = function(self)
 end
 
 ToT.OnEnable = function(self)
-	oUF:RegisterStyle("AzeriteUnitFrameTargetOfTarget", style)
+	oUF:RegisterStyle("AzeriteUnitFrameTargetTarget", style)	
 	oUF:Factory(function(self) 
-		self:SetActiveStyle("AzeriteUnitFrameTargetOfTarget") -- Set the current oUF style
-
-		-- Note that this is the default position,
-		-- it will be overwritten by saved positions.
-		local frame = self:Spawn("targettarget"):SetPoint("TOPRIGHT", -492, -67)
+		self:SetActiveStyle("AzeriteUnitFrameTargetTarget")
+		local frame = self:Spawn("targettarget")
+		frame:SetScale(.9)
+		frame:SetPoint("TOPRIGHT", -492/frame:GetScale(), -67/frame:GetScale())
 	end)
 end

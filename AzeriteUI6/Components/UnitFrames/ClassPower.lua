@@ -428,6 +428,7 @@ local style = function(self, unit)
 	-- General frame settings
 	self:SetSize(124, 168)
 	self:SetHitRectInsets(0, 0, 30, -2)
+	self:EnableMouse(false)
 
 	-- ClassPower
 	--------------------------------------------
@@ -515,15 +516,11 @@ ClassPower.OnInitialize = function(self)
 end
 
 ClassPower.OnEnable = function(self)
-	oUF:RegisterStyle("AzeriteUnitFrameClassPower", style)
+	oUF:RegisterStyle("AzeriteUnitFrameClassPower", style)	
 	oUF:Factory(function(self) 
-		self:SetActiveStyle("AzeriteUnitFrameClassPower") -- Set the current oUF style
-
-		-- Note that this is the default position,
-		-- it will be overwritten by saved positions.
+		self:SetActiveStyle("AzeriteUnitFrameClassPower")
 		local frame = self:Spawn("player")
-		frame:SetPoint("CENTER", -223, -84)
-		frame:EnableMouse(false) -- points are in the middle of the screen
-
+		frame:SetScale(.9)
+		frame:SetPoint("CENTER", -223/frame:GetScale(), -84/frame:GetScale())
 	end)
 end

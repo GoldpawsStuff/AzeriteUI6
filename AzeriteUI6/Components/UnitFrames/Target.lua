@@ -668,11 +668,11 @@ Target.OnInitialize = function(self)
 end
 
 Target.OnEnable = function(self)
-	oUF:RegisterStyle("AzeriteUnitFrameTarget", style)
+	oUF:RegisterStyle("AzeriteUnitFrameTarget", style)	
 	oUF:Factory(function(self) 
-		self:SetActiveStyle("AzeriteUnitFrameTarget") -- Set the current oUF style
-		-- Note that this is the default position,
-		-- it will be overwritten by saved positions.
-		self:Spawn("target"):SetPoint("TOPRIGHT", -40, -40)
+		self:SetActiveStyle("AzeriteUnitFrameTarget")
+		local frame = self:Spawn("target")
+		frame:SetScale(.9)
+		frame:SetPoint("TOPRIGHT", -40/frame:GetScale(), -40/frame:GetScale())
 	end)
 end

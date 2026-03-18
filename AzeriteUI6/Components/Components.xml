@@ -1,7 +1,22 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
 	<!-- ActionBars -->
-	<Script file="ActionBars\HideBlizzard.lua"/>
+	<Script file="ActionBars\Compatibility\HandleBartender.lua"/>
+	<Script file="ActionBars\Compatibility\HideBlizzard.lua"/>
+	<Script file="ActionBars\Prototypes\ActionButton.lua"/>
+	<Script file="ActionBars\Prototypes\PetButton.lua"/>
+	<Script file="ActionBars\Prototypes\StanceButton.lua"/>
+	<Script file="ActionBars\Prototypes\ActionBar.lua"/>
+	<Script file="ActionBars\MainActionBar.lua"/>
+	<Script file="ActionBars\MultiBar1.lua"/>
+	<Script file="ActionBars\MultiBar2.lua"/>
+	<Script file="ActionBars\MultiBar3.lua"/>
+	<Script file="ActionBars\MultiBar4.lua"/>
+	<Script file="ActionBars\MultiBar5.lua"/>
+	<Script file="ActionBars\MultiBar6.lua"/>
+	<Script file="ActionBars\MultiBar7.lua"/>
+	<Script file="ActionBars\PetBar.lua"/>
+	<Script file="ActionBars\StanceBar.lua"/>
 
 	<!-- Chat -->
 

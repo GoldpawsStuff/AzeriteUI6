@@ -28,8 +28,12 @@ local addonName, ns = ...
 ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
--- Saved variables global
-local AzeriteUI6_DB = {}
+-- Saved variables globals
+AzeriteUI6_DB = {}
+
+-- Global table for movable frames display names
+-- *this is a seriously clunky way of doing this
+AzeriteUI6_Positions_DisplayNames = {}
 
 -- Addon defaults (just the core)
 local defaults = { profile = {} }

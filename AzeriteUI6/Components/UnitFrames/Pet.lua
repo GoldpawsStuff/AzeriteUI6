@@ -176,12 +176,11 @@ Pet.OnInitialize = function(self)
 end
 
 Pet.OnEnable = function(self)
-	oUF:RegisterStyle("AzeriteUnitFramePet", style)
+	oUF:RegisterStyle("AzeriteUnitFramePet", style)	
 	oUF:Factory(function(self) 
-		self:SetActiveStyle("AzeriteUnitFramePet") -- Set the current oUF style
-
-		-- Note that this is the default position,
-		-- it will be overwritten by saved positions.
-		local frame = self:Spawn("pet"):SetPoint("BOTTOMLEFT", 362, 102)
+		self:SetActiveStyle("AzeriteUnitFramePet")
+		local frame = self:Spawn("pet")
+		frame:SetScale(.9)
+		frame:SetPoint("BOTTOMLEFT", 330/frame:GetScale(), 102/frame:GetScale())
 	end)
 end

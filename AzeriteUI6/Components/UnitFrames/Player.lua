@@ -43,7 +43,17 @@ local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
 -- We'll update this when entering world or changing specs
-local playerIsRetribution = UnitClassBase("player") == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+local playerClass = UnitClassBase("player")
+local playerIsRetribution = playerClass == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+
+local zeroPowerTypes = {
+	[Enum.PowerType.Rage] = true,
+	[Enum.PowerType.RunicPower] = true,
+	[Enum.PowerType.LunarPower] = true,
+	[Enum.PowerType.Insanity] = true,
+	[Enum.PowerType.Fury] = true,
+	[Enum.PowerType.Pain] = true
+}
 
 -- Function to create an alpha curve based on min/max values.
 -- Useful to hide elements when at (almost) zero.
@@ -243,6 +253,17 @@ local Power_UpdateVisibility = function(element, unit, cur, min, max)
 		end
 	end
 
+	if (zeroPowerTypes[powerType] or db.useIceCrystal) then
+		element.Backdrop:SetTexture(GetMedia("power-crystal-ice-back"))
+		element:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
+		element:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+		element:SetStatusBarColor(1, 1, 1) 
+	else
+		element.Backdrop:SetTexture(GetMedia("power_crystal_back"))
+		element:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
+		element:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+	end
+
 	-- power value visibility
 	if (element.Value.alphaCurve) then
 		local ptype = UnitPowerType(unit)  -- Safe (non-secret)
@@ -257,7 +278,8 @@ local Power_UpdateColor = function(self, event, unit)
 	if (self.unit ~= unit) then return end
 	local element = self.Power
 
-	if (db.useIceCrystal) then
+	local powerType = UnitPowerType(unit)
+	if (db.useIceCrystal or zeroPowerTypes[powerType]) then
 		--element.Texture:SetVertexColor(1, 1, 1) 
 		element:SetStatusBarColor(1, 1, 1) 
 	else
@@ -493,13 +515,14 @@ local style = function(self, unit)
 	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -7)
 	powerBg:SetSize(196, 196)
 	powerBg:SetPoint("CENTER", 0, 0)
-	powerBg:SetTexture(db.useIceCrystal and GetMedia("power-crystal-ice-back") or GetMedia("power_crystal_back"))
 
 	if (db.useIceCrystal) then
+		powerBg:SetTexture(GetMedia("power-crystal-ice-back"))
 		power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
 		power:SetStatusBarColor(1, 1, 1) 
 	else
+		powerBg:SetTexture(GetMedia("power_crystal_back"))
 		power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
 	end
@@ -530,9 +553,10 @@ local style = function(self, unit)
 
 	-- Register it with oUF
 	self.Power = power
+	self.Power.Backdrop = powerBg
 	self.Power.Value = powerValue
-	self.Power.UpdateColor = Power_UpdateColor
 	self.Power.PostUpdate = Power_UpdateVisibility
+	self.Power.UpdateColor = Power_UpdateColor
 
 	--[[-- 
 	-- ComboPoint systems
@@ -698,12 +722,11 @@ Player.OnInitialize = function(self)
 end
 
 Player.OnEnable = function(self)
-	oUF:RegisterStyle("AzeriteUnitFramePlayer", style)
+	oUF:RegisterStyle("AzeriteUnitFramePlayer", style)	
 	oUF:Factory(function(self) 
-		self:SetActiveStyle("AzeriteUnitFramePlayer") -- Set the current oUF style
-
-		-- Note that this is the default position,
-		-- it will be overwritten by saved positions.
-		local frame = self:Spawn("player"):SetPoint("BOTTOMLEFT", 46, 100)
+		self:SetActiveStyle("AzeriteUnitFramePlayer")
+		local frame = self:Spawn("player")
+		frame:SetScale(.9)
+		frame:SetPoint("BOTTOMLEFT", 46/frame:GetScale(), 100/frame:GetScale())
 	end)
 end

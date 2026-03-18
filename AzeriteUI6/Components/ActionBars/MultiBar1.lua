@@ -1,0 +1,110 @@
+--[[
+
+	The MIT License (MIT)
+
+	Copyright (c) 2026 Lars Norberg
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+
+--]]
+local _, ns = ...
+local oUF = ns.oUF
+
+local MultiBar1 = ns:NewModule("MultiBar1", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+
+-- Declare module defaults
+local defaults = { profile = {}}
+local db -- will be assigned a utility function returning the profile settings/defaults during initialization
+
+-- Custom API locals
+local AbbreviateNumber = ns.AbbreviateNumber
+local GetFont = ns.GetFont
+local GetMedia = ns.GetMedia
+
+local defaults = {
+	layout = "zigzag", -- <grid, zigzag>
+	layoutZigZagStart = 1, -- at which button the zigzag pattern should begin
+	layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
+	layoutGrowth = "horizontal", -- which direction the bar initially grows in
+	layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
+	layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
+}
+
+-- Return blizzard barID by from own bar numbers.
+local BAR_TO_ID = {
+	[1] = 1,
+	[2] = BOTTOMLEFT_ACTIONBAR_PAGE,
+	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE,
+	[4] = RIGHT_ACTIONBAR_PAGE,
+	[5] = LEFT_ACTIONBAR_PAGE,
+	[6] = MULTIBAR_5_ACTIONBAR_PAGE,
+	[7] = MULTIBAR_6_ACTIONBAR_PAGE,
+	[8] = MULTIBAR_7_ACTIONBAR_PAGE
+}
+
+-- Return our bar number from blizzard barID.
+local ID_TO_BAR = {}
+for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
+
+
+MultiBar1.Spawn = function(self)
+
+	local bar = ns.ActionBar:Create(BAR_TO_ID[2], defaults, "AZUI6_ActionBar2")
+
+	self.bar = bar
+
+	return bar
+end
+
+-- This is called by the options menu on settings changes,
+-- and by the modules themselves on enabling and combat end.
+MultiBar1.UpdateSettings = function(self)
+end
+
+-- This is called by the addon on full profile changes,
+-- and should call a full settings update.
+MultiBar1.RefreshConfig = function(self)
+	self:UpdateSettings()
+end
+
+MultiBar1.OnInitialize = function(self)
+	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
+
+	-- Let's not do these until the addon is more stable
+	--self.db = ns.db:RegisterNamespace("MultiBar1", defaults)
+	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Utility to get saved settings or defaults
+	-- *Will default to defaults if the saved settings above don't exist (during development)
+	db = (function(forceDefaults)
+		if (forceDefaults) then return defaults.profile end
+		return self.db and self.db.profile or defaults.profile
+	end)(false)
+end
+
+MultiBar1.OnEnable = function(self)
+
+	local bar = MultiBar1:Spawn()
+	bar:SetSize(400,64)
+	bar:SetPoint("BOTTOMLEFT", 950, 50)
+	bar:Update()
+
+end
