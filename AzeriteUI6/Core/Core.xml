@@ -1,9 +1,17 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-	<Script file="Addons.lua"/>
-	<Script file="Colors.lua"/>
-	<Script file="Fonts.lua"/>
-	<Script file="Media.lua"/>
-	<Script file="Numbers.lua"/>
-	<Script file="Tables.lua"/>
+
+	<!-- Various APIs -->
+	<Script file="API\Addons.lua"/>
+	<Script file="API\Colors.lua"/>
+	<Script file="API\Fonts.lua"/>
+	<Script file="API\Media.lua"/>
+	<Script file="API\Numbers.lua"/>
+	<Script file="API\Tables.lua"/>
+
+	<!-- Core of this UI -->
 	<Script file="Core.lua"/>
+
+	<!-- Will replace later -->
+	<Include file="Options\Options.xml"/>
+	
 </Ui>

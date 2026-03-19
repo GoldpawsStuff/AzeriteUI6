@@ -49,6 +49,13 @@ oUF.colors.ui = oUF:CreateColor(192, 192, 192)
 oUF.colors.uidark = oUF:CreateColor(144, 144, 144)
 oUF.colors.aura = oUF:CreateColor(251, 120, 29)
 
+-- movable frames anchor coloring
+oUF.colors.anchor = {}
+oUF.colors.anchor.general = oUF:CreateColor(128, 255, 128)
+oUF.colors.anchor.actionbars = oUF:CreateColor(64, 192, 255)
+oUF.colors.anchor.unitframes = oUF:CreateColor(255, 160, 64)
+oUF.colors.anchor.floaters = oUF:CreateColor(255, 192, 128)
+
 -- xp, rep and artifact coloring
 oUF.colors.xp = oUF:CreateColor(116, 23, 229) -- xp bar
 oUF.colors.xpValue = oUF:CreateColor(145, 77, 229) -- xp bar text

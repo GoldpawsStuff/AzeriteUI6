@@ -29,11 +29,8 @@ ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0", "LibFa
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
 -- Saved variables globals
-AzeriteUI6_DB = {}
-
--- Global table for movable frames display names
--- *this is a seriously clunky way of doing this
-AzeriteUI6_Positions_DisplayNames = {}
+AzeriteUI6_DB = {} -- handled by AceDB
+AzeriteUI6_Positions_DB = {} -- handled by us
 
 -- Addon defaults (just the core)
 local defaults = { profile = {} }
@@ -100,9 +97,9 @@ ns.OnEnable = function(self)
 end
 
 ns.OnInitialize = function(self)
-	--self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, true)
-	--self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+	self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, true)
+	self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
