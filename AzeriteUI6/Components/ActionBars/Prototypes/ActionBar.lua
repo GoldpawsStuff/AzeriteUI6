@@ -91,7 +91,7 @@ ns.ActionBar.Create = function(self, id, config, name)
 		bar.buttons[i] = button
 
 		local keyBoundTarget = string.format(BINDTEMPLATE_BY_ID[id], button.id)
-		button.keyBoundTarget = keyBoundTarget
+		button.config.keyBoundTarget = keyBoundTarget
 		bar.buttonConfig.keyBoundTarget = keyBoundTarget
 	end
 

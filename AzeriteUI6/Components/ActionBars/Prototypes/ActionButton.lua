@@ -64,15 +64,15 @@ local config = {
 		hotkey = {
 			font = {
 				fontObject = GetFont(15, "Outline", "Number"),
-				size = 15,
+				size = 17,
 				flags = "THINOUTLINE"
 			},
 			color = { 128/255, 128/255, 128/255, .75 },
 			position = {
 				anchor = "TOPLEFT",
 				relAnchor = "TOPLEFT",
-				offsetX = -3,
-				offsetY = 2
+				offsetX = 3, 
+				offsetY = -3 
 			},
 			justifyH = "LEFT",
 			justifyV = "TOP"
@@ -80,15 +80,15 @@ local config = {
 		count = {
 			font = {
 				fontObject = GetFont(16, "Outline", "Number"),
-				size = 16,
+				size = 18,
 				flags = "THINOUTLINE"
 			},
 			color = { 229/255, 178/255, 38/255, .85 },
 			position = {
 				anchor = "BOTTOMRIGHT",
 				relAnchor = "BOTTOMRIGHT",
-				offsetX = 3,
-				offsetY = -5
+				offsetX = -3,
+				offsetY = 3 
 			},
 			justifyH = "RIGHT",
 			justifyV = "MIDDLE"
@@ -271,8 +271,9 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.HotKey:SetJustifyV(config.text.hotkey.justifyV)
 	button.HotKey:SetParent(button.OverlayFrame)
 	button.HotKey:SetDrawLayer("OVERLAY", 1)
-	button.HotKey:ClearAllPoints()
-	button.HotKey:SetPoint("TOPLEFT", -5, -5)
+	--button.HotKey:ClearAllPoints()
+	--button.HotKey:SetPoint("TOPLEFT", -5, -5)
+	--button.HotKey:SetPoint("TOPLEFT", 5, -5)
 	button.HotKey:SetTextColor(oUF.colors.quest.gray:GetRGB())
 	button.HotKey:SetAlpha(.75)
 
@@ -283,8 +284,8 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.Count:SetJustifyV(config.text.count.justifyV)
 	button.Count:SetParent(button.OverlayFrame)
 	button.Count:SetDrawLayer("OVERLAY", 1)
-	button.Count:ClearAllPoints()
-	button.Count:SetPoint("BOTTOMRIGHT", -3, 3)
+	--button.Count:ClearAllPoints()
+	--button.Count:SetPoint("BOTTOMRIGHT", -3, 3)
 	button.Count:SetTextColor(oUF.colors.normal:GetRGB())
 	button.Count:SetAlpha(.85)
 
