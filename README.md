@@ -25,10 +25,10 @@ If you choose to download and manually install directly from GitHub, you'll need
   - 🚫 ~~Arena Enemy~~ *(will split into separate addon, or cancel)*  
   - ⛔ Incoming Heals *(texcoord operation blocked by secrets)*  
   - ✅ Movable/scalable UnitFrames  
-- 🔳 ActionBars  
-  - 🔳 Primary Bar  
-    - 🔳 Page Switching *(Stance/Possess/Vehicle)*  
-  - 🔳 Bar 2  
+- 🔁 ActionBars  
+  - 🔁 Primary Bar  
+    - ✅ Page Switching *(Stance/Possess/Vehicle)*  
+  - 🔁 Bar 2  
   - 🔳 Bar 3  
   - 🔳 Bar 4  
   - 🔳 Bar 5  

@@ -233,7 +233,7 @@ ActionBar.UpdateFading = function(self)
 			if (button:GetTexture()) then
 				LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", unpack(self.config.fadeButtonHitRects))
 			else
-				button:ForceUpdate()
+				--button:ForceUpdate()
 			end
 		end
 

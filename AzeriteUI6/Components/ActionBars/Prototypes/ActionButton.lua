@@ -41,8 +41,8 @@ local config = {
 	tooltip = "enabled",
 	showGrid = false,
 	colors = {
-		range = { 0.8, 0.1, 0.1 },
-		mana = { 0.5, 0.5, 1.0 }
+		range = { .8, .1, .1 },
+		mana = { .5, .5, 1 }
 	},
 	hideElements = {
 		macro = true,
@@ -169,10 +169,11 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button:SetAttribute("checkmouseovercast", true)
 
 	-- Hide unused elements
+	button.BorderShadow:SetParent(Hider)
 	button.CooldownFlash:SetParent(Hider)
 	button.InterruptDisplay:SetParent(Hider)
 	button.NewActionTexture:SetParent(Hider)
-	button.NormalTexture:SetTexture()
+	button.NormalTexture:SetTexture(GetMedia("blank"))
 	button.NormalTexture:SetParent(Hider)
 	button.SpellHighlightAnim:Stop()
 	button.SpellHighlightTexture:SetParent(Hider)
@@ -181,10 +182,6 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.SpellCastAnimFrame:SetParent(Hider)
 	button.TargetReticleAnimFrame:SetParent(Hider)
 
-	if (button.BorderShadow) then
-		button.BorderShadow:SetParent(Hider)
-	end
-
 	-- Block BaseActionButtonMixin
 	button.SlotArt = nil
 	--button.SlotBackground = nil
@@ -192,12 +189,12 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- Remove default mask texture
 	button.icon:RemoveMaskTexture(button.IconMask)
 
-	button:DisableDrawLayer("ARTWORK")
+	--button:DisableDrawLayer("ARTWORK")
 
 	button:SetAttribute("buttonLock", true)
 	button:SetSize(64, 64)
 	button:SetHitRectInsets(-10, -10, -10, -10)
-	button.hitRects = { -10, -10, -10, -10 }
+	--button.hitRects = { -10, -10, -10, -10 }
 
 	-- Overlay Frame
 	button.OverlayFrame = CreateFrame("Frame", nil, button)
@@ -220,6 +217,18 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.backdrop:SetVertexColor(.67, .67, .67, 1)
 
 	-- cooldown
+	button.cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
+	button.cooldown:ClearAllPoints()
+	button.cooldown:SetAllPoints(button.icon)
+	button.cooldown:SetUseCircularEdge(true)
+	button.cooldown:SetReverse(false)
+	button.cooldown:SetSwipeTexture(GetMedia("actionbutton-mask-circular"))
+	button.cooldown:SetDrawSwipe(true)
+	button.cooldown:SetBlingTexture(GetMedia("blank"), 0, 0, 0, 0)
+	button.cooldown:SetDrawBling(false)
+	button.cooldown:SetEdgeTexture(GetMedia("blank"))
+	button.cooldown:SetDrawEdge(false)
+	button.cooldown:SetHideCountdownNumbers(true)
 
 	-- gloss
 
@@ -235,25 +244,34 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- equipped items border
 
 	-- checked (pet abilities that are on autocast)
-	button:GetCheckedTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
-	button:GetCheckedTexture():SetVertexColor(1, .82, .1, .2)
-	button:GetCheckedTexture():SetAllPoints(button.icon)
-	button:GetCheckedTexture():SetBlendMode("ADD")
-	button:GetCheckedTexture():SetDrawLayer("OVERLAY", 1)
+	button.CheckedTexture = button:GetCheckedTexture()
+	button.CheckedTexture:SetTexture(GetMedia("actionbutton-mask-circular"))
+	button.CheckedTexture:SetVertexColor(1, .82, .1, .2)
+	button.CheckedTexture:SetAllPoints(button.icon)
+	button.CheckedTexture:SetBlendMode("ADD")
+	button.CheckedTexture:SetDrawLayer("OVERLAY", 1)
 
 	-- flash (autocast/autoattack)
 
 	-- highlight (hover)
-	button:GetHighlightTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
-	button:GetHighlightTexture():SetVertexColor(1, 1, 1, .2)
-	button:GetHighlightTexture():SetAllPoints(button.icon)
-	button:GetHighlightTexture():SetBlendMode("ADD")
-	button:GetHighlightTexture():SetDrawLayer("HIGHLIGHT")
+	button.HighlightTexture = button:GetHighlightTexture()
+	button.HighlightTexture:SetTexture(GetMedia("actionbutton-mask-circular"))
+	button.HighlightTexture:SetVertexColor(1, 1, 1, .2)
+	button.HighlightTexture:SetAllPoints(button.icon)
+	button.HighlightTexture:SetBlendMode("ADD")
+	button.HighlightTexture:SetDrawLayer("HIGHLIGHT")
 
 	-- pushed texture
-	button:GetPushedTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
-	button:GetPushedTexture():SetVertexColor(1, 1, 1, .2)
-	button:GetPushedTexture():SetAllPoints(button.icon)
+	-- not working?
+	local pushedTexture = button:CreateTexture(nil, "OVERLAY", nil, 1)
+	pushedTexture:SetVertexColor(1, 1, 1, .2)
+	pushedTexture:SetTexture(GetMedia("actionbutton-mask-circular"))
+	pushedTexture:SetAllPoints(button.icon)
+	button.pushedTexture = pushedTexture
+
+	button:SetPushedTexture(button.pushedTexture)
+
+	--button:GetPushedTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
 	button:GetPushedTexture():SetBlendMode("ADD")
 	button:GetPushedTexture():SetDrawLayer("OVERLAY", 2)
 
@@ -262,45 +280,48 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.Flash:SetAllPoints(button.icon)
 	button.Flash:SetVertexColor(1, 0, 0, .25)
 	button.Flash:SetTexture(GetMedia("actionbutton-mask-circular"))
-	button.Flash:Hide()
+	--button.Flash:Hide()
 
 	-- hotkey
 	button.HotKey.SetFont = function() end -- disables LAB from overriding it
+	button.HotKey:SetParent(button.OverlayFrame)
+	button.HotKey:SetDrawLayer("OVERLAY", 1)
 	button.HotKey:SetFontObject(config.text.hotkey.font.fontObject)
 	button.HotKey:SetJustifyH(config.text.hotkey.justifyH)
 	button.HotKey:SetJustifyV(config.text.hotkey.justifyV)
-	button.HotKey:SetParent(button.OverlayFrame)
-	button.HotKey:SetDrawLayer("OVERLAY", 1)
-	--button.HotKey:ClearAllPoints()
-	--button.HotKey:SetPoint("TOPLEFT", -5, -5)
-	--button.HotKey:SetPoint("TOPLEFT", 5, -5)
 	button.HotKey:SetTextColor(oUF.colors.quest.gray:GetRGB())
 	button.HotKey:SetAlpha(.75)
 
 	-- spell charges / stack count
 	button.Count.SetFont = function() end -- disables LAB from overriding it
+	button.Count:SetParent(button.OverlayFrame)
+	button.Count:SetDrawLayer("OVERLAY", 1)
 	button.Count:SetFontObject(config.text.count.font.fontObject)
 	button.Count:SetJustifyH(config.text.count.justifyH)
 	button.Count:SetJustifyV(config.text.count.justifyV)
-	button.Count:SetParent(button.OverlayFrame)
-	button.Count:SetDrawLayer("OVERLAY", 1)
-	--button.Count:ClearAllPoints()
-	--button.Count:SetPoint("BOTTOMRIGHT", -3, 3)
 	button.Count:SetTextColor(oUF.colors.normal:GetRGB())
 	button.Count:SetAlpha(.85)
 
 	-- macro name
 	button.Name.SetFont = function() end -- disables LAB from overriding it
+	button.Name:SetParent(button.OverlayFrame)
+	button.Name:SetDrawLayer("OVERLAY", 1)
 	button.Name:SetFontObject(config.text.macro.font.fontObject)
 	button.Name:SetJustifyH(config.text.macro.justifyH)
 	button.Name:SetJustifyV(config.text.macro.justifyV)
+	button.Name:SetAlpha(0)
 
 	-- disable the new action texture
 	button.NewActionTexture:Hide()
 	button.NewActionTexture = false
 
 	-- spell highlight
-	local highlight = CreateFrame("Frame", nil, button)
+	local highlight = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, -7)
+	highlight:SetSize(134.295081967, 134.295081967)
+	highlight:SetPoint("CENTER", 0, 0)
+	highlight:SetTexture(GetMedia("actionbutton-spellhighlight"))
+	highlight:SetVertexColor(249/255, 188/255, 65/255, .75)
+	highlight:Hide()
 
 	-- create a dummy object to safely take control of the spell highlights
 	button.AssistedCombatHighlightFrame = {
@@ -309,6 +330,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 		Hide = function() highlight:Hide() end
 	}
 
+	button.MasqueSkinned = true -- disables LAB from changing a few textures
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
 	button.AddToMasque = function() end -- disables LAB from overriding it
 

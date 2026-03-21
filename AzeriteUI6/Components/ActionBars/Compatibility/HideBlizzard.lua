@@ -71,7 +71,8 @@ local hideActionButton = function(button)
 	button:UnregisterAllEvents()
 	button:SetAttribute("statehidden", true)
 
-	button.bar = nil
+	-- This disables keybinds. better not do it.
+	--button.bar = nil
 end
 
 HideBlizzardActionBars.HideBlizzard = function(self)
