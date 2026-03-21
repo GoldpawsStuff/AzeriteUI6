@@ -26,11 +26,10 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local Pet = ns:NewModule("Pet", nil, "LibMoreEvents-1.0")
+local Pet = ns:NewModule("Pet", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {}}
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -162,25 +161,22 @@ end
 
 Pet.OnInitialize = function(self)
 	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("Pet", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("Pet", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 Pet.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteUnitFramePet", style)	
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFramePet")
+
 		local frame = self:Spawn("pet")
 		frame:SetScale(.9)
-		frame:SetPoint("BOTTOMLEFT", 330/frame:GetScale(), 102/frame:GetScale())
+		frame:SetPoint("BOTTOMLEFT", 332/.9, 102/.9)
+
+		Pet:RegisterMovableFrameAnchor(frame, string.lower(PET), "unitframes", AzeriteUI6_Positions_DB)
+
 	end)
 end

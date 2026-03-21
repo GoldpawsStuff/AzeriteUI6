@@ -68,7 +68,6 @@ local GetDifficultyColorForUnit = function(unit)
 	end
 end
 
-
 oUF.Tags.Events["azui:shorthealth"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
 oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 	if (not UnitIsConnected(unit)) then
@@ -79,6 +78,15 @@ oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 		return DEAD
 	else
 		return AbbreviateNumbers(UnitHealth(unit))
+	end
+end
+
+oUF.Tags.Events["azui:healthpercent"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
+oUF.Tags.Methods["azui:healthpercent"] = function(unit, realUnit)
+	if (not UnitIsConnected(unit) or UnitIsDeadOrGhost(unit)) then
+		return ""
+	else
+		return oUF.Tags.Methods["perhp"](unit, realUnit)
 	end
 end
 
@@ -116,7 +124,7 @@ end
 -- self:Tag(fontString, "[azui:name(maxLength)]")
 oUF.Tags.Events["azui:name"] = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
 oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
-	local name = _TAGS["name"](unit, realUnit)
+	local name = oUF.Tags.Methods["name"](unit, realUnit)
 	local length = tonumber(getargs(...))
 	if (length) then
 		return name:utf8sub(1, length)

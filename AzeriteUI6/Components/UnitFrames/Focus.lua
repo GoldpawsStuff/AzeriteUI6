@@ -26,11 +26,10 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local Focus = ns:NewModule("Focus", nil, "LibMoreEvents-1.0")
+local Focus = ns:NewModule("Focus", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {} }
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -189,25 +188,21 @@ end
 
 Focus.OnInitialize = function(self)
 	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("Focus", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("Focus", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 Focus.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteUnitFrameFocus", style)	
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameFocus")
+
 		local frame = self:Spawn("focus")
 		frame:SetScale(.9)
-		frame:SetPoint("BOTTOMLEFT", 196/frame:GetScale(), 247/frame:GetScale())
+		frame:SetPoint("BOTTOMLEFT", 196/.9, 247/.9)
+
+		Focus:RegisterMovableFrameAnchor(frame, string.lower(BINDING_NAME_FOCUSTARGET), "unitframes", AzeriteUI6_Positions_DB)
 	end)
 end

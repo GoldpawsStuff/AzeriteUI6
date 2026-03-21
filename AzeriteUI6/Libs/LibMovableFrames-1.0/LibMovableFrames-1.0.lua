@@ -40,7 +40,7 @@ lib.embeds = lib.embeds or {}
 lib.frame = lib.frame or CreateFrame("Frame")
 
 -- Constant to track login status
-local _LOGGED_IN = IsLoggedIn()
+local _PLAYER_IS_LOGGED_IN = IsLoggedIn()
 
 local Anchor = CreateFrame("Button")
 local Anchor_MT = { __index = Anchor }
@@ -52,10 +52,10 @@ local Scale_MT = { __index = Scale }
 lib.Anchors = lib.Anchors or {} -- currently registered anchors
 lib.AnchorCache = lib.AnchorCache or {} -- cache of unused anchor frames
 lib.AnchorGroups = lib.AnchorGroups or { general = {}, actionbars = {}, unitframes = {}, floaters = {} } -- registered anchor groups
-lib.AnchorGroupColors = lib.AnchorGroupColors or { -- anchor group colors
+lib.AnchorGroupColors = lib.AnchorGroupColors or {  -- anchor group colors
 	general = 		{ 128/255, 255/255, 128/255 }, 	-- bright green
-	actionbars = 	{ 64/255, 192/255, 255/255 }, 	-- bright blue
-	unitframes = 	{ 255/255, 160/255, 64/255 }, 	-- orange
+	actionbars = 	{  64/255, 192/255, 255/255 }, 	-- bright blue
+	unitframes = 	{ 255/255, 160/255,  64/255 }, 	-- orange
 	floaters = 		{ 255/255, 192/255, 128/255 } 	-- warm yellow
 }
 
@@ -68,21 +68,24 @@ local AnchorGroupColors = lib.AnchorGroupColors 	--[[-- [<"groupname">] = { r, g
 -- Clean up a number for display purposes.
 -- *do not save these numbers, as they are graphically inaccurate
 local clean = function(float) return math.floor((float * 100) + .5)/100 end
+local print = function(...)
+	_G.print(string.format("|cff3366cc%s:|r", MAJOR_VERSION), ...)
+end
 
 -- Figure out the point within the given coordinate space,
--- return values converted to the frame's own scale.
---[[--
-					1/3w            2/3w
-		_______________________________________ (uiWidth, uiHeight)
-		| TOPLEFT  |     TOP       | TOPRIGHT |
-		|__________|_______________|__________| 3/4h
-		|      1/4w     CENTER       3/4w     |
-		| LEFT  |                     | RIGHT |
-		|       |_________1/3w________|       |
-		|_______|__                 __|_______| 1/4h
-		| BOTTOM   |    BOTTOM     |   BOTTOM |
-		|_LEFT_____|_______________|____RIGHT_|
-	(0,0)
+-- return values relative to the WorldFrame or UIParent.
+--[[--                   
+        		  1/3w            2/3w
+        _______________________________________ (uiWidth, uiHeight)
+        | TOPLEFT  |     TOP       | TOPRIGHT |
+        |__________|_______________|__________| 3/4h
+        |      1/4w     CENTER       3/4w     |
+        | LEFT  |                     | RIGHT |
+        |_______|_____________________|_______| 1/3h
+        |          |               |          | 
+        | BOTTOM   |    BOTTOM     |   BOTTOM |
+        |_LEFT_____|_______________|____RIGHT_|
+    (0,0)         1/3w            2/3w
 
 --]]--
 local GetNormalizedCoords = function(frame, normalizeToUIParent)
@@ -125,7 +128,7 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 		if (x < uiWidth * 1/4) then
 
 			-- Mid Left
-			if (y > uiHeight * 1/4) then
+			if (y > uiHeight * 1/3) then
 				point, offsetX, offsetY = "LEFT", left, (y - uiHeight/2)
 
 			-- Bottom Left
@@ -137,7 +140,7 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 		elseif (x > uiWidth * 3/4) then
 
 			-- Mid Right
-			if (y > uiHeight * 1/4) then
+			if (y > uiHeight * 1/3) then
 				point, offsetX, offsetY = "RIGHT", -right, (y - uiHeight/2)
 
 			-- Bottom Right
@@ -168,86 +171,17 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 			end
 		end
 	end
+	-- Use this to position the frames
 	if (normalizeToUIParent) then
 		return point, offsetX/frameScale, offsetY/frameScale
 	else
+		-- Use this for saving, for accuracy
 		return point, offsetX, offsetY
 	end
 end
 
-Anchor.OnShow = function(self)
-	self.scale = self.owner:GetScale() -- current frame scale
-	self.baseWidth = self.owner:GetWidth() -- unscaled width
-	self.baseHeight = self.owner:GetHeight() -- unscaled height
-
-	self:SetUserResizable(self.isResizable)
-
-	-- position to its owner
-	-- scale and size to its owner
-	-- update its saved position
-
-end
-
-Anchor.OnDragStart = function(self)
-	self.owner:ClearAllPoints()
-	self.owner:SetPoint("CENTER", self) -- correct while it's centered
-
-	-- set OnUpdate script
-		-- update anchor, coords, scale
-
-	self:StartMoving()
-	self:SetUserPlaced(false) -- the above enables this, we don't want it
-end
-
-Anchor.OnDragStop = function(self)
-	self:StopMovingOrSizing()
-	self:SetScript("OnUpdate", nil)
-
-	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
-	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
-
-	self.owner:ClearAllPoints()
-	self.owner:SetPoint(point, x/scale, y/scale) 	-- Convert anchor's coordinates to same space as the frame
-end
-
-Anchor.OnSizeChanged = function(self, width, height)
-	local baseWidth, baseHeight = self.baseWidth, self.baseHeight
-	local scale = width / baseWidth 
-
-	-- limit the scale
-	if (scale > 1.5) then
-		scale = 1.5
-		width = baseWidth * 1.5
-	elseif (scale < .5) then
-		scale = .5
-		width = baseWidth * .5
-	end
-
-	-- keep the ratio
-	width = baseWidth * scale
-	height = baseHeight * scale
-
-	self.scale = scale
-
-	self.owner:SetScale(scale)
-	self.owner:ClearAllPoints() 					-- Need to reset the points
-	self.owner:SetPoint("CENTER", self) 			-- or it will become misaligned when rescaled
-
-	self:SetSize(width, height) 					-- resize the anchor
-
-	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
-	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame 
-
-	self.owner:ClearAllPoints()
-	self.owner:SetPoint(point, x/scale, y/scale) 	-- Convert anchor's coordinates to same space as the frame
-end
-
-Anchor.SetUserResizable = function(self, isResizable)
-	self.isResizable = isResizable and true or nil
-	self.sizer:SetShown(self.isResizable)
-	self:SetResizable(self.isResizable)
-end
-
+-- Setters
+---------------------------------------------
 Anchor.SetGroup = function(self, group)
 	-- validate the optional group name or add to 'general'
 	group = group and AnchorGroups[group] and group or "general" 
@@ -263,106 +197,264 @@ Anchor.SetGroup = function(self, group)
 	local r, g, b = unpack(AnchorGroupColors[group])
 	self.overlay:SetBackdropColor(r, g, b, .5)
 	self.overlay:SetBackdropBorderColor(r, g, b, .75)
-
 end
 
 Anchor.SetLabel = function(self, label)
+	self.label:SetText(label or "")
+end
+
+Anchor.SetAbove = function(self, isAbove)
+	self.isAbove = isAbove and true or nil
+	self:SetFrameLevel(self.isAbove and 1100 or self.isBelow and 900 or 1000)
+end
+
+Anchor.SetBelow = function(self, isBelow)
+	self.isBelow = isBelow and true or nil
+	self:SetFrameLevel(self.isAbove and 600 or self.isBelow and 400 or 1000)
+end
+
+-- Save & Restore
+---------------------------------------------
+-- Save current position
+Anchor.Save = function(self)
+
+	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
+	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+
+
+end
+
+-- Restore last saved position
+Anchor.Restore = function(self)
+
+	self:UpdatePosition()
+end
+
+-- Undo current change
+Anchor.Undo = function(self)
+	
+	self:UpdatePosition()
+end
+
+-- Updates
+---------------------------------------------
+Anchor.UpdatePosition = function(self)
+	-- update displayed coords and scale
+	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
+	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+
+	self.position:SetFormattedText("|cff888888%s|r  %.0f, %.0f   |cff888888%.02f|r", point, x, y, scale/UIParent:GetScale())
+end
+
+-- Script Handlers 
+---------------------------------------------
+Anchor.OnShow = function(self)
+	-- store owner's size and scale
+	self.scale = self.owner:GetScale() -- current frame scale
+	self.baseWidth = self.owner:GetWidth() -- unscaled width
+	self.baseHeight = self.owner:GetHeight() -- unscaled height
+
+	-- position, scale and size to its owner
+	self:SetScale(self.scale)
+	self:SetSize(self.baseWidth, self.baseHeight)
+	self:ClearAllPoints()
+	self:SetPoint(GetNormalizedCoords(self.owner, true))
+
+	self:UpdatePosition()
+end
+
+Anchor.OnHide = function(self)
+	
+end
+
+Anchor.OnDragStart = function(self)
+	self.owner:ClearAllPoints()
+	self.owner:SetPoint("CENTER", self) -- correct while it's centered
+
+	self:SetScript("OnUpdate", self.OnUpdate)
+
+
+	self:StartMoving()
+	self:SetUserPlaced(false) -- the above enables this, we don't want it
+
+	self:UpdatePosition()
+end
+
+Anchor.OnDragStop = function(self)
+	self:StopMovingOrSizing()
+	self:SetScript("OnUpdate", nil)
+
+	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
+	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+
+	self.owner:ClearAllPoints()
+	self.owner:SetPoint(point, x/scale, y/scale) 	-- Convert anchor's coordinates to same space as the frame
+
+	self:UpdatePosition()
+end
+
+Anchor.OnMouseDown = function(self, button)
+	if (button == "LeftButton") then
+		for frame,anchor in next,Anchors do 
+			anchor:SetFrameLevel(anchor == self and 2000 or anchor.isAbove and 1100 or anchor.isBelow and 900 or 1000)
+		end
+	elseif (button == "RightButton") then
+		for frame, anchor in next,Anchors do 
+			anchor:SetFrameLevel(anchor == self and 500 or anchor.isAbove and 600 or anchor.isBelow and 400 or 1000)
+		end
+	end
+end
+
+Anchor.OnMouseWheel = function(self, delta)
+
+	if (delta > 0 ) then
+		self.scale = math.min(1.5, self.scale + .02)
+	elseif (delta < 0) then
+		self.scale = math.max(.5, self.scale - .02)
+	end
+
+	-- retrieve unscaled position
+	local point, x, y = GetNormalizedCoords(self.owner)
+
+	-- change the scale
+	self.owner:SetScale(self.scale)
+
+	-- figure out the new effective scale
+	local effectiveScale = self.owner:GetEffectiveScale()
+
+	-- adjust position to match the old anchorpoint
+	self.owner:ClearAllPoints()
+	self.owner:SetPoint(point, x / effectiveScale, y / effectiveScale)
+
+	-- update the anchor
+	self:SetScale(self.scale)
+	self:ClearAllPoints()
+	self:SetPoint(point, x / effectiveScale, y / effectiveScale)
+
+	self:UpdatePosition()
+end
+
+Anchor.OnUpdate = function(self, elapsed)
+	self.elapsed = (self.elapsed or 0) + elapsed
+	if (self.elapsed < 1/30) then
+		return 
+	end
+	self.elapsed = 0 -- full reset
+
+	self:UpdatePosition()
 end
 
 Scale.OnMouseDown = function(self)
 	self:GetParent():StartSizing("BOTTOMRIGHT", false)
 	self:GetParent():SetUserPlaced(false)
 	self:SetButtonState("PUSHED", true)
+	self:GetParent():UpdatePosition()
 end
 
 Scale.OnMouseUp = function(self)
 	self:SetButtonState("NORMAL", false)
 	self:GetParent():StopMovingOrSizing()
+	self:GetParent():UpdatePosition()
 end
 
 --[[ RegisterMovableFrameAnchor(self, frame, [label], [group])
 Register a frame for movement.
 
-* self      	- the module registered for the event
-* frame     	- <frame> handle of the frame to be moved 
-* displayName 	- <string> label to display on the anchor (optional)
-* group 		- <string> group to add anchor to (optional)
+* self      - the module registered for the event
+* frame     - <frame> handle of the frame to be moved 
+* name 	    - <string> label to display on the anchor (optional)
+* group     - <string> group to add anchor to (optional)
+* db        - <table> a table to store the position in, preferably your SavedVariables
 --]]
-lib.RegisterMovableFrameAnchor = function(_, frame, displayName, group, savedVariables)
+lib.RegisterMovableFrameAnchor = function(_, frame, name, group, db)
 	if (not frame) then 
-		return 
+		return print("[RegisterMovableFrameAnchor]: No 'frame' provided for anchoring.")
+	end
+	if (not frame:GetParent() == "UIParent") then 
+		return print("[RegisterMovableFrameAnchor]: Frame must be parented to 'UIParent'.") 
+	end
+	if (not frame:GetScale() or not frame:GetWidth() or not frame:GetSize()) then
+		return print("[RegisterMovableFrameAnchor]: Function requires a frame with valid position and dimensions.")
 	end
 
 	-- validate the optional group name or add to 'general'
 	group = group and AnchorGroups[group] and group or "general" 
 
+	-- don't save the frame in WoWs cache, we handle it ourselves
+	if (frame:IsMovable()) then
+		frame:SetUserPlaced(false) -- disable saving in the on-disk frame cache
+	end
+
 	-- retrieve or create an anchor
 	local anchor = table.remove(AnchorCache) or setmetatable(CreateFrame("Button", nil, UIParent), Anchor_MT)
+	anchor:Hide() -- hiding early prevents some calculations, but they're fucked up without it, and will be fucked up later. WHAT THE FUCK?!?!
 	anchor.owner = frame
 	anchor.scale = frame:GetScale() -- current frame scale
 	anchor.baseWidth = frame:GetWidth() -- unscaled width
 	anchor.baseHeight = frame:GetHeight() -- unscaled height
-	anchor.isResizable = true
-	anchor.savedVariables = savedVariables
-
-	-- retrieve or create label
-	local label = anchor.label 
-
-	anchor.label = label
-
-	-- retrieve or create scale button
-	local sizer = anchor.sizer or setmetatable(CreateFrame("Button", nil, anchor), Scale_MT)
-	sizer:SetPoint("BOTTOMRIGHT")
-	sizer:SetSize(16, 16) 																-- keep it small, because of the fugly graphics 
-	sizer:SetNormalTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]) 			-- these graphics, yes.
-	sizer:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]]) 	-- and these.
-	sizer:SetPushedTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]]) 			-- and definitely these.
-	sizer:SetHitRectInsets(-16, 0, -16, 0) 												-- make the adjustable corner grow a bit into the frame
-
-	anchor.sizer = sizer
+	anchor.isResizable = true -- by default scalable
+	anchor.db = db -- link to your saved variables, or any random table to store the position in
+	anchor.default = {  } -- TODO
+	anchor.previous = anchor.previous and table.wipe(anchor.previous) or {} -- previous position (previous time anchors were shown)
 
 	-- retrieve or create visible overlay
 	local overlay = anchor.overlay or CreateFrame("Frame", nil, anchor, "BackdropTemplate")
-	overlay:SetIgnoreParentScale(true)
-	overlay:SetPoint("TOPLEFT", -1, 1)
-	overlay:SetPoint("BOTTOMRIGHT", 1, -1)
+	overlay:SetIgnoreParentScale(true) -- don't scale this
+	overlay:SetPoint("TOPLEFT", -1, 1) -- these aligns perfectly with the texture edges, 
+	overlay:SetPoint("BOTTOMRIGHT", 1, -1) -- so don't freaking change them for prettyness!
 	overlay:SetBackdrop({
 		bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
 		edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
 		edgeSize = 16, tile = true, tileSize = 16,
 		insets = { left = 4, right = 3, top = 3, bottom = 4 }
 	})
-
-	local r, g, b = unpack(AnchorGroupColors[group])
-	overlay:SetBackdropColor(r, g, b, .5)
-	overlay:SetBackdropBorderColor(r, g, b, .75)
-
 	anchor.overlay = overlay
 
-	anchor:SetLabel(displayName or "")
-	anchor:SetGroup(group)
-	anchor:SetSize(anchor.baseWidth * anchor.scale, anchor.baseHeight * anchor.scale) -- scaled size
-	anchor:ClearAllPoints()
-	anchor:SetPoint(GetNormalizedCoords(frame, true))
+	-- retrieve or create label text
+	local label = anchor.label or overlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	label:SetScale(.75)
+	label:SetDrawLayer("OVERLAY")
+	label:SetFontObject(SystemFont_Outline_Med2) -- Friz 15 Outline
+	label:SetPoint("CENTER", anchor, "CENTER", 0, 2)
+	label:SetShadowColor(0, 0, 0, 0)
+	label:SetShadowOffset(0, 0)
+	label:SetTextColor(1, .82, .2, .72)
+	anchor.label = label
+
+	-- retrieve or create position text
+	local position = anchor.position or overlay:CreateFontString(nil, "OVERLAY", nil, 1)
+	position:SetScale(.75)
+	position:SetDrawLayer("OVERLAY")
+	position:SetFontObject(NumberFont_Outline_Med) -- Arial 14 Outline (Number12FontOutline)
+	position:SetPoint("TOP", label, "BOTTOM", 0, -6)
+	position:SetShadowColor(0, 0, 0, 0)
+	position:SetShadowOffset(0, 0)
+	position:SetTextColor(.7, .7, .7, .96)
+	anchor.position = position
 
 	anchor:SetFrameStrata("HIGH")
 	anchor:SetFrameLevel(1000)
+	anchor:SetSize(anchor.baseWidth, anchor.baseHeight)
+	anchor:SetScale(anchor.scale)
+	anchor:ClearAllPoints()
+	anchor:SetPoint(GetNormalizedCoords(frame, true))
 
-	anchor:EnableMouse(true)
-	anchor:SetMovable(true)
-	anchor:SetUserResizable(true)
-	anchor:SetUserPlaced(false) -- disable saving in the on-disk frame cache, it messes with our system
-	anchor:SetClampedToScreen(false)
-
+	anchor:RegisterForClicks("AnyUp", "AnyDown")
 	anchor:RegisterForDrag("LeftButton")
-	anchor:RegisterForClicks("AnyUp")
-
+	anchor:SetScript("OnShow", Anchor.OnShow)
 	anchor:SetScript("OnDragStart", Anchor.OnDragStart)
 	anchor:SetScript("OnDragStop", Anchor.OnDragStop)
-	anchor:SetScript("OnSizeChanged", Anchor.OnSizeChanged)
+	anchor:SetScript("OnMouseDown", Anchor.OnMouseDown)
+	anchor:SetScript("OnMouseWheel", Anchor.OnMouseWheel)
 
-	sizer:SetScript("OnMouseDown", Scale.OnMouseDown)
-	sizer:SetScript("OnMouseUp", Scale.OnMouseUp)
+	-- final setup
+	anchor:EnableMouse(true)
+	anchor:SetClampedToScreen(false)
+	anchor:SetMovable(true)
+	anchor:SetUserPlaced(false) -- disable saving in the on-disk frame cache, it messes with our system
+	anchor:SetLabel(name or "") -- set the label, if any
+	anchor:SetGroup(group) -- this also colors the anchor
+	anchor:Hide() -- initially hide
 
 	-- add to a groups
 	Anchors[frame] = anchor
@@ -402,21 +494,21 @@ lib.UnregisterMovableFrameAnchor = function(_, frame)
 	Anchors[frame] = nil 
 end
 
---[[ RegisterMovableFrameGroup(self, groupName, r, g, b)
+--[[ RegisterMovableFrameGroup(self, group, r, g, b)
 Shows all registered and active movable frame anchors.
 
 * self      - the module registered for the event
-* groupName - name of the new group <string>
-* r 		- <number> [0-1] red component of the group color 
-* g 		- <number> [0-1] green component of the group color 
-* b 		- <number> [0-1] blue component of the group color 
+* group - name of the new group <string>
+* r         - <number> [0-1] red component of the group color 
+* g         - <number> [0-1] green component of the group color 
+* b         - <number> [0-1] blue component of the group color 
 --]]
-lib.RegisterMovableFrameGroup = function(_, groupName, r, g, b)
-	if (AnchorGroups[groupName]) then 
+lib.RegisterMovableFrameGroup = function(_, group, r, g, b)
+	if (AnchorGroups[group]) then 
 		return 
 	end
-	AnchorGroups[groupName] = {}
-	AnchorGroupColors[groupName] = { r, g, b }
+	AnchorGroups[group] = {}
+	AnchorGroupColors[group] = { r, g, b }
 end
 
 --[[ ShowAllMovableFrameAnchors(self)
@@ -445,6 +537,23 @@ lib.HideAllMovableFrameAnchors = function()
 	end
 end
 
+--[[ ToggleAllMovableFrameAnchors(self)
+Toggles all registered and active movable frame anchors.
+--]]
+lib.ToggleAllMovableFrameAnchors = function()
+	if (InCombatLockdown()) then return end
+	local shown
+	for frame,anchor in next,Anchors do
+		if (anchor:IsShown()) then
+			shown = true -- if one is shown, consider all to be
+			break
+		end
+	end
+	for frame,anchor in next,Anchors do
+		anchor:SetShown(not shown)
+	end
+end
+
 -- Event						When it fires								All variables?	Recommend?
 -------------------------------------------------------------------------------------------------------------------------			
 -- ADDON_LOADED (own name)		Per addon, when that addon's vars load		No (only own)	Yes — for own addon only
@@ -458,15 +567,18 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		self:UnregisterEvent("PLAYER_LOGIN") -- only need this one once
 
 		for frame,anchor in next,Anchors do
-			if (anchor.savedVariables) then
+			if (anchor.db) then
 				local frameName = frame:GetName() or frame:GetDebugName()
-				local savedPosition = anchor.savedVariables[frameName]
-
+				local savedPosition = anchor.db[frameName] -- is it saved?
+				local position, x, y = savedPosition and unpack(savedPosition)
+				if (position and x and y) then
+					-- restore frame positions
+				end
 			end
 
 		end
 
-		_LOGGED_IN = true 
+		_PLAYER_IS_LOGGED_IN = true 
 
 	elseif (event == "PLAYER_REGEN_DISABLED") then -- combat started, hide anchors
 		lib:HideAllMovableFrameAnchors()
@@ -478,7 +590,7 @@ frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 
 -- Manually fire this if we're already logged in
 -- *might happen with Load on Demand addons, though unlikely
-if (_LOGGED_IN) then
+if (_PLAYER_IS_LOGGED_IN) then
 	frame:GetScript("OnEvent")(frame, "PLAYER_LOGIN")
 else
 	frame:RegisterEvent("PLAYER_LOGIN")
@@ -488,7 +600,8 @@ local mixins = {
 	RegisterMovableFrameAnchor = true,
 	UnregisterMovableFrameAnchor = true,
 	ShowAllMovableFrameAnchors = true,
-	HideAllMovableFrameAnchors = true
+	HideAllMovableFrameAnchors = true,
+	ToggleAllMovableFrameAnchors = true
 }
 
 lib.Embed = function(self, target)

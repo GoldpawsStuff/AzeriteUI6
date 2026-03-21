@@ -26,14 +26,15 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local ToT = ns:NewModule("ToT", nil, "LibMoreEvents-1.0")
+local ToT = ns:NewModule("ToT", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {
-	hideWhenTargetingPlayer = true,
-	hideWhenTargetingSelf = true
-}}
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
+local defaults = { 
+	profile = {
+		hideWhenTargetingPlayer = true,
+		hideWhenTargetingSelf = true
+	}
+}
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -75,8 +76,8 @@ local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 
 	unit = unit or self.unit
 
-	if (db.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
-	or (db.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
+	if (ToT.db.profile.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
+	or (ToT.db.profile.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
 		self:SetAlpha(0)
 	else
 		self:SetAlpha(1)
@@ -157,7 +158,7 @@ local style = function(self, unit)
 	--------------------------------------------
 	local name = self:CreateFontString(nil, "OVERLAY", nil, 1)
 	name:SetPoint("BOTTOM", 0, 46)
-	name:SetFontObject(GetFont(12, true))
+	name:SetFontObject(GetFont(13, true))
 	name:SetTextColor(self.colors.highlight:GetRGB())
 	name:SetAlpha(.75)
 	name:SetJustifyH("RIGHT")
@@ -214,26 +215,21 @@ ToT.RefreshConfig = function(self)
 end
 
 ToT.OnInitialize = function(self)
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("ToT", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("ToT", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 ToT.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteUnitFrameTargetTarget", style)	
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameTargetTarget")
+
 		local frame = self:Spawn("targettarget")
 		frame:SetScale(.9)
-		frame:SetPoint("TOPRIGHT", -492/frame:GetScale(), -67/frame:GetScale())
+		frame:SetPoint("TOPRIGHT", -446/.9, -66/.9)
+
+		ToT:RegisterMovableFrameAnchor(frame, string.lower(SHOW_TARGET_OF_TARGET_TEXT), "unitframes", AzeriteUI6_Positions_DB):SetAbove(true)
 	end)
 end

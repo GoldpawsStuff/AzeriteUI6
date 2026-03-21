@@ -25,7 +25,7 @@
 --]]
 local addonName, ns = ...
 
-ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "LibMoreEvents-1.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
 -- Saved variables globals
@@ -71,6 +71,11 @@ ns.HideBlizzard = function(self)
 
 end
 
+-- Toggle movable frame anchors
+ns.ToggleFrameLocks = function(self)
+	self:ToggleAllMovableFrameAnchors()
+end
+
 ns.RefreshConfig = function(self, event, ...)
 	if (event == "OnNewProfile") then
 		--local db, profileKey = ...
@@ -102,4 +107,6 @@ ns.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	self:RegisterChatCommand("lock", "ToggleFrameLocks")
 end

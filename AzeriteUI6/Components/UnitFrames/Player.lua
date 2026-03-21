@@ -35,8 +35,6 @@ local defaults = { profile = {
 	useIceCrystal = false -- use the special wotlk ice crystal instead
 }}
 
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
-
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
@@ -189,7 +187,7 @@ local Mana_UpdateVisibility = function(self, event, unit)
 
 	-- There is a short period when entering vehicles where the player unit does not exist.
 	-- We don't want the mana orb accidentially popping up during this period.
-	local shouldEnable = not playerIsRetribution and not db.alwaysUseCrystal and UnitExists("player") and not UnitHasVehicleUI("player") and UnitPowerType(unit) == Enum.PowerType.Mana
+	local shouldEnable = not playerIsRetribution and not Player.db.profile.alwaysUseCrystal and UnitExists("player") and not UnitHasVehicleUI("player") and UnitPowerType(unit) == Enum.PowerType.Mana
 	local isEnabled = element.__isEnabled
 
 	if (shouldEnable and not isEnabled) then
@@ -243,7 +241,7 @@ local Power_UpdateVisibility = function(element, unit, cur, min, max)
 
 	-- power crystal visibility
 	local powerType = UnitPowerType(unit)
-	if (playerIsRetribution or db.alwaysUseCrystal) then
+	if (playerIsRetribution or Player.db.profile.alwaysUseCrystal) then
 		element:Show()
 	else
 		if (powerType == Enum.PowerType.Mana and not UnitHasVehicleUI("player")) then
@@ -253,7 +251,7 @@ local Power_UpdateVisibility = function(element, unit, cur, min, max)
 		end
 	end
 
-	if (zeroPowerTypes[powerType] or db.useIceCrystal) then
+	if (zeroPowerTypes[powerType] or Player.db.profile.useIceCrystal) then
 		element.Backdrop:SetTexture(GetMedia("power-crystal-ice-back"))
 		element:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
 		element:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
@@ -279,8 +277,7 @@ local Power_UpdateColor = function(self, event, unit)
 	local element = self.Power
 
 	local powerType = UnitPowerType(unit)
-	if (db.useIceCrystal or zeroPowerTypes[powerType]) then
-		--element.Texture:SetVertexColor(1, 1, 1) 
+	if (Player.db.profile.useIceCrystal or zeroPowerTypes[powerType]) then
 		element:SetStatusBarColor(1, 1, 1) 
 	else
 		local r, g, b, color
@@ -516,7 +513,7 @@ local style = function(self, unit)
 	powerBg:SetSize(196, 196)
 	powerBg:SetPoint("CENTER", 0, 0)
 
-	if (db.useIceCrystal) then
+	if (Player.db.profile.useIceCrystal) then
 		powerBg:SetTexture(GetMedia("power-crystal-ice-back"))
 		power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
@@ -708,17 +705,10 @@ end
 
 Player.OnInitialize = function(self)
 	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("Player", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("Player", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 Player.OnEnable = function(self)
@@ -730,7 +720,6 @@ Player.OnEnable = function(self)
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 46/.9, 100/.9) -- scaled coords
 
-		Player:RegisterMovableFrameAnchor(frame, "player", "unitframes", AzeriteUI6_Positions_DB)
-
+		Player:RegisterMovableFrameAnchor(frame, string.lower(PLAYER), "unitframes", AzeriteUI6_Positions_DB)
 	end)
 end

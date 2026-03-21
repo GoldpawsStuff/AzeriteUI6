@@ -26,11 +26,17 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local ClassPower = ns:NewModule("ClassPower", nil, "LibMoreEvents-1.0")
+local ClassPower = ns:NewModule("ClassPower", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { char = { showClassPower = true }, profile = {} } -- keep toggling a character specific setting
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
+local defaults = { 
+	char = { 
+		showClassPower = true -- keep toggling a character specific setting
+	}, 
+	profile = {
+
+	} 
+} 
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -279,7 +285,7 @@ local ClassPower_PostUpdate = function(element, cur, max, hasMaxChanged, powerTy
 		return element:Hide()
 	end
 	
-	if (not db.char.showClassPower) then
+	if (not ClassPower.db.char.showClassPower) then
 		return element:Hide()
 	end
 
@@ -501,26 +507,21 @@ ClassPower.RefreshConfig = function(self)
 end
 
 ClassPower.OnInitialize = function(self)
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("ClassPower", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults end
-		return self.db and self.db or defaults
-	end)(false)
+	self.db = ns.db:RegisterNamespace("ClassPower", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 ClassPower.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteUnitFrameClassPower", style)	
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameClassPower")
+
 		local frame = self:Spawn("player")
 		frame:SetScale(.9)
-		frame:SetPoint("CENTER", -223/frame:GetScale(), -84/frame:GetScale())
+		frame:SetPoint("CENTER", -223/.9, -84/.9)
+
+		ClassPower:RegisterMovableFrameAnchor(frame, string.lower(COMBO_POINTS), "unitframes", AzeriteUI6_Positions_DB)
 	end)
 end

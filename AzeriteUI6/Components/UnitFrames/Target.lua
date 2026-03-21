@@ -26,7 +26,7 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local Target = ns:NewModule("Target", nil, "LibMoreEvents-1.0")
+local Target = ns:NewModule("Target", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {} }
@@ -320,7 +320,7 @@ end
 local style = function(self, unit)
 
 	-- General frame settings
-	self:SetSize(550, 210)
+	self:SetSize(550, 160) -- 550, 210
 	self:SetHitRectInsets(0, 0, 0, 60)
 
 	ns.ApplyUnitFrameScriptsTo(self)
@@ -376,7 +376,7 @@ local style = function(self, unit)
 	healthPerc:SetJustifyH("LEFT")
 	healthPerc:SetJustifyV("MIDDLE")
 
-	self:Tag(healthPerc, "[perhp]")
+	self:Tag(healthPerc, "[azui:healthpercent]")
 
 	-- Options
 	health.colorDisconnected = true
@@ -660,19 +660,21 @@ Target.RefreshConfig = function(self)
 end
 
 Target.OnInitialize = function(self)
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("Target", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+	self.db = ns.db:RegisterNamespace("Target", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 Target.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteUnitFrameTarget", style)	
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameTarget")
+
 		local frame = self:Spawn("target")
 		frame:SetScale(.9)
-		frame:SetPoint("TOPRIGHT", -40/frame:GetScale(), -40/frame:GetScale())
+		frame:SetPoint("TOPRIGHT", -40/.9, -40/.9)
+
+		Target:RegisterMovableFrameAnchor(frame, string.lower(TARGET), "unitframes", AzeriteUI6_Positions_DB)
 	end)
 end
