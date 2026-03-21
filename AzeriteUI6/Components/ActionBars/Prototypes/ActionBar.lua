@@ -30,7 +30,6 @@ local LFF = LibStub("LibFadingFrames-1.0")
 local defaults = {
 	enabled = true,
 	layout = "grid", -- <grid, zigzag>
-
 	layoutZigZagStart = 1, -- at which button the zigzag pattern should begin
 	layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
 	layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
