@@ -26,7 +26,6 @@
 local _, ns = ...
 
 local Trackers = ns:NewModule("ObjectiveTracker", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
 
 -- Declare module defaults
 local defaults = { profile = {
@@ -34,7 +33,7 @@ local defaults = { profile = {
 }}
 
 Trackers.UpdateObjectiveTrackerFading = function(self)
-	if (db.fadeOutTracker) then
+	if (self.db.profile.fadeOutTracker) then
 		self:RegisterFrameForFading(ObjectiveTrackerFrame, "Trackers")
 	else
 		self:UnregisterFrameForFading(ObjectiveTrackerFrame)
@@ -54,21 +53,11 @@ Trackers.RefreshConfig = function(self)
 end
 
 Trackers.OnEnable = function(self)
-	-- Doing this manually until we enable settings profiles
-	self:UpdateObjectiveTrackerFading()
 end
 
 Trackers.OnInitialize = function(self)
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("Trackers", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("Trackers", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end

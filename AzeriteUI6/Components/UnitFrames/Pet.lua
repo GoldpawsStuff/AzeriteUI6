@@ -160,7 +160,6 @@ Pet.RefreshConfig = function(self)
 end
 
 Pet.OnInitialize = function(self)
-	-- Let's not do these until the addon is more stable
 	self.db = ns.db:RegisterNamespace("Pet", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")

@@ -31,7 +31,6 @@ local MinimapModule = ns:NewModule("Minimap", nil, "LibMoreEvents-1.0", "LibFadi
 local defaults = { profile = {
 	fadeClutter = true
 }}
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -101,16 +100,8 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("Minimap", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("Minimap", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end

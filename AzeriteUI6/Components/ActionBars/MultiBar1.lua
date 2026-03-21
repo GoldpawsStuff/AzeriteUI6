@@ -31,7 +31,7 @@ local MultiBar1 = ns:NewModule("MultiBar1", nil, "LibMoreEvents-1.0", "LibFading
 -- Declare module defaults
 local defaults = { 
 	profile = {
-		enabled = true,
+		enabled = false,
 		layout = "zigzag", -- <grid, zigzag>
 		layoutZigZagStart = 2, -- at which button the zigzag pattern should begin
 		layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
