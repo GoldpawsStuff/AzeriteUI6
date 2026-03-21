@@ -24,6 +24,7 @@
 
 --]]
 local _, ns = ...
+local oUF = ns.oUF
 
 local LAB = LibStub("LibActionButton-1.0")
 
@@ -31,6 +32,9 @@ local LAB = LibStub("LibActionButton-1.0")
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
+local Hider= CreateFrame("Frame")
+Hider:SetAllPoints()
+Hider:Hide()
 
 local config = {
 	outOfRangeColoring = "button",
@@ -108,7 +112,6 @@ local config = {
 	}
 }
 
--- Exit button for Wrath & Retail
 local exitButton = {
 	func = function(button)
 		if (UnitExists("vehicle")) then
@@ -161,36 +164,129 @@ ns.ActionButton.Create = function(self, id, name, header)
 	end
 
 	button:SetSize(header.buttonWidth, header.buttonHeight)
+	button:SetAttribute("checkselfcast", true)
+	button:SetAttribute("checkfocuscast", true)
+	button:SetAttribute("checkmouseovercast", true)
+
+	-- Hide unused elements
+	button.CooldownFlash:SetParent(Hider)
+	button.InterruptDisplay:SetParent(Hider)
+	button.NewActionTexture:SetParent(Hider)
+	button.NormalTexture:SetTexture()
+	button.NormalTexture:SetParent(Hider)
+	button.SpellHighlightAnim:Stop()
+	button.SpellHighlightTexture:SetParent(Hider)
+	button.SlotArt:SetParent(Hider)
+	--button.SlotBackground:SetParent(Hider)
+	button.SpellCastAnimFrame:SetParent(Hider)
+	button.TargetReticleAnimFrame:SetParent(Hider)
+
+	if (button.BorderShadow) then
+		button.BorderShadow:SetParent(Hider)
+	end
+
+	-- Block BaseActionButtonMixin
+	button.SlotArt = nil
+	--button.SlotBackground = nil
+
+	-- Remove default mask texture
+	button.icon:RemoveMaskTexture(button.IconMask)
+
+	button:DisableDrawLayer("ARTWORK")
+
+	button:SetAttribute("buttonLock", true)
+	button:SetSize(64, 64)
+	button:SetHitRectInsets(-10, -10, -10, -10)
+	button.hitRects = { -10, -10, -10, -10 }
+
+	-- Overlay Frame
+	button.OverlayFrame = CreateFrame("Frame", nil, button)
+	button.OverlayFrame:SetFrameLevel(button:GetFrameLevel() + 3)
+	button.OverlayFrame:SetAllPoints()
+
+	-- Icon Border
+	button.IconBorder = button.OverlayFrame:CreateTexture(nil, "BORDER", nil, 1)
+	button.IconBorder:SetPoint("CENTER", 0, 0)
+	button.IconBorder:SetSize(134.295081967, 134.295081967)
+	button.IconBorder:SetTexture(GetMedia("actionbutton-border"))
+	button.IconBorder:SetVertexColor(oUF.colors.ui:GetRGB())
 
 	-- backdrop
+	-- Custom slot texture
+	button.backdrop = button:CreateTexture(nil, "BACKGROUND", nil, -7)
+	button.backdrop:SetSize(134.295081967, 134.295081967)
+	button.backdrop:SetPoint("CENTER", 0, 0)
+	button.backdrop:SetTexture(GetMedia("actionbutton-backdrop"))
+	button.backdrop:SetVertexColor(.67, .67, .67, 1)
 
 	-- cooldown
 
 	-- gloss
 
 	-- icon
+	button.icon:SetDrawLayer("BACKGROUND", 1)
+	button.icon:ClearAllPoints()
+	button.icon:SetPoint("CENTER", 0, 0)
+	button.icon:SetSize(44, 44)
+	button.icon:SetMask(GetMedia("actionbutton-mask-circular"))
 
 	-- normal border 
 
 	-- equipped items border
 
 	-- checked (pet abilities that are on autocast)
+	button:GetCheckedTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
+	button:GetCheckedTexture():SetVertexColor(1, .82, .1, .2)
+	button:GetCheckedTexture():SetAllPoints(button.icon)
+	button:GetCheckedTexture():SetBlendMode("ADD")
+	button:GetCheckedTexture():SetDrawLayer("OVERLAY", 1)
 
 	-- flash (autocast/autoattack)
 
 	-- highlight (hover)
+	button:GetHighlightTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
+	button:GetHighlightTexture():SetVertexColor(1, 1, 1, .2)
+	button:GetHighlightTexture():SetAllPoints(button.icon)
+	button:GetHighlightTexture():SetBlendMode("ADD")
+	button:GetHighlightTexture():SetDrawLayer("HIGHLIGHT")
+
+	-- pushed texture
+	button:GetPushedTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
+	button:GetPushedTexture():SetVertexColor(1, 1, 1, .2)
+	button:GetPushedTexture():SetAllPoints(button.icon)
+	button:GetPushedTexture():SetBlendMode("ADD")
+	button:GetPushedTexture():SetDrawLayer("OVERLAY", 2)
+
+	-- autoattack flash
+	button.Flash:SetDrawLayer("OVERLAY", 2)
+	button.Flash:SetAllPoints(button.icon)
+	button.Flash:SetVertexColor(1, 0, 0, .25)
+	button.Flash:SetTexture(GetMedia("actionbutton-mask-circular"))
+	button.Flash:Hide()
 
 	-- hotkey
 	button.HotKey.SetFont = function() end -- disables LAB from overriding it
 	button.HotKey:SetFontObject(config.text.hotkey.font.fontObject)
 	button.HotKey:SetJustifyH(config.text.hotkey.justifyH)
 	button.HotKey:SetJustifyV(config.text.hotkey.justifyV)
+	button.HotKey:SetParent(button.OverlayFrame)
+	button.HotKey:SetDrawLayer("OVERLAY", 1)
+	button.HotKey:ClearAllPoints()
+	button.HotKey:SetPoint("TOPLEFT", -5, -5)
+	button.HotKey:SetTextColor(oUF.colors.quest.gray:GetRGB())
+	button.HotKey:SetAlpha(.75)
 
 	-- spell charges / stack count
 	button.Count.SetFont = function() end -- disables LAB from overriding it
 	button.Count:SetFontObject(config.text.count.font.fontObject)
 	button.Count:SetJustifyH(config.text.count.justifyH)
 	button.Count:SetJustifyV(config.text.count.justifyV)
+	button.Count:SetParent(button.OverlayFrame)
+	button.Count:SetDrawLayer("OVERLAY", 1)
+	button.Count:ClearAllPoints()
+	button.Count:SetPoint("BOTTOMRIGHT", -3, 3)
+	button.Count:SetTextColor(oUF.colors.normal:GetRGB())
+	button.Count:SetAlpha(.85)
 
 	-- macro name
 	button.Name.SetFont = function() end -- disables LAB from overriding it

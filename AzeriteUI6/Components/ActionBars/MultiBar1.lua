@@ -26,25 +26,29 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local MultiBar1 = ns:NewModule("MultiBar1", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+local MultiBar1 = ns:NewModule("MultiBar1", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {}}
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
+local defaults = { 
+	profile = {
+		enabled = false,
+		layout = "zigzag", -- <grid, zigzag>
+		layoutZigZagStart = 2, -- at which button the zigzag pattern should begin
+		layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
+		--layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
+		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
+		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
+
+		enableBarFading = true, -- whether to enable non-combat/hover button fading
+		fadeInCombat = false, -- whether to keep fading out even in combat
+		fadeFrom = 1, -- which button to start the button fading from
+	}
+}
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
-
-local defaults = {
-	layout = "zigzag", -- <grid, zigzag>
-	layoutZigZagStart = 1, -- at which button the zigzag pattern should begin
-	layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
-	layoutGrowth = "horizontal", -- which direction the bar initially grows in
-	layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
-	layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
-}
 
 -- Return blizzard barID by from own bar numbers.
 local BAR_TO_ID = {
@@ -65,7 +69,7 @@ for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
 MultiBar1.Spawn = function(self)
 
-	local bar = ns.ActionBar:Create(BAR_TO_ID[2], defaults, "AZUI6_ActionBar2")
+	local bar = ns.ActionBar:Create(BAR_TO_ID[2], self.db.profile, "AZUI6_ActionBar2")
 
 	self.bar = bar
 
@@ -86,25 +90,19 @@ end
 MultiBar1.OnInitialize = function(self)
 	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
 
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("MultiBar1", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("MultiBar1", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 MultiBar1.OnEnable = function(self)
 
 	local bar = MultiBar1:Spawn()
-	bar:SetSize(400,64)
-	bar:SetPoint("BOTTOMLEFT", 950, 50)
-	bar:Update()
+	bar:SetScale(.9)
+	bar:SetPoint("BOTTOMLEFT", (752-64-8)/.9, 42/.9) -- default position
+	bar:Update() -- update size and layout
+
+	self:RegisterMovableFrameAnchor(bar, string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 2)), "actionbars", AzeriteUI6_Positions_DB)
 
 end

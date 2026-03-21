@@ -30,6 +30,7 @@ local LFF = LibStub("LibFadingFrames-1.0")
 local defaults = {
 	enabled = true,
 	layout = "grid", -- <grid, zigzag>
+
 	layoutZigZagStart = 1, -- at which button the zigzag pattern should begin
 	layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
 	layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
@@ -38,7 +39,12 @@ local defaults = {
 	layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
 	layoutPaddingX = 8, -- horizontal padding between the buttons
 	layoutPaddingY = 8, -- vertical padding between the buttons
-	buttonHitRects = { -10, -10, -10, -10 },
+
+	enableBarFading = false, -- whether to enable non-combat/hover button fading
+	fadeInCombat = false, -- whether to keep fading out even in combat
+	fadeFrom = 1, -- which button to start the button fading from
+	fadeButtonHitRects = { -10, -10, -10, -10 },
+
 	numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
 	visibility = {
 		dragon = false,
@@ -212,7 +218,36 @@ ActionBar.Update = function(self)
 end
 
 ActionBar.UpdateFading = function(self)
-	if (InCombatLockdown()) then return end
+	--if (InCombatLockdown()) then return end
+
+	if (self.config.enabled and self.config.enableBarFading) then
+
+		-- Remove any previous fade registrations.
+		for id = 1, #self.buttons do
+			local button = self.buttons[id]
+			LFF:UnregisterFrameForFading(button)
+		end
+
+		-- Register fading for selected buttons.
+		for id = self.config.fadeFrom or 1, #self.buttons do
+			local button = self.buttons[id]
+			if (button:GetTexture()) then
+				LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", unpack(self.config.fadeButtonHitRects))
+			else
+				button:ForceUpdate()
+			end
+		end
+
+	else
+
+		-- Unregister all fading.
+		for id, button in next,self.buttons do
+			LFF:UnregisterFrameForFading(self.buttons[id])
+			if (not button:GetTexture()) then
+				--button:ForceUpdate()
+			end
+		end
+	end
 
 end
 

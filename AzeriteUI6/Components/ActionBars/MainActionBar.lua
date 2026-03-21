@@ -26,37 +26,41 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local MainActionBar = ns:NewModule("MainActionBar", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+local MainActionBar = ns:NewModule("MainActionBar", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {}}
-local db -- will be assigned a utility function returning the profile settings/defaults during initialization
+local defaults = { 
+	profile = {
+		enabled = true,
+		layout = "zigzag", -- <grid, zigzag>
+		layoutZigZagStart = 9, -- at which button the zigzag pattern should begin
+		layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
+		layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
+		layoutGrowth = "horizontal", -- which direction the bar initially grows in
+		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
+		layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
+		layoutPaddingX = 8, -- horizontal padding between the buttons
+		layoutPaddingY = 8, -- vertical padding between the buttons
+	
+		enableBarFading = true, -- whether to enable non-combat/hover button fading
+		fadeInCombat = false, -- whether to keep fading out even in combat
+		fadeFrom = 8, -- which button to start the button fading from
+		fadeButtonHitRects = { -10, -10, -10, -10 },
+
+		numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
+		visibility = {
+			dragon = true,
+			possess = true,
+			overridebar = true,
+			vehicleui = true
+		}
+	}
+}
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
-
-local defaults = {
-	enabled = true,
-	layout = "zigzag", -- <grid, zigzag>
-	layoutZigZagStart = 9, -- at which button the zigzag pattern should begin
-	layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
-	layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
-	layoutGrowth = "horizontal", -- which direction the bar initially grows in
-	layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
-	layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
-	layoutPaddingX = 8, -- horizontal padding between the buttons
-	layoutPaddingY = 8, -- vertical padding between the buttons
-	buttonHitRects = { -10, -10, -10, -10 },
-	numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
-	visibility = {
-		dragon = true,
-		possess = true,
-		overridebar = true,
-		vehicleui = true
-	}
-}
 
 -- Return blizzard barID by from own bar numbers.
 local BAR_TO_ID = {
@@ -76,7 +80,7 @@ for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
 MainActionBar.Spawn = function(self)
 
-	local bar = ns.ActionBar:Create(BAR_TO_ID[1], defaults, "AZUI6_ActionBar1")
+	local bar = ns.ActionBar:Create(BAR_TO_ID[1], self.db.profile, "AZUI6_ActionBar1")
 
 	self.bar = bar
 
@@ -97,25 +101,19 @@ end
 MainActionBar.OnInitialize = function(self)
 	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
 
-	-- Let's not do these until the addon is more stable
-	--self.db = ns.db:RegisterNamespace("MainActionBar", defaults)
-	--self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
-	--self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
-	-- Utility to get saved settings or defaults
-	-- *Will default to defaults if the saved settings above don't exist (during development)
-	db = (function(forceDefaults)
-		if (forceDefaults) then return defaults.profile end
-		return self.db and self.db.profile or defaults.profile
-	end)(false)
+	self.db = ns.db:RegisterNamespace("MainActionBar", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 MainActionBar.OnEnable = function(self)
 
 	local bar = MainActionBar:Spawn()
-	bar:SetSize(400,64)
-	bar:SetPoint("BOTTOMLEFT", 50, 50)
-	bar:Update()
+	bar:SetScale(.9)
+	bar:SetPoint("BOTTOMLEFT", 60/.9, 42/.9) -- default position
+	bar:Update() -- update size and layout
+
+	self:RegisterMovableFrameAnchor(bar, string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 
 end
