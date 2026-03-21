@@ -12,6 +12,6 @@
 	<Script file="Core.lua"/>
 
 	<!-- Will replace later -->
-	<Include file="Options\Options.xml"/>
+	<Include file="Dialogs\Dialogs.xml"/>
 	
 </Ui>

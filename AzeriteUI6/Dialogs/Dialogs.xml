@@ -1,4 +1,4 @@
-<Ui>
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Frame name="AzeriteUI6DialogTemplate" hidden="true" virtual="true" topLevel="true" enableMouse="true" inherits="ButtonFrameTemplate" mixin="AzeriteUI6DialogMixin">
 		<Size x="600" y="520"/>
 			<Scripts>
@@ -8,4 +8,5 @@
 			<OnShow method="OnShow"/>
 		</Scripts>
 	</Frame>
+	<Script file="Dialogs.lua"/>
 </Ui>
