@@ -25,6 +25,8 @@
 --]]
 local _, ns = ...
 
+LoadBindings(GetCurrentBindingSet())
+
 local LFF = LibStub("LibFadingFrames-1.0")
 
 local defaults = {
@@ -83,16 +85,18 @@ ns.ActionBar.Create = function(self, id, config, name)
 	bar.buttonConfig = ns:Merge(config or {}, ns.ActionBar.defaults)
 	bar.buttonWidth = 64
 	bar.buttonHeight = 64
-
+	
 	-- create buttons
 	for i = 1,NUM_ACTIONBAR_BUTTONS do
-		local button = ns.ActionButton:Create(i, name.."Button"..i, bar, bar.buttonConfig)
-		bar:SetFrameRef("Button"..i, button)
+		local button = ns.ActionButton:Create(i, name.."Button"..i, bar)
 		bar.buttons[i] = button
+		bar:SetFrameRef("Button"..i, button)
 
 		local keyBoundTarget = string.format(BINDTEMPLATE_BY_ID[id], button.id)
-		button.config.keyBoundTarget = keyBoundTarget
 		bar.buttonConfig.keyBoundTarget = keyBoundTarget
+		button.config.keyBoundTarget = keyBoundTarget
+
+		--local buttonConfig = ns:Merge(config or {}, ns.ActionBar.defaults)
 	end
 
 	bar:SetAttribute("UpdateVisibility", [[
@@ -471,21 +475,57 @@ ActionBar.UpdateButtonFlags = function(self)
 	end
 end
 
+-- Bad place to put this. It's hackish and weird. And in the wrong file.
+-- But leaving it here for now, because it works. 
+local KeyBound = LibStub("LibKeyBound-1.0", true)
+local GetHotkey = function(self)
+	local name = ("CLICK %s:%s"):format(self:GetName(), self.config.keyBoundClickButton)
+	local key = GetBindingKey(self.config.keyBoundTarget or name)
+	if not key and self.config.keyBoundTarget then
+		key = GetBindingKey(name)
+	end
+	if key then
+		if (IsBindingForGamePad(key)) then 
+			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
+			if (abbr) then
+				if (not self.GamePadHotKey) then
+					self.GamePadHotKey = self.OverlayFrame:CreateFontString(nil, "ARTWORK")
+					self.GamePadHotKey:SetPoint("CENTER", self, "TOPLEFT", 10, -10)
+					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
+				end
+				if (key:find("-")) then
+					self.GamePadHotKey:SetFontObject(ns.GetFont(15, "Outline", "Number"))
+				else
+					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
+				end
+				self.GamePadHotKey:SetText(abbr)
+
+				return ""
+			end
+		else
+			if (self.GamePadHotKey) then
+				self.GamePadHotKey:SetText("")
+			end
+		end
+		return KeyBound and KeyBound:ToShortKey(key) or key
+	end
+
+end
+
+-- Update the actual keybinds
 ActionBar.UpdateBindings = function(self)
 	if (InCombatLockdown()) then return end
 	if (not next(self.buttons)) then return end
 
 	ClearOverrideBindings(self)
 
-	--if (not self:IsEnabled()) then return end
-
 	for id,button in pairs(self.buttons) do
 		local bindingAction = button.keyBoundTarget
 		if (bindingAction) then
+			
 			-- iterate through the registered keys for the action
 			local buttonName = button:GetName()
 			for keyNumber = 1,select("#", GetBindingKey(bindingAction)) do
-
 				-- get a key for the action
 				local key = select(keyNumber, GetBindingKey(bindingAction))
 				if (key and (key ~= "")) then
@@ -493,6 +533,15 @@ ActionBar.UpdateBindings = function(self)
 					SetOverrideBindingClick(self, false, key, buttonName) -- assign the key to our own button
 				end
 			end
+		end
+		button.GetHotkey = GetHotkey -- forcefully replace the LibActionBar method. On every update. Not needed.
+		local key = button:GetHotkey()
+		if not key or key == "" or button.config.hideElements.hotkey then
+			button.HotKey:SetText(RANGE_INDICATOR)
+			button.HotKey:Hide()
+		else
+			button.HotKey:SetText(key)
+			button.HotKey:Show()
 		end
 	end
 end

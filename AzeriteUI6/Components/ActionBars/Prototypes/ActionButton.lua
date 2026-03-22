@@ -124,9 +124,6 @@ local exitButton = {
 	texture = [[Interface\Icons\achievement_bg_kill_carrier_opposing_flagroom]]
 }
 
-local ActionButton = CreateFrame("CheckButton")
-local ActionButton_MT = { __index = ActionButton }
-
 local Button_OnEnter = function(self)
 	if (self.OnEnter) then
 		self:OnEnter()
@@ -140,17 +137,15 @@ local Button_OnLeave = function(self)
 end
 
 ns.ActionButton = {}
-ns.ActionButton.prototype = ActionButton
-ns.ActionButton.defaults = defaults
-
 ns.ActionButton.Create = function(self, id, name, header)
 
 	local button = LAB:CreateButton(id, name, header, config)
+	button._SetText = button.SetText
+	button.SetText = function() end
 
 	for k = 1,18 do
 		button:SetState(k, "action", (k - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
 	end
-
 	button:SetState(0, "action", (header.id - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
 	--button:Show()
 	--button:SetAttribute("statehidden", nil)

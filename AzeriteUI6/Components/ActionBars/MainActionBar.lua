@@ -82,14 +82,19 @@ MainActionBar.Spawn = function(self)
 
 	local bar = ns.ActionBar:Create(BAR_TO_ID[1], self.db.profile, "AZUI6_ActionBar1")
 
-	self.bar = bar
+	self.Bar = bar
 
 	return bar
+end
+
+MainActionBar.ReassignBindings = function(self)
+	self.Bar:UpdateBindings()
 end
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 MainActionBar.UpdateSettings = function(self)
+	self.Bar:UpdateBindings()
 end
 
 -- This is called by the addon on full profile changes,
@@ -114,6 +119,8 @@ MainActionBar.OnEnable = function(self)
 	bar:SetPoint("BOTTOMLEFT", 60/.9, 42/.9) -- default position
 	bar:Update() -- update size and layout
 
-	self:RegisterMovableFrameAnchor(bar, string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
+	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
+	self:ReassignBindings()
 
+	self:RegisterMovableFrameAnchor(bar, string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 end
