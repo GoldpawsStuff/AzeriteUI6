@@ -344,13 +344,17 @@ ns.ActionButton.Create = function(self, id, name, header)
 	return button
 end
 
+-- Problem: The LibActionButton method 'UpdateHotkeys' is not a public function,
+-- so one of the simpler hacks here is to replace the 'GetHotKey' method instead.
+-- We toggle the text in the standard hotkey display and our custom gamepad display
+-- based on whether or not a gamepad keypad currently is in use for the button.
 ActionButton.GetHotkey = function(self)
 	local name = ("CLICK %s:%s"):format(self:GetName(), self.defaults.keyBoundClickButton)
 	local key = GetBindingKey(self.defaults.keyBoundTarget or name)
-	if not key and self.defaults.keyBoundTarget then
+	if (not key and self.defaults.keyBoundTarget) then
 		key = GetBindingKey(name)
 	end
-	if key then
+	if (key) then
 		if (IsBindingForGamePad(key)) then 
 			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
 			if (abbr) then
@@ -369,10 +373,15 @@ ActionButton.GetHotkey = function(self)
 				return ""
 			end
 		else
+			-- Nullify this on all normal binds.
 			if (self.GamePadHotKey) then
 				self.GamePadHotKey:SetText("")
 			end
 		end
 		return KeyBound and KeyBound:ToShortKey(key) or key
+	end
+	-- Just in case there are leftovers. 
+	if (self.GamePadHotKey) then
+		self.GamePadHotKey:SetText("")
 	end
 end
