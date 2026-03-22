@@ -32,11 +32,11 @@ local LAB = LibStub("LibActionButton-1.0")
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
-local Hider= CreateFrame("Frame")
+local Hider = CreateFrame("Frame")
 Hider:SetAllPoints()
 Hider:Hide()
 
-local config = {
+local defaults = {
 	outOfRangeColoring = "button",
 	tooltip = "enabled",
 	showGrid = false,
@@ -136,20 +136,26 @@ local Button_OnLeave = function(self)
 	end
 end
 
+local ActionButton = {}
+
 ns.ActionButton = {}
+ns.ActionButton.prototype = ActionButton
+ns.ActionButton.defaults = defaults
+
 ns.ActionButton.Create = function(self, id, name, header)
 
-	local button = LAB:CreateButton(id, name, header, config)
-	button._SetText = button.SetText
-	button.SetText = function() end
+	local button = LAB:CreateButton(id, name, header, defaults)
 
+	-- Overwrite some default methods with our own
+	for name,method in pairs(ActionButton) do
+		button[name] = method
+	end
+
+	-- Set the states allowing for page switching (forms, vehicles, override etc)
 	for k = 1,18 do
 		button:SetState(k, "action", (k - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
 	end
 	button:SetState(0, "action", (header.id - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
-	--button:Show()
-	--button:SetAttribute("statehidden", nil)
-	--button:UpdateAction()
 
 	-- Add in a vehicle exit button at slot 7 for the primary action bar.
 	if (header.id == 1 and button.id == 7) then
@@ -281,9 +287,9 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.HotKey.SetFont = function() end -- disables LAB from overriding it
 	button.HotKey:SetParent(button.OverlayFrame)
 	button.HotKey:SetDrawLayer("OVERLAY", 1)
-	button.HotKey:SetFontObject(config.text.hotkey.font.fontObject)
-	button.HotKey:SetJustifyH(config.text.hotkey.justifyH)
-	button.HotKey:SetJustifyV(config.text.hotkey.justifyV)
+	button.HotKey:SetFontObject(defaults.text.hotkey.font.fontObject)
+	button.HotKey:SetJustifyH(defaults.text.hotkey.justifyH)
+	button.HotKey:SetJustifyV(defaults.text.hotkey.justifyV)
 	button.HotKey:SetTextColor(oUF.colors.quest.gray:GetRGB())
 	button.HotKey:SetAlpha(.75)
 
@@ -291,9 +297,9 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.Count.SetFont = function() end -- disables LAB from overriding it
 	button.Count:SetParent(button.OverlayFrame)
 	button.Count:SetDrawLayer("OVERLAY", 1)
-	button.Count:SetFontObject(config.text.count.font.fontObject)
-	button.Count:SetJustifyH(config.text.count.justifyH)
-	button.Count:SetJustifyV(config.text.count.justifyV)
+	button.Count:SetFontObject(defaults.text.count.font.fontObject)
+	button.Count:SetJustifyH(defaults.text.count.justifyH)
+	button.Count:SetJustifyV(defaults.text.count.justifyV)
 	button.Count:SetTextColor(oUF.colors.normal:GetRGB())
 	button.Count:SetAlpha(.85)
 
@@ -301,9 +307,9 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.Name.SetFont = function() end -- disables LAB from overriding it
 	button.Name:SetParent(button.OverlayFrame)
 	button.Name:SetDrawLayer("OVERLAY", 1)
-	button.Name:SetFontObject(config.text.macro.font.fontObject)
-	button.Name:SetJustifyH(config.text.macro.justifyH)
-	button.Name:SetJustifyV(config.text.macro.justifyV)
+	button.Name:SetFontObject(defaults.text.macro.font.fontObject)
+	button.Name:SetJustifyH(defaults.text.macro.justifyH)
+	button.Name:SetJustifyV(defaults.text.macro.justifyV)
 	button.Name:SetAlpha(0)
 
 	-- disable the new action texture
@@ -338,3 +344,35 @@ ns.ActionButton.Create = function(self, id, name, header)
 	return button
 end
 
+ActionButton.GetHotkey = function(self)
+	local name = ("CLICK %s:%s"):format(self:GetName(), self.defaults.keyBoundClickButton)
+	local key = GetBindingKey(self.defaults.keyBoundTarget or name)
+	if not key and self.defaults.keyBoundTarget then
+		key = GetBindingKey(name)
+	end
+	if key then
+		if (IsBindingForGamePad(key)) then 
+			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
+			if (abbr) then
+				if (not self.GamePadHotKey) then
+					self.GamePadHotKey = self.OverlayFrame:CreateFontString(nil, "ARTWORK")
+					self.GamePadHotKey:SetPoint("CENTER", self, "TOPLEFT", 10, -10)
+					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
+				end
+				if (key:find("-")) then
+					self.GamePadHotKey:SetFontObject(ns.GetFont(15, "Outline", "Number"))
+				else
+					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
+				end
+				self.GamePadHotKey:SetText(abbr)
+
+				return ""
+			end
+		else
+			if (self.GamePadHotKey) then
+				self.GamePadHotKey:SetText("")
+			end
+		end
+		return KeyBound and KeyBound:ToShortKey(key) or key
+	end
+end
