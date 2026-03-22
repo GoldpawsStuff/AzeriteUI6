@@ -53,6 +53,7 @@ Trackers.RefreshConfig = function(self)
 end
 
 Trackers.OnEnable = function(self)
+	self:UpdateSettings() -- why isn't this automatic here?
 end
 
 Trackers.OnInitialize = function(self)

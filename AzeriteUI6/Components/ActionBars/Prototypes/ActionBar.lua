@@ -95,8 +95,6 @@ ns.ActionBar.Create = function(self, id, config, name)
 		local keyBoundTarget = string.format(BINDTEMPLATE_BY_ID[id], button.id)
 		bar.buttonConfig.keyBoundTarget = keyBoundTarget
 		button.config.keyBoundTarget = keyBoundTarget
-
-		--local buttonConfig = ns:Merge(config or {}, ns.ActionBar.defaults)
 	end
 
 	bar:SetAttribute("UpdateVisibility", [[
@@ -509,7 +507,6 @@ local GetHotkey = function(self)
 		end
 		return KeyBound and KeyBound:ToShortKey(key) or key
 	end
-
 end
 
 -- Update the actual keybinds
