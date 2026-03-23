@@ -50,13 +50,15 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
-MultiBar1.Spawn = function(self)
-
-	local bar = ns.ActionBar:Create(2, self.db.profile, "AZUI6_ActionBar2")
-
-	self.Bar = bar
-
-	return bar
+MultiBar1.GetBar = function(self)
+	if (not self.Bar) then 
+		local bar = ns.ActionBar:Create(2, self.db.profile, "AZUI6_ActionBar2")
+		bar:SetScale(.9) -- default scale
+		bar:SetPoint("BOTTOMLEFT", 680/.9, 42/.9) -- default position
+		bar:Update() -- update size and layout
+		self.Bar = bar
+	end
+	return self.Bar
 end
 
 MultiBar1.ReassignBindings = function(self)
@@ -85,15 +87,7 @@ MultiBar1.OnInitialize = function(self)
 end
 
 MultiBar1.OnEnable = function(self)
-
-	local bar = MultiBar1:Spawn()
-	bar:SetScale(.9)
-	bar:SetPoint("BOTTOMLEFT", (752-64-8)/.9, 42/.9) -- default position
-	bar:Update() -- update size and layout
-
+	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 2)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()
-
-	self:RegisterMovableFrameAnchor(bar, string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 2)), "actionbars", AzeriteUI6_Positions_DB)
-
 end

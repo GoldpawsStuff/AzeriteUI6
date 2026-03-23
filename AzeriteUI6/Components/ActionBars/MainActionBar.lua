@@ -62,13 +62,15 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
-MainActionBar.Spawn = function(self)
-
-	local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
-
-	self.Bar = bar
-
-	return bar
+MainActionBar.GetBar = function(self)
+	if (not self.Bar) then 
+		local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
+		bar:SetScale(.9) -- default scale
+		bar:SetPoint("BOTTOMLEFT", 60/.9, 42/.9) -- default position
+		bar:Update() -- update size and layout
+		self.Bar = bar
+	end
+	return self.Bar
 end
 
 MainActionBar.ReassignBindings = function(self)
@@ -97,14 +99,7 @@ MainActionBar.OnInitialize = function(self)
 end
 
 MainActionBar.OnEnable = function(self)
-
-	local bar = MainActionBar:Spawn()
-	bar:SetScale(.9)
-	bar:SetPoint("BOTTOMLEFT", 60/.9, 42/.9) -- default position
-	bar:Update() -- update size and layout
-
+	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()
-
-	self:RegisterMovableFrameAnchor(bar, string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 end
