@@ -307,11 +307,12 @@ ns.ActionButton.Create = function(self, id, name, header)
 		- blue glow, next in rotation
 	--]]
 	-- spell highlight
-	local highlight = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, -7)
+	local highlight = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, 1)
 	highlight:SetSize(134.295081967, 134.295081967)
 	highlight:SetPoint("CENTER", 0, 0)
 	highlight:SetTexture(GetMedia("actionbutton-spellhighlight"))
-	highlight:SetVertexColor(96/255, 159/255, 238/255, .75) -- AzeriteUI6 blue, closer to Blizz defaults
+	highlight:SetVertexColor(136/255, 189/255, 249/255, .75) -- AzeriteUI6 blue, closer to Blizz defaults
+	--highlight:SetVertexColor(96/255, 159/255, 238/255, .75) -- AzeriteUI6 darker blue
 	--highlight:SetVertexColor(190/255, 119/255, 238/255, .75) -- AzeriteUI5 purple
 	highlight:Hide()
 
@@ -329,11 +330,33 @@ ns.ActionButton.Create = function(self, id, name, header)
 		- uses LBG
 			- LBG.ShowOverlayGlow(button)
 			- LBG.HideOverlayGlow(button)
-		- does not fit our buttons AT ALL
 	--]]
+	-- spell highlight
+	local spellActivationAlert = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, -7)
+	spellActivationAlert:SetSize(134.295081967, 134.295081967)
+	spellActivationAlert:SetPoint("CENTER", 0, 0)
+	spellActivationAlert:SetTexture(GetMedia("actionbutton-spellhighlight"))
+	spellActivationAlert:SetVertexColor(249/255, 234/255, 137/255, .75)
+	spellActivationAlert:Hide()
 
-	--highlight:SetVertexColor(249/255, 188/255, 65/255, .75)
-	--highlight:Hide()
+	-- fully faking this one.
+	-- *can NOT guarantee it works with anything else than our buttons and Bartender,
+	--  will look into it and replace more frame methods if a problem occurs.
+	button.__IsVisible = button.IsVisible
+	button.__LBGoverlay = {
+		-- We don't really do any anims out, we simply hide
+		animOut = {
+			IsPlaying = function() return not spellActivationAlert:IsShown() end, -- must return 'true' for it to ever be shown. weird.
+			Play = function() spellActivationAlert:Hide() end, -- when hiding -- WORKS
+			Stop = function() spellActivationAlert:Hide() end -- when showing -- WORKS
+		},
+		animIn = {
+			IsPlaying = function() return not spellActivationAlert:IsShown() end, 
+			Play = function() spellActivationAlert:Show() end, -- when showing -- WORKS
+			Stop = function() spellActivationAlert:Hide() end -- when hiding -- WORKS
+		}
+	}
+	button.IsVisible = function() return true end
 
 	-- Stop button skinners from messing with it
 	button.MasqueSkinned = true -- disables LAB from changing a few textures

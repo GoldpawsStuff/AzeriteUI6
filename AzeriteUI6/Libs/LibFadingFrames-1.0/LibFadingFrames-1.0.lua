@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 41
+local MINOR_VERSION = 42
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
@@ -80,15 +80,6 @@ local HoverCount = lib.hoverCount
 
 -- GLOBALS: CreateFrame, IsPlayerInWorld, LAB10GEFlyoutHandlerFrame, SpellFlyout
 
--- Lua API
-local getmetatable = getmetatable
-local math_floor = math.floor
-local next = next
-local pairs = pairs
-local select = select
-local tonumber = tonumber
-local unpack = unpack
-
 -- Game flavor constants
 local patch, build, date, version = GetBuildInfo()
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
@@ -102,8 +93,10 @@ local WoW11 = version >= 110000
 local WoW12 = version >= 120000
 
 -- Frame Metamethods
-local setAlpha = getmetatable(CreateFrame("Frame")).__index.SetAlpha
-local getAlpha = getmetatable(CreateFrame("Frame")).__index.GetAlpha
+local __index = getmetatable(CreateFrame("Frame")).__index
+local setAlpha = __index.SetAlpha
+local getAlpha = __index.GetAlpha
+local isVisible = __index.IsVisible
 
 -- Alpha setter that also stores the alpha in our local registry
 local setCurrentAlpha = function(frame, alpha)
@@ -137,7 +130,7 @@ end
 local updateCurrentAlpha = function(frame)
 
 	local targetAlpha = FadeFrameTargetAlpha[frame]
-	local currentAlpha = FadeFrameCurrentAlpha[frame] or math_floor((getAlpha(frame) * 100) + .5) / 100
+	local currentAlpha = FadeFrameCurrentAlpha[frame] or math.floor((getAlpha(frame) * 100) + .5) / 100
 
 	-- If we're fading out
 	if (currentAlpha > targetAlpha) then
@@ -280,7 +273,7 @@ lib.CheckHoverFrames = function(needupdate)
 
 	for frame,fadeGroup in next,FadeFrames do
 		local rects = FadeFrameHitRects[frame]
-		if (not HoverFrames[frame] and frame:IsVisible() and frame:IsMouseOver(rects[1], rects[2], rects[3], rects[4])) then
+		if (not HoverFrames[frame] and isVisible(frame) and frame:IsMouseOver(rects[1], rects[2], rects[3], rects[4])) then
 			lib:OnFadeFrameEnter(frame, fadeGroup)
 			needupdate = true
 		end
