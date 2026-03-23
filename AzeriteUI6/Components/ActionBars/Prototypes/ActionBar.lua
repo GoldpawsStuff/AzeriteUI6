@@ -71,14 +71,14 @@ local BINDTEMPLATE_BY_ID = {
 
 -- Return blizzard barID by from own bar numbers.
 local BAR_TO_ID = {
-	[1] = 1,
-	[2] = BOTTOMLEFT_ACTIONBAR_PAGE,
-	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE,
-	[4] = RIGHT_ACTIONBAR_PAGE,
-	[5] = LEFT_ACTIONBAR_PAGE,
-	[6] = MULTIBAR_5_ACTIONBAR_PAGE,
-	[7] = MULTIBAR_6_ACTIONBAR_PAGE,
-	[8] = MULTIBAR_7_ACTIONBAR_PAGE
+	[1] = 1, 							-- primary action bar
+	[2] = BOTTOMLEFT_ACTIONBAR_PAGE, 	-- multibar 1
+	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE, 	-- multibar 2
+	[4] = RIGHT_ACTIONBAR_PAGE, 		-- multibar 3
+	[5] = LEFT_ACTIONBAR_PAGE, 			-- multibar 4
+	[6] = MULTIBAR_5_ACTIONBAR_PAGE, 	-- multibar 5
+	[7] = MULTIBAR_6_ACTIONBAR_PAGE, 	-- multibar 6
+	[8] = MULTIBAR_7_ACTIONBAR_PAGE 	-- multibar 7
 }
 
 -- Return our bar number from blizzard barID.
@@ -99,11 +99,10 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 
 	bar.id = id
 	bar.name = name or id
-	bar.config = config or ns:Copy(defaults)
+	bar.config = ns:Merge(config or ns:Copy(ns.ActionBar.defaults), ns.ActionBar.defaults) -- wth?
 
 	bar.buttons = {}
-	bar.buttonConfig = ns:Merge(config or {}, ns.ActionBar.defaults)
-	bar.buttonWidth = 64
+	bar.buttonWidth = 64 -- why exactly are we storing it directly on the bar object?
 	bar.buttonHeight = 64
 	
 	-- create buttons
@@ -111,11 +110,10 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 		local button = ns.ActionButton:Create(i, name.."Button"..i, bar)
 		button:SetHitRectInsets(unpack(bar.config.fadeButtonHitRects))
 
-		bar.buttons[i] = button
-		bar:SetFrameRef("Button"..i, button)
+		bar.buttons[i] = button -- lua reference
+		bar:SetFrameRef("Button"..i, button) -- secure environment reference
 
 		local keyBoundTarget = string.format(BINDTEMPLATE_BY_ID[id], button.id)
-		bar.buttonConfig.keyBoundTarget = keyBoundTarget
 		button.config.keyBoundTarget = keyBoundTarget
 	end
 
@@ -186,8 +184,6 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 
 		self:CallMethod("UpdateFading");
 	]])
-
-	-- run a full initial update
 
 	return bar
 end
@@ -487,42 +483,6 @@ ActionBar.UpdateButtonFlags = function(self)
 		button.hasPossessBar = self.hasPossessBar
 	end
 end
-
--- Bad place to put this. It's hackish and weird. And in the wrong file.
--- But leaving it here for now, because it works. 
---local KeyBound = LibStub("LibKeyBound-1.0", true)
---local GetHotkey = function(self)
---	local name = ("CLICK %s:%s"):format(self:GetName(), self.config.keyBoundClickButton)
---	local key = GetBindingKey(self.config.keyBoundTarget or name)
---	if not key and self.config.keyBoundTarget then
---		key = GetBindingKey(name)
---	end
---	if key then
---		if (IsBindingForGamePad(key)) then 
---			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
---			if (abbr) then
---				if (not self.GamePadHotKey) then
---					self.GamePadHotKey = self.OverlayFrame:CreateFontString(nil, "ARTWORK")
---					self.GamePadHotKey:SetPoint("CENTER", self, "TOPLEFT", 10, -10)
---					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
---				end
---				if (key:find("-")) then
---					self.GamePadHotKey:SetFontObject(ns.GetFont(15, "Outline", "Number"))
---				else
---					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
---				end
---				self.GamePadHotKey:SetText(abbr)
---
---				return ""
---			end
---		else
---			if (self.GamePadHotKey) then
---				self.GamePadHotKey:SetText("")
---			end
---		end
---		return KeyBound and KeyBound:ToShortKey(key) or key
---	end
---end
 
 -- Update the actual keybinds
 ActionBar.UpdateBindings = function(self)
