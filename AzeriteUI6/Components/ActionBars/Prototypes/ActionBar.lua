@@ -31,6 +31,7 @@ local LFF = LibStub("LibFadingFrames-1.0")
 
 local defaults = {
 	enabled = true,
+
 	layout = "grid", -- <grid, zigzag>
 	layoutZigZagStart = 1, -- at which button the zigzag pattern should begin
 	layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
@@ -44,7 +45,7 @@ local defaults = {
 	enableBarFading = false, -- whether to enable non-combat/hover button fading
 	fadeInCombat = false, -- whether to keep fading out even in combat
 	fadeFrom = 1, -- which button to start the button fading from
-	fadeButtonHitRects = { -10, -10, -10, -10 },
+	fadeButtonHitRects = { -4, -4, -4, -4 },
 
 	numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
 	visibility = {
@@ -89,6 +90,8 @@ ns.ActionBar.Create = function(self, id, config, name)
 	-- create buttons
 	for i = 1,NUM_ACTIONBAR_BUTTONS do
 		local button = ns.ActionButton:Create(i, name.."Button"..i, bar)
+		button:SetHitRectInsets(unpack(bar.config.fadeButtonHitRects))
+
 		bar.buttons[i] = button
 		bar:SetFrameRef("Button"..i, button)
 
@@ -219,37 +222,30 @@ ActionBar.Update = function(self)
 end
 
 ActionBar.UpdateFading = function(self)
-	--if (InCombatLockdown()) then return end
-
 	if (self.config.enabled and self.config.enableBarFading) then
-
-		-- Remove any previous fade registrations.
-		for id = 1, #self.buttons do
-			local button = self.buttons[id]
+		for id,button in next,self.buttons do
+			-- remove any previous fade registrations
 			LFF:UnregisterFrameForFading(button)
-		end
-
-		-- Register fading for selected buttons.
-		for id = self.config.fadeFrom or 1, #self.buttons do
-			local button = self.buttons[id]
-			if (button:GetTexture()) then
-				LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", unpack(self.config.fadeButtonHitRects))
-			else
-				--button:ForceUpdate()
+			-- register current fade for selected buttons
+			if (id >= self.config.fadeFrom) then
+				local button = self.buttons[id]
+				if (button:GetTexture()) then
+					LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", unpack(self.config.fadeButtonHitRects))
+				else
+					-- update button?
+				end
 			end
 		end
-
 	else
-
-		-- Unregister all fading.
-		for id, button in next,self.buttons do
-			LFF:UnregisterFrameForFading(self.buttons[id])
+		-- unregister all fading
+		for id,button in next,self.buttons do
+			LFF:UnregisterFrameForFading(button)
+			-- whyever did I add this?
 			if (not button:GetTexture()) then
-				--button:ForceUpdate()
+				-- update button?
 			end
 		end
 	end
-
 end
 
 ActionBar.UpdateButtonCount = function(self)
@@ -509,6 +505,16 @@ local GetHotkey = function(self)
 	end
 end
 
+local BINDING_MAPPINGS = {
+	[1] = "ACTIONBUTTON%d",
+	[3] = "MULTIACTIONBAR3BUTTON%d",
+	[4] = "MULTIACTIONBAR4BUTTON%d",
+	[5] = "MULTIACTIONBAR2BUTTON%d",
+	[6] = "MULTIACTIONBAR1BUTTON%d",
+	[13] = "MULTIACTIONBAR5BUTTON%d",
+	[14] = "MULTIACTIONBAR6BUTTON%d",
+	[15] = "MULTIACTIONBAR7BUTTON%d",
+}
 -- Update the actual keybinds
 ActionBar.UpdateBindings = function(self)
 	if (InCombatLockdown()) then return end
@@ -517,20 +523,28 @@ ActionBar.UpdateBindings = function(self)
 	ClearOverrideBindings(self)
 
 	for id,button in pairs(self.buttons) do
-		local bindingAction = button.keyBoundTarget
-		if (bindingAction) then
-			
-			-- iterate through the registered keys for the action
-			local buttonName = button:GetName()
-			for keyNumber = 1,select("#", GetBindingKey(bindingAction)) do
-				-- get a key for the action
-				local key = select(keyNumber, GetBindingKey(bindingAction))
-				if (key and (key ~= "")) then
-					-- this is why we need named buttons
-					SetOverrideBindingClick(self, false, key, buttonName) -- assign the key to our own button
-				end
+
+		local keyBindName, realButtonName = button.config.keyBoundTarget, button:GetName()
+		for keyNumber = 1, select("#", GetBindingKey(keyBindName)) do
+			local key = select(keyNumber, GetBindingKey(keyBindName))
+			if (key and key ~= "") then
+				-- owner, isPriority, key, buttonName [, mouseClick]
+				SetOverrideBindingClick(self, false, key, realButtonName--[[, "Keybind"]])
 			end
 		end
+
+		--local bindingAction = button.keyBoundTarget
+		--if (bindingAction) then
+		--	local buttonName = button:GetName()
+		--	for keyNumber = 1,select("#", GetBindingKey(bindingAction)) do
+		--		local key = select(keyNumber, GetBindingKey(bindingAction))
+		--		if (key and (key ~= "")) then
+		--			-- owner, isPriority, key, buttonName [, mouseClick]
+		--			SetOverrideBindingClick(self, false, key, buttonName) -- assign the key to our own button
+		--		end
+		--	end
+		--end
+
 		button.GetHotkey = GetHotkey -- forcefully replace the LibActionBar method. On every update. Not needed.
 		local key = button:GetHotkey()
 		if not key or key == "" or button.config.hideElements.hotkey then

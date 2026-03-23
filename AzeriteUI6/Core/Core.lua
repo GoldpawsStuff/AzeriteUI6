@@ -49,16 +49,16 @@ ns.HideBlizzard = function(self)
 	self:RegisterFrameForFading(MicroMenuContainer, "MicroMenu")
 
 	-- standard action bars
-	for i = 1,12 do
-		self:RegisterFrameForFading(_G["ActionButton"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBarBottomLeftButton"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBarBottomRightButton"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBarRightButton"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBarLeftButton"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBar5Button"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBar6Button"..i], "ActionBars")
-		self:RegisterFrameForFading(_G["MultiBar7Button"..i], "ActionBars")
-	end
+	--for i = 1,12 do
+	--	self:RegisterFrameForFading(_G["ActionButton"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBarBottomLeftButton"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBarBottomRightButton"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBarRightButton"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBarLeftButton"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBar5Button"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBar6Button"..i], "ActionBars")
+	--	self:RegisterFrameForFading(_G["MultiBar7Button"..i], "ActionBars")
+	--end
 	
 	-- stance and pet action bar
 	for i = 1,10 do

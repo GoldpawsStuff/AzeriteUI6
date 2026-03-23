@@ -111,6 +111,9 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	elseif (NPE_LoadUI ~= nil) then
 		self:SecureHook("NPE_LoadUI")
 	end
+
+	OverrideActionBar:SetParent(UIHider)
+	QueueStatusFrame:SetParent(UIParent)
 end
 
 HideBlizzardActionBars.NPE_LoadUI = function(self)
@@ -132,6 +135,4 @@ HideBlizzardActionBars.OnInitialize = function(self)
 	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
 
 	self:HideBlizzard()
-
-	QueueStatusFrame:SetParent(UIParent)
 end

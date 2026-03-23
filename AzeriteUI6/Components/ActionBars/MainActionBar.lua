@@ -32,6 +32,7 @@ local MainActionBar = ns:NewModule("MainActionBar", nil, "LibMoreEvents-1.0", "L
 local defaults = { 
 	profile = {
 		enabled = true,
+
 		layout = "zigzag", -- <grid, zigzag>
 		layoutZigZagStart = 9, -- at which button the zigzag pattern should begin
 		layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
@@ -45,7 +46,6 @@ local defaults = {
 		enableBarFading = true, -- whether to enable non-combat/hover button fading
 		fadeInCombat = false, -- whether to keep fading out even in combat
 		fadeFrom = 8, -- which button to start the button fading from
-		fadeButtonHitRects = { -10, -10, -10, -10 },
 
 		numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
 		visibility = {

@@ -19,6 +19,7 @@
 	<Include  file="UTF8\utf8.xml"/>
 	<Include file="oUF\oUF.xml"/>
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
+	<Script file="LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
 	<Script file="LibActionButton-1.0\LibActionButton-1.0.lua"/>
 	<Script file="LibMoreEvents-1.0\LibMoreEvents-1.0.lua"/>
 	<Script file="LibFadingFrames-1.0\LibFadingFrames-1.0.lua"/>

@@ -57,7 +57,7 @@ local defaults = {
 	cooldownCount = nil, -- nil: use cvar, true/false: enable/disable
 	lossOfControlCooldown = true,
 	flyoutDirection = "UP",
-	actionButtonUI = false, -- register the button with SetActionUIButton, this has some side-effects if the button changes from action type to another type, but is required for certain UI integrations. Recommended to only set on pure type=action buttons
+	actionButtonUI = true, -- register the button with SetActionUIButton, this has some side-effects if the button changes from action type to another type, but is required for certain UI integrations. Recommended to only set on pure type=action buttons
 	assistedHighlight = true, -- requires actionButtonUI to be set to work
 	spellCastVFX = false, -- enable cast vfx
 	text = {
@@ -190,12 +190,9 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- Remove default mask texture
 	button.icon:RemoveMaskTexture(button.IconMask)
 
-	--button:DisableDrawLayer("ARTWORK")
-
 	button:SetAttribute("buttonLock", true)
 	button:SetSize(64, 64)
 	button:SetHitRectInsets(-10, -10, -10, -10)
-	--button.hitRects = { -10, -10, -10, -10 }
 
 	-- Overlay Frame
 	button.OverlayFrame = CreateFrame("Frame", nil, button)
@@ -263,18 +260,12 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.HighlightTexture:SetDrawLayer("HIGHLIGHT")
 
 	-- pushed texture
-	-- not working?
-	local pushedTexture = button:CreateTexture(nil, "OVERLAY", nil, 1)
-	pushedTexture:SetVertexColor(1, 1, 1, .2)
-	pushedTexture:SetTexture(GetMedia("actionbutton-mask-circular"))
-	pushedTexture:SetAllPoints(button.icon)
-	button.pushedTexture = pushedTexture
-
-	button:SetPushedTexture(button.pushedTexture)
-
-	--button:GetPushedTexture():SetTexture(GetMedia("actionbutton-mask-circular"))
-	button:GetPushedTexture():SetBlendMode("ADD")
-	button:GetPushedTexture():SetDrawLayer("OVERLAY", 2)
+	button.PushedTexture = button:GetPushedTexture()
+	button.PushedTexture:SetTexture(GetMedia("actionbutton-mask-circular"))
+	button.PushedTexture:SetVertexColor(1, 1, 1, .2)
+	button.PushedTexture:SetAllPoints(button.icon)
+	button.PushedTexture:SetBlendMode("ADD")
+	button.PushedTexture:SetDrawLayer("OVERLAY", 2)
 
 	-- autoattack flash
 	button.Flash:SetDrawLayer("OVERLAY", 2)
@@ -316,20 +307,37 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.NewActionTexture:Hide()
 	button.NewActionTexture = false
 
+	--[[
+		AssistedCombatHighlightFrame 
+		- blue glow, next in rotation
+	--]]
 	-- spell highlight
 	local highlight = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, -7)
 	highlight:SetSize(134.295081967, 134.295081967)
 	highlight:SetPoint("CENTER", 0, 0)
 	highlight:SetTexture(GetMedia("actionbutton-spellhighlight"))
-	highlight:SetVertexColor(249/255, 188/255, 65/255, .75)
+	highlight:SetVertexColor(96/255, 159/255, 238/255, .75) -- AzeriteUI6 blue, closer to Blizz defaults
+	--highlight:SetVertexColor(190/255, 119/255, 238/255, .75) -- AzeriteUI5 purple
 	highlight:Hide()
 
 	-- create a dummy object to safely take control of the spell highlights
+	-- *this objects contain everything LibActionButton calls or references.
 	button.AssistedCombatHighlightFrame = {
-		Flipbook = { Anim = { Play = function() end, Stop = function() end } },
 		Show = function() highlight:Show() end,
-		Hide = function() highlight:Hide() end
+		Hide = function() highlight:Hide() end,
+		Flipbook = { Anim = { Play = function() end, Stop = function() end } }
 	}
+
+	--[[
+		SpellActivationAlert 
+		- yellow bright glow, activated spell
+		- uses LBG
+			- LBG.ShowOverlayGlow(button)
+			- LBG.HideOverlayGlow(button)
+	--]]
+
+	--highlight:SetVertexColor(249/255, 188/255, 65/255, .75)
+	--highlight:Hide()
 
 	button.MasqueSkinned = true -- disables LAB from changing a few textures
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
