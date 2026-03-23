@@ -62,25 +62,9 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
--- Return blizzard barID by from own bar numbers.
-local BAR_TO_ID = {
-	[1] = 1,
-	[2] = BOTTOMLEFT_ACTIONBAR_PAGE,
-	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE,
-	[4] = RIGHT_ACTIONBAR_PAGE,
-	[5] = LEFT_ACTIONBAR_PAGE,
-	[6] = MULTIBAR_5_ACTIONBAR_PAGE,
-	[7] = MULTIBAR_6_ACTIONBAR_PAGE,
-	[8] = MULTIBAR_7_ACTIONBAR_PAGE
-}
-
--- Return our bar number from blizzard barID.
-local ID_TO_BAR = {}
-for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
-
 MainActionBar.Spawn = function(self)
 
-	local bar = ns.ActionBar:Create(BAR_TO_ID[1], self.db.profile, "AZUI6_ActionBar1")
+	local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
 
 	self.Bar = bar
 

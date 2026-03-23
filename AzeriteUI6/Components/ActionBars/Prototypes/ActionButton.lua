@@ -26,15 +26,16 @@
 local _, ns = ...
 local oUF = ns.oUF
 
+local KeyBound = LibStub("LibKeyBound-1.0", true)
 local LAB = LibStub("LibActionButton-1.0")
 
 -- Custom API locals
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
-local Hider = CreateFrame("Frame")
-Hider:SetAllPoints()
-Hider:Hide()
+local UIHider = CreateFrame("Frame")
+UIHider:SetAllPoints()
+UIHider:Hide()
 
 local defaults = {
 	outOfRangeColoring = "button",
@@ -164,50 +165,50 @@ ns.ActionButton.Create = function(self, id, name, header)
 		button:SetState(18, "custom", exitButton)
 	end
 
+	-- general size and click settings
+	button:SetHitRectInsets(-10, -10, -10, -10)
 	button:SetSize(header.buttonWidth, header.buttonHeight)
+	button:SetAttribute("buttonLock", true)
 	button:SetAttribute("checkselfcast", true)
 	button:SetAttribute("checkfocuscast", true)
 	button:SetAttribute("checkmouseovercast", true)
 
-	-- Hide unused elements
-	button.BorderShadow:SetParent(Hider)
-	button.CooldownFlash:SetParent(Hider)
-	button.InterruptDisplay:SetParent(Hider)
-	button.NewActionTexture:SetParent(Hider)
+	-- hide unused elements
+	button.BorderShadow:SetParent(UIHider)
+	button.CooldownFlash:SetParent(UIHider)
+	button.InterruptDisplay:SetParent(UIHider)
+	button.NewActionTexture:SetParent(UIHider) -- initial hiding
+	button.NewActionTexture:Hide() -- initial hiding
+	button.NewActionTexture = false -- should be enough, LAB checks for existence before running methods 
 	button.NormalTexture:SetTexture(GetMedia("blank"))
-	button.NormalTexture:SetParent(Hider)
-	button.SpellHighlightAnim:Stop()
-	button.SpellHighlightTexture:SetParent(Hider)
-	button.SlotArt:SetParent(Hider)
-	--button.SlotBackground:SetParent(Hider)
-	button.SpellCastAnimFrame:SetParent(Hider)
-	button.TargetReticleAnimFrame:SetParent(Hider)
+	button.NormalTexture:SetParent(UIHider)
+	button.SpellHighlightAnim:Stop() -- default spell highlight, we use our own
+	button.SpellHighlightTexture:SetParent(UIHider)
+	button.SlotArt:SetParent(UIHider)
+	--button.SlotBackground:SetParent(UIHider) -- doesn't exist anymore
+	button.SpellCastAnimFrame:SetParent(UIHider)
+	button.TargetReticleAnimFrame:SetParent(UIHider)
 
-	-- Block BaseActionButtonMixin
+	-- block BaseActionButtonMixin
 	button.SlotArt = nil
-	--button.SlotBackground = nil
+	button.SlotBackground = nil -- doesn't exist to begin with
 
-	-- Remove default mask texture
+	-- remove default mask texture
 	button.icon:RemoveMaskTexture(button.IconMask)
 
-	button:SetAttribute("buttonLock", true)
-	button:SetSize(64, 64)
-	button:SetHitRectInsets(-10, -10, -10, -10)
-
-	-- Overlay Frame
+	-- custom overlay frame
 	button.OverlayFrame = CreateFrame("Frame", nil, button)
 	button.OverlayFrame:SetFrameLevel(button:GetFrameLevel() + 3)
 	button.OverlayFrame:SetAllPoints()
 
-	-- Icon Border
+	-- custom icon border
 	button.IconBorder = button.OverlayFrame:CreateTexture(nil, "BORDER", nil, 1)
 	button.IconBorder:SetPoint("CENTER", 0, 0)
 	button.IconBorder:SetSize(134.295081967, 134.295081967)
 	button.IconBorder:SetTexture(GetMedia("actionbutton-border"))
 	button.IconBorder:SetVertexColor(oUF.colors.ui:GetRGB())
 
-	-- backdrop
-	-- Custom slot texture
+	-- custom backdrop
 	button.backdrop = button:CreateTexture(nil, "BACKGROUND", nil, -7)
 	button.backdrop:SetSize(134.295081967, 134.295081967)
 	button.backdrop:SetPoint("CENTER", 0, 0)
@@ -248,8 +249,6 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.CheckedTexture:SetAllPoints(button.icon)
 	button.CheckedTexture:SetBlendMode("ADD")
 	button.CheckedTexture:SetDrawLayer("OVERLAY", 1)
-
-	-- flash (autocast/autoattack)
 
 	-- highlight (hover)
 	button.HighlightTexture = button:GetHighlightTexture()
@@ -303,10 +302,6 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.Name:SetJustifyV(defaults.text.macro.justifyV)
 	button.Name:SetAlpha(0)
 
-	-- disable the new action texture
-	button.NewActionTexture:Hide()
-	button.NewActionTexture = false
-
 	--[[
 		AssistedCombatHighlightFrame 
 		- blue glow, next in rotation
@@ -334,15 +329,18 @@ ns.ActionButton.Create = function(self, id, name, header)
 		- uses LBG
 			- LBG.ShowOverlayGlow(button)
 			- LBG.HideOverlayGlow(button)
+		- does not fit our buttons AT ALL
 	--]]
 
 	--highlight:SetVertexColor(249/255, 188/255, 65/255, .75)
 	--highlight:Hide()
 
+	-- Stop button skinners from messing with it
 	button.MasqueSkinned = true -- disables LAB from changing a few textures
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
 	button.AddToMasque = function() end -- disables LAB from overriding it
 
+	-- replace the default scripts with an extra layer
 	button.OnEnter = button:GetScript("OnEnter")
 	button.OnLeave = button:GetScript("OnLeave")
 
@@ -353,16 +351,16 @@ ns.ActionButton.Create = function(self, id, name, header)
 end
 
 -- Problem: The LibActionButton method 'UpdateHotkeys' is not a public function,
--- so one of the simpler hacks here is to replace the 'GetHotKey' method instead.
+-- so one of the dumber hacks here is to replace the 'GetHotKey' method instead.
 -- We toggle the text in the standard hotkey display and our custom gamepad display
 -- based on whether or not a gamepad keypad currently is in use for the button.
 ActionButton.GetHotkey = function(self)
-	local name = ("CLICK %s:%s"):format(self:GetName(), self.defaults.keyBoundClickButton)
-	local key = GetBindingKey(self.defaults.keyBoundTarget or name)
-	if (not key and self.defaults.keyBoundTarget) then
+	local name = ("CLICK %s:%s"):format(self:GetName(), self.config.keyBoundClickButton)
+	local key = GetBindingKey(self.config.keyBoundTarget or name)
+	if not key and self.config.keyBoundTarget then
 		key = GetBindingKey(name)
 	end
-	if (key) then
+	if key then
 		if (IsBindingForGamePad(key)) then 
 			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
 			if (abbr) then
@@ -381,15 +379,10 @@ ActionButton.GetHotkey = function(self)
 				return ""
 			end
 		else
-			-- Nullify this on all normal binds.
 			if (self.GamePadHotKey) then
 				self.GamePadHotKey:SetText("")
 			end
 		end
 		return KeyBound and KeyBound:ToShortKey(key) or key
-	end
-	-- Just in case there are leftovers. 
-	if (self.GamePadHotKey) then
-		self.GamePadHotKey:SetText("")
 	end
 end
