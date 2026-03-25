@@ -231,10 +231,10 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- since pure gray looks out of place on our buttons.
 	button.icon.__SetVertexColor = button.icon.SetVertexColor
 	button.icon.SetVertexColor = function(icon, r, g, b, a)
-		local normalized_r = math.floor((n * 100) + .5) / 100
+		local normalized_r = math.floor((r * 100) + .5) / 100
 		local normalized_g = math.floor((g * 100) + .5) / 100
 		local normalized_b = math.floor((b * 100) + .5) / 100
-		if (normalized_r == .4 and normalized_g = .4 and normalized_b = .4) then
+		if (normalized_r == .4 and normalized_g == .4 and normalized_b == .4) then
 			icon:__SetVertexColor(.4, .36, .32)
 		else
 			icon:__SetVertexColor(r, g, b)

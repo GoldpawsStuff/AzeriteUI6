@@ -33,7 +33,7 @@ ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 ns.SETTINGS_VERSION = -1 -- use client dependant settings version to avoid resets in unaffected builds.
 
 -- WoW client version
-local buildVersion, buildNumber, buildDate, interfaceVersion = select(4, GetBuildInfo())
+local buildVersion, buildNumber, buildDate, interfaceVersion = GetBuildInfo()
 ns.WoWBuild = tonumber(buildNumber)
 ns.WoWVersion = interfaceVersion
 ns.WoW12 = interfaceVersion >= 120000
