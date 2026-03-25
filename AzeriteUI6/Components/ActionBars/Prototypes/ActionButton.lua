@@ -38,12 +38,12 @@ UIHider:SetAllPoints()
 UIHider:Hide()
 
 local defaults = {
-	outOfRangeColoring = "button",
-	tooltip = "enabled",
-	showGrid = false,
+	outOfRangeColoring = "button", -- "button", "hotkey"
+	tooltip = "enabled", -- "enabled", "disabled", "nocombat"
+	showGrid = false, -- empty buttons should be hidden by default, only visible when moving spells
 	colors = {
-		range = { .8, .1, .1 },
-		mana = { .5, .5, 1 }
+		range = { 1, .15, .15 },
+		mana = { .25, .25, 1 }
 	},
 	hideElements = {
 		macro = true,
@@ -52,9 +52,9 @@ local defaults = {
 		border = false,
 		borderIfEmpty = true
 	},
-	keyBoundTarget = false,
-	keyBoundClickButton = "LeftButton",
-	clickOnDown = false,
+	keyBoundTarget = false, -- will be set by the actionbar object on each of its buttons
+	keyBoundClickButton = "LeftButton", -- just leave this as is
+	clickOnDown = false, 
 	cooldownCount = nil, -- nil: use cvar, true/false: enable/disable
 	lossOfControlCooldown = true,
 	flyoutDirection = "UP",
@@ -113,6 +113,7 @@ local defaults = {
 	}
 }
 
+-- custom exit button for vehicle/overridebars
 local exitButton = {
 	func = function(button)
 		if (UnitExists("vehicle")) then
@@ -125,18 +126,7 @@ local exitButton = {
 	texture = [[Interface\Icons\achievement_bg_kill_carrier_opposing_flagroom]]
 }
 
-local Button_OnEnter = function(self)
-	if (self.OnEnter) then
-		self:OnEnter()
-	end
-end
-
-local Button_OnLeave = function(self)
-	if (self.OnLeave) then
-		self:OnLeave()
-	end
-end
-
+-- our glorious template with very few methods
 local ActionButton = {}
 
 ns.ActionButton = {}
@@ -180,18 +170,18 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.NewActionTexture:SetParent(UIHider) -- initial hiding
 	button.NewActionTexture:Hide() -- initial hiding
 	button.NewActionTexture = false -- should be enough, LAB checks for existence before running methods 
-	button.NormalTexture:SetTexture(GetMedia("blank"))
+	button.NormalTexture:SetTexture(GetMedia("blank")) -- default border texture
 	button.NormalTexture:SetParent(UIHider)
 	button.SpellHighlightAnim:Stop() -- default spell highlight, we use our own
 	button.SpellHighlightTexture:SetParent(UIHider)
-	button.SlotArt:SetParent(UIHider)
+	button.SlotArt:SetParent(UIHider) -- more graphical crap we don't need
 	--button.SlotBackground:SetParent(UIHider) -- doesn't exist anymore
-	button.SpellCastAnimFrame:SetParent(UIHider)
-	button.TargetReticleAnimFrame:SetParent(UIHider)
+	button.SpellCastAnimFrame:SetParent(UIHider) -- we sooo don't need a castbar in the button
+	button.TargetReticleAnimFrame:SetParent(UIHider) -- nothing with such a name deserves to exist
 
 	-- block BaseActionButtonMixin
-	button.SlotArt = nil
-	button.SlotBackground = nil -- doesn't exist to begin with
+	button.SlotArt = nil -- this prevents the above from modifying or showing it
+	button.SlotBackground = nil -- doesn't exist to begin with anymore
 
 	-- remove default mask texture
 	button.icon:RemoveMaskTexture(button.IconMask)
@@ -230,6 +220,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.cooldown:SetHideCountdownNumbers(true)
 
 	-- gloss
+	-- *do we really want this? it just makes it harder to view
 
 	-- icon
 	button.icon:SetDrawLayer("BACKGROUND", 1)
@@ -237,6 +228,20 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.icon:SetPoint("CENTER", 0, 0)
 	button.icon:SetSize(44, 44)
 	button.icon:SetMask(GetMedia("actionbutton-mask-circular"))
+
+	-- attempt to hijack LABs disabled coloring,
+	-- since pure gray looks out of place on our buttons.
+	button.icon.__SetVertexColor = button.icon.SetVertexColor
+	button.icon.SetVertexColor = function(icon, r, g, b, a)
+		local normalized_r = math.floor((n * 100) + .5) / 100
+		local normalized_g = math.floor((g * 100) + .5) / 100
+		local normalized_b = math.floor((b * 100) + .5) / 100
+		if (normalized_r == .4 and normalized_g = .4 and normalized_b = .4) then
+			icon:__SetVertexColor(.4, .36, .32)
+		else
+			icon:__SetVertexColor(r, g, b)
+		end
+	end
 
 	-- normal border 
 
@@ -271,7 +276,6 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.Flash:SetAllPoints(button.icon)
 	button.Flash:SetVertexColor(1, 0, 0, .25)
 	button.Flash:SetTexture(GetMedia("actionbutton-mask-circular"))
-	--button.Flash:Hide()
 
 	-- hotkey
 	button.HotKey.SetFont = function() end -- disables LAB from overriding it
@@ -306,21 +310,21 @@ ns.ActionButton.Create = function(self, id, name, header)
 		AssistedCombatHighlightFrame 
 		- blue glow, next in rotation
 	--]]
-	-- spell highlight
-	local highlight = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, 1)
-	highlight:SetSize(134.295081967, 134.295081967)
-	highlight:SetPoint("CENTER", 0, 0)
-	highlight:SetTexture(GetMedia("actionbutton-spellhighlight"))
-	highlight:SetVertexColor(136/255, 189/255, 249/255, .75) -- AzeriteUI6 blue, closer to Blizz defaults
-	--highlight:SetVertexColor(96/255, 159/255, 238/255, .75) -- AzeriteUI6 darker blue
-	--highlight:SetVertexColor(190/255, 119/255, 238/255, .75) -- AzeriteUI5 purple
-	highlight:Hide()
+	-- assisted combat highlight (basically blizzard's own MaxDPS, sort of)
+	-- *note to self, make compatible with MaxDPS if possible
+	local ACH = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, 1)
+	ACH:SetSize(134.295081967, 134.295081967)
+	ACH:SetPoint("CENTER", 0, 0)
+	ACH:SetTexture(GetMedia("actionbutton-spellhighlight"))
+	ACH:SetVertexColor(136/255, 189/255, 249/255, .75) -- AzeriteUI6 blue, closer to Blizz defaults
+	--ACH:SetVertexColor(190/255, 119/255, 238/255, .75) -- AzeriteUI5 purple
+	ACH:Hide()
 
-	-- create a dummy object to safely take control of the spell highlights
-	-- *this objects contain everything LibActionButton calls or references.
+	-- create a dummy object to safely take control of the assisted combat highlights
+	-- *this objects contain everything LAB calls or references.
 	button.AssistedCombatHighlightFrame = {
-		Show = function() highlight:Show() end,
-		Hide = function() highlight:Hide() end,
+		Show = function() ACH:Show() end,
+		Hide = function() ACH:Hide() end,
 		Flipbook = { Anim = { Play = function() end, Stop = function() end } }
 	}
 
@@ -342,48 +346,46 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- fully faking this one.
 	-- *can NOT guarantee it works with anything else than our buttons and Bartender,
 	--  will look into it and replace more frame methods if a problem occurs.
-	button.__IsVisible = button.IsVisible
 	button.__LBGoverlay = {
 		-- We don't really do any anims out, we simply hide
 		animOut = {
-			IsPlaying = function() return not spellActivationAlert:IsShown() end, -- must return 'true' for it to ever be shown. weird.
-			Play = function() spellActivationAlert:Hide() end, -- when hiding -- WORKS
-			Stop = function() spellActivationAlert:Hide() end -- when showing -- WORKS
+			IsPlaying = function() return not spellActivationAlert:IsShown() end, -- it won't show unless it's hidden. doh.
+			Play = function() spellActivationAlert:Hide() end, 
+			Stop = function() spellActivationAlert:Hide() end 
 		},
+		-- This is when the activation alerts are shown
 		animIn = {
-			IsPlaying = function() return not spellActivationAlert:IsShown() end, 
-			Play = function() spellActivationAlert:Show() end, -- when showing -- WORKS
-			Stop = function() spellActivationAlert:Hide() end -- when hiding -- WORKS
+			IsPlaying = function() return not spellActivationAlert:IsShown() end, -- it won't show unless it's hidden. 
+			Play = function() spellActivationAlert:Show() end, -- this is pretty much the only time we want it shown, we don't animate
+			Stop = function() spellActivationAlert:Hide() end 
 		}
 	}
-	button.IsVisible = function() return true end
+
+	-- This could break some functionality in other parts of the addon, 
+	-- so I should make a habit out of calling the :__IsVisible() original instead.
+	button.__IsVisible = button.IsVisible
+	button.IsVisible = function() return true end 
 
 	-- Stop button skinners from messing with it
 	button.MasqueSkinned = true -- disables LAB from changing a few textures
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
 	button.AddToMasque = function() end -- disables LAB from overriding it
 
-	-- replace the default scripts with an extra layer
-	button.OnEnter = button:GetScript("OnEnter")
-	button.OnLeave = button:GetScript("OnLeave")
-
-	button:SetScript("OnEnter", Button_OnEnter)
-	button:SetScript("OnLeave", Button_OnLeave)
-
 	return button
 end
 
--- Problem: The LibActionButton method 'UpdateHotkeys' is not a public function,
+-- Problem: The LAB method 'UpdateHotkeys' is not a public function,
 -- so one of the dumber hacks here is to replace the 'GetHotKey' method instead.
 -- We toggle the text in the standard hotkey display and our custom gamepad display
 -- based on whether or not a gamepad keypad currently is in use for the button.
 ActionButton.GetHotkey = function(self)
 	local name = ("CLICK %s:%s"):format(self:GetName(), self.config.keyBoundClickButton)
 	local key = GetBindingKey(self.config.keyBoundTarget or name)
-	if not key and self.config.keyBoundTarget then
-		key = GetBindingKey(name)
-	end
-	if key then
+	--if (not key and self.config.keyBoundTarget) then -- what the hell?
+	--	key = GetBindingKey(name)
+	--end
+	if (key) then
+		-- Are we currently using gamepad binds?
 		if (IsBindingForGamePad(key)) then 
 			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
 			if (abbr) then
@@ -399,13 +401,16 @@ ActionButton.GetHotkey = function(self)
 				end
 				self.GamePadHotKey:SetText(abbr)
 
+				-- Hide the regular hotkey when using gamepad binds
 				return ""
 			end
 		else
+			-- Hide the gamepad binds when using keyboad
 			if (self.GamePadHotKey) then
 				self.GamePadHotKey:SetText("")
 			end
 		end
+		-- Return the abbreviated keybind
 		return KeyBound and KeyBound:ToShortKey(key) or key
 	end
 end
