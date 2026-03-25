@@ -24,7 +24,6 @@
 
 --]]
 local _, ns = ...
-local oUF = ns.oUF
 
 local MainActionBar = ns:NewModule("MainActionBar", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
@@ -57,11 +56,6 @@ local defaults = {
 	}
 }
 
--- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
-local GetFont = ns.GetFont
-local GetMedia = ns.GetMedia
-
 MainActionBar.GetBar = function(self)
 	if (not self.Bar) then 
 		local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
@@ -74,13 +68,17 @@ MainActionBar.GetBar = function(self)
 end
 
 MainActionBar.ReassignBindings = function(self)
-	self.Bar:UpdateBindings()
+	if (self.Bar) then
+		self.Bar:UpdateBindings()
+	end
 end
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 MainActionBar.UpdateSettings = function(self)
-	self.Bar:UpdateBindings()
+	if (self.Bar) then
+		self.Bar:UpdateBindings()
+	end
 end
 
 -- This is called by the addon on full profile changes,

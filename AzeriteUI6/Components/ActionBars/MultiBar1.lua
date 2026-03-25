@@ -24,7 +24,6 @@
 
 --]]
 local _, ns = ...
-local oUF = ns.oUF
 
 local MultiBar1 = ns:NewModule("MultiBar1", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
@@ -35,7 +34,6 @@ local defaults = {
 		layout = "zigzag", -- <grid, zigzag>
 		layoutZigZagStart = 2, -- at which button the zigzag pattern should begin
 		layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
-		--layoutZigZagOffset = 44/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
 		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
 		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
 
@@ -44,11 +42,6 @@ local defaults = {
 		fadeFrom = 1, -- which button to start the button fading from
 	}
 }
-
--- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
-local GetFont = ns.GetFont
-local GetMedia = ns.GetMedia
 
 MultiBar1.GetBar = function(self)
 	if (not self.Bar) then 
@@ -62,13 +55,17 @@ MultiBar1.GetBar = function(self)
 end
 
 MultiBar1.ReassignBindings = function(self)
-	self.Bar:UpdateBindings()
+	if (self.Bar) then
+		self.Bar:UpdateBindings()
+	end
 end
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 MultiBar1.UpdateSettings = function(self)
-	self.Bar:UpdateBindings()
+	if (self.Bar) then
+		self.Bar:UpdateBindings()
+	end
 end
 
 -- This is called by the addon on full profile changes,

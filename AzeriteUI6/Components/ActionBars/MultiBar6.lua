@@ -24,3 +24,70 @@
 
 --]]
 local _, ns = ...
+
+local MultiBar6 = ns:NewModule("MultiBar6", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
+
+-- Declare module defaults
+local defaults = { 
+	profile = {
+		enabled = false,
+
+		layout = "grid", -- <grid, zigzag>
+		layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
+		layoutGrowth = "horizontal", -- which direction the bar initially grows in
+		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
+		layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
+		layoutPaddingX = 8, -- horizontal padding between the buttons
+		layoutPaddingY = 8, -- vertical padding between the buttons
+	
+		enableBarFading = true, -- whether to enable non-combat/hover button fading
+		fadeInCombat = false, -- whether to keep fading out even in combat
+		fadeFrom = 1, -- which button to start the button fading from
+	}
+}
+
+MultiBar6.GetBar = function(self)
+	if (not self.Bar) then 
+		local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
+		bar:SetScale(.9) -- default scale
+		bar:SetPoint("CENTER", 0, (100 + 64)/.9) -- default position
+		bar:Update() -- update size and layout
+		self.Bar = bar
+	end
+	return self.Bar
+end
+
+MultiBar6.ReassignBindings = function(self)
+	if (self.Bar) then
+		self.Bar:UpdateBindings()
+	end
+end
+
+-- This is called by the options menu on settings changes,
+-- and by the modules themselves on enabling and combat end.
+MultiBar6.UpdateSettings = function(self)
+	if (self.Bar) then
+		self.Bar:UpdateBindings()
+	end
+end
+
+-- This is called by the addon on full profile changes,
+-- and should call a full settings update.
+MultiBar6.RefreshConfig = function(self)
+	self:UpdateSettings()
+end
+
+MultiBar6.OnInitialize = function(self)
+	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
+
+	self.db = ns.db:RegisterNamespace("MultiBar6", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+end
+
+MultiBar6.OnEnable = function(self)
+	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 3)), "actionbars", AzeriteUI6_Positions_DB)
+	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
+	self:ReassignBindings()
+end

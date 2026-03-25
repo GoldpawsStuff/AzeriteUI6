@@ -24,3 +24,5 @@
 
 --]]
 local _, ns = ...
+
+local StanceBar = ns:NewModule("StanceBar", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
