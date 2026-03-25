@@ -175,13 +175,11 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.SpellHighlightAnim:Stop() -- default spell highlight, we use our own
 	button.SpellHighlightTexture:SetParent(UIHider)
 	button.SlotArt:SetParent(UIHider) -- more graphical crap we don't need
-	--button.SlotBackground:SetParent(UIHider) -- doesn't exist anymore
 	button.SpellCastAnimFrame:SetParent(UIHider) -- we sooo don't need a castbar in the button
 	button.TargetReticleAnimFrame:SetParent(UIHider) -- nothing with such a name deserves to exist
 
 	-- block BaseActionButtonMixin
 	button.SlotArt = nil -- this prevents the above from modifying or showing it
-	button.SlotBackground = nil -- doesn't exist to begin with anymore
 
 	-- remove default mask texture
 	button.icon:RemoveMaskTexture(button.IconMask)
@@ -340,7 +338,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	spellActivationAlert:SetSize(134.295081967, 134.295081967)
 	spellActivationAlert:SetPoint("CENTER", 0, 0)
 	spellActivationAlert:SetTexture(GetMedia("actionbutton-spellhighlight"))
-	spellActivationAlert:SetVertexColor(249/255, 234/255, 137/255, .75)
+	spellActivationAlert:SetVertexColor(249/255, 234/255, 137/255, .75) -- bright yellow tinted white
 	spellActivationAlert:Hide()
 
 	-- fully faking this one.
@@ -381,28 +379,29 @@ end
 ActionButton.GetHotkey = function(self)
 	local name = ("CLICK %s:%s"):format(self:GetName(), self.config.keyBoundClickButton)
 	local key = GetBindingKey(self.config.keyBoundTarget or name)
-	--if (not key and self.config.keyBoundTarget) then -- what the hell?
-	--	key = GetBindingKey(name)
-	--end
+	if (not key and self.config.keyBoundTarget) then -- when keyBoundTarget is set but returns nothing 
+		key = GetBindingKey(name)
+	end
 	if (key) then
 		-- Are we currently using gamepad binds?
 		if (IsBindingForGamePad(key)) then 
 			local abbr = GetBindingText(key, "KEY_", true) -- small buttons
 			if (abbr) then
+				-- on-demand creation
 				if (not self.GamePadHotKey) then
 					self.GamePadHotKey = self.OverlayFrame:CreateFontString(nil, "ARTWORK")
 					self.GamePadHotKey:SetPoint("CENTER", self, "TOPLEFT", 10, -10)
 					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
 				end
+				-- adjust font size for multiple keys
 				if (key:find("-")) then
 					self.GamePadHotKey:SetFontObject(ns.GetFont(15, "Outline", "Number"))
 				else
 					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
 				end
-				self.GamePadHotKey:SetText(abbr)
+				self.GamePadHotKey:SetText(abbr) -- set our custom gamepad bind text
 
-				-- Hide the regular hotkey when using gamepad binds
-				return ""
+				return "" -- hide the regular hotkey when using gamepad binds
 			end
 		else
 			-- Hide the gamepad binds when using keyboad
