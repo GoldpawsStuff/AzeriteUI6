@@ -129,6 +129,7 @@ local exitButton = {
 -- our glorious template with very few methods
 local ActionButton = {}
 
+ns.ActionButtons = {}
 ns.ActionButton = {}
 ns.ActionButton.prototype = ActionButton
 ns.ActionButton.defaults = defaults
@@ -368,6 +369,8 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.MasqueSkinned = true -- disables LAB from changing a few textures
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
 	button.AddToMasque = function() end -- disables LAB from overriding it
+
+	ns.ActionButtons[button] = true
 
 	return button
 end

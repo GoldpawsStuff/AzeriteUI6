@@ -29,12 +29,12 @@ If you choose to download and manually install directly from GitHub, you'll need
   - 🔁 Primary Bar  
     - ✅ Page Switching *(Stance/Possess/Vehicle)*  
   - 🔁 Bar 2  
-  - 🔳 Bar 3  
-  - 🔳 Bar 4  
-  - 🔳 Bar 5  
-  - 🔳 Bar 6  
-  - 🔳 Bar 7  
-  - 🔳 Bar 8  
+  - 🔁 Bar 3  
+  - 🔁 Bar 4  
+  - 🔁 Bar 5  
+  - 🔁 Bar 6  
+  - 🔁 Bar 7  
+  - 🔁 Bar 8  
   - 🔳 Stance Bar  
   - 🔳 Pet Action Bar  
   - 🔳 Extra Abilities Bar  
