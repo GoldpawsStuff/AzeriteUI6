@@ -31,7 +31,7 @@ local KeyBound = LibStub("LibKeyBound-1.0")
 -- Declare module defaults
 local defaults = { 
 	profile = {
-		enabled = true,
+		enabled = false, -- true,
 
 		layout = "grid", -- <grid, zigzag>
 		layoutGridSize = NUM_PET_ACTION_SLOTS, -- when to start a new grid row
@@ -67,14 +67,48 @@ PetActionBar.CreateButton = function(self, id)
 	return button
 end
 
+PetActionBar.OnEvent = function(self, event, arg1)
+	if (event == "PET_BAR_UPDATE" or (event == "UNIT_PET" and arg1 == "player") or event == "PET_UI_UPDATE" or event == "UPDATE_VEHICLE_ACTIONBAR") then
+		self:ForAll("Update")
+	elseif (event == "PLAYER_CONTROL_LOST" or event == "PLAYER_CONTROL_GAINED" or event == "PLAYER_FARSIGHT_FOCUS_CHANGED" or event == "PET_BAR_UPDATE_USABLE" or event == "PLAYER_TARGET_CHANGED" or event == "PLAYER_MOUNT_DISPLAY_CHANGED" ) then
+		self:ForAll("Update")
+	elseif ((event == "UNIT_FLAGS") or (event == "UNIT_AURA") ) then
+		if arg1 == "pet" then
+			self:ForAll("Update")
+		end
+	elseif (event =="PET_BAR_UPDATE_COOLDOWN" ) then
+		self:ForAll("UpdateCooldown")
+	elseif (event == "PET_BAR_SHOWGRID") then
+		self:ForAll("ShowGrid")
+	elseif (event == "PET_BAR_HIDEGRID") then
+		self:ForAll("HideGrid")
+	end
+end
+
 PetActionBar.Enable = function(self)
 	if (InCombatLockdown()) then return end
 	self.enabled = true
+	self:RegisterEvent("PLAYER_CONTROL_LOST")
+	self:RegisterEvent("PLAYER_CONTROL_GAINED")
+	self:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
+	self:RegisterEvent("UNIT_PET")
+	self:RegisterEvent("UNIT_FLAGS")
+	self:RegisterEvent("PET_BAR_UPDATE")
+	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
+	self:RegisterEvent("PET_BAR_UPDATE_USABLE")
+	self:RegisterEvent("PET_UI_UPDATE")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+	self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
+	self:RegisterUnitEvent("UNIT_AURA", "pet")
+	self:RegisterEvent("PET_BAR_SHOWGRID")
+	self:RegisterEvent("PET_BAR_HIDEGRID")
 end
 
 PetActionBar.Disable = function(self)
 	if (InCombatLockdown()) then return end
 	self.enabled = false
+	self:UnregisterAllEvents()
 end
 
 PetActionBar.SetEnabled = function(self, enable)
@@ -425,39 +459,29 @@ PetBar.GetBar = function(self)
 		bar.config = self.db.profile
 
 		bar.buttons = {}
-		bar.buttonWidth = 64 -- why exactly are we storing it directly on the bar object?
-		bar.buttonHeight = 64
+		bar.buttonWidth = 48 -- why exactly are we storing it directly on the bar object?
+		bar.buttonHeight = 48
 
 		for i = 1,NUM_PET_ACTION_SLOTS do
 			local button = bar:CreateButton(i)
 
+			bar.buttons[i] = button -- lua reference
+			bar:SetFrameRef("Button"..i, button) -- secure environment reference
 
-			bar.buttons[i] = button
+			local keyBoundTarget = "BONUSACTIONBUTTON"..i
+			button.config.keyBoundTarget = keyBoundTarget
 		end
 
-		bar:RegisterEvent("PLAYER_CONTROL_LOST")
-		bar:RegisterEvent("PLAYER_CONTROL_GAINED")
-		bar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
-		bar:RegisterEvent("UNIT_PET")
-		bar:RegisterEvent("UNIT_FLAGS")
-		bar:RegisterEvent("PET_BAR_UPDATE")
-		bar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
-		bar:RegisterEvent("PET_BAR_UPDATE_USABLE")
-		bar:RegisterEvent("PET_UI_UPDATE")
-		bar:RegisterEvent("PLAYER_TARGET_CHANGED")
-		bar:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
-		bar:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
-		bar:RegisterUnitEvent("UNIT_AURA", "pet")
-		bar:RegisterEvent("PET_BAR_SHOWGRID")
-		bar:RegisterEvent("PET_BAR_HIDEGRID")
+		bar:SetScript("OnEvent", PetActionBar.OnEvent)
 
 		bar:SetScale(.9) -- default scale
-		bar:SetPoint("CENTER", 0, -100/.9) -- default position
+		bar:SetPoint("BOTTOM", 0, 220/.9) -- default position
 
 		bar:Update() -- update size and layout
 
 		self.Bar = bar
 	end
+
 	return self.Bar
 end
 
@@ -488,9 +512,11 @@ PetBar.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
 end
 
 PetBar.OnEnable = function(self)
+	self:GetBar():Enable()
 	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(HUD_EDIT_MODE_PET_ACTION_BAR_LABEL), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()

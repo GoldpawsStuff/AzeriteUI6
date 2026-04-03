@@ -113,8 +113,18 @@ local defaults = {
 	}
 }
 
+local UpdateTooltip = function(self)
+	if (GameTooltip:IsForbidden()) then
+		return
+	end
+	GameTooltip_SetDefaultAnchor(GameTooltip, self)
+	GameTooltip:SetPetAction(self.id)
+end
+
 local OnEnter = function(self, ...)
-	self:OnEnter(...)
+	self.UpdateTooltip = UpdateTooltip
+	self:UpdateTooltip()
+	--self:OnEnter(...)
 end
 
 local OnLeave = function(self)
@@ -149,8 +159,8 @@ local OnDragStart = function(self)
 	end
 end
 
-local PetButton = CreateFrame("CheckButton")
-local PetButton_MT = { __index = PetButton }
+local PetButton = {} -- CreateFrame("CheckButton")
+--local PetButton_MT = { __index = PetButton }
 
 ns.PetButtons = {}
 
@@ -160,17 +170,32 @@ ns.PetActionButton.defaults = defaults
 
 ns.PetActionButton.Create = function(self, id, name, header)
 
-	local button = setmetatable(CreateFrame("CheckButton", name, header, "PetActionButtonTemplate"), PetButton_MT)
+	--local button = setmetatable(CreateFrame("CheckButton", name, header, "PetActionButtonTemplate"), PetButton_MT)
+	local button = CreateFrame("CheckButton", name, header, "PetActionButtonTemplate")
 	button.showgrid = 0
 	button.id = id
-	button.parent = parent
+	button.parent = header
+	button.config = ns:Copy(defaults)
+
+	-- Overwrite some default methods with our own
+	for name,method in pairs(PetButton) do
+		button[name] = method
+	end
 
 	button:SetFrameStrata("MEDIUM")
+
+	-- general size and click settings
+	--button:SetHitRectInsets(-10, -10, -10, -10)
+	button:SetSize(header.buttonWidth, header.buttonHeight)
+
 
 	button:SetID(id)
 	button:SetAttribute("type", "pet")
 	button:SetAttribute("action", id)
 	button:SetAttribute("buttonLock", true)
+	button:SetAttribute("checkselfcast", true)
+	button:SetAttribute("checkfocuscast", true)
+	button:SetAttribute("checkmouseovercast", true)
 
 	button:RegisterForDrag("LeftButton", "RightButton")
 	button:RegisterForClicks("AnyUp", "AnyDown")

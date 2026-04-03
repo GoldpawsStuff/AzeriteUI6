@@ -36,7 +36,7 @@ If you choose to download and manually install directly from GitHub, you'll need
   - 🔁 Bar 7  
   - 🔁 Bar 8  
   - 🔳 Stance Bar  
-  - 🔳 Pet Action Bar  
+  - 🔁 Pet Action Bar  
   - 🔳 Extra Abilities Bar  
   - 🔳 Zone Abilities Bar  
   - 🔳 Encounter Bar  

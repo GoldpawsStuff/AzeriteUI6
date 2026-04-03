@@ -157,7 +157,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	end
 
 	-- general size and click settings
-	button:SetHitRectInsets(-10, -10, -10, -10)
+	--button:SetHitRectInsets(-10, -10, -10, -10)
 	button:SetSize(header.buttonWidth, header.buttonHeight)
 	button:SetAttribute("buttonLock", true)
 	button:SetAttribute("checkselfcast", true)
