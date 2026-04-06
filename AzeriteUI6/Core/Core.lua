@@ -24,7 +24,7 @@
 
 --]]
 local addonName, ns = ...
-local LibDeflate = LibStub("LibDeflate")
+local LibDeflate = LibStub("LibDeflate") -- intended for profile sharing later on. TODO!
 
 ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "LibMoreEvents-1.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0", "AceSerializer-3.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
@@ -44,6 +44,9 @@ ns.IsCompatible = ns.WoW12 and not ns.WoW13
 _G[addonName] = ns
 
 -- Saved variables globals
+-- *note we have to check for existence, 
+--  as the addon is set to load variables before running,
+--  so we'll constantly overwrite with the defaults if not.
 _G.AzeriteUI6_DB = _G.AzeriteUI6_DB or {} -- handled by AceDB
 _G.AzeriteUI6_Positions_DB = _G.AzeriteUI6_Positions_DB or {} -- handled by us
 
@@ -95,7 +98,7 @@ ns.Fire = function(self, name, ...)
 	self.callbacks:Fire(name, ...)
 end
 
--- Temporary fix will developing
+-- Temporary fix while developing
 ns.ResetSavedPositions = function(self)
 	table.wipe(AzeriteUI6_Positions_DB)
 	ReloadUI()
