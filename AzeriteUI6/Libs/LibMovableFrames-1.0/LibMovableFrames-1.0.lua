@@ -217,7 +217,6 @@ end
 ---------------------------------------------
 -- Save current position
 Anchor.SaveToDB = function(self)
-
 	-- figure out current position
 	local point, x, y = GetNormalizedCoords(self, true) -- Get the normalized position of the anchor 
 	local scale = self.owner:GetScale() -- We need the frame's effective scale relative to the WorldFrame
@@ -225,7 +224,6 @@ Anchor.SaveToDB = function(self)
 
 	-- store in the global table
 	self.db[name] = { scale = scale, position = { point, x, y } }
-
 end
 
 -- Restore last saved position
@@ -241,8 +239,7 @@ Anchor.RestoreFromDB = function(self)
 			self.owner:ClearAllPoints()
 			self.owner:SetPoint(position, x, y)
 
-			-- update anchor
-			self:OnShow()
+			self:OnShow() -- update anchor to new position
 		end
 	end
 	self:UpdatePositionDisplay()
@@ -261,8 +258,8 @@ Anchor.RestoreFromDefaults = function(self)
 			self.owner:ClearAllPoints()
 			self.owner:SetPoint(position, x, y)
 
-			-- update anchor
-			self:OnShow()
+			self:OnShow() -- update anchor to new position
+			self:SaveToDB() -- save current anchor position to db
 		end
 	end
 	self:UpdatePositionDisplay()
@@ -281,8 +278,8 @@ Anchor.RestoreFromPrevious = function(self)
 			self.owner:ClearAllPoints()
 			self.owner:SetPoint(position, x, y)
 
-			-- update anchor
-			self:OnShow()
+			self:OnShow() -- update anchor to new position
+			self:SaveToDB() -- save current anchor position to db
 		end
 	end
 	self:UpdatePositionDisplay()

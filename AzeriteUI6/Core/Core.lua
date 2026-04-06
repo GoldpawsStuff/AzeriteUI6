@@ -265,38 +265,33 @@ local barToMod = {
 	["forms"] 		= "StanceBar",
 }
 
-local enablebar = function(barID)
+ns.EnableActionBar = function(self, input)
+	local barID = self:GetArgs(string.lower(input))
 	if (not barID or not barToMod[barID]) then return end
+
 	local mod = ns:GetModule(barToMod[barID], true)
 	if (mod) then
 		if (mod.db.profile.enabled) then return end
+
 		mod.db.profile.enabled = true
+
 		local bar = mod:GetBar()
 		if (bar) then bar:Update() end		
 	end
 end
 
-local disablebar = function(barID)
+ns.DisableActionBar = function(self, input)
+	local barID = self:GetArgs(string.lower(input))
 	if (not barID or not barToMod[barID]) then return end
+
 	local mod = ns:GetModule(barToMod[barID], true)
 	if (mod) then
 		if (not mod.db.profile.enabled) then return end
+
 		mod.db.profile.enabled = false
+
 		local bar = mod:GetBar()
 		if (bar) then bar:Update() end
-	end
-end
-
-ns.OnChatCommand = function(self, input)
-	local command, arg1, arg2 = self:GetArgs(string.lower(input), 3)
-	if (command == "enable") then
-		if (arg1 and barToMod[arg1]) then
-			enablebar(arg1)
-		end
-	elseif (command == "disable") then
-		if (arg1 and barToMod[arg1]) then
-			disablebar(arg1)
-		end
 	end
 end
 
@@ -337,8 +332,8 @@ ns.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
 	self:RegisterChatCommand("lock", "ToggleFrameLocks") -- toggle movable frame anchors
-	self:RegisterChatCommand("resetsettings", "ResetDB") -- reset all addon settings
+	self:RegisterChatCommand("enablebar", "EnableActionBar") -- enable an action bar
+	self:RegisterChatCommand("disablebar", "DisableActionBar") -- disable an action bar
 	self:RegisterChatCommand("resetpositions", "ResetSavedPositions") -- reset all addon saved positions
-	self:RegisterChatCommand("azerite", "OnChatCommand") -- settings
-	self:RegisterChatCommand("az", "OnChatCommand") -- settings shorthand
+	self:RegisterChatCommand("resetsettings", "ResetDB") -- reset all addon settings
 end
