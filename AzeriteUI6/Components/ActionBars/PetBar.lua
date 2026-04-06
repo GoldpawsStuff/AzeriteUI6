@@ -44,7 +44,6 @@ local defaults = {
 		enableBarFading = true, -- whether to enable non-combat/hover button fading
 		fadeInCombat = false, -- whether to keep fading out even in combat
 		fadeFrom = 1, -- which button to start the button fading from
-		fadeButtonHitRects = { -4, -4, -4, -4 },
 
 		numbuttons = NUM_PET_ACTION_SLOTS, -- 10
 		--visibility = {
@@ -167,7 +166,7 @@ PetActionBar.UpdateFading = function(self)
 			if (id >= self.config.fadeFrom) then
 				local button = self.buttons[id]
 				if (GetPetActionInfo(button.id)) then 
-					PetBar:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "petactionbuttons", unpack(self.config.fadeButtonHitRects))
+					PetBar:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "petactionbuttons", -4, -4, -4, -4)
 				else
 					-- update button?
 				end

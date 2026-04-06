@@ -40,7 +40,7 @@ lib.embeds = lib.embeds or {}
 lib.frame = lib.frame or CreateFrame("Frame")
 
 -- Constant to track login status
-local _PLAYER_IS_LOGGED_IN = IsLoggedIn()
+local IS_LOGGED_IN = IsLoggedIn()
 
 local Anchor = CreateFrame("Button")
 local Anchor_MT = { __index = Anchor }
@@ -216,55 +216,113 @@ end
 -- Save & Restore
 ---------------------------------------------
 -- Save current position
-Anchor.Save = function(self)
+Anchor.SaveToDB = function(self)
 
-	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
-	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+	-- figure out current position
+	local point, x, y = GetNormalizedCoords(self, true) -- Get the normalized position of the anchor 
+	local scale = self.owner:GetScale() -- We need the frame's effective scale relative to the WorldFrame
+	local name = self.owner:GetName() or self.owner:GetDebugName()
 
+	-- store in the global table
+	self.db[name] = { scale = scale, position = { point, x, y } }
 
 end
 
 -- Restore last saved position
-Anchor.Restore = function(self)
+Anchor.RestoreFromDB = function(self)
+	local savedPosition = self.db[(self.owner:GetName() or self.owner:GetDebugName())] -- is it saved?
+	if (savedPosition) then
+		local position, x, y = unpack(savedPosition.position)
+		if (position and x and y) then
 
-	self:UpdatePosition()
+			-- restore frame positions
+			--self.owner:SetScale((savedPosition.scale and savedPosition.scale / UIParent:GetScale()) or 1)
+			self.owner:SetScale(savedPosition.scale or 1)
+			self.owner:ClearAllPoints()
+			self.owner:SetPoint(position, x, y)
+
+			-- update anchor
+			self:OnShow()
+		end
+	end
+	self:UpdatePositionDisplay()
 end
 
--- Undo current change
-Anchor.Undo = function(self)
-	
-	self:UpdatePosition()
+-- Restore to the default position and scale
+Anchor.RestoreFromDefaults = function(self)
+	local defaultPosition = self.default
+	if (defaultPosition) then
+		local position, x, y = unpack(defaultPosition.position)
+		if (position and x and y) then
+
+			-- restore frame positions
+			--self.owner:SetScale((defaultPosition.scale and defaultPosition.scale / UIParent:GetScale()) or 1)
+			self.owner:SetScale(defaultPosition.scale or 1)
+			self.owner:ClearAllPoints()
+			self.owner:SetPoint(position, x, y)
+
+			-- update anchor
+			self:OnShow()
+		end
+	end
+	self:UpdatePositionDisplay()
+end
+
+-- Restore to the position and scale the anchor had when shown
+Anchor.RestoreFromPrevious = function(self)
+	local previousPosition = self.previous
+	if (previousPosition) then
+		local position, x, y = unpack(previousPosition.position)
+		if (position and x and y) then
+
+			-- restore frame positions
+			--self.owner:SetScale((previousPosition.scale and previousPosition.scale / UIParent:GetScale()) or 1)
+			self.owner:SetScale(previousPosition.scale or 1)
+			self.owner:ClearAllPoints()
+			self.owner:SetPoint(position, x, y)
+
+			-- update anchor
+			self:OnShow()
+		end
+	end
+	self:UpdatePositionDisplay()
 end
 
 -- Updates
 ---------------------------------------------
-Anchor.UpdatePosition = function(self)
+Anchor.UpdatePositionDisplay = function(self)
 	-- update displayed coords and scale
 	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
-	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+	--local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+	local scale = self.owner:GetScale()
 
-	self.position:SetFormattedText("|cff888888%s|r  %.0f, %.0f   |cff888888%.02f|r", point, x, y, scale/UIParent:GetScale())
+	self.position:SetFormattedText("|cff888888%s|r  %.0f, %.0f   |cff888888%.02f|r", point, x, y, scale)
+	--self.position:SetFormattedText("|cff888888%s|r  %.0f, %.0f   |cff888888%.02f|r", point, x, y, scale/UIParent:GetScale())
 end
 
 -- Script Handlers 
 ---------------------------------------------
 Anchor.OnShow = function(self)
-	-- store owner's size and scale
+
+	-- Store current position and scale as "previous"
+	self.previous = { scale = self.owner:GetScale(), position = { GetNormalizedCoords(self.owner, true) } }
+
+	-- store owner's size and scale for this session
 	self.scale = self.owner:GetScale() -- current frame scale
 	self.baseWidth = self.owner:GetWidth() -- unscaled width
 	self.baseHeight = self.owner:GetHeight() -- unscaled height
 
-	-- position, scale and size to its owner
+	-- position, scale and size the anchor to its owner
 	self:SetScale(self.scale)
 	self:SetSize(self.baseWidth, self.baseHeight)
 	self:ClearAllPoints()
 	self:SetPoint(GetNormalizedCoords(self.owner, true))
 
-	self:UpdatePosition()
+	self:UpdatePositionDisplay()
 end
 
 Anchor.OnHide = function(self)
-	
+	self.previous = nil	
 end
 
 Anchor.OnDragStart = function(self)
@@ -277,42 +335,55 @@ Anchor.OnDragStart = function(self)
 	self:StartMoving()
 	self:SetUserPlaced(false) -- the above enables this, we don't want it
 
-	self:UpdatePosition()
+	self:UpdatePositionDisplay()
 end
 
 Anchor.OnDragStop = function(self)
 	self:StopMovingOrSizing()
 	self:SetScript("OnUpdate", nil)
 
-	local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
-	local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
+	--local point, x, y = GetNormalizedCoords(self) 	-- Get the normalized position of the anchor 
+	--local scale = self.owner:GetEffectiveScale() 	-- We need the frame's effective scale relative to the WorldFrame
 
 	self.owner:ClearAllPoints()
-	self.owner:SetPoint(point, x/scale, y/scale) 	-- Convert anchor's coordinates to same space as the frame
+	--self.owner:SetPoint(point, x/scale, y/scale) 	-- Convert anchor's coordinates to same space as the frame
+	self.owner:SetPoint(GetNormalizedCoords(self, true)) 	-- Convert anchor's coordinates to same space as the frame
 
-	self:UpdatePosition()
+	self:SaveToDB()
+	self:UpdatePositionDisplay()
 end
 
 Anchor.OnMouseDown = function(self, button)
 	if (button == "LeftButton") then
+		-- restore last saved position
+		if (IsShiftKeyDown()) then
+			self:RestoreFromPrevious()
+			return
+		end
+
 		for frame,anchor in next,Anchors do 
 			anchor:SetFrameLevel(anchor == self and 2000 or anchor.isAbove and 1100 or anchor.isBelow and 900 or 1000)
 		end
+
 	elseif (button == "RightButton") then
+		-- restore default
+		if (IsShiftKeyDown()) then
+			self:RestoreFromDefaults()
+			return
+		end
+
 		for frame, anchor in next,Anchors do 
 			anchor:SetFrameLevel(anchor == self and 500 or anchor.isAbove and 600 or anchor.isBelow and 400 or 1000)
 		end
+
+	elseif (button == "MiddleButton") then
+		-- restore last saved scale
+		self.scale = self.default.scale
+		self:UpdateScale()
 	end
 end
 
-Anchor.OnMouseWheel = function(self, delta)
-
-	if (delta > 0 ) then
-		self.scale = math.min(1.5, self.scale + .02)
-	elseif (delta < 0) then
-		self.scale = math.max(.5, self.scale - .02)
-	end
-
+Anchor.UpdateScale = function(self)
 	-- retrieve unscaled position
 	local point, x, y = GetNormalizedCoords(self.owner)
 
@@ -331,7 +402,19 @@ Anchor.OnMouseWheel = function(self, delta)
 	self:ClearAllPoints()
 	self:SetPoint(point, x / effectiveScale, y / effectiveScale)
 
-	self:UpdatePosition()
+	self:SaveToDB()
+	self:UpdatePositionDisplay()
+end
+
+Anchor.OnMouseWheel = function(self, delta)
+
+	if (delta > 0 ) then
+		self.scale = math.min(1.5, self.scale + .02)
+	elseif (delta < 0) then
+		self.scale = math.max(.5, self.scale - .02)
+	end
+
+	self:UpdateScale()
 end
 
 Anchor.OnUpdate = function(self, elapsed)
@@ -341,20 +424,20 @@ Anchor.OnUpdate = function(self, elapsed)
 	end
 	self.elapsed = 0 -- full reset
 
-	self:UpdatePosition()
+	self:UpdatePositionDisplay()
 end
 
 Scale.OnMouseDown = function(self)
 	self:GetParent():StartSizing("BOTTOMRIGHT", false)
 	self:GetParent():SetUserPlaced(false)
 	self:SetButtonState("PUSHED", true)
-	self:GetParent():UpdatePosition()
+	self:GetParent():UpdatePositionDisplay()
 end
 
 Scale.OnMouseUp = function(self)
 	self:SetButtonState("NORMAL", false)
 	self:GetParent():StopMovingOrSizing()
-	self:GetParent():UpdatePosition()
+	self:GetParent():UpdatePositionDisplay()
 end
 
 --[[ RegisterMovableFrameAnchor(self, frame, [label], [group])
@@ -394,8 +477,8 @@ lib.RegisterMovableFrameAnchor = function(_, frame, name, group, db)
 	anchor.baseHeight = frame:GetHeight() -- unscaled height
 	anchor.isResizable = true -- by default scalable
 	anchor.db = db -- link to your saved variables, or any random table to store the position in
-	anchor.default = {  } -- TODO
-	anchor.previous = anchor.previous and table.wipe(anchor.previous) or {} -- previous position (previous time anchors were shown)
+	anchor.default = { scale = frame:GetScale(), position = { GetNormalizedCoords(frame, true) --[[ point,x,y ]]} } -- TODO
+	anchor.previous = nil -- erase this
 
 	-- retrieve or create visible overlay
 	local overlay = anchor.overlay or CreateFrame("Frame", nil, anchor, "BackdropTemplate")
@@ -460,6 +543,11 @@ lib.RegisterMovableFrameAnchor = function(_, frame, name, group, db)
 	Anchors[frame] = anchor
 	AnchorGroups[group][anchor] = true
 	AnchorGroups[anchor] = group
+
+	-- restore last saved position, if any 
+	if (IS_LOGGED_IN) then
+		anchor:RestoreFromDB()
+	end
 
 	-- return to the user
 	return anchor
@@ -566,19 +654,13 @@ frame:SetScript("OnEvent", function(self, event, ...)
 	if (event == "PLAYER_LOGIN") then -- initial setup, re-apply saved positions
 		self:UnregisterEvent("PLAYER_LOGIN") -- only need this one once
 
+		-- Restore already registered frame anchors
 		for frame,anchor in next,Anchors do
-			if (anchor.db) then
-				local frameName = frame:GetName() or frame:GetDebugName()
-				local savedPosition = anchor.db[frameName] -- is it saved?
-				local position, x, y = savedPosition and unpack(savedPosition)
-				if (position and x and y) then
-					-- restore frame positions
-				end
-			end
-
+			anchor:RestoreFromDB()
 		end
 
-		_PLAYER_IS_LOGGED_IN = true 
+		-- Don't do this again
+		IS_LOGGED_IN = true 
 
 	elseif (event == "PLAYER_REGEN_DISABLED") then -- combat started, hide anchors
 		lib:HideAllMovableFrameAnchors()
@@ -590,7 +672,7 @@ frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 
 -- Manually fire this if we're already logged in
 -- *might happen with Load on Demand addons, though unlikely
-if (_PLAYER_IS_LOGGED_IN) then
+if (IS_LOGGED_IN) then
 	frame:GetScript("OnEvent")(frame, "PLAYER_LOGIN")
 else
 	frame:RegisterEvent("PLAYER_LOGIN")

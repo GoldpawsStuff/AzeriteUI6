@@ -46,7 +46,6 @@ local defaults = {
 	enableBarFading = false, -- whether to enable non-combat/hover button fading
 	fadeInCombat = false, -- whether to keep fading out even in combat
 	fadeFrom = 1, -- which button to start the button fading from
-	fadeButtonHitRects = { -4, -4, -4, -4 },
 
 	numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
 	visibility = {
@@ -108,7 +107,7 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 	-- create buttons
 	for i = 1,NUM_ACTIONBAR_BUTTONS do
 		local button = ns.ActionButton:Create(i, name.."Button"..i, bar)
-		button:SetHitRectInsets(unpack(bar.config.fadeButtonHitRects))
+		button:SetHitRectInsets(-4, -4, -4, -4)
 
 		bar.buttons[i] = button -- lua reference
 		bar:SetFrameRef("Button"..i, button) -- secure environment reference
@@ -188,30 +187,6 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 	return bar
 end
 
-ActionBar.Enable = function(self)
-	if (InCombatLockdown()) then return end
-	self.enabled = true
-end
-
-ActionBar.Disable = function(self)
-	if (InCombatLockdown()) then return end
-	self.enabled = false
-end
-
-ActionBar.SetEnabled = function(self, enable)
-	if (InCombatLockdown()) then return end
-
-	if (enable) then
-		self:Enable()
-	else
-		self:Disable()
-	end
-end
-
-ActionBar.IsEnabled = function(self)
-	return self.enabled
-end
-
 ActionBar.ForAll = function(self, method, ...)
 	for id,button in next,self.buttons do
 		if (type(method) == "string") then
@@ -247,7 +222,7 @@ ActionBar.UpdateFading = function(self)
 			if (id >= self.config.fadeFrom) then
 				local button = self.buttons[id]
 				if (button:GetTexture()) then
-					LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", unpack(self.config.fadeButtonHitRects))
+					LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", -4, -4, -4, -4)
 				else
 					-- update button?
 				end

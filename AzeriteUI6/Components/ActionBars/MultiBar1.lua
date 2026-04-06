@@ -88,4 +88,5 @@ MultiBar1.OnEnable = function(self)
 	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 2)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()
+	--self:UpdateSettings()
 end

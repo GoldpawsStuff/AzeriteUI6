@@ -44,8 +44,8 @@ ns.IsCompatible = ns.WoW12 and not ns.WoW13
 _G[addonName] = ns
 
 -- Saved variables globals
-AzeriteUI6_DB = {} -- handled by AceDB
-AzeriteUI6_Positions_DB = {} -- handled by us
+_G.AzeriteUI6_DB = _G.AzeriteUI6_DB or {} -- handled by AceDB
+_G.AzeriteUI6_Positions_DB = _G.AzeriteUI6_Positions_DB or {} -- handled by us
 
 -- Addon defaults (just the core)
 local defaults = { 
@@ -95,12 +95,17 @@ ns.Fire = function(self, name, ...)
 	self.callbacks:Fire(name, ...)
 end
 
-ns.ResetSettings = function(self, noreload)
-	self.db:ResetDB(self:GetDefaultProfileKey())
+-- Temporary fix will developing
+ns.ResetSavedPositions = function(self)
+	table.wipe(AzeriteUI6_Positions_DB)
+	ReloadUI()
+end
+
+-- Reset saved settings (not including positions)
+ns.ResetDB = function(self, noreload)
+	self.db:ResetDB("Default")
 	self.db.global.version = ns.SETTINGS_VERSION
-	if (not noreload) then
-		ReloadUI()
-	end
+	ReloadUI()
 end
 
 ns.ProfileExists = function(self, targetProfileKey)
@@ -170,12 +175,6 @@ end
 ns.GetProfiles = function(self)
 	local profiles = self.db:GetProfiles()
 	return profiles
-end
-
--- Returns a localized "Default" string, 
--- usable as the key for the default profile.
-ns.GetDefaultProfileKey = function(self)
-	return DEFAULT
 end
 
 ns.Export = function(self, ...)
@@ -267,21 +266,21 @@ local barToMod = {
 }
 
 local enablebar = function(barID)
-	print("enable <barID>", barID)
 	if (not barID or not barToMod[barID]) then return end
 	local mod = ns:GetModule(barToMod[barID], true)
 	if (mod) then
+		if (mod.db.profile.enabled) then return end
 		mod.db.profile.enabled = true
 		local bar = mod:GetBar()
-		if (bar) then bar:Update() end
+		if (bar) then bar:Update() end		
 	end
 end
 
 local disablebar = function(barID)
-	print("disable <barID>", barID)
 	if (not barID or not barToMod[barID]) then return end
 	local mod = ns:GetModule(barToMod[barID], true)
 	if (mod) then
+		if (not mod.db.profile.enabled) then return end
 		mod.db.profile.enabled = false
 		local bar = mod:GetBar()
 		if (bar) then bar:Update() end
@@ -326,10 +325,10 @@ ns.OnEnable = function(self)
 end
 
 ns.OnInitialize = function(self)
-	self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, self:GetDefaultProfileKey())
+	self.db = LibStub("AceDB-3.0"):New("AzeriteUI6_DB", defaults, true)
 
 	if (self.db.global.version < ns.SETTINGS_VERSION) then
-		self:ResetSettings(true)
+		self:ResetDB(true)
 	end
 
 	self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
@@ -338,7 +337,8 @@ ns.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
 	self:RegisterChatCommand("lock", "ToggleFrameLocks") -- toggle movable frame anchors
-	self:RegisterChatCommand("resetsettings", "ResetSettings") -- reset all addon settings
+	self:RegisterChatCommand("resetsettings", "ResetDB") -- reset all addon settings
+	self:RegisterChatCommand("resetpositions", "ResetSavedPositions") -- reset all addon saved positions
 	self:RegisterChatCommand("azerite", "OnChatCommand") -- settings
 	self:RegisterChatCommand("az", "OnChatCommand") -- settings shorthand
 end
