@@ -38,13 +38,13 @@ The full and proper graphical options menu is not yet ready! Until then we can c
 - 🔁 ActionBars  
   - ✅ Primary Bar  
     - ✅ Page Switching *(Stance/Possess/Vehicle)*  
-  - ✅ Bar 2  
-  - ✅ Bar 3  
-  - ✅ Bar 4  
-  - ✅ Bar 5  
-  - ✅ Bar 6  
-  - ✅ Bar 7  
-  - ✅ Bar 8  
+  - ✅ MultiBar 1  
+  - ✅ MultiBar 2  
+  - ✅ MultiBar 3  
+  - ✅ MultiBar 4  
+  - ✅ MultiBar 5  
+  - ✅ MultiBar 6  
+  - ✅ MultiBar 7  
   - 🔳 Stance Bar  
   - 🔁 Pet Action Bar  
   - 🔳 Extra Abilities Bar  
