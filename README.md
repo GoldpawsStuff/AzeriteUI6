@@ -36,15 +36,15 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - ⛔ Incoming Heals *(texcoord operation blocked by secrets)*  
   - ✅ Movable/scalable UnitFrames  
 - 🔁 ActionBars  
-  - 🔁 Primary Bar  
+  - ✅ Primary Bar  
     - ✅ Page Switching *(Stance/Possess/Vehicle)*  
-  - 🔁 Bar 2  
-  - 🔁 Bar 3  
-  - 🔁 Bar 4  
-  - 🔁 Bar 5  
-  - 🔁 Bar 6  
-  - 🔁 Bar 7  
-  - 🔁 Bar 8  
+  - ✅ Bar 2  
+  - ✅ Bar 3  
+  - ✅ Bar 4  
+  - ✅ Bar 5  
+  - ✅ Bar 6  
+  - ✅ Bar 7  
+  - ✅ Bar 8  
   - 🔳 Stance Bar  
   - 🔁 Pet Action Bar  
   - 🔳 Extra Abilities Bar  
@@ -52,6 +52,7 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - 🔳 Encounter Bar  
   - 🚫 ~~Possess Bar~~ *(using primary bar paging)*  
   - 🔳 Micro Menu  
+  - ✅ Movable/scalable ActionBars  
 - 🔳 Player Buffs & Debuffs  
 - 🔳 Chat Frames *(styling)*  
   - 🔳 Background Removal  
@@ -63,8 +64,13 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - 🔳 Grouptype banners  
   - 🔳 Mail Frame
   - 🔳 Exit Flight Button
+- 🔁 Chat Commands  
+  - ✅ ActionBar toggles
+  - 🔳 UnitFrame toggles
+  - ✅ Full positions reset
+  - ✅ Full settings reset
+- 🔳 Movable Frames Menu  
 - 🔳 Options Menu  
-- ✅ Movable UnitFrames Menu  
 
 ✅ = Finished  
 🔁 = In progress  
