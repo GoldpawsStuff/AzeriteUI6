@@ -552,36 +552,8 @@ ActionBar.UpdateVisibilityDriver = function(self)
 
 	local visdriver
 
-	local config = self.config
-	if (config.enabled) then
-
+	if (self.config.enabled) then
 		visdriver = "[petbattle]hide;"
-
-		if (config.visibility.possess) then
-			visdriver = visdriver.."[possessbar]show;"
-		else
-			visdriver = visdriver.."[possessbar]hide;"
-		end
-
-		if (config.visibility.overridebar) then
-			visdriver = visdriver.."[overridebar]show;"
-		else
-			visdriver = visdriver.."[overridebar]hide;"
-		end
-
-		if (config.visibility.vehicleui) then
-			visdriver = visdriver.."[vehicleui]show;"
-		else
-			visdriver = visdriver.."[vehicleui]hide;"
-		end
-
-		if (config.visibility.dragon) then
-			visdriver = visdriver.."[bonusbar:5]show;"
-		else
-			visdriver = visdriver.."[bonusbar:5]hide;"
-		end
-
-		visdriver = visdriver.."show"
 	end
 
 	UnregisterStateDriver(self, "vis")

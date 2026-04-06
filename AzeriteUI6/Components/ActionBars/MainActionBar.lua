@@ -25,7 +25,7 @@
 --]]
 local _, ns = ...
 
-local MainActionBar = ns:NewModule("MainActionBar", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
+local MainActionBarMod = ns:NewModule("MainActionBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { 
@@ -56,18 +56,52 @@ local defaults = {
 	}
 }
 
-MainActionBar.GetBar = function(self)
+local MainActionBar = {}
+
+MainActionBar.UpdateVisibilityDriver = function(self)
+	if (InCombatLockdown()) then return end
+
+	local visdriver
+
+	if (self.config.enabled) then
+		visdriver = "[petbattle]hide;"
+		visdriver = visdriver.."[possessbar]show;"
+		--visdriver = visdriver.."[possessbar]hide;"
+		visdriver = visdriver.."[overridebar]show;" 
+		--visdriver = visdriver.."[overridebar]hide;"
+		visdriver = visdriver.."[vehicleui]show;" -- vehicle ui
+		--visdriver = visdriver.."[vehicleui]hide;"
+		--visdriver = visdriver.."[target=vehicle,exists]show;" -- vehicle passenger
+		visdriver = visdriver.."[bonusbar:5,mounted]show;" -- dragonriding
+		--visdriver = visdriver.."[bonusbar:5]hide;" 
+		visdriver = visdriver.."show"
+	end
+
+	UnregisterStateDriver(self, "vis")
+	self:SetAttribute("state-vis", "0")
+	RegisterStateDriver(self, "vis", visdriver or "hide")
+
+end
+
+MainActionBarMod.GetBar = function(self)
 	if (not self.Bar) then 
 		local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
 		bar:SetScale(.9) -- default scale
 		bar:SetPoint("BOTTOMLEFT", 60/.9, 42/.9) -- default position
-		bar:Update() -- update size and layout
+
+		-- Overwrite some default methods with our own
+		for name,method in pairs(MainActionBar) do
+			bar[name] = method
+		end
+
+		bar:Update() 
+
 		self.Bar = bar
 	end
 	return self.Bar
 end
 
-MainActionBar.ReassignBindings = function(self)
+MainActionBarMod.ReassignBindings = function(self)
 	if (self.Bar) then
 		self.Bar:UpdateBindings()
 	end
@@ -75,19 +109,20 @@ end
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
-MainActionBar.UpdateSettings = function(self)
+MainActionBarMod.UpdateSettings = function(self)
 	if (self.Bar) then
-		self.Bar:UpdateBindings()
+		--self.Bar:UpdateBindings()
+		self.Bar:Update()
 	end
 end
 
 -- This is called by the addon on full profile changes,
 -- and should call a full settings update.
-MainActionBar.RefreshConfig = function(self)
+MainActionBarMod.RefreshConfig = function(self)
 	self:UpdateSettings()
 end
 
-MainActionBar.OnInitialize = function(self)
+MainActionBarMod.OnInitialize = function(self)
 	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
 
 	self.db = ns.db:RegisterNamespace("MainActionBar", defaults)
@@ -96,7 +131,7 @@ MainActionBar.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
-MainActionBar.OnEnable = function(self)
+MainActionBarMod.OnEnable = function(self)
 	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()

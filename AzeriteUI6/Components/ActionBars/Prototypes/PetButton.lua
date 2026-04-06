@@ -134,7 +134,7 @@ end
 
 local OnDragStart = function(self)
 	if (InCombatLockdown()) then return end
-	if (IsAltKeyDown() and IsControlKeyDown() or IsShiftKeyDown()) or (IsModifiedClick("PICKUPACTION")) then
+	if (IsModifiedClick("PICKUPACTION")) then
 		self:SetChecked(false)
 		PickupPetAction(self.id)
 		self:Update()
@@ -150,17 +150,8 @@ local OnReceiveDrag = function(self)
 	end
 end
 
-local OnDragStart = function(self)
-	if (InCombatLockdown()) then return end
-	if (IsAltKeyDown() and IsControlKeyDown() or IsShiftKeyDown()) or (IsModifiedClick("PICKUPACTION")) then
-		self:SetChecked(false)
-		PickupPetAction(self.id)
-		self:Update()
-	end
-end
-
-local PetButton = {} -- CreateFrame("CheckButton")
---local PetButton_MT = { __index = PetButton }
+local PetButton = CreateFrame("CheckButton")
+local PetButton_MT = { __index = PetButton }
 
 ns.PetButtons = {}
 
@@ -170,22 +161,13 @@ ns.PetActionButton.defaults = defaults
 
 ns.PetActionButton.Create = function(self, id, name, header)
 
-	--local button = setmetatable(CreateFrame("CheckButton", name, header, "PetActionButtonTemplate"), PetButton_MT)
-	local button = CreateFrame("CheckButton", name, header, "PetActionButtonTemplate")
+	local button = setmetatable(CreateFrame("CheckButton", name, header, "PetActionButtonTemplate"), PetButton_MT)
 	button.showgrid = 0
 	button.id = id
 	button.parent = header
 	button.config = ns:Copy(defaults)
 
-	-- Overwrite some default methods with our own
-	for name,method in pairs(PetButton) do
-		button[name] = method
-	end
-
 	button:SetFrameStrata("MEDIUM")
-
-	-- general size and click settings
-	--button:SetHitRectInsets(-10, -10, -10, -10)
 	button:SetSize(header.buttonWidth, header.buttonHeight)
 
 
@@ -253,7 +235,10 @@ PetButton.Update = function(self)
 			--if (self.StopFlash) then
 			--	self:StopFlash()
 			--end
-			self:GetCheckedTexture():SetAlpha(1.0)
+			local checked = self:GetCheckedTexture()
+			if (checked) then
+				checked:SetAlpha(1.0)
+			end
 		end
 		--self:SetChecked(not self.parent.config.hideequipped)
 	else
@@ -284,15 +269,6 @@ PetButton.Update = function(self)
 	end
 	self:UpdateCooldown()
 	self:UpdateHotkeys()
-end
-
-PetButton.GetTexture = function(self)
-	local name, texture = GetPetActionInfo(self.id)
-	return name and texture
-end
-
-PetButton.HasAction = function(self)
-	return GetPetActionInfo(self.id)
 end
 
 PetButton.UpdateCooldown = function(self)

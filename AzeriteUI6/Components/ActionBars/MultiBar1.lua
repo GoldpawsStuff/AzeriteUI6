@@ -25,7 +25,7 @@
 --]]
 local _, ns = ...
 
-local MultiBar1 = ns:NewModule("MultiBar1", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
+local MultiBar1 = ns:NewModule("MultiBar1", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { 
@@ -64,7 +64,8 @@ end
 -- and by the modules themselves on enabling and combat end.
 MultiBar1.UpdateSettings = function(self)
 	if (self.Bar) then
-		self.Bar:UpdateBindings()
+		--self.Bar:UpdateBindings()
+		self.Bar:Update()
 	end
 end
 

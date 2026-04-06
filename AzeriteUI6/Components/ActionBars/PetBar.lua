@@ -25,13 +25,13 @@
 --]]
 local _, ns = ...
 
-local PetBar = ns:NewModule("PetBar", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
+local PetBar = ns:NewModule("PetBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 local KeyBound = LibStub("LibKeyBound-1.0")
 
 -- Declare module defaults
 local defaults = { 
 	profile = {
-		enabled = false, -- true,
+		enabled = true, 
 
 		layout = "grid", -- <grid, zigzag>
 		layoutGridSize = NUM_PET_ACTION_SLOTS, -- when to start a new grid row
@@ -44,14 +44,15 @@ local defaults = {
 		enableBarFading = true, -- whether to enable non-combat/hover button fading
 		fadeInCombat = false, -- whether to keep fading out even in combat
 		fadeFrom = 1, -- which button to start the button fading from
+		fadeButtonHitRects = { -4, -4, -4, -4 },
 
 		numbuttons = NUM_PET_ACTION_SLOTS, -- 10
-		visibility = {
-			dragon = true,
-			possess = true,
-			overridebar = true,
-			vehicleui = true
-		}
+		--visibility = {
+		--	dragon = true,
+		--	possess = true,
+		--	overridebar = true,
+		--	vehicleui = true
+		--}
 	}
 }
 
@@ -62,24 +63,27 @@ PetActionBar.CreateButton = function(self, id)
 	local name = "AZUI6_PetActionBarButton" .. id
 	local button = ns.PetActionButton:Create(id, name, self)
 
-
-
 	return button
 end
 
 PetActionBar.OnEvent = function(self, event, arg1)
 	if (event == "PET_BAR_UPDATE" or (event == "UNIT_PET" and arg1 == "player") or event == "PET_UI_UPDATE" or event == "UPDATE_VEHICLE_ACTIONBAR") then
 		self:ForAll("Update")
+		self:UpdateFading()
+
 	elseif (event == "PLAYER_CONTROL_LOST" or event == "PLAYER_CONTROL_GAINED" or event == "PLAYER_FARSIGHT_FOCUS_CHANGED" or event == "PET_BAR_UPDATE_USABLE" or event == "PLAYER_TARGET_CHANGED" or event == "PLAYER_MOUNT_DISPLAY_CHANGED" ) then
 		self:ForAll("Update")
+
 	elseif ((event == "UNIT_FLAGS") or (event == "UNIT_AURA") ) then
-		if arg1 == "pet" then
+		if (arg1 == "pet") then
 			self:ForAll("Update")
 		end
 	elseif (event =="PET_BAR_UPDATE_COOLDOWN" ) then
 		self:ForAll("UpdateCooldown")
+
 	elseif (event == "PET_BAR_SHOWGRID") then
 		self:ForAll("ShowGrid")
+
 	elseif (event == "PET_BAR_HIDEGRID") then
 		self:ForAll("HideGrid")
 	end
@@ -88,21 +92,21 @@ end
 PetActionBar.Enable = function(self)
 	if (InCombatLockdown()) then return end
 	self.enabled = true
-	self:RegisterEvent("PLAYER_CONTROL_LOST")
-	self:RegisterEvent("PLAYER_CONTROL_GAINED")
-	self:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
-	self:RegisterEvent("UNIT_PET")
-	self:RegisterEvent("UNIT_FLAGS")
-	self:RegisterEvent("PET_BAR_UPDATE")
-	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
-	self:RegisterEvent("PET_BAR_UPDATE_USABLE")
-	self:RegisterEvent("PET_UI_UPDATE")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	self:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
-	self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
-	self:RegisterUnitEvent("UNIT_AURA", "pet")
-	self:RegisterEvent("PET_BAR_SHOWGRID")
-	self:RegisterEvent("PET_BAR_HIDEGRID")
+	self:RegisterEvent("PLAYER_CONTROL_LOST", "OnEvent")
+	self:RegisterEvent("PLAYER_CONTROL_GAINED", "OnEvent")
+	self:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED", "OnEvent")
+	self:RegisterEvent("UNIT_PET", "OnEvent")
+	self:RegisterEvent("UNIT_FLAGS", "OnEvent")
+	self:RegisterEvent("PET_BAR_UPDATE", "OnEvent")
+	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "OnEvent")
+	self:RegisterEvent("PET_BAR_UPDATE_USABLE", "OnEvent")
+	self:RegisterEvent("PET_UI_UPDATE", "OnEvent")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED", "OnEvent")
+	self:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", "OnEvent")
+	self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED", "OnEvent")
+	self:RegisterEvent("UNIT_AURA", "OnEvent")
+	self:RegisterEvent("PET_BAR_SHOWGRID", "OnEvent")
+	self:RegisterEvent("PET_BAR_HIDEGRID", "OnEvent")
 end
 
 PetActionBar.Disable = function(self)
@@ -156,14 +160,13 @@ end
 PetActionBar.UpdateFading = function(self)
 	if (self.config.enabled and self.config.enableBarFading) then
 		for id,button in next,self.buttons do
-
 			-- remove any previous fade registrations
 			PetBar:UnregisterFrameForFading(button)
 
 			-- register current fade for selected buttons
 			if (id >= self.config.fadeFrom) then
 				local button = self.buttons[id]
-				if (button:GetTexture()) then
+				if (GetPetActionInfo(button.id)) then 
 					PetBar:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "petactionbuttons", unpack(self.config.fadeButtonHitRects))
 				else
 					-- update button?
@@ -176,7 +179,7 @@ PetActionBar.UpdateFading = function(self)
 			PetBar:UnregisterFrameForFading(button)
 
 			-- whyever did I add this?
-			if (not button:GetTexture()) then
+			if (not GetPetActionInfo(button.id)) then
 				-- update button?
 			end
 		end
@@ -388,6 +391,22 @@ PetActionBar.UpdateButtonLayout = function(self)
 	end
 end
 
+PetActionBar.UpdateButtonFlags = function(self)
+	self.isDragonRiding = self:GetAttribute("isdragonriding")
+	self.hasVehicleBar = self:GetAttribute("hasvehiclebar")
+	self.hasOverrideBar = self:GetAttribute("hasoverridebar")
+	self.hasTempShapeshiftBar = self:GetAttribute("hastempshapeshiftbar")
+	self.hasPossessBar = self:GetAttribute("haspossessbar")
+
+	for id,button in next,self.buttons do
+		button.isDragonRiding = self.isDragonRiding
+		button.hasVehicleBar = self.hasVehicleBar
+		button.hasOverrideBar = self.hasOverrideBar
+		button.hasTempShapeshiftBar = self.hasTempShapeshiftBar
+		button.hasPossessBar = self.hasPossessBar
+	end
+end
+
 PetActionBar.UpdateBindings = function(self)
 	if (InCombatLockdown()) then return end
 	if (not next(self.buttons)) then return end
@@ -411,49 +430,22 @@ PetActionBar.UpdateVisibilityDriver = function(self)
 	if (InCombatLockdown()) then return end
 
 	local visdriver
-
-	local config = self.config
-	if (config.enabled) then
-
-		visdriver = "[petbattle]hide;"
-
-		if (config.visibility.possess) then
-			visdriver = visdriver.."[possessbar]show;"
-		else
-			visdriver = visdriver.."[possessbar]hide;"
-		end
-
-		if (config.visibility.overridebar) then
-			visdriver = visdriver.."[overridebar]show;"
-		else
-			visdriver = visdriver.."[overridebar]hide;"
-		end
-
-		if (config.visibility.vehicleui) then
-			visdriver = visdriver.."[vehicleui]show;"
-		else
-			visdriver = visdriver.."[vehicleui]hide;"
-		end
-
-		if (config.visibility.dragon) then
-			visdriver = visdriver.."[bonusbar:5]show;"
-		else
-			visdriver = visdriver.."[bonusbar:5]hide;"
-		end
-
-		visdriver = visdriver.."show"
+	if (self.config.enabled) then
+		visdriver = "[petbattle]hide;" -- pet battles
+		visdriver = visdriver .. "[mounted]hide;" -- "[bonusbar:5]hide;" -- dragonriding
+		visdriver = visdriver .. "[@pet,exists]show;" -- not dragonriding, pet exists
+		visdriver = visdriver .. "hide" -- no pet
 	end
 
 	UnregisterStateDriver(self, "vis")
 	self:SetAttribute("state-vis", "0")
-	RegisterStateDriver(self, "vis", visdriver or "hide")
+	RegisterStateDriver(self, "vis", self.config.enabled and visdriver or "hide")
 end
 
 
 
 PetBar.GetBar = function(self)
 	if (not self.Bar) then 
-		local bar -- = ns.ActionBar:Create(1, self.db.profile, "AZUI6_PetActionBar")
 		local bar = setmetatable(CreateFrame("Frame", "AZUI6_PetActionBar", UIParent, "SecureHandlerStateTemplate"), PetActionBar_MT)
 
 		bar.config = self.db.profile
@@ -477,7 +469,75 @@ PetBar.GetBar = function(self)
 		bar:SetScale(.9) -- default scale
 		bar:SetPoint("BOTTOM", 0, 220/.9) -- default position
 
-		bar:Update() -- update size and layout
+		bar:SetAttribute("UpdateVisibility", [[
+			local visibility = self:GetAttribute("visibility");
+			local userhidden = self:GetAttribute("userhidden");
+			if (visibility == "show") then
+				if (userhidden) then
+					self:Hide();
+				else
+					self:Show();
+				end
+			elseif (visibility == "hide") then
+				self:Hide();
+			end
+		]])
+
+		bar:SetAttribute("_onstate-vis", [[
+			if (not newstate) then
+				return
+			end
+			self:SetAttribute("visibility", newstate);
+			self:RunAttribute("UpdateVisibility");
+		]])
+
+		bar:SetAttribute("_onstate-page", [[
+			local hasVehicleBar, hasOverrideBar, hasTempShapeshiftBar, hasPossessBar, isDragonRiding;
+
+			if (newstate == "possess" or newstate == "dragon" or newstate == "11") then
+				if HasVehicleActionBar() then
+					newstate = GetVehicleBarIndex();
+					hasVehicleBar = true;
+
+				elseif HasOverrideActionBar() then
+					newstate = GetOverrideBarIndex();
+					hasOverrideBar = true;
+
+				elseif HasTempShapeshiftActionBar() then
+					newstate = GetTempShapeshiftBarIndex();
+					hasTempShapeshiftBar = true;
+
+				elseif HasBonusActionBar() then
+					newstate = GetBonusBarIndex();
+					if (GetBonusBarOffset() == 5) then
+						hasPossessBar = true;
+						if (IsMounted()) then
+							isDragonRiding = true;
+						end
+					end
+				else
+					newstate = nil;
+				end
+				if (not newstate) then
+					newstate = 12;
+				end
+			end
+
+			self:SetAttribute("isdragonriding", isDragonRiding);
+			self:SetAttribute("hasvehiclebar", hasVehicleBar);
+			self:SetAttribute("hasoverridebar", hasOverrideBar);
+			self:SetAttribute("hastempshapeshiftbar", hasTempShapeshiftBar);
+			self:SetAttribute("haspossessbar", hasPossessBar);
+
+			self:CallMethod("UpdateButtonFlags");
+
+			self:SetAttribute("state", newstate);
+			control:ChildUpdate("state", newstate);
+
+			self:CallMethod("UpdateFading");
+		]])
+
+		bar:Update() 
 
 		self.Bar = bar
 	end
@@ -495,7 +555,7 @@ end
 -- and by the modules themselves on enabling and combat end.
 PetBar.UpdateSettings = function(self)
 	if (self.Bar) then
-		self.Bar:UpdateBindings()
+		self.Bar:Update()
 	end
 end
 
@@ -512,7 +572,6 @@ PetBar.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-
 end
 
 PetBar.OnEnable = function(self)

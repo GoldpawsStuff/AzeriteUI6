@@ -242,6 +242,65 @@ ns.Import = function(self, encoded)
 	end
 end
 
+local barToMod = {
+	["bar1"] 		= "MainActionBar",
+	["bar2"] 		= "MultiBar1",
+	["bar3"] 		= "MultiBar2",
+	["bar4"] 		= "MultiBar3",
+	["bar5"] 		= "MultiBar4",
+	["bar6"] 		= "MultiBar5",
+	["bar7"] 		= "MultiBar6",
+	["bar8"] 		= "MultiBar7",
+	["1"] 			= "MainActionBar",
+	["2"] 			= "MultiBar1",
+	["3"] 			= "MultiBar2",
+	["4"] 			= "MultiBar3",
+	["5"] 			= "MultiBar4",
+	["6"] 			= "MultiBar5",
+	["7"] 			= "MultiBar6",
+	["8"] 			= "MultiBar7",
+	["pet"] 		= "PetBar",
+	["petbar"] 		= "PetBar",
+	["stance"] 		= "StanceBar",
+	["stancebar"] 	= "StanceBar",
+	["forms"] 		= "StanceBar",
+}
+
+local enablebar = function(barID)
+	print("enable <barID>", barID)
+	if (not barID or not barToMod[barID]) then return end
+	local mod = ns:GetModule(barToMod[barID], true)
+	if (mod) then
+		mod.db.profile.enabled = true
+		local bar = mod:GetBar()
+		if (bar) then bar:Update() end
+	end
+end
+
+local disablebar = function(barID)
+	print("disable <barID>", barID)
+	if (not barID or not barToMod[barID]) then return end
+	local mod = ns:GetModule(barToMod[barID], true)
+	if (mod) then
+		mod.db.profile.enabled = false
+		local bar = mod:GetBar()
+		if (bar) then bar:Update() end
+	end
+end
+
+ns.OnChatCommand = function(self, input)
+	local command, arg1, arg2 = self:GetArgs(string.lower(input), 3)
+	if (command == "enable") then
+		if (arg1 and barToMod[arg1]) then
+			enablebar(arg1)
+		end
+	elseif (command == "disable") then
+		if (arg1 and barToMod[arg1]) then
+			disablebar(arg1)
+		end
+	end
+end
+
 ns.RefreshConfig = function(self, event, ...)
 	if (event == "OnNewProfile") then
 		--local db, profileKey = ...
@@ -280,5 +339,6 @@ ns.OnInitialize = function(self)
 
 	self:RegisterChatCommand("lock", "ToggleFrameLocks") -- toggle movable frame anchors
 	self:RegisterChatCommand("resetsettings", "ResetSettings") -- reset all addon settings
-
+	self:RegisterChatCommand("azerite", "OnChatCommand") -- settings
+	self:RegisterChatCommand("az", "OnChatCommand") -- settings shorthand
 end
