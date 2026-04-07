@@ -22,8 +22,6 @@ The full and proper graphical options menu is not yet ready! Until then we can c
 - 🔁 UnitFrames  
   - 🔁 Player  
     - ⛔ Absorb Bar *(texcoord operation blocked by secrets)*  
-	- 🔁 ClassPower  
-	  - 🔁 Monk Stagger *(unverified)*  
   - ✅ Pet  
   - 🔁 Target  
   - ✅ Target of Target  
