@@ -23,7 +23,6 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - 🔁 Player  
     - ⛔ Absorb Bar *(texcoord operation blocked by secrets)*  
 	- 🔁 ClassPower  
-	  - 🔁 Death Knight Runes *(unverified)*  
 	  - 🔁 Monk Stagger *(unverified)*  
   - ✅ Pet  
   - 🔁 Target  
