@@ -37,7 +37,7 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - ✅ Movable/scalable UnitFrames  
 - 🔁 ActionBars  
   - ✅ Primary Bar  
-    - ✅ Page Switching *(Stance/Possess/Vehicle)*  
+    - ✅ Page Switching *(Stance/Possess/Vehicle/Etc)*  
   - ✅ MultiBar 1  
   - ✅ MultiBar 2  
   - ✅ MultiBar 3  
@@ -50,12 +50,12 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - 🔳 Extra Abilities Bar  
   - 🔳 Zone Abilities Bar  
   - 🔳 Encounter Bar  
-  - 🚫 ~~Possess Bar~~ *(using primary bar paging)*  
+  - 🚫 ~~Possess Bar~~ *(implemented through primary bar paging)*  
   - 🔳 Micro Menu  
   - ✅ Movable/scalable ActionBars  
 - 🔳 Player Buffs & Debuffs  
 - 🔳 Chat Frames *(styling)*  
-  - 🔳 Background Removal  
+  - 🔳 Background removal/transparency  
   - 🔳 Hover functionality for clutter  
 - 🔁 Minimap  
   - ✅ Border  
