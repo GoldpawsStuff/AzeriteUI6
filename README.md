@@ -4,7 +4,7 @@ Do to the enormous changes in the WoW API in the Midnight expansion from WoW Ret
 
 If you choose to download and manually install directly from GitHub, you'll need to additionally install the Ace3 libraries and the oUF framework as addons:  
 - [Ace3](https://www.curseforge.com/wow/addons/ace3)
-- [oUF](www.curseforge.com/wow/addons/ouf)
+- [oUF](https://www.curseforge.com/wow/addons/ouf)
 
 ## Configuring the UI
 The full and proper graphical options menu is not yet ready! Until then we can configure the user interface with the chat commands listed below.  
