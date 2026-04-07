@@ -17,7 +17,9 @@
 	@end-non-debug@-->
 	<Include  file="LibKeybound-1.0\lib.xml"/>
 	<Include  file="UTF8\utf8.xml"/>
+	<!--@non-debug@
 	<Include file="oUF\oUF.xml"/>
+	@end-non-debug@-->
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
 	<Script file="LibDeflate\LibDeflate.lua"/>
 	<Script file="LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>

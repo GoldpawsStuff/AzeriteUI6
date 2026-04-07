@@ -24,7 +24,7 @@
 
 --]]
 local _, ns = ...
-local oUF = ns.oUF
+local oUF = ns.oUF or oUF
 
 local KeyBound = LibStub("LibKeyBound-1.0", true)
 local LAB = LibStub("LibActionButton-1.0")

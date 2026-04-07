@@ -27,7 +27,7 @@ local _, ns = ...
 
 -- We're just going to piggyback on oUF's color table
 -- for all colors in the entire user interface.
-local oUF = ns.oUF
+local oUF = ns.oUF or oUF
 
 -- general interface colors
 oUF.colors.normal = oUF:CreateColor(229, 178, 38)

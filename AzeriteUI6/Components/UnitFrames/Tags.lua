@@ -24,7 +24,7 @@
 
 --]]
 local _, ns = ...
-local oUF = ns.oUF
+local oUF = ns.oUF or oUF
 
 -- Utility function to turn 'true','false' and 'nil' as text into actual booleans.
 local getargs = function(...)

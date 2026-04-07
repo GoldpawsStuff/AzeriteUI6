@@ -24,7 +24,7 @@
 
 --]]
 local _, ns = ...
-local oUF = ns.oUF
+local oUF = ns.oUF or oUF
 
 local ToT = ns:NewModule("ToT", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 

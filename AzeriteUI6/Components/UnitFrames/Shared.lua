@@ -24,7 +24,7 @@
 
 --]]
 local _, ns = ...
-local oUF = ns.oUF
+local oUF = ns.oUF or oUF
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
