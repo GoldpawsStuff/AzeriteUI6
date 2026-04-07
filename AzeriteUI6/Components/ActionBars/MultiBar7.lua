@@ -88,7 +88,7 @@ MultiBar7.OnInitialize = function(self)
 end
 
 MultiBar7.OnEnable = function(self)
-	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 3)), "actionbars", AzeriteUI6_Positions_DB)
+	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 8)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()
 end
