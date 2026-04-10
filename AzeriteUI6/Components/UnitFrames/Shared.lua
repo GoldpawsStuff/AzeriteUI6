@@ -178,6 +178,25 @@ ns.ApplyUnitFrameScriptsTo = function(frame)
 	frame:SetScript("OnLeave", OnLeave)
 end
 
+ns.AreUnitsSame = function(u1, u2)
+	local g1 = UnitGUID(u1)
+	local g2 = UnitGUID(u2)
+
+	-- Bail if different secrecy levels (can't be equal, avoids mixed == error)
+	if (issecretvalue(g1) ~= issecretvalue(g2)) then
+		return false
+	end
+
+	-- Now appears to create problems if both are secret too?
+	-- *"attempt to compare local 'g1' (a secret string value tainted by..."
+	if (issecretvalue(g1) and issecretvalue(g2)) then
+		return false
+	end
+
+	-- Now safe: both non-secret or both secret
+	return g1 == g2 
+end
+
 ns.UpdateHealthColor = function(self, event, unit)
 	if(not unit or self.unit ~= unit) then return end
 	local element = self.Health
@@ -187,13 +206,8 @@ ns.UpdateHealthColor = function(self, event, unit)
 		color = self.colors.disconnected
 	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		color = self.colors.tapped
-	elseif(element.colorThreat and not UnitPlayerControlled(unit) and UnitThreatSituation('player', unit)) then
-		local threat = UnitThreatSituation('player', unit)
-		if(issecretvalue(threat)) then
-			color = GetThreatStatusColor(status)
-		else
-			color =  self.colors.threat[threat]
-		end
+	elseif(element.colorThreat and not UnitPlayerControlled(unit) and UnitThreatSituation('player', unit) and not issecretvalue(UnitThreatSituation('player', unit))) then
+		color =  self.colors.threat[UnitThreatSituation('player', unit)]
 	elseif(element.colorClass and (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
 		or (element.colorClassNPC and not (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
 		or (element.colorClassPet and UnitPlayerControlled(unit) and not UnitIsPlayer(unit)) then

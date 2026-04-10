@@ -35,6 +35,7 @@ local defaults = { profile = {} }
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
+local AreUnitsSame = ns.AreUnitsSame
 
 -- Function to create an alpha curve based on min/max values.
 -- Useful to hide elements when at (almost) zero.
@@ -44,20 +45,6 @@ local createAlphaCurve = function(min, max)
 	alphaCurve:AddPoint(0, CreateColor(1, 1, 1, min or 0)) -- At 0%: alpha=<min> (hide)
 	alphaCurve:AddPoint(.01, CreateColor(1, 1, 1, max or 1)) -- At 1%+: alpha=<max> (show)
 	return alphaCurve
-end
-
--- Safely compare units
-local AreUnitsSame = function(u1, u2)
-	local g1 = UnitGUID(u1)
-	local g2 = UnitGUID(u2)
-
-	-- Bail if different secrecy levels (can't be equal, avoids mixed == error)
-	if (issecretvalue(g1) ~= issecretvalue(g2)) then
-		return false
-	end
-
-	-- Now safe: both non-secret or both secret
-	return g1 == g2
 end
 
 -- Toggle cast text color on protected casts.

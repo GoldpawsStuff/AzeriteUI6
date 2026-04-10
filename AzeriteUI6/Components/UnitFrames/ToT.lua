@@ -40,20 +40,7 @@ local defaults = {
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
-
--- Safely compare units
-local AreUnitsSame = function(u1, u2)
-	local g1 = UnitGUID(u1)
-	local g2 = UnitGUID(u2)
-
-	-- Bail if different secrecy levels (can't be equal, avoids mixed == error)
-	if (issecretvalue(g1) ~= issecretvalue(g2)) then
-		return false
-	end
-
-	-- Now safe: both non-secret or both secret
-	return g1 == g2
-end
+local AreUnitsSame = ns.AreUnitsSame
 
 -- Update targeting highlight outline
 local TargetHighlight_PostUpdate = function(self, event, unit, ...)
@@ -141,7 +128,7 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 	self.Health.Backdrop = healthBackdrop
-	self.Health.UpdateColor = ns.UpdateHealthColor -- can often be secret on this frame(?)
+	self.Health.UpdateColor = ns.UpdateHealthColor -- work around secret bug in oUF
 
 	-- Cast bar
 	--------------------------------------------

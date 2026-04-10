@@ -447,18 +447,31 @@ ActionBar.UpdateButtonLayout = function(self)
 end
 
 ActionBar.UpdateButtonFlags = function(self)
+
+	-- Retrieve button flags from the secure environment,
+	-- apply them to the bar object,
 	self.isDragonRiding = self:GetAttribute("isdragonriding")
 	self.hasVehicleBar = self:GetAttribute("hasvehiclebar")
 	self.hasOverrideBar = self:GetAttribute("hasoverridebar")
 	self.hasTempShapeshiftBar = self:GetAttribute("hastempshapeshiftbar")
 	self.hasPossessBar = self:GetAttribute("haspossessbar")
 
+	-- Apply them to each button too
 	for id,button in next,self.buttons do
 		button.isDragonRiding = self.isDragonRiding
 		button.hasVehicleBar = self.hasVehicleBar
 		button.hasOverrideBar = self.hasOverrideBar
 		button.hasTempShapeshiftBar = self.hasTempShapeshiftBar
 		button.hasPossessBar = self.hasPossessBar
+
+		-- Dumb hack to avoid some of the "empty" yet visible buttons
+		-- on direct logins or reloads during combat.
+		if (button.isDragonRiding and 	button.id > 7)
+		or (button.hasOverrideBar and 	button.id > NUM_OVERRIDE_BUTTONS)
+		or (button.hasPossessBar and 	button.id > NUM_POSSESS_SLOTS)
+		then
+			button:SetAlpha(0)
+		end
 	end
 end
 
