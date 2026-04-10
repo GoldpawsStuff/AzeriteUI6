@@ -392,6 +392,7 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 	self.Health.Texture = healthTex
+	self.Health.UpdateColor = ns.UpdateHealthColor
 	self.Health.PostUpdateColor = Health_PostUpdateColor
 
 	-- Apply scripts that update our reversed bar texture.

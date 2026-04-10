@@ -177,3 +177,55 @@ ns.ApplyUnitFrameScriptsTo = function(frame)
 	frame:SetScript("OnEnter", OnEnter)
 	frame:SetScript("OnLeave", OnLeave)
 end
+
+ns.UpdateHealthColor = function(self, event, unit)
+	if(not unit or self.unit ~= unit) then return end
+	local element = self.Health
+
+	local color
+	if(element.colorDisconnected and not UnitIsConnected(unit)) then
+		color = self.colors.disconnected
+	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
+		color = self.colors.tapped
+	elseif(element.colorThreat and not UnitPlayerControlled(unit) and UnitThreatSituation('player', unit)) then
+		local threat = UnitThreatSituation('player', unit)
+		if(issecretvalue(threat)) then
+			color = GetThreatStatusColor(status)
+		else
+			color =  self.colors.threat[threat]
+		end
+	elseif(element.colorClass and (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
+		or (element.colorClassNPC and not (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
+		or (element.colorClassPet and UnitPlayerControlled(unit) and not UnitIsPlayer(unit)) then
+		local _, class = UnitClass(unit)
+		color = self.colors.class[class]
+	elseif(element.colorSelection and unitSelectionType(unit, element.considerSelectionInCombatHostile)) then
+		color = self.colors.selection[unitSelectionType(unit, element.considerSelectionInCombatHostile)]
+	elseif(element.colorReaction and UnitReaction(unit, 'player')) then
+		color = self.colors.reaction[UnitReaction(unit, 'player')]
+	elseif(element.colorSmooth and self.colors.health:GetCurve()) then
+		color = element.values:EvaluateCurrentHealthPercent(self.colors.health:GetCurve())
+	elseif(element.colorHealth) then
+		color = self.colors.health
+	end
+
+	if(color) then
+		if (issecretvalue(color)) then
+			element:SetStatusBarColor(color[1], color[2], color[3])
+			return
+		else
+			element:SetStatusBarColor(color:GetRGB())
+		end
+	end
+
+	--[[ Callback: Health:PostUpdateColor(unit, color)
+	Called after the element color has been updated.
+
+	* self  - the Health element
+	* unit  - the unit for which the update has been triggered (string)
+	* color - the used ColorMixin-based object (table?)
+	--]]
+	if(element.PostUpdateColor) then
+		element:PostUpdateColor(unit, color)
+	end
+end

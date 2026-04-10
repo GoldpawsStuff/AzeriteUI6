@@ -126,7 +126,7 @@ oUF.Tags.Events["azui:name"] = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
 oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
 	local name = oUF.Tags.Methods["name"](unit, realUnit)
 	local length = tonumber(getargs(...))
-	if (length) then
+	if (length and not issecretvalue(name)) then
 		return name:utf8sub(1, length)
 	else
 		return name

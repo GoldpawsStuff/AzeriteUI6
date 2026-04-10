@@ -201,6 +201,7 @@ oUF.colors.selection[oUF.Enum.SelectionType.PartyPvPInBattleground] = oUF:Create
 oUF.colors.selection[oUF.Enum.SelectionType.RecentAlly] = oUF:CreateColor(83, 201, 255)
 
 -- threat coloring
+-- *are these a source of secrecy violations? 
 oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
 oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
 oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro

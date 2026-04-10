@@ -19,6 +19,7 @@
 	<Script file="ActionBars\StanceBar.lua"/>
 
 	<!-- Chat -->
+	<Script file="Chat\ChatFrames.lua"/>
 
 	<!-- Minimap -->
 	<Script file="Minimap\Minimap.lua"/>

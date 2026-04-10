@@ -141,6 +141,7 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 	self.Health.Backdrop = healthBackdrop
+	self.Health.UpdateColor = ns.UpdateHealthColor -- can often be secret on this frame(?)
 
 	-- Cast bar
 	--------------------------------------------
