@@ -467,6 +467,8 @@ ActionBar.UpdateButtonFlags = function(self)
 		-- on direct logins or reloads during combat.
 		-- Very questionable if this is a good place to do this, 
 		-- considering this method is only meant to set flags.
+		-- Also, the reason for the problem to begin with is probably 
+		-- my forcefully added border layer. I add something, I have to raise it. 
 		if (button.isDragonRiding and 	button.id > 7)
 		or (button.hasOverrideBar and 	button.id > NUM_OVERRIDE_BUTTONS)
 		or (button.hasPossessBar and 	button.id > NUM_POSSESS_SLOTS)
