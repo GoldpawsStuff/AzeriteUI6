@@ -447,7 +447,6 @@ ActionBar.UpdateButtonLayout = function(self)
 end
 
 ActionBar.UpdateButtonFlags = function(self)
-
 	-- Retrieve button flags from the secure environment,
 	-- apply them to the bar object,
 	self.isDragonRiding = self:GetAttribute("isdragonriding")
@@ -466,6 +465,8 @@ ActionBar.UpdateButtonFlags = function(self)
 
 		-- Dumb hack to avoid some of the "empty" yet visible buttons
 		-- on direct logins or reloads during combat.
+		-- Very questionable if this is a good place to do this, 
+		-- considering this method is only meant to set flags.
 		if (button.isDragonRiding and 	button.id > 7)
 		or (button.hasOverrideBar and 	button.id > NUM_OVERRIDE_BUTTONS)
 		or (button.hasPossessBar and 	button.id > NUM_POSSESS_SLOTS)
