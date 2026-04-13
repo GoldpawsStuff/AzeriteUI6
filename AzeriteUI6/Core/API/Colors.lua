@@ -202,10 +202,10 @@ oUF.colors.selection[oUF.Enum.SelectionType.RecentAlly] = oUF:CreateColor(83, 20
 
 -- threat coloring
 -- *are these a source of secrecy violations? 
-oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
-oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
-oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro
-oUF.colors.threat[3] = oUF.colors.reaction[1] -- securely tanking, or totally fucked :)
+--oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
+--oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
+--oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro
+--oUF.colors.threat[3] = oUF.colors.reaction[1] -- securely tanking, or totally fucked :)
 
 -- power colors
 oUF.colors.power.MANA = oUF:CreateColor(80, 116, 255)

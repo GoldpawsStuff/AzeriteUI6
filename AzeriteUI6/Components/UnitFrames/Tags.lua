@@ -134,7 +134,7 @@ oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
 end
 
 -- Show level when appropriate
--- self:Tag(fontString, "[azui:level(reversed)]")
+-- self:Tag(fontString, "[azui:level(showLast)]")
 oUF.Tags.Events["azui:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
 oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 	local level = UnitEffectiveLevel(realUnit or unit)

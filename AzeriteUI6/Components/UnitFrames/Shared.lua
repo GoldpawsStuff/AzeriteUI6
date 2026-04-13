@@ -207,7 +207,7 @@ ns.UpdateHealthColor = function(self, event, unit)
 	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		color = self.colors.tapped
 	elseif(element.colorThreat and not UnitPlayerControlled(unit) and UnitThreatSituation('player', unit) and not issecretvalue(UnitThreatSituation('player', unit))) then
-		color =  self.colors.threat[UnitThreatSituation('player', unit)]
+		color = self.colors.threat[UnitThreatSituation('player', unit)]
 	elseif(element.colorClass and (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
 		or (element.colorClassNPC and not (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
 		or (element.colorClassPet and UnitPlayerControlled(unit) and not UnitIsPlayer(unit)) then
