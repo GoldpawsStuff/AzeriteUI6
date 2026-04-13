@@ -201,11 +201,18 @@ oUF.colors.selection[oUF.Enum.SelectionType.PartyPvPInBattleground] = oUF:Create
 oUF.colors.selection[oUF.Enum.SelectionType.RecentAlly] = oUF:CreateColor(83, 201, 255)
 
 -- threat coloring
--- *are these a source of secrecy violations? 
---oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
---oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
---oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro
---oUF.colors.threat[3] = oUF.colors.reaction[1] -- securely tanking, or totally fucked :)
+-- Unit has less than 100% threat for mobUnit. The default UI shows no indicator.
+-- *default coloring would be gray for this, we changed it to yellow
+oUF.colors.threat[0] = oUF.colors.reaction[4] -- not really on the threat table
+
+-- Unit has higher than 100% threat for mobUnit, but isn't the primary target. The default UI shows a yellow indicator.
+oUF.colors.threat[1] = oUF.colors.reaction[3] -- tanks having lost threat, dps overnuking
+
+-- Unit is the primary target for mobUnit, but another unit has higher than 100% threat. The default UI shows an orange indicator.
+oUF.colors.threat[2] = oUF.colors.reaction[2] -- tanks about to lose threat, dps getting aggro
+
+-- Unit is the primary target for mobUnit and no other unit has higher than 100% threat. The default UI shows a red indicator.
+oUF.colors.threat[3] = oUF.colors.reaction[1] -- securely tanking, or totally fucked :)
 
 -- power colors
 oUF.colors.power.MANA = oUF:CreateColor(80, 116, 255)

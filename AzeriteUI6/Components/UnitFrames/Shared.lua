@@ -224,12 +224,7 @@ ns.UpdateHealthColor = function(self, event, unit)
 	end
 
 	if(color) then
-		if (issecretvalue(color)) then
-			element:SetStatusBarColor(color[1], color[2], color[3])
-			return
-		else
-			element:SetStatusBarColor(color:GetRGB())
-		end
+		element:SetStatusBarColor(color:GetRGB())
 	end
 
 	--[[ Callback: Health:PostUpdateColor(unit, color)

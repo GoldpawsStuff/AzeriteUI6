@@ -128,7 +128,12 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Value = healthValue
 	self.Health.Backdrop = healthBackdrop
-	self.Health.UpdateColor = ns.UpdateHealthColor -- work around secret bug in oUF
+
+	-- work around secret bug in oUF
+	-- *threat appears to be a secret on this particular unit(?), 
+	--  and thus cannot be used to index the threat color table.
+	--  Is this an issue for all eventless units? 
+	self.Health.UpdateColor = ns.UpdateHealthColor
 
 	-- Cast bar
 	--------------------------------------------
