@@ -8,10 +8,16 @@
 	<Script file="API\Numbers.lua"/>
 	<Script file="API\Tables.lua"/>
 
+	<!-- Will replace later -->
+	<Include file="Dialogs\Dialogs.xml"/>
+
 	<!-- Core of this UI -->
 	<Script file="Core.lua"/>
 
-	<!-- Will replace later -->
-	<Include file="Dialogs\Dialogs.xml"/>
+	<!-- Immersive fading system -->
+	<Script file="ExplorerMode.lua"/>
+
+	<!-- Add our media to SharedMedia -->
+	<Script file="SharedMedia.lua"/>
 	
 </Ui>
