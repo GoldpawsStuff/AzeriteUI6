@@ -31,7 +31,7 @@ local ChatFrames = ns:NewModule("ChatFrames", nil, "LibMoreEvents-1.0", "LibFadi
 local defaults = { profile = {
 	showClutter = false, -- always show buttons and tabs
 	fadeOnInactivity = true, -- blizz default is true
-	timeVisible = 20, -- 120, -- blizz default is 120
+	timeVisible = 6, -- our default 20, blizz default 120
 	timeFading = 3,
 	clearOnReload = true,
 	timeClearing = 1

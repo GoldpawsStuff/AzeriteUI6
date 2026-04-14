@@ -52,23 +52,30 @@ The full and proper graphical options menu is not yet ready! Until then we can c
   - 🔳 Micro Menu  
   - ✅ Movable/scalable ActionBars  
 - 🔳 Player Buffs & Debuffs  
-- 🔳 Chat Frames *(styling)*  
-  - 🔳 Background removal/transparency  
-  - 🔳 Hover functionality for clutter  
+- 🔁 Chat Frames *(styling)*  
+  - ✅ Background removal/transparency  
+  - ✅ Hover functionality for clutter  
 - 🔁 Minimap  
   - ✅ Border  
   - 🔳 Compass North tag  
   - 🔳 Groupfinder eye  
   - 🔳 Grouptype banners  
   - 🔳 Mail Frame
-  - 🔳 Exit Flight Button
+  - 🔳 Exit Flight Button  
 - 🔁 Chat Commands  
-  - ✅ ActionBar toggles
-  - 🔳 UnitFrame toggles
-  - ✅ Full positions reset
-  - ✅ Full settings reset
-- 🔳 Movable Frames Menu  
+  - ✅ ActionBar toggles  
+  - 🔳 UnitFrame toggles  
+  - ✅ Full positions reset ***/resetpositions***  
+  - ✅ Full settings reset ***/resetsettings***  
+- 🔳 Explorer Mode  
+  - 🔳 Chat Frames  
+  - 🔳 ActionBars  
+  - 🔳 UnitFrames  
+    - 🔳 Player UnitFrame  
+    - 🔳 Pet UnitFrame  
+	- 🔳 Group/Raid Tool  
 - 🔳 Options Menu  
+  - 🔳 Movable Frames ***/lock***  
 
 ✅ = Finished  
 🔁 = In progress  
