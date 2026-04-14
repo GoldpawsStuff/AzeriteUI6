@@ -28,4 +28,5 @@
 	<Script file="LibFadingFrames-1.0\LibFadingFrames-1.0.lua"/>
 	<Script file="LibMovableFrames-1.0\LibMovableFrames-1.0.lua"/>
 	<Script file="LibOrb-1.0\LibOrb-1.0.lua"/>
+	<Script file="LibSpinBar-1.0\LibSpinBar-1.0.lua"/>
 </Ui>

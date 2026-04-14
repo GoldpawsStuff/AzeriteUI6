@@ -2,7 +2,7 @@
 
 	The MIT License (MIT)
 
-	Copyright (c) 2025 Lars Norberg
+	Copyright (c) 2026 Lars Norberg
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibMoreEvents-1.0"
-local MINOR_VERSION = 4
+local MINOR_VERSION = 5
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")

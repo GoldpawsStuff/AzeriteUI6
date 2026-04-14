@@ -2,7 +2,7 @@
 
 	The MIT License (MIT)
 
-	Copyright (c) 2025 Lars Norberg
+	Copyright (c) 2026 Lars Norberg
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -24,18 +24,18 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 42
+local MINOR_VERSION = 43
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
 local LibMoreEvents = LibStub:GetLibrary("LibMoreEvents-1.0", true)
-assert(MAJOR_VERSION .. " requires LibMoreEvents-1.0.")
+assert(LibMoreEvents, MAJOR_VERSION .. " requires LibMoreEvents-1.0.")
 
 local AceTimer = LibStub:GetLibrary("AceTimer-3.0", true)
-assert(MAJOR_VERSION .. " requires AceTimer-3.0.")
+assert(AceTimer, MAJOR_VERSION .. " requires AceTimer-3.0.")
 
 local AceHook = LibStub:GetLibrary("AceHook-3.0", true)
-assert(MAJOR_VERSION .. " requires AceHook-3.0.")
+assert(AceHook, MAJOR_VERSION .. " requires AceHook-3.0.")
 
 local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if (not lib) then
