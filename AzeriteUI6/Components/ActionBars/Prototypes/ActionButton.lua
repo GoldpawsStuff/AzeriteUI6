@@ -150,11 +150,11 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button:SetState(0, "action", (header.id - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
 
 	-- Add in a vehicle exit button at slot 7 for the primary action bar.
-	if (header.id == 1 and button.id == 7) then
-		button:SetState(16, "custom", exitButton)
-		button:SetState(17, "custom", exitButton)
-		button:SetState(18, "custom", exitButton)
-	end
+	--if (header.id == 1 and button.id == 7) then
+	--	button:SetState(16, "custom", exitButton)
+	--	button:SetState(17, "custom", exitButton)
+	--	button:SetState(18, "custom", exitButton)
+	--end
 
 	-- general size and click settings
 	--button:SetHitRectInsets(-10, -10, -10, -10)
@@ -373,7 +373,25 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- prevents empty hovering buttons from appearing on initial login
 	-- when currently mounted/dragonriding or when using another bar with 
 	-- less than the standard 12 buttons.
-	button:SetAlpha(0)
+	--button:SetAlpha(0)
+	--button.setAlpha = button.SetAlpha
+	--button.SetAlpha = function(self, alpha)
+	--	if (self.header.id == 1) then 
+	--		if (C_ActionBar.HasOverrideActionBar()) then
+	--			return self:setAlpha(self.id > NUM_OVERRIDE_BUTTONS and 0 or alpha)
+	--		elseif (C_ActionBar.HasBonusActionBar() and C_ActionBar.GetBonusBarOffset() == 5) then
+	--			if (IsMounted()) then 
+	--				return self:setAlpha(self.id > NUM_OVERRIDE_BUTTONS and 0 or alpha)
+	--			else
+	--				return self:setAlpha(self.id > NUM_OVERRIDE_BUTTONS and 0 or alpha)
+	--			end
+	--		else
+	--			return self:setAlpha(alpha)
+	--		end
+	--	else
+	--		return self:setAlpha(alpha)
+	--	end
+	--end
 
 	ns.ActionButtons[button] = true
 

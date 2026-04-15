@@ -103,6 +103,8 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 	bar.buttons = {}
 	bar.buttonWidth = 64 -- why exactly are we storing it directly on the bar object?
 	bar.buttonHeight = 64
+
+	bar:SetAttribute("id", id)
 	
 	-- create buttons
 	for i = 1,NUM_ACTIONBAR_BUTTONS do
@@ -180,6 +182,19 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 
 		self:SetAttribute("state", newstate);
 		control:ChildUpdate("state", newstate);
+
+		-- ugly fix for overridebuttons > 6 showing
+		-- (these buttons are empty, overridebars only have 6 buttons)
+		if (self:GetAttribute("id") == 1) then 
+			for i = 7,12 do
+				local button = self:GetFrameRef("Button"..i);
+				if (hasOverrideBar) then
+					button:Hide();
+				else
+					button:Show();
+				end
+			end
+		end
 
 		self:CallMethod("UpdateFading");
 	]])
@@ -462,19 +477,6 @@ ActionBar.UpdateButtonFlags = function(self)
 		button.hasOverrideBar = self.hasOverrideBar
 		button.hasTempShapeshiftBar = self.hasTempShapeshiftBar
 		button.hasPossessBar = self.hasPossessBar
-
-		-- Dumb hack to avoid some of the "empty" yet visible buttons
-		-- on direct logins or reloads during combat.
-		-- Very questionable if this is a good place to do this, 
-		-- considering this method is only meant to set flags.
-		-- Also, the reason for the problem to begin with is probably 
-		-- my forcefully added border layer. I add something, I have to raise it. 
-		if (button.isDragonRiding and 	button.id > 7)
-		or (button.hasOverrideBar and 	button.id > NUM_OVERRIDE_BUTTONS)
-		or (button.hasPossessBar and 	button.id > NUM_POSSESS_SLOTS)
-		then
-			button:SetAlpha(0)
-		end
 	end
 end
 
