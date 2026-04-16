@@ -66,14 +66,10 @@ MainActionBar.UpdateVisibilityDriver = function(self)
 	if (self.config.enabled) then
 		visdriver = "[petbattle]hide;"
 		visdriver = visdriver.."[possessbar]show;"
-		--visdriver = visdriver.."[possessbar]hide;"
 		visdriver = visdriver.."[overridebar]show;" 
-		--visdriver = visdriver.."[overridebar]hide;"
 		visdriver = visdriver.."[vehicleui]show;" -- vehicle ui
-		--visdriver = visdriver.."[vehicleui]hide;"
-		--visdriver = visdriver.."[target=vehicle,exists]show;" -- vehicle passenger
+		--visdriver = visdriver.."[target=vehicle,exists]show;" -- vehicle passenger (just the normal bar)
 		visdriver = visdriver.."[bonusbar:5,mounted]show;" -- dragonriding
-		--visdriver = visdriver.."[bonusbar:5]hide;" 
 		visdriver = visdriver.."show"
 	end
 
@@ -135,5 +131,4 @@ MainActionBarMod.OnEnable = function(self)
 	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
 	self:ReassignBindings()
-	--self:UpdateSettings()
 end

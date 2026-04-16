@@ -67,40 +67,42 @@ ns.exportableSettings, ns.exportableLayouts = {}, {}
 -- Temporary solution while developing. 
 -- *Doesn't actually hide anything, just adds hover visibility.
 ns.HideClutter = function(self)
-
-	-- buffs and debuffs
-	self:RegisterFrameForFading(BuffFrame, "PlayerAuras")
-	self:RegisterFrameForFading(DebuffFrame, "PlayerAuras")
-
-	-- Various clutter
-	for element in next,{
+	for element, fadeGroup in next,{
+		--["BagsBar"] = "BagsBar",
+		["BuffFrame"] = "PlayerAuras",
+		["DebuffFrame"] = "PlayerAuras",
+		--["MainStatusTrackingBarContainer"] = "StatusBars",
+		--["MicroMenu"] = "MicroMenu",
+		--["MicroMenuContainer"] = "MicroMenu",
 		["LibDBIcon10_BugSack"] = true
 	} do
 		if (_G[element]) then
-			self:RegisterFrameForFading(_G[element], element)
-		else
-			print("did not find", element)
+			self:RegisterFrameForFading(_G[element], fadeGroup == true and element or fadeGroup)
 		end
 	end
-
-	-- bags bar and micro menu
-	--self:RegisterFrameForFading(BagsBar, "BagsBar")
-	--self:RegisterFrameForFading(MicroMenu, "MicroMenu")
-	--self:RegisterFrameForFading(MicroMenuContainer, "MicroMenu")
-
-	-- stance and pet action bar
-	--for i = 1,10 do
-	--	self:RegisterFrameForFading(_G["PetActionButton"..i], "PetBars")
-	--	self:RegisterFrameForFading(_G["StanceButton"..i], "StanceBars")
-	--end
-
-	-- xp- and reputation bars
-	--self:RegisterFrameForFading(MainStatusTrackingBarContainer, "StatusBars")
 end
 
 -- Toggle movable frame anchors
 ns.ToggleFrameLocks = function(self)
 	self:ToggleAllMovableFrameAnchors()
+	if (self:AreMovableFrameAnchorsVisible()) then
+		self.movableFrameAnchorsVisible = true
+		self:Fire("MovableFrameAnchorsVisible") -- tell other modules anchors are visible
+		self:RegisterEvent("PLAYER_REGEN_DISABLED", "PostMovableFrameAnchorsHiddenOnCombat")
+	else
+		self.movableFrameAnchorsVisible = nil
+		self:Fire("MovableFrameAnchorsHidden") -- tell other modules anchors are hidden
+		self:UnregisterEvent("PLAYER_REGEN_DISABLED", "PostMovableFrameAnchorsHiddenOnCombat")
+	end
+end
+
+-- Clean-up when anchors are hidden by combat
+ns.PostMovableFrameAnchorsHiddenOnCombat = function(self)
+	if (self.movableFrameAnchorsVisible) then 
+		self.movableFrameAnchorsVisible = nil
+		self:Fire("MovableFrameAnchorsHidden") -- tell other modules anchors are hidden
+		self:UnregisterEvent("PLAYER_REGEN_DISABLED", "PostMovableFrameAnchorsHiddenOnCombat")
+	end
 end
 
 -- Proxy method to avoid modules using the callback object directly

@@ -28,10 +28,6 @@ local _, ns = ...
 local ExplorerMode = ns:NewModule("ExplorerMode", nil, "AceTimer-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 local LFF = LibStub("LibFadingFrames-1.0")
 
--- Player Constants
-local _,playerClass = UnitClass("player")
-local playerLevel = UnitLevel("player")
-
 -- Declare module defaults
 local defaults = { 
 	profile = {
@@ -74,6 +70,10 @@ ExplorerMode.CheckForForcedState = function(self)
 	local db = self.db.profile
 
 	if (self.delayTimer) then
+		return true
+	end
+
+	if (self.movableFrameAnchorsVisible) then
 		return true
 	end
 
@@ -134,31 +134,31 @@ ExplorerMode.CheckCursor = function(self)
 	self.busyCursor = nil
 end
 
---ExplorerMode.CheckHealth = function(self)
---	local current = UnitHealth("player")
---	local maxHealth = UnitHealthMax("player")
---
---	-- this never fires?
---	if (issecretvalue(current) == issecretvalue(maxHealth)) then
---		if (current == maxHealth) then
---			self.lowHealth = nil
---		else
---			self.lowHealth = true
---		end
---
---	-- this ALWAYS fires?
---	elseif (issecretvalue(current) or issecretvalue(maxHealth)) then
---		self.lowHealth = true
---
---	-- this never fires.
---	else
---		if (current == maxHealth) then
---			self.lowHealth = nil
---		else
---			self.lowHealth = true
---		end
---	end
---end
+--[[ExplorerMode.CheckHealth = function(self)
+	local current = UnitHealth("player")
+	local maxHealth = UnitHealthMax("player")
+
+	-- this never fires?
+	if (issecretvalue(current) == issecretvalue(maxHealth)) then
+		if (current == maxHealth) then
+			self.lowHealth = nil
+		else
+			self.lowHealth = true
+		end
+
+	-- this ALWAYS fires?
+	elseif (issecretvalue(current) or issecretvalue(maxHealth)) then
+		self.lowHealth = true
+
+	-- this never fires.
+	else
+		if (current == maxHealth) then
+			self.lowHealth = nil
+		else
+			self.lowHealth = true
+		end
+	end
+end--]]
 
 ExplorerMode.CheckVehicle = function(self)
 	-- Only check for vehicle bars where you have actions,
@@ -250,6 +250,16 @@ ExplorerMode.OnTimedForcedStateEnd = function(self)
 	self:UpdateSettings()
 end
 
+ExplorerMode.OnMovableFrameAnchorsVisible = function(self)
+	self.movableFrameAnchorsVisible = true
+	self:UpdateSettings()
+end
+
+ExplorerMode.OnMovableFrameAnchorsHidden = function(self)
+	self.movableFrameAnchorsVisible = nil
+	self:UpdateSettings()
+end
+
 ExplorerMode.SetTimedForcedState = function(self, duration)
 	if (self.delayTimer) then
 		self:CancelTimer(self.delayTimer)
@@ -313,17 +323,6 @@ ExplorerMode.OnEvent = function(self, event, ...)
 		--self:CheckHealth()
 		self:CheckCursor()
 
-	elseif (event == "PLAYER_LEVEL_UP") then
-			local level = ...
-			if (level and (level ~= playerLevel)) then
-				playerLevel = level
-			else
-				local level = UnitLevel("player")
-				if (not playerLevel) or (playerLevel < level) then
-					playerLevel = level
-				end
-			end
-
 	elseif (event == "PLAYER_REGEN_DISABLED") then
 		self.inCombat = true
 		--self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
@@ -374,60 +373,6 @@ ExplorerMode.OnEvent = function(self, event, ...)
 	self:UpdateSettings()
 end 
 
-ExplorerMode.EnableExplorerMode = function(self)
-	self:RegisterEvent("CURSOR_CHANGED", "OnEvent")
-	self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "OnEvent")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
-	self:RegisterEvent("PLAYER_LEAVING_WORLD", "OnEvent")
-	self:RegisterEvent("PLAYER_LEVEL_UP", "OnEvent")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED", "OnEvent")
-	self:RegisterEvent("GROUP_ROSTER_UPDATE", "OnEvent")
-	self:RegisterEvent("PLAYER_FOCUS_CHANGED", "OnEvent")
-	self:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR", "OnEvent")
-	self:RegisterEvent("UPDATE_POSSESS_BAR", "OnEvent")
-	self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "OnEvent")
-	self:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", "OnEvent", "player")
-	self:RegisterUnitEvent("UNIT_ENTERED_VEHICLE", "OnEvent", "player")
-	self:RegisterUnitEvent("UNIT_ENTERING_VEHICLE", "OnEvent", "player")
-	self:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "OnEvent", "player")
-	self:RegisterUnitEvent("UNIT_EXITING_VEHICLE", "OnEvent", "player")
-
-	--if (not InCombatLockdown()) then
-	--	self:RegisterUnitEvent("UNIT_HEALTH", "OnEvent", "player")
-	--end
-
-	self.enabled = true
-end
-
-ExplorerMode.DisableExplorerMode = function(self)
-	self:UnregisterEvent("CURSOR_CHANGED", "OnEvent")
-	self:UnregisterEvent("ZONE_CHANGED_NEW_AREA", "OnEvent")
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
-	self:UnregisterEvent("PLAYER_LEAVING_WORLD", "OnEvent")
-	self:UnregisterEvent("PLAYER_LEVEL_UP", "OnEvent")
-	self:UnregisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
-	self:UnregisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
-	self:UnregisterEvent("PLAYER_TARGET_CHANGED", "OnEvent")
-	self:UnregisterEvent("GROUP_ROSTER_UPDATE", "OnEvent")
-	self:UnregisterEvent("PLAYER_FOCUS_CHANGED", "OnEvent")
-	self:UnregisterEvent("UPDATE_OVERRIDE_ACTIONBAR", "OnEvent")
-	self:UnregisterEvent("UPDATE_POSSESS_BAR", "OnEvent")
-	self:UnregisterEvent("UPDATE_BONUS_ACTIONBAR", "OnEvent")
-	self:UnregisterEvent("UPDATE_VEHICLE_ACTIONBAR", "OnEvent", "player")
-	self:UnregisterEvent("UNIT_ENTERED_VEHICLE", "OnEvent", "player")
-	self:UnregisterEvent("UNIT_ENTERING_VEHICLE", "OnEvent", "player")
-	self:UnregisterEvent("UNIT_EXITED_VEHICLE", "OnEvent", "player")
-	self:UnregisterEvent("UNIT_EXITING_VEHICLE", "OnEvent", "player")
-
-	--if (not InCombatLockdown()) then
-	--	self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
-	--end
-
-	self.enabled = nil
-end
-
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 ExplorerMode.UpdateSettings = function(self)
@@ -435,9 +380,56 @@ ExplorerMode.UpdateSettings = function(self)
 	local db = self.db.profile
 
 	if (db.enabled and not self.enabled) then
-		self:EnableExplorerMode()
+
+		self:RegisterEvent("CURSOR_CHANGED", "OnEvent")
+		self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "OnEvent")
+		self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
+		self:RegisterEvent("PLAYER_LEAVING_WORLD", "OnEvent")
+		self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
+		self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
+		self:RegisterEvent("PLAYER_TARGET_CHANGED", "OnEvent")
+		self:RegisterEvent("GROUP_ROSTER_UPDATE", "OnEvent")
+		self:RegisterEvent("PLAYER_FOCUS_CHANGED", "OnEvent")
+		self:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR", "OnEvent")
+		self:RegisterEvent("UPDATE_POSSESS_BAR", "OnEvent")
+		self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "OnEvent")
+		self:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR", "OnEvent", "player")
+		self:RegisterUnitEvent("UNIT_ENTERED_VEHICLE", "OnEvent", "player")
+		self:RegisterUnitEvent("UNIT_ENTERING_VEHICLE", "OnEvent", "player")
+		self:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "OnEvent", "player")
+		self:RegisterUnitEvent("UNIT_EXITING_VEHICLE", "OnEvent", "player")
+
+		--if (not InCombatLockdown()) then
+		--	self:RegisterUnitEvent("UNIT_HEALTH", "OnEvent", "player")
+		--end
+
+		self.enabled = true
+
 	elseif (not db.enabled and self.enabled) then
-		self:DisableExplorerMode()
+
+		self:UnregisterEvent("CURSOR_CHANGED", "OnEvent")
+		self:UnregisterEvent("ZONE_CHANGED_NEW_AREA", "OnEvent")
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
+		self:UnregisterEvent("PLAYER_LEAVING_WORLD", "OnEvent")
+		self:UnregisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
+		self:UnregisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
+		self:UnregisterEvent("PLAYER_TARGET_CHANGED", "OnEvent")
+		self:UnregisterEvent("GROUP_ROSTER_UPDATE", "OnEvent")
+		self:UnregisterEvent("PLAYER_FOCUS_CHANGED", "OnEvent")
+		self:UnregisterEvent("UPDATE_OVERRIDE_ACTIONBAR", "OnEvent")
+		self:UnregisterEvent("UPDATE_POSSESS_BAR", "OnEvent")
+		self:UnregisterEvent("UPDATE_BONUS_ACTIONBAR", "OnEvent")
+		self:UnregisterEvent("UPDATE_VEHICLE_ACTIONBAR", "OnEvent", "player")
+		self:UnregisterEvent("UNIT_ENTERED_VEHICLE", "OnEvent", "player")
+		self:UnregisterEvent("UNIT_ENTERING_VEHICLE", "OnEvent", "player")
+		self:UnregisterEvent("UNIT_EXITED_VEHICLE", "OnEvent", "player")
+		self:UnregisterEvent("UNIT_EXITING_VEHICLE", "OnEvent", "player")
+
+		--if (not InCombatLockdown()) then
+		--	self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
+		--end
+
+		self.enabled = nil
 	end
 
 	self.FORCED = not db.enabled or self:CheckForForcedState()
@@ -577,4 +569,7 @@ end
 
 ExplorerMode.OnEnable = function(self)
 	self:UpdateSettings()
+
+	ns.RegisterCallback(self, "MovableFrameAnchorsVisible", "OnMovableFrameAnchorsVisible")
+	ns.RegisterCallback(self, "MovableFrameAnchorsHidden", "OnMovableFrameAnchorsHidden")
 end

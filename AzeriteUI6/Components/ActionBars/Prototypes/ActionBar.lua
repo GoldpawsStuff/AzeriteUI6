@@ -160,7 +160,7 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 				newstate = GetBonusBarIndex();
 				if (GetBonusBarOffset() == 5) then
 					hasPossessBar = true;
-					if (IsMounted()) then
+					if (IsMounted() or IsFlying()) then
 						isDragonRiding = true;
 					end
 				end
@@ -183,12 +183,12 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 		self:SetAttribute("state", newstate);
 		control:ChildUpdate("state", newstate);
 
-		-- ugly fix for overridebuttons > 6 showing
-		-- (these buttons are empty, overridebars only have 6 buttons)
+		-- ugly fix for overridebuttons > 6 showing (these buttons are empty, overridebars only have 6 buttons)
+		-- *still no fix for empty buttons on overridebars (verify this, I thought I fixed it?)
 		if (self:GetAttribute("id") == 1) then 
 			for i = 7,12 do
 				local button = self:GetFrameRef("Button"..i);
-				if (hasOverrideBar) then
+				if (hasVehicleBar or hasOverrideBar or hasPossessBar) then -- confirm button numbers, might need to rewrite this.
 					button:Hide();
 				else
 					button:Show();
@@ -513,24 +513,25 @@ ActionBar.UpdateStateDriver = function(self)
 	if (InCombatLockdown()) then return end
 
 	local statedriver
+
 	if (self.id == 1) then
-		statedriver = "[overridebar] possess; [possessbar] possess; [shapeshift] possess; [bonusbar:5] dragon; [form,noform] 0; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6"
+		statedriver = "[overridebar][possessbar][shapeshift]possess;[bonusbar:5]dragon;[form,noform]0;[bar:2]2;[bar:3]3;[bar:4]4;[bar:5]5;[bar:6]6;"
 
 		local playerClass = UnitClassBase("player")
 		if (playerClass == "DRUID") then
-			statedriver = statedriver .. "; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10"
+			statedriver = statedriver .. "[bonusbar:1]7;[bonusbar:2]8;[bonusbar:3]9;[bonusbar:4]10;"
 
 		elseif (playerClass == "MONK") then
-			statedriver = statedriver .. "; [bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9"
+			statedriver = statedriver .. "[bonusbar:1]7;[bonusbar:2]8;[bonusbar:3]9;"
 
 		elseif (playerClass == "ROGUE") then
-			statedriver = statedriver .. "; [bonusbar:1] 7"
+			statedriver = statedriver .. "[bonusbar:1]7;"
 
 		elseif (playerClass == "WARRIOR") then
-			statedriver = statedriver .. "; [bonusbar:1] 7; [bonusbar:2] 8"
+			statedriver = statedriver .. "[bonusbar:1]7;[bonusbar:2]8;"
 		end
 
-		statedriver = statedriver .. "; 1"
+		statedriver = statedriver .. "1"
 	else
 		statedriver = tostring(self.id)
 	end
@@ -546,7 +547,7 @@ ActionBar.UpdateVisibilityDriver = function(self)
 	local visdriver
 
 	if (self.config.enabled) then
-		visdriver = "[petbattle]hide;"
+		visdriver = "[petbattle]hide;show"
 	end
 
 	UnregisterStateDriver(self, "vis")

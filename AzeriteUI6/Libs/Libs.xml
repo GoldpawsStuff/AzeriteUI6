@@ -23,7 +23,9 @@
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
 	<Script file="LibDeflate\LibDeflate.lua"/>
 	<Script file="LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
+	<!--@non-debug@
 	<Script file="LibActionButton-1.0\LibActionButton-1.0.lua"/>
+	@end-non-debug@-->
 	<Script file="LibMoreEvents-1.0\LibMoreEvents-1.0.lua"/>
 	<Script file="LibFadingFrames-1.0\LibFadingFrames-1.0.lua"/>
 	<Script file="LibMovableFrames-1.0\LibMovableFrames-1.0.lua"/>

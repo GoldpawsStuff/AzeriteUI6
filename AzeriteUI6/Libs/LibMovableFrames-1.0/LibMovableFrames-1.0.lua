@@ -603,11 +603,7 @@ Shows all registered and active movable frame anchors.
 --]]
 lib.ShowAllMovableFrameAnchors = function()
 	if (InCombatLockdown()) then return end
-
 	for frame,anchor in next,Anchors do
-		-- update texts
-		-- x, y, scale
-		-- show the anchor
 		anchor:Show()
 	end
 end
@@ -636,6 +632,14 @@ lib.ToggleAllMovableFrameAnchors = function()
 	end
 	for frame,anchor in next,Anchors do
 		anchor:SetShown(not shown)
+	end
+end
+
+lib.AreMovableFrameAnchorsVisible = function()
+	for frame,anchor in next,Anchors do
+		if (anchor:IsShown()) then
+			return true
+		end
 	end
 end
 
@@ -680,7 +684,8 @@ local mixins = {
 	UnregisterMovableFrameAnchor = true,
 	ShowAllMovableFrameAnchors = true,
 	HideAllMovableFrameAnchors = true,
-	ToggleAllMovableFrameAnchors = true
+	ToggleAllMovableFrameAnchors = true,
+	AreMovableFrameAnchorsVisible = true
 }
 
 lib.Embed = function(self, target)

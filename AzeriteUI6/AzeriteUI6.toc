@@ -5,7 +5,7 @@
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
 ## Version: 1.0.0-Alpha
-## OptionalDeps: Ace3, oUF, Bartender4, Clique
+## OptionalDeps: Ace3, LibActionButton-1.0, oUF, Clique, Bartender4
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul
