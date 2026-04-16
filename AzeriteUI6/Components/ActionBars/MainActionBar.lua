@@ -58,26 +58,27 @@ local defaults = {
 
 local MainActionBar = {}
 
-MainActionBar.UpdateVisibilityDriver = function(self)
-	if (InCombatLockdown()) then return end
-
-	local visdriver
-
-	if (self.config.enabled) then
-		visdriver = "[petbattle]hide;"
-		visdriver = visdriver.."[possessbar]show;"
-		visdriver = visdriver.."[overridebar]show;" 
-		visdriver = visdriver.."[vehicleui]show;" -- vehicle ui
-		--visdriver = visdriver.."[target=vehicle,exists]show;" -- vehicle passenger (just the normal bar)
-		visdriver = visdriver.."[bonusbar:5,mounted]show;" -- dragonriding
-		visdriver = visdriver.."show"
-	end
-
-	UnregisterStateDriver(self, "vis")
-	self:SetAttribute("state-vis", "0")
-	RegisterStateDriver(self, "vis", visdriver or "hide")
-
-end
+-- This doesn't really change anything, does it?
+--MainActionBar.UpdateVisibilityDriver = function(self)
+--	if (InCombatLockdown()) then return end
+--
+--	local visdriver
+--
+--	if (self.config.enabled) then
+--		visdriver = "[petbattle]hide;"
+--		visdriver = visdriver.."[possessbar]show;"
+--		visdriver = visdriver.."[overridebar]show;" 
+--		visdriver = visdriver.."[vehicleui]show;" -- vehicle ui
+--		--visdriver = visdriver.."[target=vehicle,exists]show;" -- vehicle passenger (just the normal bar)
+--		visdriver = visdriver.."[bonusbar:5,mounted]show;" -- dragonriding
+--		visdriver = visdriver.."show"
+--	end
+--
+--	UnregisterStateDriver(self, "vis")
+--	self:SetAttribute("state-vis", "0")
+--	RegisterStateDriver(self, "vis", visdriver or "hide")
+--
+--end
 
 MainActionBarMod.GetBar = function(self)
 	if (not self.Bar) then 
