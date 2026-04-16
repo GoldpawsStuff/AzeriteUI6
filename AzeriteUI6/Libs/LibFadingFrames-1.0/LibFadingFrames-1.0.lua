@@ -91,6 +91,7 @@ local isMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
 local WoW10 = version >= 100000
 local WoW11 = version >= 110000
 local WoW12 = version >= 120000
+local WoW13 = version >= 130000
 
 -- Frame Metamethods
 local __index = getmetatable(CreateFrame("Frame")).__index

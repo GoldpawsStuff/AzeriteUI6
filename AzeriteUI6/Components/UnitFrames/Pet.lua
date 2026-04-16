@@ -136,6 +136,11 @@ local style = function(self, unit)
 
 end
 
+-- Return the unitframe
+Pet.GetFrame = function(self)
+	return self.frame
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 Pet.UpdateSettings = function(self)
@@ -162,6 +167,8 @@ Pet.OnEnable = function(self)
 		local frame = self:Spawn("pet")
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 332/.9, 102/.9)
+
+		Pet.frame = frame
 
 		Pet:RegisterMovableFrameAnchor(frame, string.lower(PET), "unitframes", AzeriteUI6_Positions_DB)
 

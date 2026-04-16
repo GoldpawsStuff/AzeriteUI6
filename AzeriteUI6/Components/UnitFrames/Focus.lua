@@ -163,6 +163,11 @@ local style = function(self, unit)
 
 end
 
+-- Return the unitframe
+Focus.GetFrame = function(self)
+	return self.frame
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 Focus.UpdateSettings = function(self)
@@ -189,6 +194,8 @@ Focus.OnEnable = function(self)
 		local frame = self:Spawn("focus")
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 196/.9, 247/.9)
+
+		Focus.frame = frame
 
 		Focus:RegisterMovableFrameAnchor(frame, string.lower(BINDING_NAME_FOCUSTARGET), "unitframes", AzeriteUI6_Positions_DB)
 	end)

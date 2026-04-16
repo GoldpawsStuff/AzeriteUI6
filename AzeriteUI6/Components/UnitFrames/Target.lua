@@ -636,6 +636,11 @@ local style = function(self, unit)
 
 end
 
+-- Return the unitframe
+Target.GetFrame = function(self)
+	return self.frame
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 Target.UpdateSettings = function(self)
@@ -662,6 +667,8 @@ Target.OnEnable = function(self)
 		local frame = self:Spawn("target")
 		frame:SetScale(.9)
 		frame:SetPoint("TOPRIGHT", -40/.9, -40/.9)
+
+		Target.frame = frame
 
 		Target:RegisterMovableFrameAnchor(frame, string.lower(TARGET), "unitframes", AzeriteUI6_Positions_DB)
 	end)

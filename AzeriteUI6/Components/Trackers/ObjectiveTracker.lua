@@ -25,7 +25,7 @@
 --]]
 local _, ns = ...
 
-local Trackers = ns:NewModule("ObjectiveTracker", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+local Trackers = ns:NewModule("ObjectiveTracker", nil, "AceTimer-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
@@ -52,13 +52,19 @@ Trackers.RefreshConfig = function(self)
 	self:UpdateSettings()
 end
 
-Trackers.OnEnable = function(self)
-	self:UpdateSettings() -- why isn't this automatic here?
-end
-
 Trackers.OnInitialize = function(self)
 	self.db = ns.db:RegisterNamespace("Trackers", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+end
+
+Trackers.OnEnable = function(self)
+	local ExplorerMode = ns:GetModule("ExplorerMode", true)
+	if (ExplorerMode) then
+		self:ScheduleTimer("UpdateSettings", math.min(ExplorerMode.db.profile.delayOnLogin, ExplorerMode.db.profile.delayOnReload))
+	else
+		self:ScheduleTimer("UpdateSettings", 5)
+	end
+	--self:UpdateSettings()
 end

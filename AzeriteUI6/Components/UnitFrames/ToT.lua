@@ -196,6 +196,11 @@ local style = function(self, unit)
 
 end
 
+-- Return the unitframe
+ToT.GetFrame = function(self)
+	return self.frame
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 ToT.UpdateSettings = function(self)
@@ -222,6 +227,8 @@ ToT.OnEnable = function(self)
 		local frame = self:Spawn("targettarget")
 		frame:SetScale(.9)
 		frame:SetPoint("TOPRIGHT", -446/.9, -66/.9)
+
+		ToT.frame = frame
 
 		ToT:RegisterMovableFrameAnchor(frame, string.lower(SHOW_TARGET_OF_TARGET_TEXT), "unitframes", AzeriteUI6_Positions_DB):SetAbove(true)
 	end)

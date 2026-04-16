@@ -398,6 +398,31 @@ ns.ActionButton.Create = function(self, id, name, header)
 	return button
 end
 
+-- Replacing the LAB method to properly detect 
+-- empty buttons when using an override bar. 
+-- The problem is that overridebars reports empty slots as having actions,
+-- but checking for their texture instead more reliably shows that they're empty.
+ActionButton.HasAction = function(self)
+	if (self._state_type == "empty") then
+		return nil
+
+	elseif (self._state_type == "action") then
+		return GetActionTexture(self._state_action) -- HasAction(self._state_action)
+
+	elseif (self._state_type == "spell") then
+		return true
+
+	elseif (self._state_type == "item") then
+		return true
+
+	elseif (self._state_type == "macro") then
+		return true
+
+	elseif (self._state_type == "custom") then
+		return true
+	end
+end
+
 -- Problem: The LAB method 'UpdateHotkeys' is not a public function,
 -- so one of the dumber hacks here is to replace the 'GetHotKey' method instead.
 -- We toggle the text in the standard hotkey display and our custom gamepad display

@@ -495,6 +495,11 @@ local style = function(self, unit)
 
 end
 
+-- Return the unitframe
+ClassPower.GetFrame = function(self)
+	return self.frame
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 ClassPower.UpdateSettings = function(self)
@@ -521,6 +526,8 @@ ClassPower.OnEnable = function(self)
 		local frame = self:Spawn("player")
 		frame:SetScale(.9)
 		frame:SetPoint("CENTER", -223/.9, -84/.9)
+
+		ClassPower.frame = frame
 
 		ClassPower:RegisterMovableFrameAnchor(frame, string.lower(COMBO_POINTS), "unitframes", AzeriteUI6_Positions_DB)
 	end)

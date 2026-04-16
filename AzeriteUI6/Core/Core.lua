@@ -30,15 +30,15 @@ ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "LibMoreE
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
 -- Changing this number forces a full settings reset.
-ns.SETTINGS_VERSION = -1 -- use client dependant settings version to avoid resets in unaffected builds.
+ns.SETTINGS_VERSION = -1 
 
 -- WoW client version
 local buildVersion, buildNumber, buildDate, interfaceVersion = GetBuildInfo()
-ns.WoWBuild = tonumber(buildNumber)
-ns.WoWVersion = interfaceVersion
-ns.WoW12 = interfaceVersion >= 120000
-ns.WoW13 = interfaceVersion >= 130000
-ns.IsCompatible = ns.WoW12 and not ns.WoW13
+ns.WoWBuild = tonumber(buildNumber) -- numerical build number
+ns.WoWVersion = interfaceVersion -- patch version as string
+ns.WoW12 = interfaceVersion >= 120000 -- current expansion
+ns.WoW13 = interfaceVersion >= 130000 -- future expansion
+ns.IsCompatible = ns.WoW12 and not ns.WoW13 -- what this addon is compatible with
 
 -- Tinkerers rejoyce!
 _G[addonName] = ns
@@ -73,25 +73,24 @@ ns.HideBlizzard = function(self)
 	self:RegisterFrameForFading(DebuffFrame, "PlayerAuras")
 
 	-- bags bar and micro menu
-	self:RegisterFrameForFading(BagsBar, "BagsBar")
-	self:RegisterFrameForFading(MicroMenu, "MicroMenu")
-	self:RegisterFrameForFading(MicroMenuContainer, "MicroMenu")
+	--self:RegisterFrameForFading(BagsBar, "BagsBar")
+	--self:RegisterFrameForFading(MicroMenu, "MicroMenu")
+	--self:RegisterFrameForFading(MicroMenuContainer, "MicroMenu")
 
 	-- stance and pet action bar
-	for i = 1,10 do
-		self:RegisterFrameForFading(_G["PetActionButton"..i], "PetBars")
-		self:RegisterFrameForFading(_G["StanceButton"..i], "StanceBars")
-	end
+	--for i = 1,10 do
+	--	self:RegisterFrameForFading(_G["PetActionButton"..i], "PetBars")
+	--	self:RegisterFrameForFading(_G["StanceButton"..i], "StanceBars")
+	--end
 
 	-- xp- and reputation bars
-	self:RegisterFrameForFading(MainStatusTrackingBarContainer, "StatusBars")
+	--self:RegisterFrameForFading(MainStatusTrackingBarContainer, "StatusBars")
 end
 
 -- Toggle movable frame anchors
 ns.ToggleFrameLocks = function(self)
 	self:ToggleAllMovableFrameAnchors()
 end
-
 
 -- Proxy method to avoid modules using the callback object directly
 ns.Fire = function(self, name, ...)

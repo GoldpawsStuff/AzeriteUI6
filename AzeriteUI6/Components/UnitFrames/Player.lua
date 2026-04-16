@@ -693,6 +693,11 @@ local style = function(self, unit)
 
 end
 
+-- Return the unitframe
+Player.GetFrame = function(self)
+	return self.frame
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 Player.UpdateSettings = function(self)
@@ -719,6 +724,8 @@ Player.OnEnable = function(self)
 		local frame = self:Spawn("player")
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 46/.9, 100/.9) -- scaled coords
+
+		Player.frame = frame
 
 		Player:RegisterMovableFrameAnchor(frame, string.lower(PLAYER), "unitframes", AzeriteUI6_Positions_DB)
 	end)
