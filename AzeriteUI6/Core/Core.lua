@@ -26,7 +26,7 @@
 local addonName, ns = ...
 local LibDeflate = LibStub("LibDeflate") -- intended for profile sharing later on. TODO!
 
-ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "LibMoreEvents-1.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0", "AceSerializer-3.0")
+ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "AceTimer-3.0", "LibMoreEvents-1.0", "AceSerializer-3.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
 
 -- Changing this number forces a full settings reset.
@@ -66,11 +66,22 @@ ns.exportableSettings, ns.exportableLayouts = {}, {}
 
 -- Temporary solution while developing. 
 -- *Doesn't actually hide anything, just adds hover visibility.
-ns.HideBlizzard = function(self)
+ns.HideClutter = function(self)
 
 	-- buffs and debuffs
 	self:RegisterFrameForFading(BuffFrame, "PlayerAuras")
 	self:RegisterFrameForFading(DebuffFrame, "PlayerAuras")
+
+	-- Various clutter
+	for element in next,{
+		["LibDBIcon10_BugSack"] = true
+	} do
+		if (_G[element]) then
+			self:RegisterFrameForFading(_G[element], element)
+		else
+			print("did not find", element)
+		end
+	end
 
 	-- bags bar and micro menu
 	--self:RegisterFrameForFading(BagsBar, "BagsBar")
@@ -317,8 +328,7 @@ ns.RefreshConfig = function(self, event, ...)
 end
 
 ns.OnEnable = function(self)
-	-- Temporary solution to clean things up during development.
-	self:HideBlizzard()
+	self:ScheduleTimer("HideClutter", 1) -- some icons require a little time to be created
 end
 
 ns.OnInitialize = function(self)

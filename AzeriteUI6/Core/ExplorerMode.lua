@@ -54,7 +54,7 @@ local defaults = {
 		fadeWithDeadTarget = true,
 		fadeWithFocusTarget = false,
 		fadeInVehicles = false,
-		--fadeWithLowHealth = false,
+		--fadeWithLowHealth = false, -- doesn't work anymore because of secrets
 
 		-- Which elements to fade out
 		-- while in Explorer Mode.
