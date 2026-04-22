@@ -459,7 +459,7 @@ ExplorerMode.UpdateSettings = function(self)
 
 			if (fade and not fullyFaded) then
 				-- Register the bar for fading
-				LFF:RegisterFrameForFading(bar, self:GetName())
+				LFF:RegisterFrameForFading(bar, bar.id == 1 and "PlayerHUD" or moduleName)
 			else
 				-- Unregister the bar for fading, does not affect button fading.
 				LFF:UnregisterFrameForFading(bar)
@@ -480,7 +480,7 @@ ExplorerMode.UpdateSettings = function(self)
 		local playerFrame = Player:GetFrame()
 		if (playerFrame) then
 			if (fade) then
-				LFF:RegisterFrameForFading(playerFrame, self:GetName())
+				LFF:RegisterFrameForFading(playerFrame, "PlayerHUD")
 			else
 				LFF:UnregisterFrameForFading(playerFrame)
 			end
@@ -493,7 +493,7 @@ ExplorerMode.UpdateSettings = function(self)
 		local classPowerFrame = ClassPower:GetFrame()
 		if (classPowerFrame) then
 			if (fade) then
-				LFF:RegisterFrameForFading(classPowerFrame, self:GetName())
+				LFF:RegisterFrameForFading(classPowerFrame, "HUDs")
 			else
 				LFF:UnregisterFrameForFading(classPowerFrame)
 			end
@@ -506,7 +506,7 @@ ExplorerMode.UpdateSettings = function(self)
 		local petFrame = Pet:GetFrame()
 		if (petFrame) then
 			if (fade) then
-				LFF:RegisterFrameForFading(petFrame, self:GetName())
+				LFF:RegisterFrameForFading(petFrame, "PlayerHUD")
 			else
 				LFF:UnregisterFrameForFading(petFrame)
 			end
@@ -519,7 +519,7 @@ ExplorerMode.UpdateSettings = function(self)
 		local focusFrame = Focus:GetFrame()
 		if (focusFrame) then
 			if (fade) then
-				LFF:RegisterFrameForFading(focusFrame, self:GetName())
+				LFF:RegisterFrameForFading(focusFrame, "PlayerHUD")
 			else
 				LFF:UnregisterFrameForFading(focusFrame)
 			end
@@ -545,7 +545,7 @@ ExplorerMode.UpdateSettings = function(self)
 		local chatFrame = _G[frameName]
 		if (chatFrame) then
 			if (fadeChat) then
-				LFF:RegisterFrameForFading(chatFrame, "ChatFrames")
+				LFF:RegisterFrameForFading(chatFrame, frameName)
 			else
 				LFF:UnregisterFrameForFading(chatFrame)
 			end
