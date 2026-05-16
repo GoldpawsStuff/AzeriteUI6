@@ -54,12 +54,12 @@ local defaults = {
 
 		-- Which elements to fade out
 		-- while in Explorer Mode.
-		fadeActionBars = true,
+		--fadeActionBars = true,
 		fadePetBar = true,
 		fadeStanceBar = true,
-		fadePlayerFrame = true,
+		--fadePlayerFrame = true,
 		fadePlayerClassPower = true,
-		fadePetFrame = true,
+		--fadePetFrame = true,
 		fadeFocusFrame = true,
 		--fadeTracker = true,
 		fadeChatFrames = true

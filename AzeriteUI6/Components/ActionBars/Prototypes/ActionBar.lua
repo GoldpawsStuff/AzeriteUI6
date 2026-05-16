@@ -118,6 +118,8 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 		button.config.keyBoundTarget = keyBoundTarget
 	end
 
+	EventRegistry:RegisterCallback("HouseEditor.StateUpdated", function(_, state) bar:HousingStateChanged(state) end, bar)
+
 	bar:SetAttribute("UpdateVisibility", [[
 		local visibility = self:GetAttribute("visibility");
 		local userhidden = self:GetAttribute("userhidden");
@@ -200,6 +202,16 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 	]])
 
 	return bar
+end
+
+ActionBar.HousingStateChanged = function(self, state)
+	self.InHousing = state
+	if (not next(self.buttons)) then return end
+	if (state) then
+		ClearOverrideBindings(self)
+	elseif (not state) then
+		self:UpdateBindings()
+	end
 end
 
 ActionBar.ForAll = function(self, method, ...)
@@ -481,9 +493,12 @@ ActionBar.UpdateButtonFlags = function(self)
 end
 
 -- Update the actual keybinds
+local inReassignBindingsLockdown = false
 ActionBar.UpdateBindings = function(self)
-	if (InCombatLockdown()) then return end
+	if (InCombatLockdown()) or (self.InHousing) or (inReassignBindingsLockdown) then return end
 	if (not next(self.buttons)) then return end
+
+	inReassignBindingsLockdown = true
 
 	ClearOverrideBindings(self)
 
@@ -507,6 +522,8 @@ ActionBar.UpdateBindings = function(self)
 			button.HotKey:Show()
 		end
 	end
+
+	inReassignBindingsLockdown = false
 end
 
 ActionBar.UpdateStateDriver = function(self)
