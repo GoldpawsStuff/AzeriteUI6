@@ -15,9 +15,7 @@ externals:
     AzeriteUI6/Libs/AceSerializer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceSerializer-3.0
     AzeriteUI6/Libs/AceComm-3.0: https://repos.wowace.com/wow/ace3/trunk/AceComm-3.0
     AzeriteUI6/Libs/LibActionButton-1.0: https://repos.wowace.com/wow/libactionbutton-1-0
-    AzeriteUI6/Libs/oUF:
-       url: git://github.com/oUF-wow/oUF.git
-       tag: latest
+    AzeriteUI6/Libs/oUF: https://github.com/oUF-wow/oUF
 
 move-folders:
     AzeriteUI6/AzeriteUI6: AzeriteUI6
