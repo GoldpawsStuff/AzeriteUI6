@@ -76,7 +76,7 @@ The full and proper graphical options menu is not yet ready! Until then we can c
     - 🔳 Pet UnitFrame  
 	- 🔳 Group/Raid Tool  
 - 🔳 Options Menu  
-  - 🔳 Movable Frames ***/lock***  
+  - ✅ Movable Frames ***/lock***  
 
 ✅ = Finished  
 🔁 = In progress  
