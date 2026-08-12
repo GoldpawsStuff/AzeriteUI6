@@ -147,7 +147,7 @@ local function createUpdateFrame()
 end
 
 local function Update(self, event, unit, ...)
-	if(not unit) or (unit ~= self.unit) then
+	if(not unit) or (unit ~= self.__unit) then
 		return
 	end
 
@@ -268,7 +268,7 @@ local function Path(self, ...)
 end
 
 local function ForceUpdate(element)
-	Path(element.__owner, 'ForceUpdate', element.__owner.unit)
+	Path(element.__owner, 'ForceUpdate', element.__owner.__unit)
 end
 
 local function Enable(self)

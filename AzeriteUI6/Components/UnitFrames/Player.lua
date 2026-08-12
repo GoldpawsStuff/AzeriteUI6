@@ -94,27 +94,30 @@ end
 
 -- Only show Horde/Alliance badges, and hide them in combat.
 local PvPIndicator_Override = function(self, event, unit)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.PvPIndicator
-	unit = unit or self.unit
+	unit = unit or self.__unit
 
 	local status
 	local factionGroup = UnitFactionGroup(unit) or "Neutral"
 
 	if (factionGroup ~= "Neutral") then
 		if (UnitIsPVPFreeForAll(unit)) then
-		elseif (UnitIsPVP(unit)) then
-			-- Mercenaries fight for the opposite team, 
-			-- happens all the time in battlegrounds.
-			if (unit == "player" and UnitIsMercenary(unit)) then
-				if (factionGroup == "Horde") then
-					factionGroup = "Alliance"
-				elseif (factionGroup == "Alliance") then
-					factionGroup = "Horde"
+		else 
+			local isPvP = UnitIsPVP(unit)
+			if (not issecretvalue(isPvP) and isPvP) then
+				-- Mercenaries fight for the opposite team, 
+				-- happens all the time in battlegrounds.
+				if (unit == "player" and UnitIsMercenary(unit)) then
+					if (factionGroup == "Horde") then
+						factionGroup = "Alliance"
+					elseif (factionGroup == "Alliance") then
+						factionGroup = "Horde"
+					end
 				end
+				status = factionGroup
 			end
-			status = factionGroup
 		end
 	end
 
@@ -129,7 +132,7 @@ end
 
 -- We need to override this update
 local Mana_Override = function(self, event, unit)
-	if(self.unit ~= unit) then return end
+	if(self.__unit ~= unit) then return end
 	local element = self.AdditionalPower
 
 	--[[ Callback: Power:PreUpdate(unit)
@@ -273,7 +276,7 @@ end
 
 -- Partly sourced from oUF's power element's coloring function
 local Power_UpdateColor = function(self, event, unit)
-	if (self.unit ~= unit) then return end
+	if (self.__unit ~= unit) then return end
 	local element = self.Power
 
 	local powerType = UnitPowerType(unit)
@@ -340,8 +343,9 @@ local style = function(self, unit)
 	-- General frame settings
 	self:SetSize(560, 180)
 	self:SetHitRectInsets(0, 0, 30, -2)
+	self:SetFrameLevel(self:GetFrameLevel() + 10)
 
-	ns.ApplyUnitFrameScriptsTo(self)
+	ns.ApplyUnitFrameScriptsTo(self, unit)
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)

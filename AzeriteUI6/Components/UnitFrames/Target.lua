@@ -88,7 +88,7 @@ local CastBar_OnUpdate = function(element, elapsed)
 
 	-- The rest here is just a copy of oUF's code, 
 	-- since we're replacing it with this function.
-	elseif (element.holdTime > 0) then
+	elseif (element.holdTime and element.holdTime > 0) then
 		element.holdTime = element.holdTime - elapsed
 	else
 		element.castID = nil
@@ -109,10 +109,10 @@ end
 
 -- Update NPC classification badge for rares, elites and bosses.
 local Classification_Update = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.Classification
-	unit = unit or self.unit
+	unit = unit or self.__unit or self.__unit
 
 	if (UnitIsPlayer(unit)) then
 		return element:Hide()
@@ -139,7 +139,7 @@ end
 local Health_OnValueChanged = function(element, val) 
 	if (val) then
 		-- This returns the health as a value from 0 to 1. 
-		local perc = UnitHealthPercent(element.__owner.unit, true, CurveConstants.ZeroToOne)
+		local perc = UnitHealthPercent(element.__owner.__unit, true, CurveConstants.ZeroToOne)
 		element.Texture:SetTexCoord(perc, 0, 0, 1)
 	else
 		element.Texture:SetTexCoord(1, 0, 0, 1)
@@ -201,10 +201,10 @@ end
 -- Only show Horde/Alliance badges,
 -- keep this hidding for rare-, elite- and boss NPCs.
 local PvPIndicator_Override = function(self, event, unit)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.PvPIndicator
-	unit = unit or self.unit
+	unit = unit or self.__unit or self.__unit
 
 	local l = UnitEffectiveLevel(unit)
 	local c = (l and l < 1) and "worldboss" or UnitClassification(unit)
@@ -216,12 +216,15 @@ local PvPIndicator_Override = function(self, event, unit)
 	local factionGroup = UnitFactionGroup(unit) or "Neutral"
 	if (factionGroup ~= "Neutral") then
 		if (UnitIsPVPFreeForAll(unit)) then
-		elseif (UnitIsPVP(unit)) then
-			if (ns.IsRetail and UnitIsMercenary(unit)) then
-				if (factionGroup == "Horde") then
-					factionGroup = "Alliance"
-				elseif (factionGroup == "Alliance") then
-					factionGroup = "Horde"
+		else
+			local isPvP = UnitIsPVP(unit)
+			if (not issecretvalue(isPvP) and isPvP) then
+				if (ns.IsRetail and UnitIsMercenary(unit)) then
+					if (factionGroup == "Horde") then
+						factionGroup = "Alliance"
+					elseif (factionGroup == "Alliance") then
+						factionGroup = "Horde"
+					end
 				end
 			end
 			status = factionGroup
@@ -238,10 +241,10 @@ end
 
 -- Update target indicator texture.
 local TargetIndicator_Update = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.TargetIndicator
-	unit = unit or self.unit
+	unit = unit or self.__unit or self.__unit
 
 	-- if we are targeting ourselves, hide the targeting eye
 	if (AreUnitsSame(unit, "player")) then
@@ -292,7 +295,7 @@ local TargetIndicator_Stop = function(self)
 end
 
 local UnitFrame_PostUpdate = function(self, event, unit, ...)
-	Classification_Update(self)
+	Classification_Update(self, event, unit, ...)
 	TargetIndicator_Update(self, event, unit, ...)
 	TargetIndicator_Start(self)
 end
@@ -309,8 +312,9 @@ local style = function(self, unit)
 	-- General frame settings
 	self:SetSize(550, 160) -- 550, 210
 	self:SetHitRectInsets(0, 0, 0, 60)
+	self:SetFrameLevel(self:GetFrameLevel() + 10)
 
-	ns.ApplyUnitFrameScriptsTo(self)
+	ns.ApplyUnitFrameScriptsTo(self, unit)
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)

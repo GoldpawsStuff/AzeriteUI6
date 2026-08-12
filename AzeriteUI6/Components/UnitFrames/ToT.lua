@@ -44,10 +44,10 @@ local AreUnitsSame = ns.AreUnitsSame
 
 -- Update targeting highlight outline
 local TargetHighlight_PostUpdate = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.TargetHighlight
-	unit = unit or self.unit
+	unit = unit or self.__unit
 
 	if (AreUnitsSame(unit, "focus")) then
 		element:Show()
@@ -59,9 +59,9 @@ end
 
 -- Hide the ToT frame under certain conditions using alpha
 local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
-	unit = unit or self.unit
+	unit = unit or self.__unit
 
 	if (ToT.db.profile.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
 	or (ToT.db.profile.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
@@ -72,7 +72,7 @@ local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 end
 
 local UnitFrame_OnEvent = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	Unitframe_PostUpdateAlpha(self, event, unit, ...)
 	TargetHighlight_PostUpdate(self, event, unit, ...)
@@ -82,9 +82,9 @@ local style = function(self, unit)
 
 		-- General frame settings
 	self:SetSize(136, 47)
-	self:SetFrameLevel(self:GetFrameLevel() + 10)
+	self:SetFrameLevel(self:GetFrameLevel() + 20)
 
-	ns.ApplyUnitFrameScriptsTo(self)
+	ns.ApplyUnitFrameScriptsTo(self, unit)
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)
@@ -182,7 +182,7 @@ local style = function(self, unit)
 
 	-- Midnight-compatible ToT watcher
 	local ToTWatcher = CreateFrame("Frame")
-	ToTWatcher.unit = unit
+	ToTWatcher.__unit = unit
 	ToTWatcher.frame = self
 	-- None of these appears to be passed to unittarget unitframes,
 	-- so we need a regular frame to monitor them. 
@@ -191,7 +191,7 @@ local style = function(self, unit)
 	ToTWatcher:RegisterEvent("PLAYER_FOCUS_CHANGED")
 	ToTWatcher:RegisterUnitEvent("UNIT_TARGET", "target")
 	ToTWatcher:SetScript("OnEvent", function(self, event, unit, ...)
-		UnitFrame_OnEvent(self.frame, event, self.unit, ...)
+		UnitFrame_OnEvent(self.frame, event, self.__unit, ...)
 	end)
 
 end

@@ -434,6 +434,7 @@ local style = function(self, unit)
 	-- General frame settings
 	self:SetSize(124, 168)
 	self:SetHitRectInsets(0, 0, 30, -2)
+	self:SetFrameLevel(self:GetFrameLevel() + 10)
 	self:EnableMouse(false)
 
 	-- ClassPower

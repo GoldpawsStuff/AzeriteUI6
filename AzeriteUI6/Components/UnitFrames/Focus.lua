@@ -39,10 +39,10 @@ local AreUnitsSame = ns.AreUnitsSame
 
 -- Update targeting highlight outline
 local TargetHighlight_PostUpdate = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.TargetHighlight
-	unit = unit or self.unit
+	unit = unit or self.__unit
 
 	if (AreUnitsSame(unit, "target")) then
 		element:Show()
@@ -52,7 +52,7 @@ local TargetHighlight_PostUpdate = function(self, event, unit, ...)
 end
 
 local UnitFrame_OnEvent = function(self, event, unit, ...)
-	if (unit and unit ~= self.unit) then return end
+	if (unit and unit ~= self.__unit) then return end
 
 	TargetHighlight_PostUpdate(self, event, unit, ...)
 end
@@ -61,9 +61,9 @@ local style = function(self, unit)
 
 		-- General frame settings
 	self:SetSize(136, 47)
-	self:SetFrameLevel(self:GetFrameLevel() + 10)
+	self:SetFrameLevel(self:GetFrameLevel() + 20)
 
-	ns.ApplyUnitFrameScriptsTo(self)
+	ns.ApplyUnitFrameScriptsTo(self, unit)
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)
