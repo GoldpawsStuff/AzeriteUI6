@@ -226,8 +226,8 @@ local PvPIndicator_Override = function(self, event, unit)
 						factionGroup = "Horde"
 					end
 				end
+				status = factionGroup
 			end
-			status = factionGroup
 		end
 	end
 
@@ -598,36 +598,48 @@ local style = function(self, unit)
 
 	-- Auras
 	--------------------------------------------
-	local auras = CreateFrame("Frame", nil, self)
+	local auras = self:CreateAuras()
 	auras:SetSize(316, 76)
 	auras:SetPoint("TOPRIGHT", -150, -126)
 
-	-- settings
-	auras.disableMouse = false
-	auras.disableCooldown = false
-	auras.onlyShowPlayer = false
+	-- Custom style function
+	auras.PostCreateButton = ns.AuraButton_PostCreate
+  	
+	-- Enable some sub-widgets
+	auras.showCount = true
+	auras.showBuffBorder = false
 
-	-- layout
-	auras.size = 36
-	auras.spacing = 4
-	auras.numTotal = 16
-	auras.spacingX = 4
-	auras.spacingY = 4
-	auras.initialAnchor = "TOPRIGHT"
-	auras.growthX = "LEFT"
-	auras.growthY = "DOWN"
-	auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
+	-- Group options
+	auras.num = 16
+	auras.maxFrameCount = 16 -- Number of buttons to display. Defaults to an infinite number (number)
+	auras.elementSpacing = 4 -- Spacing between each button (number) 
+	auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
+	auras.groupSpacing = 4 -- Spacing between each group (number) 
+	auras.groupLineSpacing = 4 -- Spacing between each group row or column 
+	auras.forceNewLine = false -- Whether to force a new row or column between each group (boolean)
 
 	-- sorting 
-	auras.reanchorIfVisibleChanged = true
-	auras.sortMethod = "TIME_REMAINING"
-	auras.sortDirection = "DESCENDING"
-	auras.buffFilter = "HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT"
-	auras.debuffFilter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY"
+	auras.sortMethod = AuraContainerSortMethod.Expiration -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
+	auras.sortDirection = AuraContainerSortDirection.Normal -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
+
+	auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT", {
+		-- Button options
+		size = 36,
+		tooltipAnchor = "ANCHOR_BOTTOMLEFT",
+		tooltipOffsetX = 0,
+		tooltipOffsetY = -4,
+	})
+
+	auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE", {
+		-- Button options
+		size = 36,
+		tooltipAnchor = "ANCHOR_BOTTOMLEFT",
+		tooltipOffsetX = 0,
+		tooltipOffsetY = -4,
+	})
 
 	self.Auras = auras
-	self.Auras.PostCreateButton = ns.AuraButton_PostCreate
-	self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget
+	--self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget -- gone?
 
 	-- General post update
 	self.PostUpdate = UnitFrame_PostUpdate

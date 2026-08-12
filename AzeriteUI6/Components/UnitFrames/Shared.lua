@@ -33,7 +33,8 @@ local GetMedia = ns.GetMedia
 
 -- Auras
 -----------------------------------------
-ns.AuraButton_PostCreate = function(element, button)
+--ns.AuraButton_PostCreate = function(element, options, button)
+ns.AuraButton_PostCreate = function(element, button, options)
 
 	-- adjust the stack count
 	button.Count:SetFontObject(GetFont(12,true))
@@ -57,7 +58,7 @@ ns.AuraButton_PostCreate = function(element, button)
 	border:SetFrameLevel(button:GetFrameLevel() + 2)
 	button.Border = border -- we need access for coloring
 
-	button.Overlay:SetTexture(GetMedia("blank"))
+	--button.Overlay:SetTexture(GetMedia("blank")) -- gone?
 
 	-- adjust the countdown/timer fontstring
 	local countdownString = button.Cooldown:GetCountdownFontString()
