@@ -1,4 +1,4 @@
-## Interface: 120007, 120005, 120001, 120000
+## Interface: 120100, 120007, 120005, 120001, 120000
 ## IconTexture: Interface\Addons\AzeriteUI6\Assets\power-crystal-ice-icon.tga
 
 ## Title: AzeriteUI
