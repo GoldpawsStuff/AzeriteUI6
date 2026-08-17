@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.5-RC] 2026-08-17
+### Fixed
+- Fixed a bug causing the addon to break when the library LibSharedMedia was loaded. This is used by a lot of addons include nearly every addon showing timer bars. 
+
 ## [1.0.4-RC] 2026-08-12
 - Updated toc version for WoW Retail Client Patch 12.1.0.
 - Started fixing things for the WoW 12.1.0 API.

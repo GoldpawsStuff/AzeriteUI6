@@ -23,11 +23,14 @@
 	SOFTWARE.
 
 --]]
+local _, ns = ...
+local GetMedia = ns.GetMedia
+
 local LSM = LibStub("LibSharedMedia-3.0", true)
 if (not LSM) then return end
 
 local AddMedia = function(mediatype, name, key)
-	LSM:Register(mediatype, name, ns.API.GetMedia(key or name) or key or name)
+	LSM:Register(mediatype, name, GetMedia(key or name) or key or name)
 end
 
 -- Borders
