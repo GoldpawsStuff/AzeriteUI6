@@ -87,9 +87,9 @@ MainActionBarMod.GetBar = function(self)
 		bar:SetPoint("BOTTOMLEFT", 60/.9, 42/.9) -- default position
 
 		-- Overwrite some default methods with our own
-		for name,method in pairs(MainActionBar) do
-			bar[name] = method
-		end
+		--for name,method in pairs(MainActionBar) do
+		--	bar[name] = method
+		--end
 
 		bar:Update() 
 
