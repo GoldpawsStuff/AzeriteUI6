@@ -365,7 +365,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.__IsVisible = button.IsVisible
 	button.IsVisible = function() return true end 
 
-	-- Stop button skinners from messing with it
+	-- Stop button skinners from messing with it, as they are incompatible with ours
 	button.MasqueSkinned = true -- disables LAB from changing a few textures
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
 	button.AddToMasque = function() end -- disables LAB from overriding it
