@@ -62,11 +62,18 @@ local BINDTEMPLATE_BY_ID = {
 	[BOTTOMLEFT_ACTIONBAR_PAGE] = "MULTIACTIONBAR1BUTTON%d",
 	[BOTTOMRIGHT_ACTIONBAR_PAGE] = "MULTIACTIONBAR2BUTTON%d",
 	[RIGHT_ACTIONBAR_PAGE] = "MULTIACTIONBAR3BUTTON%d",
-	[LEFT_ACTIONBAR_PAGE] = "MULTIACTIONBAR4BUTTON%d",
-	[MULTIBAR_5_ACTIONBAR_PAGE] = "MULTIACTIONBAR5BUTTON%d",
-	[MULTIBAR_6_ACTIONBAR_PAGE] = "MULTIACTIONBAR6BUTTON%d",
-	[MULTIBAR_7_ACTIONBAR_PAGE] = "MULTIACTIONBAR7BUTTON%d"
+	[LEFT_ACTIONBAR_PAGE] = "MULTIACTIONBAR4BUTTON%d"
 }
+do 
+	-- These only exist in Mainline and Camelot
+	for i = 5,7 do
+		local barName = string.format("MULTIBAR_%d_ACTIONBAR_PAGE",i)
+		local pageNumber = tonumber(_G[barName])
+		if (pageNumber) then
+			BINDTEMPLATE_BY_ID[pageNumber] = "MULTIACTIONBAR"..pageNumber.."BUTTON%d"
+		end
+	end
+end
 
 -- Return blizzard barID by from own bar numbers.
 local BAR_TO_ID = {
@@ -75,9 +82,9 @@ local BAR_TO_ID = {
 	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE, 	-- multibar 2
 	[4] = RIGHT_ACTIONBAR_PAGE, 		-- multibar 3
 	[5] = LEFT_ACTIONBAR_PAGE, 			-- multibar 4
-	[6] = MULTIBAR_5_ACTIONBAR_PAGE, 	-- multibar 5
-	[7] = MULTIBAR_6_ACTIONBAR_PAGE, 	-- multibar 6
-	[8] = MULTIBAR_7_ACTIONBAR_PAGE 	-- multibar 7
+	[6] = ns.WoWRetail or ns.WoWCamelot and MULTIBAR_5_ACTIONBAR_PAGE or nil, -- multibar 5
+	[7] = ns.WoWRetail or ns.WoWCamelot and MULTIBAR_6_ACTIONBAR_PAGE or nil, -- multibar 6
+	[8] = ns.WoWRetail or ns.WoWCamelot and MULTIBAR_7_ACTIONBAR_PAGE or nil -- multibar 7
 }
 
 -- Return our bar number from blizzard barID.
@@ -268,16 +275,24 @@ ActionBar.UpdateFading = function(self)
 	end
 end
 
+local hider = CreateFrame("Frame", nil, UIParent)
+hider:Hide()
+
 ActionBar.UpdateButtonCount = function(self)
 	if (InCombatLockdown()) then return end
 
 	for id,button in next,self.buttons do
 		if (id <= self.config.numbuttons) then
+			button:SetParent(self)
 			button:Show()
 			button:SetAttribute("statehidden", nil)
+			button:UpdateAction()
 		else
+			-- These aren't hiding. 
 			button:Hide()
+			button:SetParent(hider) -- UIParent
 			button:SetAttribute("statehidden", true)
+			button:UpdateAction()
 		end
 	end
 end
