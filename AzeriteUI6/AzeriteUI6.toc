@@ -1,11 +1,11 @@
-## Interface: 120100, 120007, 120005, 120001, 120000
+## Interface: 120100, 50504, 20506, 11509 
 ## IconTexture: Interface\Addons\AzeriteUI6\Assets\power-crystal-ice-icon.tga
 
 ## Title: AzeriteUI
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
-## Version: 1.0.2-Alpha
-## OptionalDeps: Ace3, LibActionButton-1.0, oUF, Clique, Bartender4
+## Version: 1.0.6-Alpha
+## OptionalDeps: Ace3, oUF, LibActionButton-1.0, Bartender4, Clique, SharedMedia
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul
@@ -22,10 +22,11 @@
 
 ## SavedVariables: AzeriteUI6_DB, AzeriteUI6_Positions_DB
 ## LoadSavedVariablesFirst: 1
+## AllowAddOnTableAccess: 1
 
 ## X-Curse-Project-ID: 1484064
 
 Fontstyles.xml
-Libs\Libs.xml
+Libs\Libs_[Game].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]
 Core\Core.xml
-Components\Components.xml
+Components\Components_[Game].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]

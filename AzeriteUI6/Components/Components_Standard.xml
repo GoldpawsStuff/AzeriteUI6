@@ -1,0 +1,44 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<!-- ActionBars -->
+	<Script file="ActionBars\Compatibility\HandleBartender.lua"/>
+	<Script file="ActionBars\Compatibility\HideBlizzard.lua"/>
+	<Script file="ActionBars\Prototypes\ActionButton.lua"/>
+	<Script file="ActionBars\Prototypes\PetButton.lua"/>
+	<Script file="ActionBars\Prototypes\StanceButton.lua"/>
+	<Script file="ActionBars\Prototypes\ActionBar.lua"/>
+	<Script file="ActionBars\MainActionBar.lua"/>
+	<Script file="ActionBars\MultiBar1.lua"/>
+	<Script file="ActionBars\MultiBar2.lua"/>
+	<Script file="ActionBars\MultiBar3.lua"/>
+	<Script file="ActionBars\MultiBar4.lua"/>
+	<Script file="ActionBars\MultiBar5.lua"/>
+	<Script file="ActionBars\MultiBar6.lua"/>
+	<Script file="ActionBars\MultiBar7.lua"/>
+	<Script file="ActionBars\PetBar.lua"/>
+	<Script file="ActionBars\StanceBar.lua"/>
+
+	<!-- Chat -->
+	<Script file="Chat\ChatFrames.lua"/>
+
+	<!-- Minimap -->
+	<Script file="Minimap\Minimap.lua"/>
+
+	<!-- Trackers -->
+	<Script file="Trackers\ObjectiveTracker.lua"/>
+
+	<!-- UnitFrames-->
+	<Script file="UnitFrames\Shared.lua"/>
+	<Script file="UnitFrames\Tags.lua"/>
+	<Script file="UnitFrames\Player.lua"/>
+	<Script file="UnitFrames\ClassPower.lua"/>
+	<Script file="UnitFrames\Pet.lua"/>
+	<Script file="UnitFrames\Target.lua"/>
+	<Script file="UnitFrames\ToT.lua"/>
+	<Script file="UnitFrames\Focus.lua"/>
+	<Script file="UnitFrames\Party.lua"/>
+	<Script file="UnitFrames\Raid.lua"/>
+	<Script file="UnitFrames\ArenaPrep.lua"/>
+	<Script file="UnitFrames\ArenaEnemy.lua"/>
+
+</Ui>
