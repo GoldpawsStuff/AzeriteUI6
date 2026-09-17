@@ -66,6 +66,7 @@ local defaults = {
 	}
 }
 
+-- Checks if an event has occurred requiring faded elements to be visible
 ExplorerMode.CheckForForcedState = function(self)
 	local db = self.db.profile
 
@@ -114,6 +115,7 @@ ExplorerMode.CheckForForcedState = function(self)
 	return nil
 end
 
+-- Checks if the cursor currently has an object requiring faded elements to be visible
 ExplorerMode.CheckCursor = function(self)
 	--if (CursorHasSpell() or CursorHasItem()) then
 	--	self.busyCursor = true
@@ -160,6 +162,7 @@ end
 	end
 end--]]
 
+-- Checks if the player currently has a vehicle actionbar (or page)
 ExplorerMode.CheckVehicle = function(self)
 	-- Only check for vehicle bars where you have actions,
 	-- ignore vehicles you're just riding in like the
@@ -171,6 +174,7 @@ ExplorerMode.CheckVehicle = function(self)
 	self.inVehicle = nil
 end
 
+-- Checks if the player currently has an override bar (or page)
 ExplorerMode.CheckOverride = function(self)
 	if (HasOverrideActionBar() or HasTempShapeshiftActionBar()) then
 		self.hasOverride = true
@@ -179,6 +183,7 @@ ExplorerMode.CheckOverride = function(self)
 	self.hasOverride = nil
 end
 
+-- Checks if the player currently has a possess bar (or page)
 ExplorerMode.CheckPossess = function(self)
 	if (IsPossessBarVisible()) then
 		self.hasPossess = true
@@ -187,6 +192,7 @@ ExplorerMode.CheckPossess = function(self)
 	self.hasPossess = nil
 end
 
+-- Checks if the player currently has a dragon riding bar (or page)
 ExplorerMode.CheckDragonRiding = function(self)
 	if (HasBonusActionBar()) then
 		if (GetBonusBarOffset() == 5) then
@@ -199,6 +205,7 @@ ExplorerMode.CheckDragonRiding = function(self)
 	self.isDragonRiding = nil
 end
 
+-- Checks if the player currently has a target
 ExplorerMode.CheckTarget = function(self)
 	if (UnitExists("target")) then
 		self.hasTarget = true
@@ -211,6 +218,7 @@ ExplorerMode.CheckTarget = function(self)
 	self.hasDeadTarget = nil
 end
 
+-- Checks if the player currently has a focus target set
 ExplorerMode.CheckFocus = function(self)
 	if (UnitExists("focus")) then
 		self.hasFocus = true
@@ -219,6 +227,7 @@ ExplorerMode.CheckFocus = function(self)
 	self.hasFocus = nil
 end
 
+-- Checks if the player is currently in a group
 ExplorerMode.CheckGroup = function(self)
 	if (IsInGroup()) then
 		self.inGroup = true
@@ -227,6 +236,7 @@ ExplorerMode.CheckGroup = function(self)
 	self.inGroup = nil
 end
 
+-- Checks if the player is currently in an instance
 ExplorerMode.CheckInstance = function(self)
 	if (IsInInstance()) then
 		self.inInstance = true
