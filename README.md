@@ -1,6 +1,6 @@
 **AzeriteUI 6.0** is a custom World of Warcraft user interface for WoW Retail. 
 
-**Update:** Currently in the process of unifying all current WoW versions into this addon. Elements and features that are blocked in Retail and Forever will not be included in the Classic versions either. This is not a bug, it's intentional to provide a unified user interface experience across versions again.  
+**Update:** Currently in the process of unifying all current WoW versions into this addon. Elements and features that are blocked in Retail and Forever will not be included in the Classic versions either. This is not a bug, it's intentional to provide a unified user interface experience across versions again. Note that the addon currently **ONLY** works for WoW Retail, and I advice people to not attempt it in other flavors yet.  
 
 If you choose to download and manually install directly from GitHub, you'll need to additionally install the following as standalone addons:  
 - [Ace3](https://www.curseforge.com/wow/addons/ace3)  
@@ -13,6 +13,7 @@ The full and proper graphical options menu is not yet ready! Until then we can c
 ### Chat Commands
 - **/enablebar `n`** Enables action bar `n` *(replace `n` with `1`-`8`, `pet` or `stance`)*  
 - **/disablebar `n`** Disables action bar `n` *(replace `n` with `1`-`8`, `pet` or `stance`)*  
+- **/setbar `<args>`** Command to toggle/configure the actionbars. Will write a proper section in the README about this.  
 - **/lock** Toggles the movable frame anchors for this user interface. *(Note that most of the default Blizzard elements are controlled by the game's own EditMode, so you need to enter it to move or scale these.)*  
   - `Mouse Wheel` to scale/size a frame.  
   - `Shift` + `Left Mouse Button` to return a frame to its previous position.  
