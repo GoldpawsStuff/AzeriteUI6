@@ -22,7 +22,7 @@
 	<Script file="Chat\ChatFrames.lua"/>
 
 	<!-- Minimap -->
-	<Script file="Minimap\Minimap.lua"/>
+	<!--<Script file="Minimap\Minimap.lua"/>-->
 
 	<!-- Trackers -->
 	<!--<Script file="Trackers\ObjectiveTracker.lua"/>-->

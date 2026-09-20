@@ -515,7 +515,9 @@ local style = function(self, unit)
 	local portraitOverlayFrame = nil
 	portraitOverlayFrame = CreateFrame("Frame", nil, self, "PingReceiverAttributeTemplate")
 
-	Mixin(portraitOverlayFrame, PingableTypeMixin)
+	if (ns.WoW12 or ns.WoWCamelot) then
+		Mixin(portraitOverlayFrame, PingableTypeMixin)
+	end
 
 	portraitOverlayFrame.GetContextualPingType = function(self) return PingUtil:GetContextualPingTypeForUnit(self:GetTargetPingGUID()) end
 	portraitOverlayFrame.GetTargetPingGUID = function(self) return UnitGUID(unit) end
@@ -598,48 +600,51 @@ local style = function(self, unit)
 
 	-- Auras
 	--------------------------------------------
-	local auras = self:CreateAuras()
-	auras:SetSize(316, 76)
-	auras:SetPoint("TOPRIGHT", -150, -126)
+	if (ns.WoW12 or ns.WoWCamelot) then
 
-	-- Custom style function
-	auras.PostCreateButton = ns.AuraButton_PostCreate
-  	
-	-- Enable some sub-widgets
-	auras.showCount = true
-	auras.showBuffBorder = false
+		local auras = self:CreateAuras()
+		auras:SetSize(316, 76)
+		auras:SetPoint("TOPRIGHT", -150, -126)
 
-	-- Group options
-	auras.num = 16
-	auras.maxFrameCount = 16 -- Number of buttons to display. Defaults to an infinite number (number)
-	auras.elementSpacing = 4 -- Spacing between each button (number) 
-	auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
-	auras.groupSpacing = 4 -- Spacing between each group (number) 
-	auras.groupLineSpacing = 4 -- Spacing between each group row or column 
-	auras.forceNewLine = false -- Whether to force a new row or column between each group (boolean)
+		-- Custom style function
+		auras.PostCreateButton = ns.AuraButton_PostCreate
+		
+		-- Enable some sub-widgets
+		auras.showCount = true
+		auras.showBuffBorder = false
 
-	-- sorting 
-	auras.sortMethod = AuraContainerSortMethod.Expiration -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
-	auras.sortDirection = AuraContainerSortDirection.Normal -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
+		-- Group options
+		auras.num = 16
+		auras.maxFrameCount = 16 -- Number of buttons to display. Defaults to an infinite number (number)
+		auras.elementSpacing = 4 -- Spacing between each button (number) 
+		auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
+		auras.groupSpacing = 4 -- Spacing between each group (number) 
+		auras.groupLineSpacing = 4 -- Spacing between each group row or column 
+		auras.forceNewLine = false -- Whether to force a new row or column between each group (boolean)
 
-	auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT", {
-		-- Button options
-		size = 36,
-		tooltipAnchor = "ANCHOR_BOTTOMLEFT",
-		tooltipOffsetX = 0,
-		tooltipOffsetY = -4,
-	})
+		-- sorting 
+		auras.sortMethod = AuraContainerSortMethod.Expiration -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
+		auras.sortDirection = AuraContainerSortDirection.Normal -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
 
-	auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE", {
-		-- Button options
-		size = 36,
-		tooltipAnchor = "ANCHOR_BOTTOMLEFT",
-		tooltipOffsetX = 0,
-		tooltipOffsetY = -4,
-	})
+		auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT", {
+			-- Button options
+			size = 36,
+			tooltipAnchor = "ANCHOR_BOTTOMLEFT",
+			tooltipOffsetX = 0,
+			tooltipOffsetY = -4,
+		})
 
-	self.Auras = auras
-	--self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget -- gone?
+		auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE", {
+			-- Button options
+			size = 36,
+			tooltipAnchor = "ANCHOR_BOTTOMLEFT",
+			tooltipOffsetX = 0,
+			tooltipOffsetY = -4,
+		})
+
+		self.Auras = auras
+		--self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget -- gone?
+	end
 
 	-- General post update
 	self.PostUpdate = UnitFrame_PostUpdate

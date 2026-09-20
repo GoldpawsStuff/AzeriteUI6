@@ -26,7 +26,7 @@
 
 ## X-Curse-Project-ID: 1484064
 
-Fontstyles.xml
+FontStyles_[Family].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]
 Libs\Libs_[Game].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]
 Core\Core.xml
 Components\Components_[Game].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]

@@ -38,23 +38,23 @@ local buildVersion, buildNumber, buildDate, interfaceVersion = GetBuildInfo()
 ns.WoWBuild = tonumber(buildNumber) -- numerical build number for pure larger than/smaller than comparisons
 ns.WoWVersion = interfaceVersion -- patch version as string for display purposes
 
--- Booleans to check for specific versions
+-- Flavor Flags
 ns.WoWRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
 ns.WoWVanilla = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 ns.WoWTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 ns.WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 ns.WoWCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
+ns.WoWMidnight = (ns.WoWVersion >= 120000 and ns.WoWVersion < 130000)
+ns.WoWCamelot = (ns.WoWVersion >= 16000 and ns.WoWVersion < 20000)
 --ns.WoWCamelot = (WOW_PROJECT_ID == WOW_PROJECT_CAMELOT) -- doesn't exist yet?
-ns.WoWCamelot = ns.WoWVersion >= 16001 and ns.WoWVersion < 20000
 
--- Flags checking for "at least" a specific major version
-ns.WoW12 = ns.WoWVersion >= 120000 -- current expansion, added secrecy
-ns.WoW13 = ns.WoWVersion >= 130000 -- future expansion
+-- Minimum Version Flags
+ns.WoW12 = (ns.WoWVersion >= 120000) -- current expansion, added secrecy
+ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
--- Flags to disable currently unsupported alpha/beta versions for the public
-ns.WoWStandard = ns.WoWVersion >= 120000 and ns.WoWVersion < 130000 -- this doesn't refer to retail, but rather to what version this addon currently supports
-ns.IsCompatible = ns.WoWStandard or ns.WoWVanilla -- if this addon is compatible with the current client
+-- Flag to disable currently unsupported alpha/beta versions for the public
+ns.IsCompatible = ns.WoWMidnight or ns.WoWVanilla -- if this addon is compatible with the current client
 
 -- Tinkerers rejoyce!
 -- *We give public access through the WoW API, but adding this global for convenience.
@@ -280,9 +280,9 @@ local barToMod = {
 	["bar3"] 		= "MultiBar2", -- bottom right
 	["bar4"] 		= "MultiBar3", -- rightmost sidebar
 	["bar5"] 		= "MultiBar4", -- leftmost sidebar
-	["bar6"] 		= ns.WoWRetail or ns.WoWCamelot and "MultiBar5" or nil,
-	["bar7"] 		= ns.WoWRetail or ns.WoWCamelot and "MultiBar6" or nil,
-	["bar8"] 		= ns.WoWRetail or ns.WoWCamelot and "MultiBar7" or nil,
+	["bar6"] 		= (ns.WoW12 or ns.WoWCamelot) and "MultiBar5" or nil,
+	["bar7"] 		= (ns.WoW12 or ns.WoWCamelot) and "MultiBar6" or nil,
+	["bar8"] 		= (ns.WoW12 or ns.WoWCamelot) and "MultiBar7" or nil,
 	["pet"] 		= "PetBar",
 	["petbar"] 		= "PetBar",
 	["stance"] 		= "StanceBar", 

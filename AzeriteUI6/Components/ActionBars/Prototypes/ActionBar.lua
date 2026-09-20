@@ -77,14 +77,14 @@ end
 
 -- Return blizzard barID by from own bar numbers.
 local BAR_TO_ID = {
-	[1] = 1, 							-- primary action bar
-	[2] = BOTTOMLEFT_ACTIONBAR_PAGE, 	-- multibar 1
-	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE, 	-- multibar 2
-	[4] = RIGHT_ACTIONBAR_PAGE, 		-- multibar 3
-	[5] = LEFT_ACTIONBAR_PAGE, 			-- multibar 4
-	[6] = ns.WoWRetail or ns.WoWCamelot and MULTIBAR_5_ACTIONBAR_PAGE or nil, -- multibar 5
-	[7] = ns.WoWRetail or ns.WoWCamelot and MULTIBAR_6_ACTIONBAR_PAGE or nil, -- multibar 6
-	[8] = ns.WoWRetail or ns.WoWCamelot and MULTIBAR_7_ACTIONBAR_PAGE or nil -- multibar 7
+	[1] = 1, -- primary action bar
+	[2] = BOTTOMLEFT_ACTIONBAR_PAGE, -- multibar 1
+	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE, -- multibar 2
+	[4] = RIGHT_ACTIONBAR_PAGE, -- multibar 3
+	[5] = LEFT_ACTIONBAR_PAGE, -- multibar 4
+	[6] = (ns.WoW12 or ns.WoWCamelot) and MULTIBAR_5_ACTIONBAR_PAGE or nil, -- multibar 5
+	[7] = (ns.WoW12 or ns.WoWCamelot) and MULTIBAR_6_ACTIONBAR_PAGE or nil, -- multibar 6
+	[8] = (ns.WoW12 or ns.WoWCamelot) and MULTIBAR_7_ACTIONBAR_PAGE or nil -- multibar 7
 }
 
 -- Return our bar number from blizzard barID.
@@ -125,7 +125,9 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 		button.config.keyBoundTarget = keyBoundTarget
 	end
 
-	EventRegistry:RegisterCallback("HouseEditor.StateUpdated", function(_, state) bar:HousingStateChanged(state) end, bar)
+	if (ns.WoW12) then
+		EventRegistry:RegisterCallback("HouseEditor.StateUpdated", function(_, state) bar:HousingStateChanged(state) end, bar)
+	end
 
 	bar:SetAttribute("UpdateVisibility", [[
 		local visibility = self:GetAttribute("visibility");
@@ -275,24 +277,26 @@ ActionBar.UpdateFading = function(self)
 	end
 end
 
-local hider = CreateFrame("Frame", nil, UIParent)
-hider:Hide()
+do 
+	local hider = CreateFrame("Frame", nil, UIParent)
+	hider:Hide()
 
-ActionBar.UpdateButtonCount = function(self)
-	if (InCombatLockdown()) then return end
+	ActionBar.UpdateButtonCount = function(self)
+		if (InCombatLockdown()) then return end
 
-	for id,button in next,self.buttons do
-		if (id <= self.config.numbuttons) then
-			button:SetParent(self)
-			button:Show()
-			button:SetAttribute("statehidden", nil)
-			button:UpdateAction()
-		else
-			-- These aren't hiding. 
-			button:Hide()
-			button:SetParent(hider) -- UIParent
-			button:SetAttribute("statehidden", true)
-			button:UpdateAction()
+		for id,button in next,self.buttons do
+			if (id <= self.config.numbuttons) then
+				button:SetParent(self)
+				button:Show()
+				button:SetAttribute("statehidden", nil)
+				button:UpdateAction()
+			else
+				-- These aren't hiding. State driver? 
+				button:Hide()
+				button:SetParent(hider)
+				button:SetAttribute("statehidden", true)
+				button:UpdateAction()
+			end
 		end
 	end
 end

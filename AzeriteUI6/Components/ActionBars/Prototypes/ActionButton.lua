@@ -166,8 +166,12 @@ ns.ActionButton.Create = function(self, id, name, header)
 
 	-- hide unused elements
 	button.BorderShadow:SetParent(UIHider)
-	button.CooldownFlash:SetParent(UIHider)
-	button.InterruptDisplay:SetParent(UIHider)
+	if (button.CooldownFlash) then
+		button.CooldownFlash:SetParent(UIHider)
+	end
+	if (button.InterruptDisplay) then
+		button.InterruptDisplay:SetParent(UIHider)
+	end
 	button.NewActionTexture:SetParent(UIHider) -- initial hiding
 	button.NewActionTexture:Hide() -- initial hiding
 	button.NewActionTexture = false -- should be enough, LAB checks for existence before running methods 
@@ -175,9 +179,15 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.NormalTexture:SetParent(UIHider)
 	button.SpellHighlightAnim:Stop() -- default spell highlight, we use our own
 	button.SpellHighlightTexture:SetParent(UIHider)
-	button.SlotArt:SetParent(UIHider) -- more graphical crap we don't need
-	button.SpellCastAnimFrame:SetParent(UIHider) -- we sooo don't need a castbar in the button
-	button.TargetReticleAnimFrame:SetParent(UIHider) -- nothing with such a name deserves to exist
+	if (button.SlotArt) then
+		button.SlotArt:SetParent(UIHider) -- more graphical crap we don't need
+	end
+	if (button.SpellCastAnimFrame) then
+		button.SpellCastAnimFrame:SetParent(UIHider) -- we sooo don't need a castbar in the button
+	end
+	if (button.TargetReticleAnimFrame) then
+		button.TargetReticleAnimFrame:SetParent(UIHider) -- nothing with such a name deserves to exist
+	end
 
 	-- block BaseActionButtonMixin
 	button.SlotArt = nil -- this prevents the above from modifying or showing it
