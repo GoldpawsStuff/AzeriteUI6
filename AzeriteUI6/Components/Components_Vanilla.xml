@@ -2,7 +2,7 @@
 
 	<!-- ActionBars -->
 	<Script file="ActionBars\Compatibility\HandleBartender.lua"/>
-	<Script file="ActionBars\Compatibility\HideBlizzard_Vanilla.lua"/>
+	<Script file="ActionBars\Compatibility\HideBlizzard.lua"/>
 	<Script file="ActionBars\Prototypes\ActionButton.lua"/>
 	<Script file="ActionBars\Prototypes\PetButton.lua"/>
 	<Script file="ActionBars\Prototypes\StanceButton.lua"/>

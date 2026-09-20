@@ -76,7 +76,9 @@ local hideActionButton = function(button)
 end
 
 HideBlizzardActionBars.HideBlizzard = function(self)
-	hideActionBarFrame(MainActionBar, false)
+
+	hideActionBarFrame(MainMenuBar, false) -- <= 11.2.5
+	hideActionBarFrame(MainActionBar, false) -- >= 11.2.7/12.0
 	hideActionBarFrame(MultiBarBottomLeft, true)
 	hideActionBarFrame(MultiBarBottomRight, true)
 	hideActionBarFrame(MultiBarLeft, true)
@@ -105,6 +107,14 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	hideActionBarFrame(StatusTrackingBarManager, false)
 	hideActionBarFrame(BagsBar, true)
 	hideActionBarFrame(MicroMenu, true)
+
+	-- these events drive visibility, we want the MainMenuBar to remain invisible
+	if (MainMenuBar) then -- <= 11.2.5
+		MainMenuBar:UnregisterEvent("PLAYER_REGEN_ENABLED")
+		MainMenuBar:UnregisterEvent("PLAYER_REGEN_DISABLED")
+		MainMenuBar:UnregisterEvent("ACTIONBAR_SHOWGRID")
+		MainMenuBar:UnregisterEvent("ACTIONBAR_HIDEGRID")
+	end
 
 	if (C_AddOns.IsAddOnLoaded("Blizzard_NewPlayerExperience")) then
 		self:NPE_LoadUI()
