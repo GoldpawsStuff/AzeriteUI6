@@ -1,7 +1,9 @@
 local parent, ns = ...
-local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
-local global = GetAddOnMetadata(parent, 'X-oUF')
-local _VERSION = 'devel'
+local global = C_AddOns.GetAddOnMetadata(parent, 'X-oUF')
+local _VERSION = '@project-version@'
+if(_VERSION:find('project%-version')) then
+	_VERSION = 'devel'
+end
 
 local oUF = ns.oUF
 local Private = oUF.Private
@@ -9,33 +11,6 @@ local Private = oUF.Private
 local argcheck = Private.argcheck
 local print = Private.print -- luacheck: no unused
 local nierror = Private.nierror
-
-local _G = _G
-local strsplit = strsplit
-local assert, setmetatable = assert, setmetatable
-local next, type, select = next, type, select
-local strupper, format = strupper, format
-local tinsert, tremove = tinsert, tremove
-
-local SecureHandlerSetFrameRef = SecureHandlerSetFrameRef
-local RegisterAttributeDriver = RegisterAttributeDriver
-local UnregisterUnitWatch = UnregisterUnitWatch
-local RegisterUnitWatch = RegisterUnitWatch
-local CreateFrame = CreateFrame
-local IsLoggedIn = IsLoggedIn
-local UnitGUID = UnitGUID
-local Mixin = Mixin
-
-local SecureButton_GetUnit = SecureButton_GetUnit
-local SecureButton_GetModifiedUnit = SecureButton_GetModifiedUnit
-
-local SetNamePlateHitTestInsets = C_NamePlateManager and C_NamePlateManager.SetNamePlateHitTestInsets
-local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
-local SetNamePlateSize = C_NamePlate.SetNamePlateSize
-local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
-local SetCVar = C_CVar.SetCVar
-
-local NAMEPLATE_TYPE = Enum.NamePlateType
 
 local styles, style = {}
 local callback, objects, headers = {}, {}, {}
@@ -775,20 +750,21 @@ end
 do
 	local hitInset = 10000 -- some large number that will ensure we have full coverage
 	local function updateDriver(driver)
-		if(SetNamePlateSize and IsLoggedIn()) then
-			SetNamePlateSize(driver.plateWidth or 200, driver.plateHeight or 30)
+		if(C_NamePlate.SetNamePlateSize and IsLoggedIn()) then
+			C_NamePlate.SetNamePlateSize(driver.plateWidth or 200, driver.plateHeight or 30)
 
+			local SetNamePlateHitTestInsets = C_NamePlateManager and C_NamePlateManager.SetNamePlateHitTestInsets
 			if SetNamePlateHitTestInsets then
 				local enemyInset = driver.enemyNonInteractible and hitInset or -hitInset
-				SetNamePlateHitTestInsets(NAMEPLATE_TYPE.Enemy, enemyInset, enemyInset, enemyInset, enemyInset)
+				SetNamePlateHitTestInsets(Enum.NamePlateType.Enemy, enemyInset, enemyInset, enemyInset, enemyInset)
 
 				local friendlyInset = driver.friendlyNonInteractible and hitInset or -hitInset
-				SetNamePlateHitTestInsets(NAMEPLATE_TYPE.Friendly, friendlyInset, friendlyInset, friendlyInset, friendlyInset)
+				SetNamePlateHitTestInsets(Enum.NamePlateType.Friendly, friendlyInset, friendlyInset, friendlyInset, friendlyInset)
 			end
 
 			if(driver.cvars) then
 				for name, value in next, driver.cvars do
-					SetCVar(name, value)
+					C_CVar.SetCVar(name, value)
 				end
 			end
 		end
@@ -880,7 +856,7 @@ do
 		if(event == 'PLAYER_LOGIN') then
 			updateDriver(self)
 		elseif(event == 'PLAYER_TARGET_CHANGED') then
-			local nameplate = GetNamePlateForUnit('target')
+			local nameplate = C_NamePlate.GetNamePlateForUnit('target')
 			if(not nameplate or not nameplate.unitFrame) then return end
 
 			if(self.targetCallback) then
@@ -891,7 +867,7 @@ do
 			-- ForceUpdate calls layouts have to do after changing things
 			nameplate.unitFrame:UpdateAllElements(event)
 		elseif(event == 'NAME_PLATE_UNIT_ADDED') then
-			local nameplate = GetNamePlateForUnit(unit)
+			local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
 			if(not nameplate) then return end
 
 			oUF:DisableBlizzard(unit)
@@ -940,7 +916,7 @@ do
 			-- ForceUpdate calls layouts have to do after changing things
 			nameplate.unitFrame:UpdateAllElements(event)
 		elseif(event == 'NAME_PLATE_UNIT_REMOVED') then
-			local nameplate = GetNamePlateForUnit(unit)
+			local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
 			if(not nameplate or not nameplate.unitFrame) then return end
 
 			nameplate.unitFrame:SetAttribute('unit', nil)
@@ -1015,7 +991,7 @@ function oUF:AddElement(name, update, enable, disable)
 end
 
 function oUF:GetSpellInfo(spellID)
-	local info = spellID and C_Spell_GetSpellInfo(spellID)
+	local info = spellID and C_Spell.GetSpellInfo(spellID)
 	if not info then return end
 
 	return info.name, nil, info.iconID, info.castTime, info.minRange, info.maxRange, info.spellID, info.originalIconID
