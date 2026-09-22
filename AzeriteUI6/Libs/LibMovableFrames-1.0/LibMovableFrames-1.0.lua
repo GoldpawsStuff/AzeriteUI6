@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibMovableFrames-1.0"
-local MINOR_VERSION = 1
+local MINOR_VERSION = 2
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")
@@ -220,7 +220,10 @@ Anchor.SaveToDB = function(self)
 	-- figure out current position
 	local point, x, y = GetNormalizedCoords(self, true) -- Get the normalized position of the anchor 
 	local scale = self.owner:GetScale() -- We need the frame's effective scale relative to the WorldFrame
-	local name = self.owner:GetName() or self.owner:GetDebugName()
+
+	-- Require an explicit, unique frame name, debugnames can change.
+	local name = self.owner:GetName()
+	if (not name) then return end
 
 	-- store in the global table
 	self.db[name] = { scale = scale, position = { point, x, y } }
@@ -228,7 +231,7 @@ end
 
 -- Restore last saved position
 Anchor.RestoreFromDB = function(self)
-	local savedPosition = self.db[(self.owner:GetName() or self.owner:GetDebugName())] -- is it saved?
+	local savedPosition = self.db[(self.owner:GetName())] -- is it saved?
 	if (savedPosition) then
 		local position, x, y = unpack(savedPosition.position)
 		if (position and x and y) then

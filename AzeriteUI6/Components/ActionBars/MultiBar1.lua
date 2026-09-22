@@ -31,15 +31,12 @@ local MultiBar1 = ns:NewModule("MultiBar1", nil, "AceConsole-3.0", "LibMoreEvent
 local defaults = { 
 	profile = {
 		enabled = false,
+
 		layout = "zigzag", -- <grid, zigzag>
 		layoutZigZagStart = 2, -- at which button the zigzag pattern should begin
 		layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
-		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
-		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
 
 		enableBarFading = true, -- whether to enable non-combat/hover button fading
-		fadeInCombat = false, -- whether to keep fading out even in combat
-		fadeFrom = 1, -- which button to start the button fading from
 	}
 }
 

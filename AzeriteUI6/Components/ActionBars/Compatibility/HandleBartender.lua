@@ -27,6 +27,10 @@ local _, ns = ...
 
 local HandleBartender = ns:NewModule("HandleBartender", nil, "LibMoreEvents-1.0", "AceHook-3.0")
 
+-- Hidden parent frame
+local UIHider = CreateFrame("Frame")
+UIHider:Hide()
+
 HandleBartender.HandleBagBar = function(self)
 	local BagBarMod = Bartender4:GetModule("BagBar")
 	if (not BagBarMod) then
@@ -67,7 +71,7 @@ HandleBartender.HandleVehicle = function(self)
 	if (Bartender4.vehicleController) then
 		OverrideActionBar:UnregisterAllEvents()
 		OverrideActionBar:Hide()
-		OverrideActionBar:SetParent(ns.Hider)
+		OverrideActionBar:SetParent(UIHider)
 		UnregisterStateDriver(Bartender4.vehicleController, "vehicle")
 		Bartender4.vehicleController:Execute([[ self:ClearBindings(); ]])
 	end

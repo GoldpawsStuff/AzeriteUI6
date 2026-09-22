@@ -24,6 +24,9 @@
 
 --]]
 local _, ns = ...
+local oUF = ns.oUF or oUF
+
+--LoadAddOn("Blizzard_TimeManager")
 
 local MinimapModule = ns:NewModule("Minimap", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 

@@ -35,14 +35,9 @@ local defaults = {
 		layout = "grid", -- <grid, zigzag>
 		layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
 		layoutGrowth = "horizontal", -- which direction the bar initially grows in
-		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
 		layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
-		layoutPaddingX = 8, -- horizontal padding between the buttons
-		layoutPaddingY = 8, -- vertical padding between the buttons
 	
 		enableBarFading = true, -- whether to enable non-combat/hover button fading
-		fadeInCombat = false, -- whether to keep fading out even in combat
-		fadeFrom = 1, -- which button to start the button fading from
 	}
 }
 
