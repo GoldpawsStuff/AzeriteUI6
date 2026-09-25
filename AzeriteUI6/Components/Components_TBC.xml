@@ -24,6 +24,9 @@
 	<!-- Minimap -->
 	<Script file="Minimap\Minimap_Classic.lua"/>
 
+	<!-- Tooltips -->
+	<Script file="Tooltips\Tooltips.lua"/>
+
 	<!-- Trackers -->
 	<!--<Script file="Trackers\ObjectiveTracker.lua"/>-->
 
