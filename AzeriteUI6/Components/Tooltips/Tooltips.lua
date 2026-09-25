@@ -83,7 +83,6 @@ Tooltips.OnEnable = function(self)
 
 	self.anchor = anchor
 
-	-- Why doesn't this save...? All other frames do.
 	self:RegisterMovableFrameAnchor(self.anchor, HUD_EDIT_MODE_HUD_TOOLTIP_LABEL, "floaters", AzeriteUI6_Positions_DB)
 
 	self:SecureHook("GameTooltip_SetDefaultAnchor", "SetDefaultAnchor")
