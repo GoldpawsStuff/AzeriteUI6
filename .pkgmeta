@@ -14,8 +14,12 @@ externals:
     AzeriteUI6/Libs/AceConfig-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
     AzeriteUI6/Libs/AceSerializer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceSerializer-3.0
     AzeriteUI6/Libs/AceComm-3.0: https://repos.wowace.com/wow/ace3/trunk/AceComm-3.0
+	AzeriteUI6/Libs/LibButtonGlow-1.0: https://repos.wowace.com/wow/libbuttonglow-1-0
     AzeriteUI6/Libs/LibActionButton-1.0: https://repos.wowace.com/wow/libactionbutton-1-0
-    AzeriteUI6/Libs/oUF: https://github.com/oUF-wow/oUF
+    AzeriteUI6/Libs/oUF:
+        url: https://github.com/oUF-wow/oUF
+        branch: master  # grab master, not the latest tagged release
+        # tag: latest   # grab the latest tagged release
 
 move-folders:
     AzeriteUI6/AzeriteUI6: AzeriteUI6

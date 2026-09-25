@@ -17,13 +17,20 @@
 	@end-non-debug@-->
 	<Include  file="LibKeybound-1.0\lib.xml"/>
 	<Include  file="UTF8\utf8.xml"/>
+	<!--@do-not-package@-->
+	<Include file="..\oUF\oUF.xml"/>
+	<!--@end-do-not-package@-->
 	<!--@non-debug@
 	<Include file="oUF\oUF.xml"/>
 	@end-non-debug@-->
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
 	<Script file="LibDeflate\LibDeflate.lua"/>
-	<Script file="LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
+	<!--@do-not-package@-->
+	<Script file="..\LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
+	<Script file="..\LibActionButton-1.0\LibActionButton-1.0.lua"/>
+	<!--@end-do-not-package@-->
 	<!--@non-debug@
+	<Script file="LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
 	<Script file="LibActionButton-1.0\LibActionButton-1.0.lua"/>
 	@end-non-debug@-->
 	<Script file="LibMoreEvents-1.0\LibMoreEvents-1.0.lua"/>

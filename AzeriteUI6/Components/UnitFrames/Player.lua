@@ -414,57 +414,6 @@ local style = function(self, unit)
 
 	self.CombatFeedback = combatFeedback
 
-	-- Health Prediction
-	--------------------------------------------
-	-- This frame needs to be reversed, 
-	-- so we need to apply some trickery to make it work.
-	--local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
-	--damageAbsorb:SetFrameLevel(self.Health:GetFrameLevel() + 3)
-	--damageAbsorb:SetSize(386, 40)
-	--damageAbsorb:SetPoint("TOP")
-	--damageAbsorb:SetPoint("BOTTOM")
-	--damageAbsorb:SetPoint("RIGHT")
-	--damageAbsorb:SetStatusBarTexture(GetMedia("hp_cap_bar"))
-	--damageAbsorb:GetStatusBarTexture():SetAlpha(0) -- hide the bar tex, not the bar
-	--damageAbsorb:SetReverseFill(true)
-
-	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
-	--damageAbsorbTex:SetSize(385, 40)
-	--damageAbsorbTex:SetAllPoints(damageAbsorb:GetStatusBarTexture())
-	--damageAbsorbTex:SetTexture(GetMedia("hp_cap_bar"))
-	--damageAbsorbTex:SetTexCoord(1, 0, 0, 1)
-	--damageAbsorbTex:SetVertexColor(1, 1, 1, .35)
-
-	-- Fake absorb texture, needed for reversed bars
-	--local damageAbsorbTex = damageAbsorb:CreateTexture(nil, "ARTWORK", nil, 0)
-	--damageAbsorb.Texture = damageAbsorbTex
-
-	-- Register with oUF
-	--self.HealthPrediction = {
-	--	healingAll = nil, 
-	--	--damageAbsorb = damageAbsorb,
-	--	damageAbsorbClampMode = 0,
-	--	incomingHealClampMode = 0,
-	--	incomingHealOverflow = 1
-	--}
-
-	--local HealthPrediction_PostUpdate = function(element, unit)
-	--	local absorb = element.damageAbsorb
-	--	-- Is this considered secret?
-	--  -- Yes, it is. 
-	--	local min, max = absorb:GetMinMaxValues() -- secret
-	--	local val = absorb:GetValue() -- secret
-	--	if (val and min and max) then
-	--		perc = val/max -- this doesn't work, numbers are secret
-	--		absorb.Texture:SetTexCoord(perc, 0, 0, 1)
-	--		absorb.Texture:Show()
-	--	else
-	--		absorb.Texture:SetTexCoord(1, 0, 0, 1)
-	--		absorb.Texture:Hide()
-	--	end
-	--end
-	--self.HealthPrediction.PostUpdate = HealthPrediction_PostUpdate
-
 	-- Overlayed Castbar
 	--------------------------------------------
 	local castbar = CreateFrame("StatusBar", nil, self)
@@ -655,8 +604,43 @@ local style = function(self, unit)
 
 	-- Auras
 	--------------------------------------------
+	-- Oldstyle Auras
+	if (ns.WoWClassic) then
+		local auras = CreateFrame("Frame", nil, self)
+		auras:SetSize(40*8 - 4, 40*2 - 4)
+		auras:SetPoint("BOTTOMLEFT", 158, 91)
+
+		auras.size = 36
+		auras.spacing = 4
+		auras.numTotal = 16
+		auras.disableMouse = false
+		auras.disableCooldown = false
+		auras.onlyShowPlayer = false
+		auras.showStealableBuffs = false
+		auras.showBuffType = false
+		auras.showDebuffType = true
+		auras.initialAnchor = "BOTTOMLEFT"
+		auras["spacing-x"] = 4
+		auras["spacing-y"] = 4
+		auras["growth-x"] = "RIGHT"
+		auras["growth-y"] = "UP"
+		auras.tooltipAnchor = "ANCHOR_TOPLEFT"
+		auras.sortMethod = "TIME_REMAINING"
+		auras.sortDirection = "DESCENDING"
+		auras.reanchorIfVisibleChanged = true
+
+		--auras.CreateButton = ns.AuraStyles.CreateButton
+		--auras.PostUpdateButton = ns.AuraStyles.PlayerPostUpdateButton
+		--auras.CustomFilter = ns.AuraFilters.PlayerAuraFilter -- classic
+		--auras.FilterAura = ns.AuraFilters.PlayerAuraFilter -- retail
+		--auras.PreSetPosition = ns.AuraSorts.Default -- only in classic
+		--auras.SortAuras = ns.AuraSorts.DefaultFunction -- only in retail
+
+		self.Auras = auras
+	end
+
+	-- Modern Secrecy Auras
 	if (ns.WoW12 or ns.WoWCamelot) then
-		--local auras = CreateFrame("Frame", nil, self)
 		local auras = self:CreateAuras()
 		auras:SetSize(40*8 - 4, 40*2 - 4)
 		auras:SetPoint("BOTTOMLEFT", 158, 91)
