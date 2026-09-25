@@ -150,6 +150,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button:SetState(0, "action", (header.id - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
 
 	-- Add in a vehicle exit button at slot 7 for the primary action bar.
+	-- *pretty certain the game does this now? Or?
 	--if (header.id == 1 and button.id == 7) then
 	--	button:SetState(16, "custom", exitButton)
 	--	button:SetState(17, "custom", exitButton)
@@ -215,12 +216,14 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.backdrop:SetVertexColor(.67, .67, .67, 1)
 
 	-- cooldown
+	-- *cooldown spiral is fully opaque in the Classics. Fix it! 
 	button.cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
 	button.cooldown:ClearAllPoints()
 	button.cooldown:SetAllPoints(button.icon)
 	button.cooldown:SetUseCircularEdge(true)
 	button.cooldown:SetReverse(false)
 	button.cooldown:SetSwipeTexture(GetMedia("actionbutton-mask-circular"))
+	button.cooldown:SetSwipeColor(0, 0, 0, .5)
 	button.cooldown:SetDrawSwipe(true)
 	button.cooldown:SetBlingTexture(GetMedia("blank"), 0, 0, 0, 0)
 	button.cooldown:SetDrawBling(false)
