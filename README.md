@@ -26,7 +26,7 @@ This command is used to configure a visible actionbar. It controls layout and nu
 /setbar barID (layoutType) (keywordPair, keywordPair, ...)  
 ```
 - **barID** *(Required)* The ID of the bar. This is `1-8` in Retail and Forever, `1-5` in other versions.  
-- **layoutType** *(Optional)* The layout type of the bar. This is either `grid` or `zigzag`, where grid is a standard bartender-like layout, and zigzag is the kind of layout the primary action bar by default has from button 9.  
+- **layoutType** *(Optional)* The layout type of the bar. This is either `grid` or `zigzag`, where grid is a standard bartender-like layout, and zigzag is the kind of layout the primary action bar by default has from button 9. This argument should always come directly after the **barID**.  
 - **keywordPair** *(Optional)* Pairs of keywords and numbers to configure the bar:  
   - `max` **`n`** Maximum number of buttons on the bar, where **n** can range from `1-12`. Applies to all layoutTypes.   
   - `size` **`n`** The maximum length/width of a bar in number of buttons before a new row of buttons begin. Only applies to layoutType `grid`.  
