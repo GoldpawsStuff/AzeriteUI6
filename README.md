@@ -28,11 +28,13 @@ This command is used to configure a visible actionbar. It controls layout and nu
 - **barID** *(Required)* The ID of the bar. This is `1-8` in Retail and Forever, `1-5` in other versions.  
 - **layoutType** *(Optional)* The layout type of the bar. This is either `grid` or `zigzag`, where grid is a standard bartender-like layout, and zigzag is the kind of layout the primary action bar by default has from button 9. This argument should always come directly after the **barID**.  
 - **keywordPair** *(Optional)* Pairs of keywords and numbers to configure the bar:  
+  - `zigzag from` **`n`** This includes **layoutType** and directly follows **barID**. The zigzag pattern starts at button `n`, which can range from `1-12`.
   - `max` **`n`** Maximum number of buttons on the bar, where **n** can range from `1-12`. Applies to all layoutTypes.   
-  - `size` **`n`** The maximum length/width of a bar in number of buttons before a new row of buttons begin. Only applies to layoutType `grid`.  
-  - `from` **`n`** The first button of the second row in a zigzag pattern when the layoutType is `zigzag`. The primary actionbar starts it default zigzag from button `9`.
+  - `size` **`n`** The maximum length/width of a bar in number of buttons before a new line of buttons begin. Only applies to **layoutType** `grid`.  
+  - `fade from` **`n`** Fade out the buttons starting from button number `n`.
+  - `nofade` Single instruction indicating this bar shouldn't fade at all. Only needed to disable a fade that was previously set.
   - `right` `left` `up` `down` 
-    - These are keywords that need to come as a pair, one horizontal, one vertical. These decide the growth of the bar. If you start with `up` or `down`, the bar will grow vertically first, typically a sidebar. If you start with `right` or `left`, the bar will grow horizontally first. To grow the bar right, then start a new row beneath it, you should use `right down`. 
+    - These are keywords that need to come as a pair of two; one horizontal, one vertical. These decide the growth of the bar. If you start with `up` or `down`, the bar will grow vertically first, typically a sidebar. If you start with `right` or `left`, the bar will grow horizontally first. To grow the bar right and have a new row start beneath it, you should use `right down`. 
 
 ### Example Layout Commands
 Setup the primary action bar as a `4x2` grid with max `8` buttons:  
@@ -45,9 +47,8 @@ Setup the second actionbar as a vertical grid of `2x6`, where the first button i
 ```  
 Setup the primary action bar as the default AzeriteUI layout:  
 ```
-/setbar 1 zigzag from 9 max 12
+/setbar 1 zigzag from 9 max 12 fade from 8
 ```  
-
 
 ## Development Status
 - 🔁 UnitFrames  

@@ -281,10 +281,12 @@ local ClassPower_PostUpdate = function(element, cur, max, hasMaxChanged, powerTy
 		style = "Stagger"
 	end
 
+	-- For the impossible scenario with less than 3 class power points.
 	if (not style) then
 		return element:Hide()
 	end
 	
+	-- The user chose to hide it
 	if (not ClassPower.db.char.showClassPower) then
 		return element:Hide()
 	end

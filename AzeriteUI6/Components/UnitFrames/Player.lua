@@ -44,6 +44,11 @@ local GetMedia = ns.GetMedia
 local playerClass = UnitClassBase("player")
 local playerIsRetribution = playerClass == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
 
+-- These are powertypes that eventually will  
+-- go to zero when the player is out of combat.
+-- So when the player is standing around in cities, 
+-- we will almost always be looking at an empty power crystal.
+-- Thus we want something more interesting to look at. 
 local zeroPowerTypes = {
 	[Enum.PowerType.Rage] = true,
 	[Enum.PowerType.RunicPower] = true,
@@ -296,6 +301,7 @@ local Power_UpdateColor = function(self, event, unit)
 						r, g, b = r / 255, g / 255, b / 255
 					end
 				else
+					-- Check for our custom power crystal colors first, then regular power, then fall back to standard mana color.
 					color = self.colors.power[pToken.."_CRYSTAL"] or self.colors.power[pType] or self.colors.power.MANA
 				end
 			end

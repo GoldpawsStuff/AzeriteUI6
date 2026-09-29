@@ -558,7 +558,7 @@ ns.SetActionBarLayout = function(self, input)
 		if (bar) then bar:Update() end		
 	end
 end
--- /setbar 1 zigzag 8 fade from 9
+
 ns.RefreshConfig = function(self, event, ...)
 	if (event == "OnNewProfile") then
 		--local db, profileKey = ...
