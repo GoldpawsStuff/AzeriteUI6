@@ -150,7 +150,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button:SetState(0, "action", (header.id - 1) * NUM_ACTIONBAR_BUTTONS + button.id)
 
 	-- Add in a vehicle exit button at slot 7 for the primary action bar.
-	-- *pretty certain the game does this now? Or?
+	-- *pretty certain the game does this by itself now? Or?
 	--if (header.id == 1 and button.id == 7) then
 	--	button:SetState(16, "custom", exitButton)
 	--	button:SetState(17, "custom", exitButton)
@@ -158,7 +158,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	--end
 
 	-- general size and click settings
-	--button:SetHitRectInsets(-10, -10, -10, -10)
+	--button:SetHitRectInsets(-10, -10, -10, -10) -- adjusted and moved to ActionBar.lua
 	button:SetSize(header.buttonWidth, header.buttonHeight)
 	button:SetAttribute("buttonLock", true)
 	button:SetAttribute("checkselfcast", true)
@@ -320,10 +320,10 @@ ns.ActionButton.Create = function(self, id, name, header)
 
 	--[[
 		AssistedCombatHighlightFrame 
+		- assisted combat highlight (basically blizzard's own MaxDPS, sort of)
+		- *note to self, make compatible with MaxDPS if possible
 		- blue glow, next in rotation
 	--]]
-	-- assisted combat highlight (basically blizzard's own MaxDPS, sort of)
-	-- *note to self, make compatible with MaxDPS if possible
 	local ACH = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, 1)
 	ACH:SetSize(134.295081967, 134.295081967)
 	ACH:SetPoint("CENTER", 0, 0)
@@ -342,6 +342,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 
 	--[[
 		SpellActivationAlert 
+		- used when a reactive spell like a proc becomes available.
 		- yellow bright glow, activated spell
 		- uses LBG
 			- LBG.ShowOverlayGlow(button)
@@ -386,6 +387,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	-- prevents empty hovering buttons from appearing on initial login
 	-- when currently mounted/dragonriding or when using another bar with 
 	-- less than the standard 12 buttons.
+	-- *think I fixed this elsewhere, but for some reason didn't document it here.
 	--button:SetAlpha(0)
 	--button.setAlpha = button.SetAlpha
 	--button.SetAlpha = function(self, alpha)
