@@ -368,7 +368,6 @@ MinimapModule.RefreshConfig = function(self)
 end
 
 MinimapModule.OnEnable = function(self)
-
 	--local mapScale = 198/140 -- 1 in retail, larger in classics
 
 	--Minimap:SetScale(mapScale)
@@ -379,6 +378,9 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
+	C_AddOns.LoadAddOn("Blizzard_TimeManager")
+	C_AddOns.LoadAddOn("Blizzard_GroupFinder_VanillaStyle")
+
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")

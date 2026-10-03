@@ -1,7 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="LibStub\LibStub.lua"/>
 	<Include file="CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
-	<!--@non-debug@
 	<Include file="AceAddon-3.0\AceAddon-3.0.xml"/>
 	<Include file="AceDB-3.0\AceDB-3.0.xml"/>
 	<Include file="AceDBOptions-3.0\AceDBOptions-3.0.xml"/>
@@ -14,25 +13,13 @@
 	<Include file="AceConfig-3.0\AceConfig-3.0.xml"/>
 	<Include file="AceComm-3.0\AceComm-3.0.xml"/>
 	<Include file="AceSerializer-3.0\AceSerializer-3.0.xml"/>
-	@end-non-debug@-->
-	<Include  file="LibKeybound-1.0\lib.xml"/>
-	<Include  file="UTF8\utf8.xml"/>
-	<!--@do-not-package@-->
-	<Include file="..\oUF\oUF.xml"/>
-	<!--@end-do-not-package@-->
-	<!--@non-debug@
+	<Include file="LibKeybound-1.0\lib.xml"/>
+	<Include file="UTF8\utf8.xml"/>
 	<Include file="oUF\oUF.xml"/>
-	@end-non-debug@-->
 	<Script file="oUF_CombatFeedback\oUF_CombatFeedback.lua"/>
 	<Script file="LibDeflate\LibDeflate.lua"/>
-	<!--@do-not-package@-->
-	<Script file="..\LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
-	<Script file="..\LibActionButton-1.0\LibActionButton-1.0.lua"/>
-	<!--@end-do-not-package@-->
-	<!--@non-debug@
 	<Script file="LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
 	<Script file="LibActionButton-1.0\LibActionButton-1.0.lua"/>
-	@end-non-debug@-->
 	<Script file="LibMoreEvents-1.0\LibMoreEvents-1.0.lua"/>
 	<Script file="LibFadingFrames-1.0\LibFadingFrames-1.0.lua"/>
 	<Script file="LibMovableFrames-1.0\LibMovableFrames-1.0.lua"/>

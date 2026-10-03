@@ -550,6 +550,12 @@ PetBar.ReassignBindings = function(self)
 	end
 end
 
+PetBar.HasConflicts = function(self)
+	for _,addon in next,{ "ConsolePort_Bar" } do 
+		if (ns.IsAddOnEnabled(addon)) then return true end 
+	end
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 PetBar.UpdateSettings = function(self)
@@ -565,7 +571,7 @@ PetBar.RefreshConfig = function(self)
 end
 
 PetBar.OnInitialize = function(self)
-	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
+	if (self:HasConflicts()) then return self:Disable() end
 
 	self.db = ns.db:RegisterNamespace("PetBar", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

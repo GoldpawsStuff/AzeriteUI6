@@ -12,6 +12,9 @@
 	<Script file="ActionBars\MultiBar2.lua"/>
 	<Script file="ActionBars\MultiBar3.lua"/>
 	<Script file="ActionBars\MultiBar4.lua"/>
+	<!--<Script file="ActionBars\MultiBar5.lua"/>-->
+	<!--<Script file="ActionBars\MultiBar6.lua"/>-->
+	<!--<Script file="ActionBars\MultiBar7.lua"/>-->
 	<Script file="ActionBars\PetBar.lua"/>
 	<Script file="ActionBars\StanceBar.lua"/>
 
@@ -22,10 +25,10 @@
 	<Script file="Minimap\Minimap_Classic.lua"/>
 
 	<!-- Tooltips -->
-	<Script file="Tooltips\Tooltips.lua"/>
+	<Script file="Tooltips\Tooltips_Classic.lua"/>
 
 	<!-- Trackers -->
-	<Script file="Trackers\QuestWatchFrame.lua"/>
+	<Script file="Trackers\Tracker_Classic.lua"/>
 
 	<!-- UnitFrames-->
 	<Script file="UnitFrames\Shared.lua"/>
@@ -36,7 +39,10 @@
 	<Script file="UnitFrames\Target.lua"/>
 	<Script file="UnitFrames\ToT.lua"/>
 	<!--<Script file="UnitFrames\Focus.lua"/>-->
+	<Script file="UnitFrames\NamePlates.lua"/>
 	<!--<Script file="UnitFrames\Party.lua"/>-->
 	<!--<Script file="UnitFrames\Raid.lua"/>-->
+	<!--<Script file="UnitFrames\ArenaPrep.lua"/>-->
+	<!--<Script file="UnitFrames\ArenaEnemy.lua"/>-->
 
 </Ui>

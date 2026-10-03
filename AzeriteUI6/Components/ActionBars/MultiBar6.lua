@@ -58,6 +58,12 @@ MultiBar6.ReassignBindings = function(self)
 	end
 end
 
+MultiBar6.HasConflicts = function(self)
+	for _,addon in next,{ "ConsolePort_Bar" } do 
+		if (ns.IsAddOnEnabled(addon)) then return true end 
+	end
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 MultiBar6.UpdateSettings = function(self)
@@ -74,7 +80,7 @@ MultiBar6.RefreshConfig = function(self)
 end
 
 MultiBar6.OnInitialize = function(self)
-	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
+	if (self:HasConflicts()) then return self:Disable() end
 
 	self.db = ns.db:RegisterNamespace("MultiBar6", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

@@ -626,6 +626,12 @@ ChatFrames.OnEvent = function(self, event, ...)
 	end
 end
 
+ChatFrames.HasConflicts = function(self)
+	for _,addon in next,{ "Prat-3.0", "ls_Glass" } do 
+		if (ns.IsAddOnEnabled(addon)) then return true end 
+	end
+end
+
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
 ChatFrames.UpdateSettings = function(self)
@@ -644,7 +650,7 @@ ChatFrames.RefreshConfig = function(self)
 end
 
 ChatFrames.OnInitialize = function(self)
-	if (ns.IsAddOnEnabled("Prat-3.0") or ns.IsAddOnEnabled("ls_Glass")) then return self:Disable() end
+	if (self:HasConflicts()) then return self:Disable() end
 
 	self.db = ns.db:RegisterNamespace("ChatFrames", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

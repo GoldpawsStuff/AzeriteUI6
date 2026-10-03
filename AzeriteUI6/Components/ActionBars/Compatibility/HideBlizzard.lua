@@ -140,9 +140,14 @@ HideBlizzardActionBars.NPE_LoadUI = function(self)
 	Tutorials.AutoPushSpellWatcher:Complete()
 end
 
+HideBlizzardActionBars.HasConflicts = function(self)
+	for _,addon in next,{ "Bartender4", "ConsolePort_Bar" } do 
+		if (ns.IsAddOnEnabled(addon)) then return true end 
+	end
+end
+
 HideBlizzardActionBars.OnInitialize = function(self)
-	if (ns.IsAddOnEnabled("Bartender4")) then return self:Disable() end
-	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
+	if (self:HasConflicts()) then return self:Disable() end
 
 	self:HideBlizzard()
 end

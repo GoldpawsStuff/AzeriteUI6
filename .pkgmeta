@@ -1,32 +1,16 @@
 package-as: AzeriteUI6
 enable-nolib-creation: no
 
-externals:
-    AzeriteUI6/Libs/AceAddon-3.0: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
-    AzeriteUI6/Libs/AceDB-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
-    AzeriteUI6/Libs/AceDBOptions-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
-    AzeriteUI6/Libs/AceEvent-3.0: https://repos.wowace.com/wow/ace3/trunk/AceEvent-3.0
-    AzeriteUI6/Libs/AceTimer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
-    AzeriteUI6/Libs/AceConsole-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConsole-3.0
-    AzeriteUI6/Libs/AceHook-3.0: https://repos.wowace.com/wow/ace3/trunk/AceHook-3.0
-    AzeriteUI6/Libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
-    AzeriteUI6/Libs/AceGUI-3.0: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
-    AzeriteUI6/Libs/AceConfig-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
-    AzeriteUI6/Libs/AceSerializer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceSerializer-3.0
-    AzeriteUI6/Libs/AceComm-3.0: https://repos.wowace.com/wow/ace3/trunk/AceComm-3.0
-	AzeriteUI6/Libs/LibButtonGlow-1.0: https://repos.wowace.com/wow/libbuttonglow-1-0
-    AzeriteUI6/Libs/LibActionButton-1.0: https://repos.wowace.com/wow/libactionbutton-1-0
-    AzeriteUI6/Libs/oUF:
-        url: https://github.com/oUF-wow/oUF
-        branch: master  # grab master, not the latest tagged release
-        # tag: latest   # grab the latest tagged release
-
 move-folders:
     AzeriteUI6/AzeriteUI6: AzeriteUI6
 
-tools-used:
+embedded-libraries:
+  - ace3
+  - libstub
+  - libactionbutton-1-0
+  - libbuttonglow-1-0
   - ouf
-  
+
 manual-changelog:
     filename: CHANGELOG.md
     markup-type: markdown

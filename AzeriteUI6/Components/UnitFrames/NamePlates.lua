@@ -24,67 +24,75 @@
 
 --]]
 local _, ns = ...
+local oUF = ns.oUF or oUF
 
-local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0", "AceHook-3.0")
+local NamePlates = ns:NewModule("NamePlates", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
-	anchorToCursor = nil
+	enable = true
 }}
 
-Tooltips.SetDefaultAnchor = function(self, tooltip, parent)
-	if (not tooltip or tooltip:IsForbidden()) then return end
+-- Custom API locals
+local AbbreviateNumber = ns.AbbreviateNumber
+local GetFont = ns.GetFont
+local GetMedia = ns.GetMedia
 
-	if (GameTooltipStatusBar) then
-		GameTooltipStatusBar:SetHeight(2)
-		GameTooltipStatusBar:ClearAllPoints()
-		GameTooltipStatusBar:SetPoint("BOTTOMLEFT", tooltip, "BOTTOMLEFT", 6, 5)
-		GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", tooltip, "BOTTOMRIGHT", -6, 5)
-	end
+local style = function(self, unit)
 
-	if (parent and not parent:IsForbidden()) then
-		if (self.db.profile.anchorToCursor) then
-			tooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
-			return
-		else
-			local point, x, y = self.anchor:GetPoint()
 
-			tooltip:SetOwner(parent, "ANCHOR_NONE")
-			tooltip:ClearAllPoints()
-			tooltip:SetPoint(point, self.anchor, point)
-		end
+
+end
+
+NamePlates.HasConflicts = function(self)
+	for _,addon in next,{
+		"BetterBlizzPlates",
+		"ClassicPlatesPlus",
+		"Kui_Nameplates",
+		"NamePlateKAI",
+		"Nameplates",
+		"NDui",
+		"NeatPlates",
+		"Plater",
+		"SimplePlates",
+		"TidyPlates",
+		"TidyPlates_ThreatPlates",
+		"TidyPlatesContinued" } do 
+		if (ns.IsAddOnEnabled(addon)) then return true end 
 	end
 end
 
 -- This is called by the options menu on settings changes,
--- and by the modules themselves on enabling.
-Tooltips.UpdateSettings = function(self)
+-- and by the modules themselves on enabling and combat end.
+NamePlates.UpdateSettings = function(self)
 end
 
 -- This is called by the addon on full profile changes,
 -- and should call a full settings update.
-Tooltips.RefreshConfig = function(self)
+NamePlates.RefreshConfig = function(self)
 	self:UpdateSettings()
 end
 
-Tooltips.OnInitialize = function(self)
-	self.db = ns.db:RegisterNamespace("Tooltips", defaults)
+NamePlates.OnInitialize = function(self)
+	if (self:HasConflicts()) then return self:Disable() end
+
+	C_AddOns.LoadAddOn("Blizzard_NamePlates")
+
+	self.db = ns.db:RegisterNamespace("NamePlates", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
-Tooltips.OnEnable = function(self)
+NamePlates.OnEnable = function(self)
+	-- soft disabling
+	-- we still want the module and settings there
+	if (not self.db.profile.enable) then return end
 
-	local anchor = CreateFrame("Frame", "AZUI6_Tooltip", UIParent)
-	--anchor:SetPoint("BOTTOMRIGHT", -20, 70) 
-	anchor:SetPoint("BOTTOMRIGHT", -244, 124)
-	anchor:SetSize(250, 120)
+	oUF:RegisterStyle("AzeriteNamePlates", style)
+	oUF:SetActiveStyle("AzeriteNamePlates")
+	oUF:SpawnNamePlates("Azerite", callback, cvars)
 
-	self.anchor = anchor
-
-	self:RegisterMovableFrameAnchor(self.anchor, HUD_EDIT_MODE_HUD_TOOLTIP_LABEL, "floaters", AzeriteUI6_Positions_DB)
-
-	self:SecureHook("GameTooltip_SetDefaultAnchor", "SetDefaultAnchor")
-
+	-- figure out a way to bypass or change the blizz nameplate settings to match our plate sizes
+	-- also check how we can interact with their settings as much as possible
 end

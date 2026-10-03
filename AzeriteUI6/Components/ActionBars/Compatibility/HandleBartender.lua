@@ -101,9 +101,15 @@ HandleBartender.HandleBartender = function(self, event, addon)
 	ns.BartenderHandled = true
 end
 
+HandleBartender.HasConflicts = function(self)
+	for _,addon in next,{ "Bartender4", "ConsolePort_Bar" } do 
+		if (ns.IsAddOnEnabled(addon)) then return true end 
+	end
+end
+
 HandleBartender.OnInitialize = function(self)
-	if (not ns.IsAddOnEnabled("Bartender4")) then return self:Disable() end
-	if (ns.IsAddOnEnabled("ConsolePort_Bar")) then return self:Disable() end
+	if (self:HasConflicts()) then return self:Disable() end
+
 
 	self:HandleBartender()
 end

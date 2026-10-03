@@ -155,27 +155,57 @@ end
 
 -- Hover Scripts
 -----------------------------------------
+-- Classics
+local UpdateTooltip = function(self)
+	if (GameTooltip:IsForbidden()) then return end
+	GameTooltip:SetUnit(self.unit)
+end
+
 local OnEnter = function(self)
-	if (GameTooltip:IsForbidden()) then
-		self.UpdateTooltip = nil
-	else
+	if (GameTooltip:IsForbidden()) then return end
+
+	local unit = self.__unit or self:GetAttribute("unit")
+	if (not unit or not UnitExists(unit)) then return end
+
+	GameTooltip_SetDefaultAnchor(GameTooltip, self)
+
+	if (GameTooltip:SetUnit(unit)) then
+		GameTooltip:Show()
 	end
 end
+
 
 local OnLeave = function(self)
-	self.UpdateTooltip = nil
-	if (not GameTooltip:IsForbidden()) then
-		UnitFrame_OnLeave(self)
-	end
+	if (GameTooltip:IsForbidden()) then return end
+	GameTooltip:Hide()
 end
 
-ns.ApplyUnitFrameScriptsTo = function(frame)
-	-- Enable clicks (required for both targeting and menus)
-	frame:RegisterForClicks("AnyUp")
+--local OnEnter_Classic = function(self)
+--	self.UpdateTooltip = nil
+--
+--	if (GameTooltip:IsForbidden()) then
+--		self.UpdateTooltip = nil
+--		return
+--	end
+--
+--	GameTooltip_SetDefaultAnchor(GameTooltip, self)
+--	GameTooltip:SetUnit(frame.unit)
+--	GameTooltip:Show()
+--
+--	self.UpdateTooltip = UpdateTooltip
+--end
+--
+--local OnLeave_Classic = function(self)
+--	self.UpdateTooltip = nil
+--    if (GameTooltip:IsForbidden()) then return end
+--    GameTooltip:Hide()
+--end
 
-	-- Standard Blizzard tooltip handling (shows unit name, health, buffs, etc.)
-	frame:SetScript("OnEnter", OnEnter)
-	frame:SetScript("OnLeave", OnLeave)
+ns.ApplyUnitFrameScriptsTo = function(frame)
+	frame:RegisterForClicks("AnyUp")
+	frame:EnableMouse(true) -- this isn't automatic anymore?
+	frame:SetScript("OnEnter", (ns.WoW12 or ns.WoWCamelot) and OnEnter or UnitFrame_OnEnter --[[OnEnter_Classic]])
+	frame:SetScript("OnLeave", (ns.WoW12 or ns.WoWCamelot) and OnLeave or UnitFrame_OnLeave --[[OnLeave_Classic]])
 end
 
 ns.AreUnitsSame = function(u1, u2)
