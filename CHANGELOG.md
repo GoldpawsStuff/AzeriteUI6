@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-09-17
-Started planning support for the game flavors listed below. Note that these versions are not even in Alpha testing yet, and I highly discourage even attempting to install the addon on those gaming clients. That'll be about as fun and as useful as bading naked in a pool of sulphuric acid while covered in syrup and rolled in flesh eating ants. Unless that is your thing, wait for the tagged releases.  
+## [Unreleased] 2026-10-03
+- Now embeds all libraries directly in our repository, no externals. All credits appropriately given in the pkgmeta to ensure author rewards.  
+- Added basic support for all current versions of the game:  
   - Classic Era **1.15.9**.
   - Burning Crusade Anniversary **2.5.6**.
   - Mists of Pandaria Classic **5.5.4**.
