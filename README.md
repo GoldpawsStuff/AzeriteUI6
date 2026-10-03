@@ -1,6 +1,6 @@
 **AzeriteUI 6.0** is a custom user interface for World of Warcraft. 
 
-**Update:** Currently in the process of unifying all current WoW versions into this addon. Elements and features that are blocked in Retail and Forever will not be included in the Classic versions either. This is not a bug, it's intentional to provide a unified user interface experience across versions again. Note that the addon currently **ONLY** works for WoW Retail, and I advice people to not attempt it in other flavors yet.  
+**Update:** Currently in the process of unifying all current WoW versions into this addon. Elements and features that are blocked in Retail and Forever will not be included in the Classic versions either. This is not a bug, it's intentional to provide a unified user interface experience across versions again. Note that the addon currently is very limited, and I won't be answering questions related to when or if features will be available. It's a "wait and see" situation.  
 
 ## Configuring the UI
 The full and proper graphical options menu is not yet ready! Until then we can configure the user interface with the chat commands listed below. Note that the maximum number of bars is `8` for Retail and Forever, but `5` for all the Classic versions of the game.  
