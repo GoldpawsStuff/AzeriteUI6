@@ -79,7 +79,7 @@ HandleBartender.HandleVehicle = function(self)
 end
 
 HandleBartender.HandleBartender = function(self, event, addon)
-	if (not IsAddOnLoaded("Bartender4")) then
+	if (not C_AddOns.IsAddOnLoaded("Bartender4")) then
 		return self:RegisterEvent("ADDON_LOADED", "HandleBartender")
 	elseif (event == "ADDON_LOADED") then
 		if (addon ~= "Bartender4") then return end
@@ -109,7 +109,5 @@ end
 
 HandleBartender.OnInitialize = function(self)
 	if (self:HasConflicts()) then return self:Disable() end
-
-
 	self:HandleBartender()
 end

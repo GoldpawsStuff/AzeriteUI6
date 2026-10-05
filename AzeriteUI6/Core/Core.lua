@@ -34,7 +34,6 @@ ns.SETTINGS_VERSION = -1
 
 -- WoW client version
 local buildVersion, buildNumber, buildDate, interfaceVersion = GetBuildInfo()
-
 ns.WoWBuild = tonumber(buildNumber) -- numerical build number for pure larger than/smaller than comparisons
 ns.WoWVersion = interfaceVersion -- patch version as string for display purposes
 
@@ -47,14 +46,23 @@ ns.WoWCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
 ns.WoWMidnight = (ns.WoWVersion >= 120000 and ns.WoWVersion < 130000)
 ns.WoWCamelot = (ns.WoWVersion >= 16000 and ns.WoWVersion < 20000)
---ns.WoWCamelot = (WOW_PROJECT_ID == WOW_PROJECT_CAMELOT) -- doesn't exist yet?
 
 -- Minimum Version Flags
-ns.WoW12 = (ns.WoWVersion >= 120000) -- current expansion, added secrecy
+ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
 ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
--- Flag to disable currently unsupported alpha/beta versions for the public
-ns.IsCompatible = ns.WoWMidnight or ns.WoWVanilla -- if this addon is compatible with the current client
+-- Version name as a string meant for table indices
+ns.WoWVersionName = ns.WoWRetail and "Retail" or
+					ns.WoWVanilla and "Vanilla" or
+					ns.WoWTBC and "TBC" or
+					ns.WoWWrath and "Wrath" or
+					ns.WoWCata and "Cata" or
+					ns.WoWMists and "Mists" or
+					ns.WoWMidnight and "Midnight" or
+					ns.WoWCamelot and "Camelot"
+
+-- Uppercase constant for table indices
+ns.PlayerClassBase = UnitClassBase("player")
 
 -- Tinkerers rejoyce!
 -- *We give public access through the WoW API, but adding this global for convenience.

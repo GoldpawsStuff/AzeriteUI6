@@ -71,13 +71,17 @@ MinimapModule.StyleMinimap = function(self)
 
 	-- hide the clutter
 	MinimapCluster.BorderTop:SetParent(hider)
-	MinimapCluster.DielFrame:SetParent(hider) -- contains day/night indicator
+	if (ns.WoWCamelot) then -- Only in Forever
+		MinimapCluster.DielFrame:SetParent(hider) -- contains day/night indicator
+	end
 	MinimapCluster.Tracking:SetParent(hider)
 	MinimapCluster.ZoneTextButton:SetParent(hider)
 	Minimap.ZoomIn:SetParent(hider)
 	Minimap.ZoomOut:SetParent(hider)
 	MinimapCompassTexture:SetParent(hider)
-	MinimapCompassTextureUnderlay:SetParent(hider)
+	if (ns.WoWCamelot) then -- Only in Forever
+		MinimapCompassTextureUnderlay:SetParent(hider)
+	end
 	AddonCompartmentFrame:SetParent(hider)
 	GameTimeFrame:SetParent(hider)
 	TimeManagerClockButton:SetParent(hider)
@@ -86,11 +90,13 @@ MinimapModule.StyleMinimap = function(self)
 	-- hide new retail coords, or move them inside the map
 
 	-- Readjust stock coordinate text to match classic azerite position and size
-	MinimapCluster.MinimapContainer.PlayerCoords:ClearAllPoints()
-	MinimapCluster.MinimapContainer.PlayerCoords:SetPoint("BOTTOM", Minimap, "BOTTOM", 3, 23)
-	MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetFontObject(GetFont(12, true))
-	MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetTextColor(oUF.colors.offwhite:GetRGB())
-	MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetAlpha(.75)
+	if (ns.WoWCamelot) then -- Only in Forever
+		MinimapCluster.MinimapContainer.PlayerCoords:ClearAllPoints()
+		MinimapCluster.MinimapContainer.PlayerCoords:SetPoint("BOTTOM", Minimap, "BOTTOM", 3, 23)
+		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetFontObject(GetFont(12, true))
+		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetTextColor(oUF.colors.offwhite:GetRGB())
+		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetAlpha(.75)
+	end
 
 	-- get this out of the way
 	MinimapCluster:EnableMouse(false)
