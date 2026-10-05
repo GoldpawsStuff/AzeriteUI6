@@ -56,6 +56,9 @@ local defaults = {
 	}
 }
 
+-- Player class file name
+local playerClass = UnitClassBase("player")
+
 -- Return bindaction by blizzard barID.
 local BINDTEMPLATE_BY_ID = {
 	[1] = "ACTIONBUTTON%d",
@@ -64,14 +67,12 @@ local BINDTEMPLATE_BY_ID = {
 	[RIGHT_ACTIONBAR_PAGE] = "MULTIACTIONBAR3BUTTON%d",
 	[LEFT_ACTIONBAR_PAGE] = "MULTIACTIONBAR4BUTTON%d"
 }
-do 
-	-- These only exist in Mainline and Camelot
-	for i = 5,7 do
-		local barName = string.format("MULTIBAR_%d_ACTIONBAR_PAGE",i)
-		local pageNumber = tonumber(_G[barName])
-		if (pageNumber) then
-			BINDTEMPLATE_BY_ID[pageNumber] = "MULTIACTIONBAR"..pageNumber.."BUTTON%d"
-		end
+-- These only exist in Mainline and Camelot
+for i = 5,7 do
+	local barName = string.format("MULTIBAR_%d_ACTIONBAR_PAGE",i)
+	local pageNumber = tonumber(_G[barName])
+	if (pageNumber) then
+		BINDTEMPLATE_BY_ID[pageNumber] = "MULTIACTIONBAR"..pageNumber.."BUTTON%d"
 	end
 end
 
@@ -91,56 +92,52 @@ local BAR_TO_ID = {
 local ID_TO_BAR = {}
 for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
--- Bonusbar offset table based on Flavor and Class
--- *actual actionpage is always bonusbar offset + 6
+-- Bonusbar offset table based on expansion version and player class
 -- *the goal of this is to visually illustrate which classes in which game flavors have extra action pages, 
 --  while the finished table itself is just a list of available bonusbar offsets for the player.
-local BonusBarOffsets = ({
-	Vanilla = ({
+local bonusBarOffsets = 
+	ns.WoWVanilla and ({
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	TBC = ({
+	})[playerClass] or
+	ns.WoWTBC and ({
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Wrath = ({
+	})[playerClass] or
+	ns.WoWWrath and ({
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Cata = ({
+	})[playerClass] or
+	ns.WoWCata and ({
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Mists = ({
+	})[playerClass] or
+	ns.WoWMists and ({
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		MONK 	= { 1, 2, 3 }, 		-- Tiger, Ox, Serpent
 		PRIEST 	= { 1, 2 }, 		-- Shadowform, Shadow Dance
 		ROGUE 	= { 1 } 			-- Stealth
-	})[ns.PlayerClassBase],
-	Midnight = ({ -- Retail
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		EVOKER 	= { 1 }, 			-- Soar
-		ROGUE 	= { 1 } 			-- Stealth
-	})[ns.PlayerClassBase],
-	Camelot = ({ -- Forever
+	})[playerClass] or
+	ns.WoWCamelot and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Retail = ({ -- Midnight
+	})[playerClass] or 
+	ns.WoWMidnight or ns.WoWRetail and ({
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		EVOKER 	= { 1 }, 			-- Soar
 		ROGUE 	= { 1 } 			-- Stealth
-	})[ns.PlayerClassBase]
-})[ns.WoWVersionName]
+	})[playerClass] or {} -- create an empty fallback for iterating
+
+local UIHider = CreateFrame("Frame", nil, UIParent)
+UIHider:Hide()
 
 local ActionBar = CreateFrame("Frame")
 local ActionBar_MT = { __index = ActionBar }
@@ -328,26 +325,21 @@ ActionBar.UpdateFading = function(self)
 	end
 end
 
-do 
-	local hider = CreateFrame("Frame", nil, UIParent)
-	hider:Hide()
+ActionBar.UpdateButtonCount = function(self)
+	if (InCombatLockdown()) then return end
 
-	ActionBar.UpdateButtonCount = function(self)
-		if (InCombatLockdown()) then return end
-
-		for id,button in next,self.buttons do
-			if (id <= self.config.numbuttons) then
-				button:SetParent(self)
-				button:Show()
-				button:SetAttribute("statehidden", nil)
-				button:UpdateAction()
-			else
-				-- These aren't hiding. State driver? 
-				button:Hide()
-				button:SetParent(hider)
-				button:SetAttribute("statehidden", true)
-				button:UpdateAction()
-			end
+	for id,button in next,self.buttons do
+		if (id <= self.config.numbuttons) then
+			button:SetParent(self)
+			button:Show()
+			button:SetAttribute("statehidden", nil)
+			button:UpdateAction()
+		else
+			-- These aren't hiding. State driver? 
+			button:Hide()
+			button:SetParent(UIHider)
+			button:SetAttribute("statehidden", true)
+			button:UpdateAction()
 		end
 	end
 end
@@ -604,10 +596,8 @@ ActionBar.UpdateStateDriver = function(self)
 	if (self.id == 1) then
 		statedriver = "[overridebar][possessbar][shapeshift]possess;[bonusbar:5]dragon;[form,noform]0;[bar:2]2;[bar:3]3;[bar:4]4;[bar:5]5;[bar:6]6;"
 
-		if (BonusBarOffsets) then -- only exists for selected classes
-			for _,offset in next,BonusBarOffsets do
-				statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6)
-			end
+		for _,offset in next,bonusBarOffsets do
+			statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6) -- bonusbar paging is always bonusbar offset + 6
 		end
 
 		statedriver = statedriver .. "1"

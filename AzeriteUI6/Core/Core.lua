@@ -51,19 +51,6 @@ ns.WoWCamelot = (ns.WoWVersion >= 16000 and ns.WoWVersion < 20000)
 ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
 ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
--- Version name as a string meant for table indices
-ns.WoWVersionName = ns.WoWRetail and "Retail" or
-					ns.WoWVanilla and "Vanilla" or
-					ns.WoWTBC and "TBC" or
-					ns.WoWWrath and "Wrath" or
-					ns.WoWCata and "Cata" or
-					ns.WoWMists and "Mists" or
-					ns.WoWMidnight and "Midnight" or
-					ns.WoWCamelot and "Camelot"
-
--- Uppercase constant for table indices
-ns.PlayerClassBase = UnitClassBase("player")
-
 -- Tinkerers rejoyce!
 -- *We give public access through the WoW API, but adding this global for convenience.
 _G[addonName] = ns
