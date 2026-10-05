@@ -93,6 +93,8 @@ for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
 -- Bonusbar offset table based on Flavor and Class
 -- *actual actionpage is always bonusbar offset + 6
+-- *the goal of this is to visually illustrate which classes in which game flavors have extra action pages, 
+--  while the finished table itself is just a list of available bonusbar offsets for the player.
 local BonusBarOffsets = ({
 	Vanilla = ({
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
