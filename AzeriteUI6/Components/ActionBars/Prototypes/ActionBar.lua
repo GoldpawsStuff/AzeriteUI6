@@ -93,7 +93,7 @@ for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
 -- Bonusbar offset table based on Flavor and Class
 -- *actual actionpage is always bonusbar offset + 6
-local bonusBarOffsets = ({
+local BonusBarOffsets = ({
 	Vanilla = ({
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
@@ -602,8 +602,10 @@ ActionBar.UpdateStateDriver = function(self)
 	if (self.id == 1) then
 		statedriver = "[overridebar][possessbar][shapeshift]possess;[bonusbar:5]dragon;[form,noform]0;[bar:2]2;[bar:3]3;[bar:4]4;[bar:5]5;[bar:6]6;"
 
-		for _,offset in next,bonusBarOffsets do
-			statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6)
+		if (BonusBarOffsets) then -- only exists for selected classes
+			for _,offset in next,BonusBarOffsets do
+				statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6)
+			end
 		end
 
 		statedriver = statedriver .. "1"
