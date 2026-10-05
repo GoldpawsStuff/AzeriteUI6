@@ -91,6 +91,55 @@ local BAR_TO_ID = {
 local ID_TO_BAR = {}
 for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
+-- Bonusbar offset table based on Flavor and Class
+-- *actual actionpage is always bonusbar offset + 6
+local bonusBarOffsets = ({
+	Vanilla = ({
+		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
+		ROGUE 	= { 1 }, 			-- Stealth
+		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
+	})[ns.PlayerClassBase],
+	TBC = ({
+		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
+		PRIEST 	= { 1 }, 			-- Shadowform
+		ROGUE 	= { 1 }, 			-- Stealth
+		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
+	})[ns.PlayerClassBase],
+	Wrath = ({
+		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
+		PRIEST 	= { 1 }, 			-- Shadowform
+		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
+		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
+	})[ns.PlayerClassBase],
+	Cata = ({
+		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
+		PRIEST 	= { 1 }, 			-- Shadowform
+		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
+		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
+	})[ns.PlayerClassBase],
+	Mists = ({
+		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
+		MONK 	= { 1, 2, 3 }, 		-- Tiger, Ox, Serpent
+		PRIEST 	= { 1, 2 }, 		-- Shadowform, Shadow Dance
+		ROGUE 	= { 1 } 			-- Stealth
+	})[ns.PlayerClassBase],
+	Midnight = ({ -- Retail
+		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
+		EVOKER 	= { 1 }, 			-- Soar
+		ROGUE 	= { 1 } 			-- Stealth
+	})[ns.PlayerClassBase],
+	Camelot = ({ -- Forever
+		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
+		ROGUE 	= { 1 }, 			-- Stealth
+		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
+	})[ns.PlayerClassBase],
+	Retail = ({ -- Midnight
+		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
+		EVOKER 	= { 1 }, 			-- Soar
+		ROGUE 	= { 1 } 			-- Stealth
+	})[ns.PlayerClassBase]
+})[ns.WoWVersionName]
+
 local ActionBar = CreateFrame("Frame")
 local ActionBar_MT = { __index = ActionBar }
 
@@ -545,95 +594,6 @@ ActionBar.UpdateBindings = function(self)
 	inReassignBindingsLockdown = false
 end
 
-local bonusBarOffsetsFull = {
-	WoWVanilla = {
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		ROGUE 	= { 1 }, 			-- Stealth
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	},
-	WoWTBC = {
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		PRIEST 	= { 1 }, 			-- Shadowform
-		ROGUE 	= { 1 }, 			-- Stealth
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	},
-	WoWWrath = {
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		PRIEST 	= { 1 }, 			-- Shadowform
-		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	},
-	WoWCata = {
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		PRIEST 	= { 1 }, 			-- Shadowform
-		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	},
-	WoWMists = {
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		MONK 	= { 1, 2, 3 }, 		-- Tiger, Ox, Serpent
-		PRIEST 	= { 1, 2 }, 		-- Shadowform, Shadow Dance
-		ROGUE 	= { 1 } 			-- Stealth
-	},
-	WoWMidnight = {
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		EVOKER 	= { 1 }, 			-- Soar
-		ROGUE 	= { 1 } 			-- Stealth
-	},
-	WoWCamelot = {
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		ROGUE 	= { 1 }, 			-- Stealth
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	}
-}
-
-local bonusBarOffsets = ({
-	Vanilla = ({
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		ROGUE 	= { 1 }, 			-- Stealth
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	TBC = ({
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		PRIEST 	= { 1 }, 			-- Shadowform
-		ROGUE 	= { 1 }, 			-- Stealth
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Wrath = ({
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		PRIEST 	= { 1 }, 			-- Shadowform
-		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Cata = ({
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		PRIEST 	= { 1 }, 			-- Shadowform
-		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Mists = ({
-		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
-		MONK 	= { 1, 2, 3 }, 		-- Tiger, Ox, Serpent
-		PRIEST 	= { 1, 2 }, 		-- Shadowform, Shadow Dance
-		ROGUE 	= { 1 } 			-- Stealth
-	})[ns.PlayerClassBase],
-	Midnight = ({ -- Retail
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		EVOKER 	= { 1 }, 			-- Soar
-		ROGUE 	= { 1 } 			-- Stealth
-	})[ns.PlayerClassBase],
-	Camelot = ({ -- Forever
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		ROGUE 	= { 1 }, 			-- Stealth
-		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
-	})[ns.PlayerClassBase],
-	Retail = ({ -- Midnight
-		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
-		EVOKER 	= { 1 }, 			-- Soar
-		ROGUE 	= { 1 } 			-- Stealth
-	})[ns.PlayerClassBase]
-})[ns.WoWVersionName]
-
 ActionBar.UpdateStateDriver = function(self)
 	if (InCombatLockdown()) then return end
 
@@ -645,41 +605,6 @@ ActionBar.UpdateStateDriver = function(self)
 		for _,offset in next,bonusBarOffsets do
 			statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6)
 		end
-
-		--[[
-		local playerClass = UnitClassBase("player")
-		if (playerClass == "DRUID") then
-			statedriver = statedriver .. "[bonusbar:1]7;" -- Cat/Prowl
-			if (ns.WoWTBC or ns.WoWWrath or ns.WoWCata or ns.WoWMists) then
-				statedriver = statedriver .. "[bonusbar:2]8;" -- Tree of Life
-			end
-			statedriver = statedriver .. "[bonusbar:3]9;[bonusbar:4]10;" -- Bear, Moonkin
-	
-		elseif (playerClass == "EVOKER") then
-			statedriver = statedriver .. "[bonusbar:1]7;" -- Soar
-
-		elseif (playerClass == "MONK") then
-			if (ns.WoWMists) then
-				statedriver = statedriver .. "[bonusbar:1]7;[bonusbar:2]8;[bonusbar:3]9;" -- Tiger, Ox, Serpent
-			end
-
-		elseif (playerClass == "PRIEST") then
-			if (ns.WoWTBC or ns.WoWWrath or ns.WoWCata or ns.WoWMists) then
-				statedriver = statedriver .. "[bonusbar:1]7;" -- Shadowform
-			end
-
-		elseif (playerClass == "ROGUE") then
-			statedriver = statedriver .. "[bonusbar:1]7;" -- Stealth
-			if (ns.WoWWrath or ns.WoWCata or ns.WoWMists) then
-				statedriver = statedriver .. "[bonusbar:2]8;" -- Shadow Dance
-			end
-
-		elseif (playerClass == "WARRIOR") then
-			if (not ns.WoWRetail and not ns.WoWMists) then
-				statedriver = statedriver .. "[bonusbar:1]7;[bonusbar:2]8;[bonusbar:3]9;"
-			end
-		end
-		--]]
 
 		statedriver = statedriver .. "1"
 	else
