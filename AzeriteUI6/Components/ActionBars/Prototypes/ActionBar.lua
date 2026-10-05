@@ -602,7 +602,7 @@ ActionBar.UpdateStateDriver = function(self)
 
 		statedriver = statedriver .. "1"
 	else
-		statedriver = tostring(self.id)
+		statedriver = self.id and tostring(self.id)
 	end
 
 	UnregisterStateDriver(self, "page")
