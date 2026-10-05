@@ -56,9 +56,6 @@ local defaults = {
 	}
 }
 
--- Player class file name
-local playerClass = UnitClassBase("player")
-
 -- Return bindaction by blizzard barID.
 local BINDTEMPLATE_BY_ID = {
 	[1] = "ACTIONBUTTON%d",
@@ -92,52 +89,75 @@ local BAR_TO_ID = {
 local ID_TO_BAR = {}
 for i,j in next,BAR_TO_ID do ID_TO_BAR[j] = i end
 
+-- Player class file name
+local playerClass = UnitClassBase("player")
+
 -- Bonusbar offset table based on expansion version and player class
 -- *the goal of this is to visually illustrate which classes in which game flavors have extra action pages, 
 --  while the finished table itself is just a list of available bonusbar offsets for the player.
 local bonusBarOffsets = 
-	ns.WoWVanilla and ({
+
+	-- Season of Discovery
+	ns.WoWSoD and ({ 
+		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
+		ROGUE 	= { 1 }, 			-- Stealth
+		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
+	})[playerClass] or
+
+	-- Classic Era, Classic Era Hardcore, Classic Era Anniversary Hardcore	
+	ns.WoWVanilla and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or
-	ns.WoWTBC and ({
+
+	-- The Burning Crusade Anniversary
+	ns.WoWTBC and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or
-	ns.WoWWrath and ({
+
+	-- Wrath of the Lich King Classic
+	ns.WoWWrath and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or
-	ns.WoWCata and ({
+
+	-- Cataclysm Classic
+	ns.WoWCata and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or
-	ns.WoWMists and ({
+
+	-- Mists of Pandaria Classic
+	ns.WoWMists and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		MONK 	= { 1, 2, 3 }, 		-- Tiger, Ox, Serpent
 		PRIEST 	= { 1, 2 }, 		-- Shadowform, Shadow Dance
 		ROGUE 	= { 1 } 			-- Stealth
 	})[playerClass] or
+
+	-- Forever
 	ns.WoWCamelot and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or 
-	ns.WoWMidnight or ns.WoWRetail and ({
+
+	-- Midnight (Retail)
+	ns.WoWMidnight or ns.WoWRetail and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		EVOKER 	= { 1 }, 			-- Soar
 		ROGUE 	= { 1 } 			-- Stealth
-	})[playerClass] or {} -- create an empty fallback for iterating
+	})[playerClass] or 
 
-local UIHider = CreateFrame("Frame", nil, UIParent)
-UIHider:Hide()
+{} -- create an empty fallback for easier iterations
 
 local ActionBar = CreateFrame("Frame")
 local ActionBar_MT = { __index = ActionBar }
@@ -324,6 +344,9 @@ ActionBar.UpdateFading = function(self)
 		end
 	end
 end
+
+local UIHider = CreateFrame("Frame", nil, UIParent)
+UIHider:Hide()
 
 ActionBar.UpdateButtonCount = function(self)
 	if (InCombatLockdown()) then return end
