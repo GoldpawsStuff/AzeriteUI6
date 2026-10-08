@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.7-Alpha] 2026-10-06
+## [1.0.7-Alpha] 2026-10-08
 - Now embeds all libraries directly in our repository, no externals. All credits appropriately given in the pkgmeta to ensure author rewards.  
 - Added basic support for all current versions of the game:  
   - Classic Era **1.15.9**.
   - Burning Crusade Anniversary **2.5.6**.
   - Mists of Pandaria Classic **5.5.4**.
   - Forever **1.60.1**.
+  - Midnight **12.1.0**.
 
 ### Added
 - Added a chat based system to configure action bars. Currently in Alpha mode, will post usage information later. Note that this is not meant to replace a GUI, it's simply an addition that was faster to write and will provide the functionality until then. The commands will remain even when the GUI is done.
