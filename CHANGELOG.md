@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-17
+## [1.0.8-Alpha] 2026-10-17
 ### Added
-- Added a basic graphical options menu. Options are being added.
+- Added a basic graphical options menu accessible with `/az` or through the Blizzard Options. Work in progress.
 
 ### Fixed
 - Fixed an issue where Multi Action Bar 2-8 all displayed the contents of the Primary Action Bar.
