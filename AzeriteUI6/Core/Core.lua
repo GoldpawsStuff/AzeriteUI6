@@ -661,7 +661,7 @@ ns.OnInitialize = function(self)
 	self:RegisterChatCommand("resetpositions", "ResetSavedPositions") -- reset all addon saved positions
 	self:RegisterChatCommand("resetsettings", "ResetDB") -- reset all addon settings
 	self:RegisterChatCommand("az", "OpenOptions") -- open options menu
-	self:RegisterChatCommand("azui", "OpenOptions")
-	self:RegisterChatCommand("azerite", "OpenOptions")
-	self:RegisterChatCommand("azeriteui", "OpenOptions")
+	self:RegisterChatCommand("azui", "OpenOptions") -- adding a bunch of aliases
+	self:RegisterChatCommand("azerite", "OpenOptions") -- since people all seem to 
+	self:RegisterChatCommand("azeriteui", "OpenOptions") -- prefer different commands
 end
