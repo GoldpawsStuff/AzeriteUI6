@@ -37,46 +37,9 @@ local defaults = {
 		layout = "grid", -- <grid, zigzag>
 		layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
 		layoutGrowth = "horizontal", -- which direction the bar initially grows in
-		layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
+		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
 	
 		enableBarFading = false, -- whether to enable non-combat/hover button fading
-	}
-}
-
--- Declare options menu
-local mod = MultiBar4
-local options = {
-	type = "group",
-	name = L["Action Bar 5"],
-	args = {
-		enable = {
-			type = "toggle",
-			name = L["Enable"],
-			disabled = function() return InCombatLockdown() end,
-			get = function(info) return mod.db.profile.enabled end,
-			set = function(info, val) 
-				if InCombatLockdown() then return end
-
-				mod.db.profile.enabled = val 
-				mod:UpdateSettings()
-			end,
-			order = 1
-		},
-		numbuttons = {
-			type = "range", width = "full", min = 0, max = 12, step = 1,
-			name = L["Number of visible buttons:"],
-			desc = L["Sets the number of visible buttons on the Action Bar."],
-			disabled = function() return InCombatLockdown() end,
-			hidden = function() return not mod.db.profile.enabled end,
-			get = function(info) return mod.db.profile.numbuttons end,
-			set = function(info,val)
-				if InCombatLockdown() then return end
-
-				mod.db.profile.numbuttons = val
-				mod:UpdateSettings()
-			end,
-			order = 10
-		}
 	}
 }
 
@@ -85,7 +48,7 @@ MultiBar4.GetDefaults = function(self)
 end
 
 MultiBar4.GetOptions = function(self)
-	return options
+	return ns.GenerateActionBarOptionsByBarID(5)
 end
 
 MultiBar4.GetBar = function(self)

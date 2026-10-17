@@ -28,4 +28,4 @@ local _, ns = ...
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local KeyBound = LibStub("LibKeyBound-1.0")
 
-local StanceBar = ns:NewModule("StanceBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
+--local StanceBar = ns:NewModule("StanceBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")

@@ -58,87 +58,12 @@ local defaults = {
 	}
 }
 
--- Declare options menu
-local mod = MainActionBarMod
-local options = {
-	type = "group",
-	name = L["Action Bar 1"],
-	args = {
-		--[[--
-		layout
-			layoutZigZagStart
-			layoutZigZagOffset
-			layoutGridSize
-			layoutGrowth
-			layoutGrowthHorizontal
-			layoutGrowthVertical
-			layoutPaddingX
-			layoutPaddingY
-		enableBarFading
-			fadeInCombat
-			fadeFrom
-		--]]--
-		enable = {
-			type = "toggle",
-			name = L["Enable"],
-			disabled = function() return InCombatLockdown() end,
-			get = function(info) return mod.db.profile.enabled end,
-			set = function(info, val) 
-				if InCombatLockdown() then return end
-
-				mod.db.profile.enabled = val 
-				mod:UpdateSettings()
-			end,
-			order = 1
-		},
-		numbuttons = {
-			type = "range", width = "full", min = 0, max = 12, step = 1,
-			name = L["Number of visible buttons:"],
-			desc = L["Sets the number of visible buttons on the Action Bar."],
-			disabled = function() return InCombatLockdown() end,
-			hidden = function() return not mod.db.profile.enabled end,
-			get = function(info) return mod.db.profile.numbuttons end,
-			set = function(info,val)
-				if InCombatLockdown() then return end
-
-				mod.db.profile.numbuttons = val
-				mod:UpdateSettings()
-			end,
-			order = 10
-		}
-	}
-}
-
-local MainActionBar = {}
-
--- This doesn't really change anything, does it?
---MainActionBar.UpdateVisibilityDriver = function(self)
---	if (InCombatLockdown()) then return end
---
---	local visdriver
---
---	if (self.config.enabled) then
---		visdriver = "[petbattle]hide;"
---		visdriver = visdriver.."[possessbar]show;"
---		visdriver = visdriver.."[overridebar]show;" 
---		visdriver = visdriver.."[vehicleui]show;" -- vehicle ui
---		--visdriver = visdriver.."[target=vehicle,exists]show;" -- vehicle passenger (just the normal bar)
---		visdriver = visdriver.."[bonusbar:5,mounted]show;" -- dragonriding
---		visdriver = visdriver.."show"
---	end
---
---	UnregisterStateDriver(self, "vis")
---	self:SetAttribute("state-vis", "0")
---	RegisterStateDriver(self, "vis", visdriver or "hide")
---
---end
-
 MainActionBarMod.GetDefaults = function(self)
 	return defaults
 end
 
 MainActionBarMod.GetOptions = function(self)
-	return options
+	return ns.GenerateActionBarOptionsByBarID(1)
 end
 
 MainActionBarMod.GetBar = function(self)

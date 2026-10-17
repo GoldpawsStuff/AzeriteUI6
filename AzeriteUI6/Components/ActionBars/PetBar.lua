@@ -39,7 +39,7 @@ local defaults = {
 		layoutGridSize = NUM_PET_ACTION_SLOTS, -- when to start a new grid row
 		layoutGrowth = "horizontal", -- which direction the bar initially grows in
 		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
-		layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
+		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
 		layoutPaddingX = 8, -- horizontal padding between the buttons
 		layoutPaddingY = 8, -- vertical padding between the buttons
 	
@@ -54,43 +54,6 @@ local defaults = {
 		--	overridebar = true,
 		--	vehicleui = true
 		--}
-	}
-}
-
--- Declare options menu
-local mod = PetBar
-local options = {
-	type = "group",
-	name = L["Pet Bar"],
-	args = {
-		enable = {
-			type = "toggle",
-			name = L["Enable"],
-			disabled = function() return InCombatLockdown() end,
-			get = function(info) return mod.db.profile.enabled end,
-			set = function(info, val) 
-				if InCombatLockdown() then return end
-
-				mod.db.profile.enabled = val 
-				mod:UpdateSettings()
-			end,
-			order = 1
-		},
-		numbuttons = {
-			type = "range", width = "full", min = 0, max = 10, step = 1,
-			name = L["Number of visible buttons:"],
-			desc = L["Sets the number of visible buttons on the Action Bar."],
-			disabled = function() return InCombatLockdown() end,
-			hidden = function() return not mod.db.profile.enabled end,
-			get = function(info) return mod.db.profile.numbuttons end,
-			set = function(info,val)
-				if InCombatLockdown() then return end
-
-				mod.db.profile.numbuttons = val
-				mod:UpdateSettings()
-			end,
-			order = 10
-		}
 	}
 }
 
@@ -485,7 +448,7 @@ PetBar.GetDefaults = function(self)
 end
 
 PetBar.GetOptions = function(self)
-	return options
+	return ns.GenerateActionBarOptionsByBarID("pet")
 end
 
 PetBar.GetBar = function(self)
