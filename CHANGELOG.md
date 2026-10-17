@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added a basic graphical options menu. Options are being added.
 
+### Fixed
+- Fixed an issue where Multi Action Bar 2-8 all displayed the contents of the Primary Action Bar.
+
 ## [1.0.7-Alpha] 2026-10-08
 - Now embeds all libraries directly in our repository, no externals. All credits appropriately given in the pkgmeta to ensure author rewards.  
 - Added basic support for all current versions of the game:  
