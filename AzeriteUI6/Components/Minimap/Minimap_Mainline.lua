@@ -70,21 +70,23 @@ MinimapModule.StyleMinimap = function(self)
 	hider:Hide()
 
 	-- hide the clutter
-	MinimapCluster.BorderTop:SetParent(hider)
-	if (ns.WoWCamelot) then -- Only in Forever
-		MinimapCluster.DielFrame:SetParent(hider) -- contains day/night indicator
+	for _,element in next, {
+		MinimapCluster.BorderTop, -- Retail
+		MinimapCluster.DielFrame, -- Forever (contains day/night indicator)
+		MinimapCluster.Tracking,
+		MinimapCluster.ZoneTextButton,
+		Minimap.ZoomIn,
+		Minimap.ZoomOut,
+		MinimapCompassTexture,
+		MinimapCompassTextureUnderlay, -- Forever
+		AddonCompartmentFrame,
+		GameTimeFrame,
+		TimeManagerClockButton
+	} do
+		if (element) then 
+			element:SetParent(hider)
+		end
 	end
-	MinimapCluster.Tracking:SetParent(hider)
-	MinimapCluster.ZoneTextButton:SetParent(hider)
-	Minimap.ZoomIn:SetParent(hider)
-	Minimap.ZoomOut:SetParent(hider)
-	MinimapCompassTexture:SetParent(hider)
-	if (ns.WoWCamelot) then -- Only in Forever
-		MinimapCompassTextureUnderlay:SetParent(hider)
-	end
-	AddonCompartmentFrame:SetParent(hider)
-	GameTimeFrame:SetParent(hider)
-	TimeManagerClockButton:SetParent(hider)
 
 	-- hide various banners and retail buttons too? figure out what they are!
 	-- hide new retail coords, or move them inside the map

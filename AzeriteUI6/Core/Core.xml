@@ -7,9 +7,7 @@
 	<Script file="API\Media.lua"/>
 	<Script file="API\Numbers.lua"/>
 	<Script file="API\Tables.lua"/>
-
-	<!-- Will replace later -->
-	<Include file="Dialogs\Dialogs.xml"/>
+	<!--<Script file="API\Time.lua"/>-->
 
 	<!-- Core of this UI -->
 	<Script file="Core.lua"/>

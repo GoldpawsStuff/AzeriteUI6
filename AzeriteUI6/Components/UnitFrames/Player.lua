@@ -26,8 +26,10 @@
 local _, ns = ...
 local oUF = ns.oUF or oUF
 
-local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local LibOrb = LibStub("LibOrb-1.0")
+
+local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {

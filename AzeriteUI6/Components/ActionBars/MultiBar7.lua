@@ -25,6 +25,8 @@
 --]]
 local _, ns = ...
 
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+
 local MultiBar7 = ns:NewModule("MultiBar7", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
@@ -37,13 +39,58 @@ local defaults = {
 		layoutGrowth = "horizontal", -- which direction the bar initially grows in
 		layoutGrowthVertical = "UP", -- which direction the bar grows in vertically
 	
-		enableBarFading = true, -- whether to enable non-combat/hover button fading
+		enableBarFading = false, -- whether to enable non-combat/hover button fading
 	}
 }
 
+-- Declare options menu
+local mod = MultiBar7
+local options = {
+	type = "group",
+	name = L["Action Bar 8"],
+	args = {
+		enable = {
+			type = "toggle",
+			name = L["Enable"],
+			disabled = function() return InCombatLockdown() end,
+			get = function(info) return mod.db.profile.enabled end,
+			set = function(info, val) 
+				if InCombatLockdown() then return end
+
+				mod.db.profile.enabled = val 
+				mod:UpdateSettings()
+			end,
+			order = 1
+		},
+		numbuttons = {
+			type = "range", width = "full", min = 0, max = 12, step = 1,
+			name = L["Number of visible buttons:"],
+			desc = L["Sets the number of visible buttons on the Action Bar."],
+			disabled = function() return InCombatLockdown() end,
+			hidden = function() return not mod.db.profile.enabled end,
+			get = function(info) return mod.db.profile.numbuttons end,
+			set = function(info,val)
+				if InCombatLockdown() then return end
+
+				mod.db.profile.numbuttons = val
+				mod:UpdateSettings()
+			end,
+			order = 10
+		}
+	}
+}
+
+MultiBar7.GetDefaults = function(self)
+	return defaults
+end
+
+MultiBar7.GetOptions = function(self)
+	return options
+end
+
 MultiBar7.GetBar = function(self)
 	if (not self.Bar) then 
-		local bar = ns.ActionBar:Create(1, self.db.profile, "AZUI6_ActionBar1")
+		local bar = ns.ActionBar:Create(8, self.db.profile, "AZUI6_ActionBar1")
 		bar:SetScale(.9) -- default scale
 		bar:SetPoint("CENTER", 0, (100 + 64)/.9) -- default position
 		bar:Update() -- update size and layout
@@ -68,7 +115,6 @@ end
 -- and by the modules themselves on enabling and combat end.
 MultiBar7.UpdateSettings = function(self)
 	if (self.Bar) then
-		--self.Bar:UpdateBindings()
 		self.Bar:Update()
 	end
 end

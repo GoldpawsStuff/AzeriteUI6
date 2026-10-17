@@ -25,6 +25,8 @@
 --]]
 local _, ns = ...
 
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+
 local Trackers = ns:NewModule("ObjectiveTracker", nil, "AceTimer-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 
 -- Declare module defaults

@@ -46,6 +46,7 @@ local defaults = {
 	enableBarFading = false, -- whether to enable non-combat/hover button fading
 	fadeInCombat = false, -- whether to keep fading out even in combat
 	fadeFrom = 1, -- which button to start the button fading from
+	fadeAlone = true, -- let bars fade individually
 
 	numbuttons = NUM_ACTIONBAR_BUTTONS, -- 12
 	visibility = {

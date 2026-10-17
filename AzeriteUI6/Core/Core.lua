@@ -24,6 +24,9 @@
 
 --]]
 local addonName, ns = ...
+local addonTitle = C_AddOns.GetAddOnMetadata(addonName, "Title")
+
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local LibDeflate = LibStub("LibDeflate") -- intended for profile sharing later on. TODO!
 
 ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "AceTimer-3.0", "LibMoreEvents-1.0", "AceSerializer-3.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0")
@@ -87,7 +90,48 @@ local defaults = {
 	profile = {} 
 }
 
+-- Addon options menu
+local options = {
+	type = "group",
+	name = addonTitle,
+	childGroups = "tree",
+	args = {
+		-- root level controls
+	}
+}
+
 ns.exportableSettings, ns.exportableLayouts = {}, {}
+
+-- Generate the options menu
+ns.GenerateOptions = function(self)
+
+	-- iterate submodules
+	for name, module in self:IterateModules() do
+		if (module.GetOptions) then
+			local moduleOptions = module:GetOptions()
+			if (moduleOptions) then
+				options.args[name] = moduleOptions
+			end
+		end
+	end
+
+	-- profiles, etc.
+	local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.profiles = profiles
+	options.args.profiles.order = 1000
+
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+	local _, categoryID = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonTitle)
+	self.categoryID = categoryID
+end
+
+ns.OpenOptions = function(self)
+	if (self.categoryID) then
+		Settings.OpenToCategory(self.categoryID)
+	else
+		AceConfigDialog:Open(addonTitle)
+	end
+end
 
 -- Temporary solution while developing. 
 -- *Doesn't actually hide anything, just adds hover visibility.
@@ -348,7 +392,6 @@ end
 ns.SetActionBarLayout = function(self, input)
 	if (InCombatLockdown()) then return end
 
-
 	local args = stringsToTable(input)
 	--local args = { self:GetArgs(string.lower(input)) }
 
@@ -586,8 +629,17 @@ ns.RefreshConfig = function(self, event, ...)
 	end
 end
 
+ns.RefreshOptions = function(self)
+	LibStub("AceConfigRegistry-3.0"):NotifyChange(addonName)
+end
+
 ns.OnEnable = function(self)
 	self:ScheduleTimer("HideClutter", 1) -- some icons require a little time to be created
+
+	self:GenerateOptions() -- generate the options menu
+
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "RefreshOptions")
+    self:RegisterEvent("PLAYER_REGEN_ENABLED", "RefreshOptions")
 end
 
 ns.OnInitialize = function(self)
@@ -608,4 +660,8 @@ ns.OnInitialize = function(self)
 	self:RegisterChatCommand("setbar", "SetActionBarLayout") -- specify bar layout and button count
 	self:RegisterChatCommand("resetpositions", "ResetSavedPositions") -- reset all addon saved positions
 	self:RegisterChatCommand("resetsettings", "ResetDB") -- reset all addon settings
+	self:RegisterChatCommand("az", "OpenOptions") -- open options menu
+	self:RegisterChatCommand("azui", "OpenOptions")
+	self:RegisterChatCommand("azerite", "OpenOptions")
+	self:RegisterChatCommand("azeriteui", "OpenOptions")
 end

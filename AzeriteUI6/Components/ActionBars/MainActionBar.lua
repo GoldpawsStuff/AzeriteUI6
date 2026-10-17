@@ -25,6 +25,8 @@
 --]]
 local _, ns = ...
 
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+
 local MainActionBarMod = ns:NewModule("MainActionBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
@@ -56,6 +58,57 @@ local defaults = {
 	}
 }
 
+-- Declare options menu
+local mod = MainActionBarMod
+local options = {
+	type = "group",
+	name = L["Action Bar 1"],
+	args = {
+		--[[--
+		layout
+			layoutZigZagStart
+			layoutZigZagOffset
+			layoutGridSize
+			layoutGrowth
+			layoutGrowthHorizontal
+			layoutGrowthVertical
+			layoutPaddingX
+			layoutPaddingY
+		enableBarFading
+			fadeInCombat
+			fadeFrom
+		--]]--
+		enable = {
+			type = "toggle",
+			name = L["Enable"],
+			disabled = function() return InCombatLockdown() end,
+			get = function(info) return mod.db.profile.enabled end,
+			set = function(info, val) 
+				if InCombatLockdown() then return end
+
+				mod.db.profile.enabled = val 
+				mod:UpdateSettings()
+			end,
+			order = 1
+		},
+		numbuttons = {
+			type = "range", width = "full", min = 0, max = 12, step = 1,
+			name = L["Number of visible buttons:"],
+			desc = L["Sets the number of visible buttons on the Action Bar."],
+			disabled = function() return InCombatLockdown() end,
+			hidden = function() return not mod.db.profile.enabled end,
+			get = function(info) return mod.db.profile.numbuttons end,
+			set = function(info,val)
+				if InCombatLockdown() then return end
+
+				mod.db.profile.numbuttons = val
+				mod:UpdateSettings()
+			end,
+			order = 10
+		}
+	}
+}
+
 local MainActionBar = {}
 
 -- This doesn't really change anything, does it?
@@ -79,6 +132,14 @@ local MainActionBar = {}
 --	RegisterStateDriver(self, "vis", visdriver or "hide")
 --
 --end
+
+MainActionBarMod.GetDefaults = function(self)
+	return defaults
+end
+
+MainActionBarMod.GetOptions = function(self)
+	return options
+end
 
 MainActionBarMod.GetBar = function(self)
 	if (not self.Bar) then 
@@ -114,7 +175,6 @@ end
 -- and by the modules themselves on enabling and combat end.
 MainActionBarMod.UpdateSettings = function(self)
 	if (self.Bar) then
-		--self.Bar:UpdateBindings()
 		self.Bar:Update()
 	end
 end
@@ -137,6 +197,8 @@ end
 MainActionBarMod.OnEnable = function(self)
 	self:RegisterMovableFrameAnchor(self:GetBar(), string.lower(string.format(HUD_EDIT_MODE_ACTION_BAR_LABEL, 1)), "actionbars", AzeriteUI6_Positions_DB)
 	self:RegisterEvent("UPDATE_BINDINGS", "ReassignBindings")
-	--self:RegisterEvent("HOUSE_EDITOR_MODE_CHANGED", "HousingStateChanged")
+	--if (ns.WoWMidnight) then
+	--	self:RegisterEvent("HOUSE_EDITOR_MODE_CHANGED", "HousingStateChanged") 
+	--end
 	self:ReassignBindings()
 end

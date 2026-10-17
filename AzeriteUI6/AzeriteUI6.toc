@@ -28,5 +28,6 @@
 
 FontStyles_[Family].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]
 Libs\Libs_[Game].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]
+Locale\Locale.xml
 Core\Core.xml
 Components\Components_[Game].xml [AllowLoadGameType mainline, camelot, mists, tbc, vanilla]

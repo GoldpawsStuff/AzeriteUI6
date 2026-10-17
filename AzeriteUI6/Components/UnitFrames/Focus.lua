@@ -26,6 +26,8 @@
 local _, ns = ...
 local oUF = ns.oUF or oUF
 
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+
 local Focus = ns:NewModule("Focus", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
