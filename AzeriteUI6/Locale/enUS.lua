@@ -19,16 +19,14 @@ L["Stance Bar"] = HUD_EDIT_MODE_STANCE_BAR_LABEL
 --------------------------------------------------------------------
 L["Action Bar layout"] = true
 L["Enable Action Bar fading."] = true
-L["First ZigZag button"] = true
+L["Which button to start the ZigZag pattern from"] = true
 L["Grid"] = true
 L["Keep faded while engaged in combat."] = true
 L["Number of buttons before line-break."] = true
 L["Number of visible buttons"] = true
 L["Primary growth direction"] = true
 L["Secondary growth direction"] = true
-
 L["Sets the layout type of the Action Bar.|n|n|cff4488ffGrid:|r|nDisplay the Action Bar as a standard row, column or retangular grid of buttons.|n|n|cff4488ffZigZag:|r|nDisplay the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."] = true
-
 L["Sets the number of visible buttons on the Action Bar."] = true
 L["Sets the offset in fractions of a single button the second row of a ZigZag pattern should appear at."] = true
 L["Sets the horizontal padding between buttons on the Action Bar."] = true

@@ -51,14 +51,9 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 			type = "group",
 			name = L["Action Bar "..barID],
 			args = {
+				-- unfinished settings:
 				--[[--
-				layout
-					layoutZigZagStart
 					layoutZigZagOffset
-					layoutGridSize
-					layoutGrowth
-					layoutGrowthHorizontal
-					layoutGrowthVertical
 					layoutPaddingX
 					layoutPaddingY
 				enableBarFading
@@ -93,8 +88,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 					order = 15
 				}, 
 				layoutSpacer1 = {
-					type = "description", 
-					name = "",
+					type = "description", name = "",
 					disabled = function() return InCombatLockdown() end,
 					hidden = function() return not mod.db.profile.enabled end,
 					order = 16
@@ -161,6 +155,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 					end,
 					order = 21,
 				},
+				numbuttonsSpacer = { type = "description", fontSize = "medium", name = " ", order = 29 },
 				numbuttons = {
 					type = "range", width = "full", min = 1, max = 12, step = 1,
 					name = L["Number of visible buttons"],
@@ -187,11 +182,11 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 						mod.db.profile.layoutGridSize = tonumber(val)
 						mod:UpdateSettings()
 					end,
-					order = 31,
+					order = 40,
 				},
 				zigzagstart = {
 					type = "range", width = "full", min = 1, max = 12, step = 1,
-					name = L["First ZigZag button"],
+					name = L["Which button to start the ZigZag pattern from"],
 					desc = L["Sets what button to start the ZigZag pattern from. This is the ID of the first button on the second row of the pattern."],
 					disabled = function() return InCombatLockdown() end,
 					hidden = function() return not mod.db.profile.enabled or mod.db.profile.layout == "grid" end,
@@ -201,7 +196,13 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 						mod.db.profile.layoutZigZagStart = tonumber(val)
 						mod:UpdateSettings()
 					end,
-					order = 31,
+					order = 40,
+				},
+				fadingSpacer = { 
+					type = "description", fontSize = "medium", name = " ", 
+					disabled = function() return InCombatLockdown() end,
+					hidden = function() return not mod.db.profile.enabled end,
+					order = 99 
 				},
 			}
 		}
