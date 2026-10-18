@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 2026-10-18
+- Various.
+
 ## [1.0.9-RC] 2026-10-18
 - Fixed a bunch of things that magically broke.
 - Updated a bunch of things that weren't previously updated.
