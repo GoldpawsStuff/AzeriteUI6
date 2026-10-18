@@ -379,7 +379,7 @@ end
 
 MinimapModule.OnInitialize = function(self)
 	C_AddOns.LoadAddOn("Blizzard_TimeManager")
-	C_AddOns.LoadAddOn("Blizzard_GroupFinder_VanillaStyle")
+	--C_AddOns.LoadAddOn("Blizzard_GroupFinder_VanillaStyle") -- something else loads this in MoP, it bugs out when doing it twice
 
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

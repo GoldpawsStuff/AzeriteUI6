@@ -193,7 +193,7 @@ Focus.OnEnable = function(self)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameFocus")
 
-		local frame = self:Spawn("focus")
+		local frame = self:Spawn("focus", "AzeriteUnitFrameFocus")
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 196/.9, 247/.9)
 

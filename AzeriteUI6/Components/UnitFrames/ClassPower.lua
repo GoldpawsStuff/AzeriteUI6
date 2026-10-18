@@ -528,7 +528,7 @@ ClassPower.OnEnable = function(self)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameClassPower")
 
-		local frame = self:Spawn("player")
+		local frame = self:Spawn("player", "AzeriteUnitFrameClassPowerPlayer")
 		frame:SetScale(.9)
 		frame:SetPoint("CENTER", -223/.9, -84/.9)
 

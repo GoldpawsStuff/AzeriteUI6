@@ -99,21 +99,21 @@ local playerClass = UnitClassBase("player")
 local bonusBarOffsets = 
 
 	-- Season of Discovery
-	ns.WoWSoD and ({ 
+	(ns.WoWSoD) and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or
 
 	-- Classic Era, Classic Era Hardcore, Classic Era Anniversary Hardcore	
-	ns.WoWVanilla and ({ 
+	(ns.WoWVanilla) and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or
 
 	-- The Burning Crusade Anniversary
-	ns.WoWTBC and ({ 
+	(ns.WoWTBC) and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1 }, 			-- Stealth
@@ -121,7 +121,7 @@ local bonusBarOffsets =
 	})[playerClass] or
 
 	-- Wrath of the Lich King Classic
-	ns.WoWWrath and ({ 
+	(ns.WoWWrath) and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
@@ -129,7 +129,7 @@ local bonusBarOffsets =
 	})[playerClass] or
 
 	-- Cataclysm Classic
-	ns.WoWCata and ({ 
+	(ns.WoWCata) and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		PRIEST 	= { 1 }, 			-- Shadowform
 		ROGUE 	= { 1, 2 }, 		-- Stealth, Shadow Dance
@@ -137,7 +137,7 @@ local bonusBarOffsets =
 	})[playerClass] or
 
 	-- Mists of Pandaria Classic
-	ns.WoWMists and ({ 
+	(ns.WoWMists) and ({ 
 		DRUID 	= { 1, 2, 3, 4 }, 	-- Cat/Prowl, Tree of Life, Bear, Moonkin
 		MONK 	= { 1, 2, 3 }, 		-- Tiger, Ox, Serpent
 		PRIEST 	= { 1, 2 }, 		-- Shadowform, Shadow Dance
@@ -145,14 +145,14 @@ local bonusBarOffsets =
 	})[playerClass] or
 
 	-- Forever
-	ns.WoWCamelot and ({ 
+	(ns.WoWCamelot) and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		ROGUE 	= { 1 }, 			-- Stealth
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or 
 
 	-- Midnight (Retail)
-	ns.WoWMidnight or ns.WoWRetail and ({ 
+	(ns.WoWMidnight or ns.WoWRetail) and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		EVOKER 	= { 1 }, 			-- Soar
 		ROGUE 	= { 1 } 			-- Stealth

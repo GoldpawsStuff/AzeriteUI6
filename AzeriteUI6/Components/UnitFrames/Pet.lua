@@ -166,7 +166,7 @@ Pet.OnEnable = function(self)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFramePet")
 
-		local frame = self:Spawn("pet")
+		local frame = self:Spawn("pet", "AzeriteUnitFramePet")
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 332/.9, 102/.9)
 

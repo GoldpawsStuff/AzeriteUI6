@@ -687,7 +687,7 @@ Target.OnEnable = function(self)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameTarget")
 
-		local frame = self:Spawn("target")
+		local frame = self:Spawn("target", "AzeriteUnitFrameTarget")
 		frame:SetScale(.9)
 		frame:SetPoint("TOPRIGHT", -40/.9, -40/.9)
 

@@ -732,7 +732,14 @@ Player.OnEnable = function(self)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFramePlayer")
 
-		local frame = self:Spawn("player")
+		local frame = self:Spawn("player", "AzeriteUnitFramePlayer")
+
+		-- Need to do this once for oUF_Classic
+		local parent = frame:GetParent()
+		if (parent ~= UIParent) then
+			parent:SetAllPoints(UIParent)
+		end
+
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 46/.9, 100/.9) -- scaled coords
 

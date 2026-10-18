@@ -226,7 +226,7 @@ ToT.OnEnable = function(self)
 	oUF:Factory(function(self) 
 		self:SetActiveStyle("AzeriteUnitFrameTargetTarget")
 
-		local frame = self:Spawn("targettarget")
+		local frame = self:Spawn("targettarget", "AzeriteUnitFrameTargetTarget")
 		frame:SetScale(.9)
 		frame:SetPoint("TOPRIGHT", -446/.9, -66/.9)
 

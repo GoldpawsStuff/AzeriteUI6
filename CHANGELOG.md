@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.9-RC] 2026-10-18
+- Fixed a bunch of things that magically broke.
+- Updated a bunch of things that weren't previously updated.
+
 ## [1.0.8-Alpha] 2026-10-17
 ### Added
 - Added a basic graphical options menu accessible with `/az` or through the Blizzard Options. Work in progress.

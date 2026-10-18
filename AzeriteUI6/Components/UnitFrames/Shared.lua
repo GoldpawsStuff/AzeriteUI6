@@ -189,7 +189,7 @@ end
 --	end
 --
 --	GameTooltip_SetDefaultAnchor(GameTooltip, self)
---	GameTooltip:SetUnit(frame.unit)
+--	GameTooltip:SetUnit(self.unit)
 --	GameTooltip:Show()
 --
 --	self.UpdateTooltip = UpdateTooltip
@@ -204,8 +204,13 @@ end
 ns.ApplyUnitFrameScriptsTo = function(frame)
 	frame:RegisterForClicks("AnyUp")
 	frame:EnableMouse(true) -- this isn't automatic anymore?
-	frame:SetScript("OnEnter", (ns.WoW12 or ns.WoWCamelot) and OnEnter or UnitFrame_OnEnter --[[OnEnter_Classic]])
-	frame:SetScript("OnLeave", (ns.WoW12 or ns.WoWCamelot) and OnLeave or UnitFrame_OnLeave --[[OnLeave_Classic]])
+
+	--frame:SetScript("OnEnter", (ns.WoW12 or ns.WoWCamelot) and OnEnter or UnitFrame_OnEnter --[[OnEnter_Classic]])
+	--frame:SetScript("OnLeave", (ns.WoW12 or ns.WoWCamelot) and OnLeave or UnitFrame_OnLeave --[[OnLeave_Classic]])
+
+	-- Works for Retail, Forever, SoD, Classic Era 
+	frame:SetScript("OnEnter", OnEnter)
+	frame:SetScript("OnLeave", OnLeave)
 end
 
 ns.AreUnitsSame = function(u1, u2)

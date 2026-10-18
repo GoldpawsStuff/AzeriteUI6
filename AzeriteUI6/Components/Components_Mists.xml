@@ -29,7 +29,7 @@
 	<Script file="Tooltips\Tooltips_Classic.lua"/>
 
 	<!-- Trackers -->
-	<Script file="Trackers\Tracker_Classic.lua"/>
+	<Script file="Trackers\Tracker_Mists.lua"/>
 
 	<!-- UnitFrames-->
 	<Script file="UnitFrames\Shared.lua"/>
