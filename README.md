@@ -16,7 +16,7 @@ Toggles the movable frame anchors for this user interface. *(Note that most of t
   - `Shift` + `Right Mouse Button` to return a frame to its default position.  
 
 ### /setbar  
-This command is used to configure a visible actionbar. It controls layout and number of buttons. Note that though these commands always will remain in the UI to allow macros to switch layouts out of combat, they are not meant as the primary configuration option. I _will_ make a graphical menu where it's much easier to understand the setup. I simply wrote these first because it was faster!  
+This command is used to configure a visible actionbar. It controls layout and number of buttons. Meant as an additional source of configuration, not a replacement for the options menu.    
 ```Lua
 /setbar barID (layoutType) (keywordPair, keywordPair, ...)  
 ```
@@ -94,7 +94,7 @@ Setup the primary action bar as the default AzeriteUI layout:
     - 🔳 Player UnitFrame  
     - 🔳 Pet UnitFrame  
 	- 🔳 Group/Raid Tool  
-- 🔳 Options Menu  
+- 🔁 Options Menu  
 
 ✅ = Finished  
 🔁 = In progress  
