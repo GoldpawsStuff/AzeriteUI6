@@ -155,7 +155,6 @@ end
 
 -- Hover Scripts
 -----------------------------------------
--- Classics
 local UpdateTooltip = function(self)
 	if (GameTooltip:IsForbidden()) then return end
 	GameTooltip:SetUnit(self.unit)
@@ -174,42 +173,15 @@ local OnEnter = function(self)
 	end
 end
 
-
 local OnLeave = function(self)
 	if (GameTooltip:IsForbidden()) then return end
 	GameTooltip:Hide()
 end
 
---local OnEnter_Classic = function(self)
---	self.UpdateTooltip = nil
---
---	if (GameTooltip:IsForbidden()) then
---		self.UpdateTooltip = nil
---		return
---	end
---
---	GameTooltip_SetDefaultAnchor(GameTooltip, self)
---	GameTooltip:SetUnit(self.unit)
---	GameTooltip:Show()
---
---	self.UpdateTooltip = UpdateTooltip
---end
---
---local OnLeave_Classic = function(self)
---	self.UpdateTooltip = nil
---    if (GameTooltip:IsForbidden()) then return end
---    GameTooltip:Hide()
---end
-
 ns.ApplyUnitFrameScriptsTo = function(frame)
 	frame:RegisterForClicks("AnyUp")
 	frame:EnableMouse(true) -- this isn't automatic anymore?
-
-	--frame:SetScript("OnEnter", (ns.WoW12 or ns.WoWCamelot) and OnEnter or UnitFrame_OnEnter --[[OnEnter_Classic]])
-	--frame:SetScript("OnLeave", (ns.WoW12 or ns.WoWCamelot) and OnLeave or UnitFrame_OnLeave --[[OnLeave_Classic]])
-
-	-- Works for Retail, Forever, SoD, Classic Era 
-	frame:SetScript("OnEnter", OnEnter)
+	frame:SetScript("OnEnter", OnEnter) 
 	frame:SetScript("OnLeave", OnLeave)
 end
 
