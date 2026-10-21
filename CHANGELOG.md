@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-18
-- Various.
+## [1.0.10-RC] 2026-10-21
+### Changed
+- Changed the options menu structure a bit, moved the module listing into the addon listing on the left.
 
 ## [1.0.9-RC] 2026-10-18
 - Fixed a bunch of things that magically broke.
