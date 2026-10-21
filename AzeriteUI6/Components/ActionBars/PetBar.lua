@@ -26,6 +26,7 @@
 local _, ns = ...
 
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
+local LFF = LibStub("LibFadingFrames-1.0")
 local KeyBound = LibStub("LibKeyBound-1.0")
 
 local PetBar = ns:NewModule("PetBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
@@ -159,28 +160,36 @@ end
 PetActionBar.UpdateFading = function(self)
 	if (self.config.enabled and self.config.enableBarFading) then
 		for id,button in next,self.buttons do
-			-- remove any previous fade registrations
-			PetBar:UnregisterFrameForFading(button)
+
+			-- retrieve current fade status
+			local isRegistered = LFF:IsFrameRegisteredForFading(button)
 
 			-- register current fade for selected buttons
 			if (id >= self.config.fadeFrom) then
 				local button = self.buttons[id]
+
+				-- register fading for buttons with content
 				if (GetPetActionInfo(button.id)) then 
-					PetBar:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "petactionbuttons", -4, -4, -4, -4)
+					if (not isRegistered) then
+						LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "petactionbuttons", -4, -4, -4, -4)
+					end
 				else
-					-- update button?
+					-- unregister fade for buttons with no content
+					if (isRegistered) then
+						LFF:UnregisterFrameForFading(button)
+					end
+				end
+			else
+				-- unregister fade for buttons that no longer should be faded
+				if (isRegistered) then
+					LFF:UnregisterFrameForFading(button)
 				end
 			end
 		end
 	else
 		-- unregister all fading
 		for id,button in next,self.buttons do
-			PetBar:UnregisterFrameForFading(button)
-
-			-- whyever did I add this?
-			if (not GetPetActionInfo(button.id)) then
-				-- update button?
-			end
+			LFF:UnregisterFrameForFading(button)
 		end
 	end
 end

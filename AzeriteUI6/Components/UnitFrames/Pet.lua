@@ -140,6 +140,32 @@ local style = function(self, unit)
 
 end
 
+Pet.GetDefaults = function(self)
+	return defaults
+end
+
+Pet.GetOptions = function(self)
+	return {
+		type = "group",
+		name = L["Pet Frame"],
+		order = 210,
+		args = {
+			enable = {
+				type = "toggle", width = "full",
+				name = L["Enable"],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.enabled end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.enabled = val 
+					self:UpdateSettings()
+				end,
+				order = 1
+			},
+		}
+	}
+end
+
 -- Return the unitframe
 Pet.GetFrame = function(self)
 	return self.frame
@@ -148,6 +174,20 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 Pet.UpdateSettings = function(self)
+	if (InCombatLockdown()) then return end
+
+	local frame = self:GetFrame()
+	if (not frame) then return end
+
+	if (self.db.profile.enabled) then
+		if (not frame:IsEnabled()) then
+			frame:Enable()
+		end
+	else
+		if (frame:IsEnabled()) then
+			frame:Disable()
+		end
+	end
 end
 
 -- This is called by the addon on full profile changes,
@@ -175,6 +215,6 @@ Pet.OnEnable = function(self)
 		Pet.frame = frame
 
 		Pet:RegisterMovableFrameAnchor(frame, string.lower(PET), "unitframes", AzeriteUI6_Positions_DB)
-
+		Pet:UpdateSettings()
 	end)
 end

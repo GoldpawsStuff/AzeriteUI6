@@ -205,6 +205,20 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 ToT.UpdateSettings = function(self)
+	if (InCombatLockdown()) then return end
+
+	local frame = self:GetFrame()
+	if (not frame) then return end
+
+	if (self.db.profile.enabled) then
+		if (not frame:IsEnabled()) then
+			frame:Enable()
+		end
+	else
+		if (frame:IsEnabled()) then
+			frame:Disable()
+		end
+	end
 end
 
 -- This is called by the addon on full profile changes,
@@ -232,5 +246,6 @@ ToT.OnEnable = function(self)
 		ToT.frame = frame
 
 		ToT:RegisterMovableFrameAnchor(frame, string.lower(SHOW_TARGET_OF_TARGET_TEXT), "unitframes", AzeriteUI6_Positions_DB):SetAbove(true)
+		ToT:UpdateSettings()
 	end)
 end

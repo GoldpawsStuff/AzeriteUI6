@@ -7,7 +7,6 @@
 	<Script file="ActionBars\Prototypes\PetButton.lua"/>
 	<Script file="ActionBars\Prototypes\StanceButton.lua"/>
 	<Script file="ActionBars\Prototypes\ActionBar.lua"/>
-	<Script file="ActionBars\Prototypes\Options.lua"/>
 	<Script file="ActionBars\MainActionBar.lua"/>
 	<Script file="ActionBars\MultiBar1.lua"/>
 	<Script file="ActionBars\MultiBar2.lua"/>
@@ -18,6 +17,7 @@
 	<Script file="ActionBars\MultiBar7.lua"/>
 	<Script file="ActionBars\PetBar.lua"/>
 	<Script file="ActionBars\StanceBar.lua"/>
+	<Script file="ActionBars\Options.lua"/>
 
 	<!-- Chat -->
 	<Script file="Chat\ChatFrames.lua"/>

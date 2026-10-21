@@ -114,9 +114,7 @@ local defaults = {
 }
 
 local UpdateTooltip = function(self)
-	if (GameTooltip:IsForbidden()) then
-		return
-	end
+	if (GameTooltip:IsForbidden()) then return end
 	GameTooltip_SetDefaultAnchor(GameTooltip, self)
 	GameTooltip:SetPetAction(self.id)
 end
@@ -124,7 +122,6 @@ end
 local OnEnter = function(self, ...)
 	self.UpdateTooltip = UpdateTooltip
 	self:UpdateTooltip()
-	--self:OnEnter(...)
 end
 
 local OnLeave = function(self)

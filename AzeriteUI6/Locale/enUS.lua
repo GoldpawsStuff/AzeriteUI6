@@ -18,6 +18,12 @@ L["Pet Bar"] = HUD_EDIT_MODE_PET_ACTION_BAR_LABEL
 L["Raid"] = RAID
 L["Stance Bar"] = HUD_EDIT_MODE_STANCE_BAR_LABEL
 
+L["Player Frame"] = HUD_EDIT_MODE_PLAYER_FRAME_LABEL
+L["Pet Frame"] = HUD_EDIT_MODE_PET_FRAME_LABEL
+L["Focus Frame"] = HUD_EDIT_MODE_FOCUS_FRAME_LABEL
+L["Target Frame"] = HUD_EDIT_MODE_TARGET_FRAME_LABEL
+L["Target of Target"] = SHOW_TARGET_OF_TARGET_TEXT
+
 -- Addon Localization
 -- *Keep in alphanumerical order by the key
 --  to make it easier to manually search through.

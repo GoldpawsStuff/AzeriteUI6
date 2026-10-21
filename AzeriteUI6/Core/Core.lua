@@ -119,9 +119,8 @@ ns.GenerateOptions = function(self)
 	local _, categoryID = AceConfigDialog:AddToBlizOptions(addonName, addonTitle)
 	self.categoryID = categoryID
 
-	local subModules, subModuleNames = {}, {}
-
 	-- iterate submodules to get a list of titles
+	local subModules, subModuleNames = {}, {}
 	for name, module in self:IterateModules() do
 		if (module.GetOptions) then
 			local moduleOptions = module:GetOptions()
@@ -132,17 +131,25 @@ ns.GenerateOptions = function(self)
 		end
 	end
 
-	-- sort the title listing
-	table.sort(subModuleNames)
+	-- sort the title listing relative to 'order' fields, if they exist
+	table.sort(subModuleNames, function(a,b) 
+		-- Technically risky to assume a module exists before calling member methods,
+		-- but we literally verified this about 11 lines before this, so we're good.
+		local orderA = self:GetModule(a):GetOptions().order
+		local orderB = self:GetModule(b):GetOptions().order
+		if (orderA and orderB) then
+			return orderA < orderB 
+		end
+	end)
 
 	-- add submodules in alphanumerical order
 	for i = 1,#subModuleNames do
 		local name = subModuleNames[i]
-
+	
 		local module = subModules[name]
 		local moduleOptions = module:GetOptions()
 		moduleOptions.dialogHidden = true
-
+	
 		local moduleAppName = addonName .. "_" .. name
 		AceConfig:RegisterOptionsTable(moduleAppName, moduleOptions)
 		AceConfigDialog:AddToBlizOptions(moduleAppName, moduleOptions.name or name, addonTitle)
@@ -151,7 +158,7 @@ ns.GenerateOptions = function(self)
 	-- add profiles, etc.
 	local profiles = AceDBOptions:GetOptionsTable(self.db)
 	profiles.dialogHidden = true
-	profiles.order = 1000
+	profiles.order = 10000 -- this doesn't really matter here, does it? Order is by registration, in our case.
 
 	AceConfig:RegisterOptionsTable(addonName .. "_Profiles", profiles)
 	AceConfigDialog:AddToBlizOptions(addonName .. "_Profiles", "Profiles", addonTitle)

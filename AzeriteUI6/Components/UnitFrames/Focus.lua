@@ -31,7 +31,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local Focus = ns:NewModule("Focus", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {} }
+local defaults = { profile = {
+	enabled = true
+}}
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -165,6 +167,32 @@ local style = function(self, unit)
 
 end
 
+Focus.GetDefaults = function(self)
+	return defaults
+end
+
+Focus.GetOptions = function(self)
+	return {
+		type = "group",
+		name = L["Focus Frame"],
+		order = 230,
+		args = {
+			enable = {
+				type = "toggle", width = "full",
+				name = L["Enable"],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.enabled end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.enabled = val 
+					self:UpdateSettings()
+				end,
+				order = 1
+			},
+		}
+	}
+end
+
 -- Return the unitframe
 Focus.GetFrame = function(self)
 	return self.frame
@@ -173,6 +201,20 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling and combat end.
 Focus.UpdateSettings = function(self)
+	if (InCombatLockdown()) then return end
+
+	local frame = self:GetFrame()
+	if (not frame) then return end
+
+	if (self.db.profile.enabled) then
+		if (not frame:IsEnabled()) then
+			frame:Enable()
+		end
+	else
+		if (frame:IsEnabled()) then
+			frame:Disable()
+		end
+	end
 end
 
 -- This is called by the addon on full profile changes,
@@ -200,5 +242,6 @@ Focus.OnEnable = function(self)
 		Focus.frame = frame
 
 		Focus:RegisterMovableFrameAnchor(frame, string.lower(BINDING_NAME_FOCUSTARGET), "unitframes", AzeriteUI6_Positions_DB)
+		Focus:UpdateSettings()
 	end)
 end
