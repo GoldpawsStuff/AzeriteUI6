@@ -704,7 +704,7 @@ ns.OnInitialize = function(self)
 	self:RegisterChatCommand("azeriteui", "OpenOptions") -- prefer different commands
 
 	-- Standalone Ace3 adds this, but most people don't have that.
-	if (not ns.IsAddOnEnabled("Ace3")) then
+	if (C_AddOns.GetAddOnEnableState("Ace3", UnitGUID("player")) == Enum.AddOnEnableState.None) then
 		self:RegisterChatCommand("rl", function() ReloadUI() end)
 	end
 end

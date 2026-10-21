@@ -48,6 +48,7 @@ end
 
 NamePlates.HasConflicts = function(self)
 	for _,addon in next,{
+		"AzeriteUI6", -- doh
 		"BetterBlizzPlates",
 		"ClassicPlatesPlus",
 		"Kui_Nameplates",
@@ -60,7 +61,9 @@ NamePlates.HasConflicts = function(self)
 		"TidyPlates",
 		"TidyPlates_ThreatPlates",
 		"TidyPlatesContinued" } do 
-		if (ns.IsAddOnEnabled(addon)) then return true end 
+		if (C_AddOns.GetAddOnEnableState(addon, UnitGUID("player")) == Enum.AddOnEnableState.All) then
+			return true
+		end
 	end
 end
 
@@ -91,6 +94,7 @@ NamePlates.OnInitialize = function(self)
 end
 
 NamePlates.OnEnable = function(self)
+	print("enabling")
 	oUF:RegisterStyle("AzeriteNamePlates", style)
 	oUF:SetActiveStyle("AzeriteNamePlates")
 	oUF:SpawnNamePlates("Azerite", callback, cvars)

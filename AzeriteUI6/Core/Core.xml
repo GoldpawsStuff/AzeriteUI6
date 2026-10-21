@@ -1,7 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
 	<!-- Various APIs -->
-	<Script file="API\Addons.lua"/>
 	<Script file="API\Colors.lua"/>
 	<Script file="API\Fonts.lua"/>
 	<Script file="API\Media.lua"/>

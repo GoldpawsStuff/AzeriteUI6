@@ -103,7 +103,9 @@ end
 
 HandleBartender.HasConflicts = function(self)
 	for _,addon in next,{ "Bartender4", "ConsolePort_Bar" } do 
-		if (ns.IsAddOnEnabled(addon)) then return true end 
+		if (C_AddOns.GetAddOnEnableState(addon, UnitGUID("player")) == Enum.AddOnEnableState.All) then
+			return true
+		end
 	end
 end
 
