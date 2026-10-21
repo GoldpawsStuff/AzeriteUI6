@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 2026-10-21
+- Magic.
+
 ## [1.0.14-RC] 2026-10-21
 - Summarizing the day's updates under the latest tag for convenience.
 
