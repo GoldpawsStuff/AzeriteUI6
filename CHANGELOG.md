@@ -4,13 +4,19 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.12-RC] 2026-10-21
+## [1.0.14-RC] 2026-10-21
+- Summarizing the day's updates under the latest tag for convenience.
+
 ### Added
 - Added fading options to the Action Bar menus.
 - Added simple toggle switches for Player, Pet, Focus, Target and Target of Target Unit Frames to the options menu.
 
 ### Changed
 - Changed the options menu structure a bit, moved the module listing into the addon listing on the left.
+
+### Fixed
+- Fixed an issue where neither ours nor the default nameplates were shown.
+- Fixed the detection of conflicting addons, since apparently the whole API for this had changed.
 
 ## [1.0.9-RC] 2026-10-18
 - Fixed a bunch of things that magically broke.
