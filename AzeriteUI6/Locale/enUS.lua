@@ -1,7 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale((...), "enUS", true, false)
 
 -- Retrieved from GlobalStrings
--- *Shouldn't be any need to translate any of these,
+-- *Shouldn't be any need to further translate any of these,
 --  better to keep them as is for consistency with the game.
 L["Action Bar 1"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(1)
 L["Action Bar 2"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(2)
@@ -12,15 +12,14 @@ L["Action Bar 6"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(6)
 L["Action Bar 7"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(7)
 L["Action Bar 8"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(8)
 L["Enable"] = ENABLE
+L["Focus Frame"] = HUD_EDIT_MODE_FOCUS_FRAME_LABEL
 L["Group"] = GROUP
 L["Party"] = PARTY
+L["Player Frame"] = HUD_EDIT_MODE_PLAYER_FRAME_LABEL
 L["Pet Bar"] = HUD_EDIT_MODE_PET_ACTION_BAR_LABEL
+L["Pet Frame"] = HUD_EDIT_MODE_PET_FRAME_LABEL
 L["Raid"] = RAID
 L["Stance Bar"] = HUD_EDIT_MODE_STANCE_BAR_LABEL
-
-L["Player Frame"] = HUD_EDIT_MODE_PLAYER_FRAME_LABEL
-L["Pet Frame"] = HUD_EDIT_MODE_PET_FRAME_LABEL
-L["Focus Frame"] = HUD_EDIT_MODE_FOCUS_FRAME_LABEL
 L["Target Frame"] = HUD_EDIT_MODE_TARGET_FRAME_LABEL
 L["Target of Target"] = SHOW_TARGET_OF_TARGET_TEXT
 
