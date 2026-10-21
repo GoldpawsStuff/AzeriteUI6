@@ -5,11 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] 2026-10-21
-- Magic.
-
-## [1.0.14-RC] 2026-10-21
 - Summarizing the day's updates under the latest tag for convenience.
 
+## [1.0.14-RC] 2026-10-21
 ### Added
 - Added fading options to the Action Bar menus.
 - Added simple toggle switches for Player, Pet, Focus, Target and Target of Target Unit Frames to the options menu.
