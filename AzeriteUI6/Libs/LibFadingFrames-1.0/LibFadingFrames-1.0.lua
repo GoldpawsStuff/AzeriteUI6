@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 43
+local MINOR_VERSION = 44 -- 43
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
@@ -301,6 +301,13 @@ lib.SetFadeOutDuration = function(_, duration)
 	lib.fadeOutDuration = tonumber(duration) or fadeOutDuration
 end
 
+lib.IsFrameRegisteredForFading = function(_, frame)
+	if (not FadeFrames[frame]) then
+		return
+	end
+	return true
+end
+
 lib.RegisterFrameForFading = function(_, frame, fadeGroup, ...)
 	local shouldInit = not next(FadeFrames)
 	if (FadeFrames[frame]) then
@@ -382,15 +389,15 @@ lib.UnregisterFrameForFading = function(_, frame)
 	end
 
 	-- Return frames to full opacity.
-	if (frameType ~= "actionbutton" and frameType ~= "petbutton") then
+	--if (frameType ~= "actionbutton" and frameType ~= "petbutton") then
 		setCurrentAlpha(frame, 1)
-	end
+	--end
 
 	if (not next(FadeFrames)) then
 		lib:Disable()
 	end
 
-	--lib:UpdateTargetAlphas()
+	lib:UpdateTargetAlphas()
 end
 
 lib.Enable = function()
@@ -415,7 +422,6 @@ lib.Enable = function()
 	end
 
 	lib:UpdateTargetAlphas()
-
 end
 
 lib.Disable = function()
@@ -498,6 +504,7 @@ end
 local mixins = {
 	SetFadeInDuration = true,
 	SetFadeOutDuration = true,
+	IsFrameRegisteredForFading = true,
 	RegisterFrameForFading = true,
 	UnregisterFrameForFading = true
 }

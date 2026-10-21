@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] 2026-10-21
 - Various.
 
+## [1.0.11-RC] 2026-10-21
+### Added
+- Added fading options to the Action Bar menus.
+
 ## [1.0.10-RC] 2026-10-21
 ### Changed
 - Changed the options menu structure a bit, moved the module listing into the addon listing on the left.

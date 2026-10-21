@@ -27,6 +27,7 @@ L["Enable Action Bar fading."] = true
 L["Choose a section on the left."] = true
 L["Grid"] = true
 L["Keep faded while engaged in combat."] = true
+L["Prevents the faded Action Buttons from automatically becoming visible when engaged in combat. Faded Action Buttons are still visible when moused over."] = true
 L["Number of buttons before line-break."] = true
 L["Number of visible buttons"] = true
 L["Primary growth direction"] = true

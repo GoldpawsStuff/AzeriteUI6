@@ -185,7 +185,7 @@ local RegisterMouseScripts = function(self)
 	self:SetScript("OnLeave", OnLeave)
 end
 
--- Classic oUF parents to its own frame, 
+-- Classic oUF parents new frames to its own frame, 
 -- but that frame hasn't had its points set.
 -- This messes up our movable frame system.
 local SetAllParentPoints = function(self)

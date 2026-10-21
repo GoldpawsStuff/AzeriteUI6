@@ -319,17 +319,25 @@ end
 ActionBar.UpdateFading = function(self)
 	if (self.config.enabled and self.config.enableBarFading) then
 		for id,button in next,self.buttons do
-
-			-- remove any previous fade registrations
-			LFF:UnregisterFrameForFading(button)
+			
+			local isRegistered = LFF:IsFrameRegisteredForFading(button)
 
 			-- register current fade for selected buttons
 			if (id >= self.config.fadeFrom) then
 				local button = self.buttons[id]
 				if (button:GetTexture()) then
-					LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", -4, -4, -4, -4)
+					-- Register fading for buttons with content
+					if (not isRegistered) then
+						LFF:RegisterFrameForFading(button, self.config.fadeAlone and self:GetName() or "actionbuttons", -4, -4, -4, -4)
+					end
 				else
-					-- update button?
+					if (isRegistered) then
+						LFF:UnregisterFrameForFading(button)
+					end
+				end
+			else
+				if (isRegistered) then
+					LFF:UnregisterFrameForFading(button)
 				end
 			end
 		end
@@ -337,11 +345,6 @@ ActionBar.UpdateFading = function(self)
 		-- unregister all fading
 		for id,button in next,self.buttons do
 			LFF:UnregisterFrameForFading(button)
-
-			-- whyever did I add this?
-			if (not button:GetTexture()) then
-				-- update button?
-			end
 		end
 	end
 end

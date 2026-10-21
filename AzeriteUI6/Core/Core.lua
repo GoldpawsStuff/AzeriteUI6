@@ -695,4 +695,9 @@ ns.OnInitialize = function(self)
 	self:RegisterChatCommand("azui", "OpenOptions") -- adding a bunch of aliases
 	self:RegisterChatCommand("azerite", "OpenOptions") -- since people all seem to 
 	self:RegisterChatCommand("azeriteui", "OpenOptions") -- prefer different commands
+
+	-- Standalone Ace3 adds this, but most people don't have that.
+	if (not ns.IsAddOnEnabled("Ace3")) then
+		self:RegisterChatCommand("rl", function() ReloadUI() end)
+	end
 end

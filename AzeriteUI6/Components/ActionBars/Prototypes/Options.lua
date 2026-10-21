@@ -155,7 +155,12 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 					end,
 					order = 21,
 				},
-				numbuttonsSpacer = { type = "description", fontSize = "medium", name = " ", order = 29 },
+				numbuttonsSpacer = { 
+					type = "description", fontSize = "medium", name = " ", 
+					disabled = function() return InCombatLockdown() end,
+					hidden = function() return not mod.db.profile.enabled end,
+					order = 29
+				},
 				numbuttons = {
 					type = "range", width = "full", min = 1, max = 12, step = 1,
 					name = L["Number of visible buttons"],
@@ -204,6 +209,48 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 					hidden = function() return not mod.db.profile.enabled end,
 					order = 99 
 				},
+				enablebarfading = {
+					type = "toggle", width = "full",
+					name = L["Enable Action Bar fading."],
+					desc = L["Sets whether the Action Bar should fade out or not."],
+					disabled = function() return InCombatLockdown() end,
+					hidden = function() return not mod.db.profile.enabled end,
+					get = function(info) return mod.db.profile.enableBarFading end,
+					set = function(info, val) 
+						if InCombatLockdown() then return end
+						mod.db.profile.enableBarFading = val 
+						mod:UpdateSettings()
+					end,
+					order = 100
+				},
+				fadeincombat = {
+					type = "toggle", width = "full",
+					name = L["Keep faded while engaged in combat."],
+					desc = L["Prevents the faded Action Buttons from automatically becoming visible when engaged in combat. Faded Action Buttons are still visible when moused over."],
+					disabled = function() return InCombatLockdown() end,
+					hidden = function() return not mod.db.profile.enabled end,
+					get = function(info) return mod.db.profile.fadeInCombat end,
+					set = function(info, val) 
+						if InCombatLockdown() then return end
+						mod.db.profile.fadeInCombat = val 
+						mod:UpdateSettings()
+					end,
+					order = 110
+				},
+				fadefrom = {
+					type = "range", width = "full", min = 1, max = 12, step = 1,
+					name = L["Start fading from button ID"],
+					desc = L["Sets what button ID the fading begins at."],
+					disabled = function() return InCombatLockdown() end,
+					hidden = function() return not mod.db.profile.enabled end,
+					get = function(info) return mod.db.profile.fadeFrom end,
+					set = function(info,val)
+						if InCombatLockdown() then return end
+						mod.db.profile.fadeFrom = val
+						mod:UpdateSettings()
+					end,
+					order = 120
+				}
 			}
 		}
 	end
