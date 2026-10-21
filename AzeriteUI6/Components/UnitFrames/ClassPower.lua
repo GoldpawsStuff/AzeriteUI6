@@ -36,7 +36,7 @@ local defaults = {
 		showClassPower = true -- keep toggling a character specific setting
 	}, 
 	profile = {
-
+		enabled = true
 	} 
 } 
 

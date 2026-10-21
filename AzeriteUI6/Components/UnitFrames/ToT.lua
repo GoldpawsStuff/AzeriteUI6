@@ -31,12 +31,11 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local ToT = ns:NewModule("ToT", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { 
-	profile = {
-		hideWhenTargetingPlayer = true,
-		hideWhenTargetingSelf = true
-	}
-}
+local defaults = { profile = {
+	enabled = true,
+	hideWhenTargetingPlayer = true,
+	hideWhenTargetingSelf = true
+}}
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -85,8 +84,8 @@ local style = function(self, unit)
 		-- General frame settings
 	self:SetSize(136, 47)
 	self:SetFrameLevel(self:GetFrameLevel() + 20)
-
-	ns.ApplyUnitFrameScriptsTo(self, unit)
+	self:SetAllParentPoints()
+	self:RegisterMouseScripts()
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)

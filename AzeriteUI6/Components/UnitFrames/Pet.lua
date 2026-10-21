@@ -31,7 +31,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local Pet = ns:NewModule("Pet", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {}}
+local defaults = { profile = {
+	enabled = true
+}}
 
 -- Custom API locals
 local AbbreviateNumber = ns.AbbreviateNumber
@@ -67,8 +69,8 @@ local style = function(self, unit)
 	-- General frame settings
 	self:SetSize(136, 47)
 	self:SetFrameLevel(self:GetFrameLevel() + 20)
-
-	ns.ApplyUnitFrameScriptsTo(self, unit)
+	self:SetAllParentPoints()
+	self:RegisterMouseScripts()
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)

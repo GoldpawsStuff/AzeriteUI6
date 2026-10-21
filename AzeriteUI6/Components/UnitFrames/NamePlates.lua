@@ -32,7 +32,7 @@ local NamePlates = ns:NewModule("NamePlates", nil, "LibMoreEvents-1.0", "LibMova
 
 -- Declare module defaults
 local defaults = { profile = {
-	enable = true
+	enabled = true
 }}
 
 -- Custom API locals
@@ -78,23 +78,20 @@ end
 NamePlates.OnInitialize = function(self)
 	if (self:HasConflicts()) then return self:Disable() end
 
-	C_AddOns.LoadAddOn("Blizzard_NamePlates")
+	if (not C_AddOns.IsAddOnLoaded("Blizzard_NamePlates")) then
+		C_AddOns.LoadAddOn("Blizzard_NamePlates")
+	end
 
 	self.db = ns.db:RegisterNamespace("NamePlates", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	if (not self.db.profile.enabled) then return self:Disable() end
 end
 
 NamePlates.OnEnable = function(self)
-	-- soft disabling
-	-- we still want the module and settings there
-	if (not self.db.profile.enable) then return end
-
 	oUF:RegisterStyle("AzeriteNamePlates", style)
 	oUF:SetActiveStyle("AzeriteNamePlates")
 	oUF:SpawnNamePlates("Azerite", callback, cvars)
-
-	-- figure out a way to bypass or change the blizz nameplate settings to match our plate sizes
-	-- also check how we can interact with their settings as much as possible
 end

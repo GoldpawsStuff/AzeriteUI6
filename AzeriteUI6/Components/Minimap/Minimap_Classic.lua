@@ -26,8 +26,6 @@
 local _, ns = ...
 local oUF = ns.oUF or oUF
 
---LoadAddOn("Blizzard_TimeManager") -- still needed?
-
 local MinimapModule = ns:NewModule("Minimap", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0", "AceTimer-3.0")
 
 -- Declare module defaults
@@ -378,8 +376,15 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
-	C_AddOns.LoadAddOn("Blizzard_TimeManager")
-	--C_AddOns.LoadAddOn("Blizzard_GroupFinder_VanillaStyle") -- something else loads this in MoP, it bugs out when doing it twice
+	if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
+		C_AddOns.LoadAddOn("Blizzard_TimeManager")
+	end
+
+	-- something else loads this in MoP, it bugs out when doing it twice
+	-- figure out how to do it properly or just wait for it to load naturally and hook into that. 
+	--if (not C_AddOns.IsAddOnLoaded("Blizzard_GroupFinder_VanillaStyle")) then
+	--	C_AddOns.LoadAddOn("Blizzard_GroupFinder_VanillaStyle") 
+	--end
 
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

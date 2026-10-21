@@ -179,7 +179,9 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
-	C_AddOns.LoadAddOn("Blizzard_TimeManager")
+	if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
+		C_AddOns.LoadAddOn("Blizzard_TimeManager")
+	end
 
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

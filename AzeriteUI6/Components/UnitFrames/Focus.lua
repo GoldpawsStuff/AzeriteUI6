@@ -64,8 +64,8 @@ local style = function(self, unit)
 		-- General frame settings
 	self:SetSize(136, 47)
 	self:SetFrameLevel(self:GetFrameLevel() + 20)
-
-	ns.ApplyUnitFrameScriptsTo(self, unit)
+	self:SetAllParentPoints()
+	self:RegisterMouseScripts()
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)

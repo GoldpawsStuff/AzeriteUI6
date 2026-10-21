@@ -30,17 +30,15 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local MultiBar1 = ns:NewModule("MultiBar1", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { 
-	profile = {
-		enabled = false,
+local defaults = { profile = {
+	enabled = false,
 
-		layout = "zigzag", -- <grid, zigzag>
-		layoutZigZagStart = 2, -- at which button the zigzag pattern should begin
-		layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
+	layout = "zigzag", -- <grid, zigzag>
+	layoutZigZagStart = 2, -- at which button the zigzag pattern should begin
+	layoutZigZagOffset = 28/64, -- -- relative offset in the growth direction for the alternate zigzag row as a fraction of button size.
 
-		enableBarFading = true, -- whether to enable non-combat/hover button fading
-	}
-}
+	enableBarFading = true, -- whether to enable non-combat/hover button fading
+}}
 
 MultiBar1.GetDefaults = function(self)
 	return defaults

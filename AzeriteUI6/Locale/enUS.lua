@@ -1,7 +1,8 @@
 local L = LibStub("AceLocale-3.0"):NewLocale((...), "enUS", true, false)
 
 -- Retrieved from GlobalStrings
--- *Shouldn't be any need to translate any of these
+-- *Shouldn't be any need to translate any of these,
+--  better to keep them as is for consistency with the game.
 L["Action Bar 1"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(1)
 L["Action Bar 2"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(2)
 L["Action Bar 3"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(3)
@@ -11,15 +12,19 @@ L["Action Bar 6"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(6)
 L["Action Bar 7"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(7)
 L["Action Bar 8"] = HUD_EDIT_MODE_ACTION_BAR_LABEL:format(8)
 L["Enable"] = ENABLE
+L["Group"] = GROUP
+L["Party"] = PARTY
 L["Pet Bar"] = HUD_EDIT_MODE_PET_ACTION_BAR_LABEL
+L["Raid"] = RAID
 L["Stance Bar"] = HUD_EDIT_MODE_STANCE_BAR_LABEL
 
 -- Addon Localization
 -- *Keep in alphanumerical order by the key
+--  to make it easier to manually search through.
 --------------------------------------------------------------------
 L["Action Bar layout"] = true
 L["Enable Action Bar fading."] = true
-L["Which button to start the ZigZag pattern from"] = true
+L["Choose a section on the left."] = true
 L["Grid"] = true
 L["Keep faded while engaged in combat."] = true
 L["Number of buttons before line-break."] = true
@@ -38,4 +43,5 @@ L["Sets whether the Action Bar should fade out or not."] = true
 L["Sets which direction the Action Bar initially should expand in."] = true
 L["Sets which direction the Action Bar should start a new line of buttons in."] = true
 L["Start fading from button ID"] = true
+L["Which button to start the ZigZag pattern from"] = true
 L["ZigZag"] = true

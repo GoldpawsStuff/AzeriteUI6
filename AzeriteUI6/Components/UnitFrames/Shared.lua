@@ -178,12 +178,26 @@ local OnLeave = function(self)
 	GameTooltip:Hide()
 end
 
-ns.ApplyUnitFrameScriptsTo = function(frame)
-	frame:RegisterForClicks("AnyUp")
-	frame:EnableMouse(true) -- this isn't automatic anymore?
-	frame:SetScript("OnEnter", OnEnter) 
-	frame:SetScript("OnLeave", OnLeave)
+local RegisterMouseScripts = function(self)
+	self:RegisterForClicks("AnyUp")
+	self:EnableMouse(true) -- this isn't automatic anymore?
+	self:SetScript("OnEnter", OnEnter) 
+	self:SetScript("OnLeave", OnLeave)
 end
+
+-- Classic oUF parents to its own frame, 
+-- but that frame hasn't had its points set.
+-- This messes up our movable frame system.
+local SetAllParentPoints = function(self)
+	local parent = self:GetParent()
+	if (parent ~= UIParent) then
+		parent:ClearAllPoints()
+		parent:SetAllPoints(UIParent)
+	end
+end
+
+oUF:RegisterMetaFunction("SetAllParentPoints", SetAllParentPoints)
+oUF:RegisterMetaFunction("RegisterMouseScripts", RegisterMouseScripts)
 
 ns.AreUnitsSame = function(u1, u2)
 	local g1 = UnitGUID(u1)

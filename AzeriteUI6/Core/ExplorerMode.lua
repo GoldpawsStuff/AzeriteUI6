@@ -29,42 +29,40 @@ local ExplorerMode = ns:NewModule("ExplorerMode", nil, "AceTimer-3.0", "LibMoreE
 local LFF = LibStub("LibFadingFrames-1.0")
 
 -- Declare module defaults
-local defaults = { 
-	profile = {
-		enabled = true,
+local defaults = { profile = {
+	enabled = true,
 
-		-- How long to wait before initiating
-		-- Explorer Mode after a loading screen.
-		delayOnLogin = 15,
-		delayOnReload = 5,
-		delayOnZoning = 0,
-		delayOnCombatEnd = 5,
+	-- How long to wait before initiating
+	-- Explorer Mode after a loading screen.
+	delayOnLogin = 15,
+	delayOnReload = 5,
+	delayOnZoning = 0,
+	delayOnCombatEnd = 5,
 
-		-- These options are kind of backwards,
-		-- as they set when to EXIT the Explorer Mode.
-		fadeInCombat = false,
-		fadeInGroups = false,
-		fadeInInstances = false,
-		fadeWithFriendlyTarget = false,
-		fadeWithHostileTarget = false,
-		fadeWithDeadTarget = true,
-		fadeWithFocusTarget = false,
-		fadeInVehicles = false,
-		--fadeWithLowHealth = false, -- doesn't work anymore because of secrets
+	-- These options are kind of backwards,
+	-- as they set when to EXIT the Explorer Mode.
+	fadeInCombat = false,
+	fadeInGroups = false,
+	fadeInInstances = false,
+	fadeWithFriendlyTarget = false,
+	fadeWithHostileTarget = false,
+	fadeWithDeadTarget = true,
+	fadeWithFocusTarget = false,
+	fadeInVehicles = false,
+	--fadeWithLowHealth = false, -- doesn't work anymore because of secrets
 
-		-- Which elements to fade out
-		-- while in Explorer Mode.
-		--fadeActionBars = true,
-		fadePetBar = true,
-		fadeStanceBar = true,
-		--fadePlayerFrame = true,
-		fadePlayerClassPower = true,
-		--fadePetFrame = true,
-		fadeFocusFrame = true,
-		--fadeTracker = true,
-		fadeChatFrames = true
-	}
-}
+	-- Which elements to fade out
+	-- while in Explorer Mode.
+	--fadeActionBars = true,
+	fadePetBar = true,
+	fadeStanceBar = true,
+	--fadePlayerFrame = true,
+	fadePlayerClassPower = true,
+	--fadePetFrame = true,
+	fadeFocusFrame = true,
+	--fadeTracker = true,
+	fadeChatFrames = true
+}}
 
 -- Checks if an event has occurred requiring faded elements to be visible
 ExplorerMode.CheckForForcedState = function(self)

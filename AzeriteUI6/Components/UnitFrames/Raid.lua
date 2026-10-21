@@ -24,3 +24,21 @@
 
 --]]
 local _, ns = ...
+local oUF = ns.oUF or oUF
+
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+
+local Raid = ns:NewModule("Raid", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
+
+-- Declare module defaults
+local defaults = { profile = {
+	enabled = true,
+	showRaid = true, -- show while in a raid of 6-40p. 
+	showParty = false, -- show while in a non-raid 2-5p group (party)
+}}
+
+
+-- Custom API locals
+local AbbreviateNumber = ns.AbbreviateNumber
+local GetFont = ns.GetFont
+local GetMedia = ns.GetMedia

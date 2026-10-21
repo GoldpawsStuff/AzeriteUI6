@@ -30,18 +30,16 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local MultiBar5 = ns:NewModule("MultiBar5", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { 
-	profile = {
-		enabled = false,
+local defaults = { profile = {
+	enabled = false,
 
-		layout = "grid", -- <grid, zigzag>
-		layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
-		layoutGrowth = "horizontal", -- which direction the bar initially grows in
-		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
-	
-		enableBarFading = false, -- whether to enable non-combat/hover button fading
-	}
-}
+	layout = "grid", -- <grid, zigzag>
+	layoutGridSize = NUM_ACTIONBAR_BUTTONS, -- when to start a new grid row
+	layoutGrowth = "horizontal", -- which direction the bar initially grows in
+	layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
+
+	enableBarFading = false, -- whether to enable non-combat/hover button fading
+}}
 
 MultiBar5.GetDefaults = function(self)
 	return defaults

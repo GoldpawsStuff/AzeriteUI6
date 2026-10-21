@@ -31,31 +31,29 @@ local KeyBound = LibStub("LibKeyBound-1.0")
 local PetBar = ns:NewModule("PetBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { 
-	profile = {
-		enabled = true, 
+local defaults = { profile = {
+	enabled = true, 
 
-		layout = "grid", -- <grid, zigzag>
-		layoutGridSize = NUM_PET_ACTION_SLOTS, -- when to start a new grid row
-		layoutGrowth = "horizontal", -- which direction the bar initially grows in
-		layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
-		layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
-		layoutPaddingX = 8, -- horizontal padding between the buttons
-		layoutPaddingY = 8, -- vertical padding between the buttons
-	
-		enableBarFading = true, -- whether to enable non-combat/hover button fading
-		fadeInCombat = false, -- whether to keep fading out even in combat
-		fadeFrom = 1, -- which button to start the button fading from
+	layout = "grid", -- <grid, zigzag>
+	layoutGridSize = NUM_PET_ACTION_SLOTS, -- when to start a new grid row
+	layoutGrowth = "horizontal", -- which direction the bar initially grows in
+	layoutGrowthHorizontal = "RIGHT", -- which direction the bar grows in horizontally
+	layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
+	layoutPaddingX = 8, -- horizontal padding between the buttons
+	layoutPaddingY = 8, -- vertical padding between the buttons
 
-		numbuttons = NUM_PET_ACTION_SLOTS, -- 10
-		--visibility = {
-		--	dragon = true,
-		--	possess = true,
-		--	overridebar = true,
-		--	vehicleui = true
-		--}
-	}
-}
+	enableBarFading = true, -- whether to enable non-combat/hover button fading
+	fadeInCombat = false, -- whether to keep fading out even in combat
+	fadeFrom = 1, -- which button to start the button fading from
+
+	numbuttons = NUM_PET_ACTION_SLOTS, -- 10
+	--visibility = {
+	--	dragon = true,
+	--	possess = true,
+	--	overridebar = true,
+	--	vehicleui = true
+	--}
+}}
 
 local PetActionBar = CreateFrame("Frame")
 local PetActionBar_MT = { __index = PetActionBar }

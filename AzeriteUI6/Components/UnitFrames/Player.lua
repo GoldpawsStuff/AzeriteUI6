@@ -33,6 +33,7 @@ local Player = ns:NewModule("Player", nil, "LibMoreEvents-1.0", "LibMovableFrame
 
 -- Declare module defaults
 local defaults = { profile = {
+	enabled = true,
 	alwaysUseCrystal = false, -- always use crystal, never the mana orb
 	useIceCrystal = false -- use the special wotlk ice crystal instead
 }}
@@ -352,8 +353,8 @@ local style = function(self, unit)
 	self:SetSize(560, 180)
 	self:SetHitRectInsets(0, 0, 30, -2)
 	self:SetFrameLevel(self:GetFrameLevel() + 10)
-
-	ns.ApplyUnitFrameScriptsTo(self, unit)
+	self:SetAllParentPoints()
+	self:RegisterMouseScripts()
 
 	-- Frame for font Overlays
 	local overlay = CreateFrame("Frame", nil, self)
@@ -733,13 +734,6 @@ Player.OnEnable = function(self)
 		self:SetActiveStyle("AzeriteUnitFramePlayer")
 
 		local frame = self:Spawn("player", "AzeriteUnitFramePlayer")
-
-		-- Need to do this once for oUF_Classic
-		local parent = frame:GetParent()
-		if (parent ~= UIParent) then
-			parent:SetAllPoints(UIParent)
-		end
-
 		frame:SetScale(.9)
 		frame:SetPoint("BOTTOMLEFT", 46/.9, 100/.9) -- scaled coords
 

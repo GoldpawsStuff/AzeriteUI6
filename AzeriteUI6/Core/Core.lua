@@ -94,9 +94,14 @@ local defaults = {
 local options = {
 	type = "group",
 	name = addonTitle,
-	childGroups = "tree",
+	childGroups = "select",
 	args = {
-		-- root level controls
+		description = {
+			type = "description",
+			name = L["Choose a section on the left."],
+			fontSize = "medium",
+			order = 1
+		}
 	}
 }
 
@@ -104,32 +109,58 @@ ns.exportableSettings, ns.exportableLayouts = {}, {}
 
 -- Generate the options menu
 ns.GenerateOptions = function(self)
+	local AceConfig = LibStub("AceConfig-3.0")
+	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+	local AceDBOptions = LibStub("AceDBOptions-3.0")
 
-	-- iterate submodules
+	-- register the full options table
+	AceConfig:RegisterOptionsTable(addonName, options)
+
+	local _, categoryID = AceConfigDialog:AddToBlizOptions(addonName, addonTitle)
+	self.categoryID = categoryID
+
+	local subModules, subModuleNames = {}, {}
+
+	-- iterate submodules to get a list of titles
 	for name, module in self:IterateModules() do
 		if (module.GetOptions) then
 			local moduleOptions = module:GetOptions()
 			if (moduleOptions) then
-				options.args[name] = moduleOptions
+				subModules[name] = module
+				subModuleNames[#subModuleNames + 1] = name
 			end
 		end
 	end
 
-	-- profiles, etc.
-	local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	options.args.profiles = profiles
-	options.args.profiles.order = 1000
+	-- sort the title listing
+	table.sort(subModuleNames)
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
-	local _, categoryID = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonTitle)
-	self.categoryID = categoryID
+	-- add submodules in alphanumerical order
+	for i = 1,#subModuleNames do
+		local name = subModuleNames[i]
+
+		local module = subModules[name]
+		local moduleOptions = module:GetOptions()
+		moduleOptions.dialogHidden = true
+
+		local moduleAppName = addonName .. "_" .. name
+		AceConfig:RegisterOptionsTable(moduleAppName, moduleOptions)
+		AceConfigDialog:AddToBlizOptions(moduleAppName, moduleOptions.name or name, addonTitle)
+	end
+
+	-- add profiles, etc.
+	local profiles = AceDBOptions:GetOptionsTable(self.db)
+	profiles.dialogHidden = true
+	profiles.order = 1000
+
+	AceConfig:RegisterOptionsTable(addonName .. "_Profiles", profiles)
+	AceConfigDialog:AddToBlizOptions(addonName .. "_Profiles", "Profiles", addonTitle)
+
 end
 
 ns.OpenOptions = function(self)
 	if (self.categoryID) then
 		Settings.OpenToCategory(self.categoryID)
-	else
-		AceConfigDialog:Open(addonTitle)
 	end
 end
 
