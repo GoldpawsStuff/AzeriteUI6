@@ -181,7 +181,8 @@ ns.HideClutter = function(self)
 		--["MainStatusTrackingBarContainer"] = "StatusBars",
 		--["MicroMenu"] = "MicroMenu",
 		--["MicroMenuContainer"] = "MicroMenu",
-		["LibDBIcon10_BugSack"] = true
+		["LibDBIcon10_BugSack"] = true,
+		["LibDBIcon10_Max_Camera_Distance"] = true,
 	} do
 		if (_G[element]) then
 			self:RegisterFrameForFading(_G[element], fadeGroup == true and element or fadeGroup)

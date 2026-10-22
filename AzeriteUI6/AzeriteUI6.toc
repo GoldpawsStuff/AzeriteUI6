@@ -4,7 +4,7 @@
 ## Title: Azerite UI
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
-## Version: 1.0.15-Alpha
+## Version: 1.0.16-RC
 ## OptionalDeps: Ace3, oUF, LibActionButton-1.0, Bartender4, Clique, SharedMedia
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories

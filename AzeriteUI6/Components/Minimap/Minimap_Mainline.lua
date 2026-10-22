@@ -73,6 +73,7 @@ MinimapModule.StyleMinimap = function(self)
 	for _,element in next, {
 		MinimapCluster.BorderTop, -- Retail
 		MinimapCluster.DielFrame, -- Forever (contains day/night indicator)
+		MinimapCluster.IndicatorFrame, -- Retail (MailFrame)
 		MinimapCluster.Tracking,
 		MinimapCluster.ZoneTextButton,
 		Minimap.ZoomIn,
@@ -92,7 +93,7 @@ MinimapModule.StyleMinimap = function(self)
 	-- hide new retail coords, or move them inside the map
 
 	-- Readjust stock coordinate text to match classic azerite position and size
-	if (ns.WoWCamelot) then -- Only in Forever
+	if (ns.WoWCamelot or ns.WoWRetail) then -- Only in Forever (+Retail now)
 		MinimapCluster.MinimapContainer.PlayerCoords:ClearAllPoints()
 		MinimapCluster.MinimapContainer.PlayerCoords:SetPoint("BOTTOM", Minimap, "BOTTOM", 3, 23)
 		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetFontObject(GetFont(12, true))
@@ -179,9 +180,10 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
-	if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
-		C_AddOns.LoadAddOn("Blizzard_TimeManager")
-	end
+	-- FATALITY! 
+	--if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
+	--	C_AddOns.LoadAddOn("Blizzard_TimeManager")
+	--end
 
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")

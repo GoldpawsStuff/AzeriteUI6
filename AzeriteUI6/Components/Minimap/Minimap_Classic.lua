@@ -376,9 +376,9 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
-	if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
-		C_AddOns.LoadAddOn("Blizzard_TimeManager")
-	end
+	--if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
+	--	C_AddOns.LoadAddOn("Blizzard_TimeManager")
+	--end
 
 	-- something else loads this in MoP, it bugs out when doing it twice
 	-- figure out how to do it properly or just wait for it to load naturally and hook into that. 
