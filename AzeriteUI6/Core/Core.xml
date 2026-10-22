@@ -1,6 +1,5 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-	<!-- Various APIs -->
 	<Script file="API\Colors.lua"/>
 	<Script file="API\Fonts.lua"/>
 	<Script file="API\Media.lua"/>
@@ -8,13 +7,9 @@
 	<Script file="API\Tables.lua"/>
 	<!--<Script file="API\Time.lua"/>-->
 
-	<!-- Core of this UI -->
 	<Script file="Core.lua"/>
-
-	<!-- Immersive fading system -->
+	<Script file="EditMode.lua"/>
 	<Script file="ExplorerMode.lua"/>
-
-	<!-- Add our media to SharedMedia -->
 	<Script file="SharedMedia.lua"/>
 	
 </Ui>

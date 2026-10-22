@@ -4,8 +4,11 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-21
+## [1.0.15-Alpha] 2026-10-22
 - Summarizing the day's updates under the latest tag for convenience.
+
+### Added
+- Now creates an EditMode preset named "Azerite UI Default" if it doesn't exist, and applies it. 
 
 ## [1.0.14-RC] 2026-10-21
 ### Added

@@ -1,11 +1,11 @@
-## Interface: 120105, 120100, 50504, 20506, 16001, 11509 
+## Interface: 120107, 120105, 120100, 50504, 20506, 16001, 11509 
 ## IconTexture: Interface\Addons\AzeriteUI6\Assets\power-crystal-ice-icon.tga
 
 ## Title: Azerite UI
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
-## Version: 1.0.14-RC
-## OptionalDeps: Ace3, oUF, LibActionButton-1.0, Foundry-1.0, Bartender4, Clique, SharedMedia
+## Version: 1.0.15-Alpha
+## OptionalDeps: Ace3, oUF, LibActionButton-1.0, Bartender4, Clique, SharedMedia
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul
