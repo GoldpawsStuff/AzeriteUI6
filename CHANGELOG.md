@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 2026-10-23
+- Hopefully some missing Classic UnitFrame auras and NamePlates for all versions.
+
+### Added
+- Added XP bar to the Retail/Forever Minimap.
+
 ## [1.0.16-RC] 2026-10-22
 ### Added
 - Now creates an EditMode preset named "Azerite UI Default" if it doesn't exist, and applies it. 

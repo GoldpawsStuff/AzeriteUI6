@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibSpinBar-1.0"
-local MINOR_VERSION = 10
+local MINOR_VERSION = 11
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")
@@ -234,7 +234,7 @@ Quadrant.RotateTexture = function(self, degrees)
 		offsetY = offsetY + height
 	end
 
-		-- Convert to coordinates used
+	-- Convert to coordinates used
 	-- by the wow texcoord system
 	LLx = LLx + .5
 	LRx = LRx + .5
@@ -249,7 +249,6 @@ Quadrant.RotateTexture = function(self, degrees)
 	self:SetRotation(-(self.quadrantDegree + (self.clockwise and 0 or 90) - degrees) * DEGS_TO_RADS)
 	self:SetPoint(point, offsetX, offsetY)
 	self:SetTexCoord(ULx, ULy, LLx, LLy, URx, URy, LRx, LRy)
-
 
 	local data = Bars[self]
 	local bar = data.statusbar

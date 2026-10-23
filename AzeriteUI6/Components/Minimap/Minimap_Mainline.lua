@@ -23,14 +23,17 @@
 	SOFTWARE.
 
 --]]
-local _, ns = ...
+local addonName, ns = ...
 local oUF = ns.oUF or oUF
 
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+local LibSpinBar = LibStub("LibSpinBar-1.0")
 local MinimapModule = ns:NewModule("Minimap", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
-	fadeClutter = true
+	fadeClutter = true,
+	showXP = true
 }}
 
 -- Custom API locals
@@ -94,11 +97,17 @@ MinimapModule.StyleMinimap = function(self)
 
 	-- Readjust stock coordinate text to match classic azerite position and size
 	if (ns.WoWCamelot or ns.WoWRetail) then -- Only in Forever (+Retail now)
-		MinimapCluster.MinimapContainer.PlayerCoords:ClearAllPoints()
-		MinimapCluster.MinimapContainer.PlayerCoords:SetPoint("BOTTOM", Minimap, "BOTTOM", 3, 23)
-		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetFontObject(GetFont(12, true))
-		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetTextColor(oUF.colors.offwhite:GetRGB())
-		MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetAlpha(.75)
+		local coords = MinimapCluster.MinimapContainer.PlayerCoords
+		coords:ClearAllPoints()
+		coords:SetPoint("BOTTOM", Minimap, "BOTTOM", 1, 24)
+
+		local msg = coords.CoordText
+		msg:SetFontObject(GetFont(11, true))
+		msg:SetTextColor(oUF.colors.offwhite:GetRGB())
+		msg:SetAlpha(.66)
+
+		local holder = msg:GetParent()
+		holder:SetParent(Minimap)
 	end
 
 	-- get this out of the way
@@ -128,17 +137,6 @@ MinimapModule.StyleMinimap = function(self)
 	-- *does this taint? seems dodgy
 	Minimap:HookScript("OnMouseUp", Minimap_OnMouseUp)
 	
-	--local north = MinimapBackdrop:CreateFontString(nil, "ARTWORK", nil, 1)
-	--north:SetFontObject(GetFont(16,true))
-	--north:SetTextColor(oUF.colors.normal:GetRGB())
-	--north:SetAlpha(.75)
-	--north:SetText("N")
-	--north:SetPoint("TOP", MinimapCompassTexture, "TOP", 0, 0) -- ?
-
-	--compass.north = north
-
-	--self.compass = compass
-
 	-- Mail
 --	local mailFrame = CreateFrame("Button", nil, frame)
 --	mailFrame:SetFrameLevel(mailFrame:GetFrameLevel() + 5)
@@ -162,6 +160,239 @@ MinimapModule.StyleMinimap = function(self)
 --	self:RegisterEvent("UPDATE_PENDING_MAIL", "UpdateMail")
 --	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
 
+	-- XP bar
+	------------------------------------------
+	-- badge showing xp percent with hover functionality to show bars
+	local badge = CreateFrame("Frame", nil, Minimap)
+	badge:SetFrameStrata("HIGH")
+	badge:SetFrameLevel(Minimap:GetFrameLevel() + 50)
+	badge:SetSize(50, 50)
+	badge:SetPoint("CENTER", Minimap, "BOTTOM", ns.WoWMainline and 2 or 0, -6*.9)
+	self.Badge = badge
+
+	-- badge backdrop
+	local badgeBackdrop = badge:CreateTexture(nil, "BACKGROUND", nil, 1)
+	badgeBackdrop:SetSize(90, 90)
+	badgeBackdrop:SetPoint("CENTER", 0, 4)
+	badgeBackdrop:SetTexture(GetMedia("point_plate"))
+	badgeBackdrop:SetVertexColor(oUF.colors.ui:GetRGB())
+
+	-- badge value showing percentage towards next level
+	local badgeValue = badge:CreateFontString(nil, "OVERLAY", nil, 1)
+	badgeValue:SetFontObject(GetFont(12, true)) -- 15
+	badgeValue:SetPoint("CENTER", 1, 4)
+	badgeValue:SetJustifyH("CENTER")
+	badgeValue:SetJustifyV("MIDDLE")
+	badgeValue:SetTextColor(oUF.colors.ui:GetRGB())
+	badgeValue:SetAlpha(.75)
+	self.Badge.Value = badgeValue
+
+	-- ringframe containing backdrops and bars
+	local ringFrame = CreateFrame("Frame", nil, badge)
+	ringFrame:SetFrameStrata("MEDIUM")
+	ringFrame:SetSize(182, 182)
+	ringFrame:SetPoint("CENTER", Minimap, "CENTER", 0, -2)
+	self.RingFrame = ringFrame
+
+	-- ringframe backdrop
+	local ringBackdrop = ringFrame:CreateTexture(nil, "BACKGROUND", nil, 1)
+	ringBackdrop:SetSize(352, 352)
+	ringBackdrop:SetPoint("CENTER", -1, 0)
+	ringBackdrop:SetTexture(GetMedia("minimap-onebar-backdrop"))
+	ringBackdrop:SetVertexColor(oUF.colors.ui:GetRGB())
+	self.RingFrame.Backdrop = ringBackdrop
+
+	-- xp bar
+	local xp = LibSpinBar:CreateSpinBar(addonName.."XPBar", ringFrame)
+	xp:SetFrameLevel(ringFrame:GetFrameLevel() + 5)
+	xp:SetPoint("CENTER", -1, 1)
+	xp:SetSize(182,182)
+	xp:SetStatusBarTexture(GetMedia("minimap-bars-single"))
+	xp:SetSparkOffset(-1/10) -- offset in degrees from the end of the bar to the spark
+	xp:SetSparkInset(17) -- distance from outer diameter to start of spark
+	xp:SetSparkSize(24,34) -- width = thickness along ring bar, height = length across
+	xp:SetSparkFlash(nil, nil, 1, 1)
+	xp:SetSparkBlendMode("ADD")
+	xp:SetClockwise(true)
+	xp:SetDegreeOffset(256) -- offset from top center in degrees to the start of the ring bar
+	xp:SetDegreeSpan(332) -- degrees of the circle covered by the bar
+	self.XP = xp
+
+	-- xp rested bonus bar
+	local rested = LibSpinBar:CreateSpinBar(addonName.."XPBar", ringFrame)
+	rested:SetFrameLevel(ringFrame:GetFrameLevel() + 2)
+	rested:SetPoint("CENTER", -1, 1)
+	rested:SetSize(182,182)
+	rested:SetStatusBarTexture(GetMedia("minimap-bars-single"))
+	rested:SetStatusBarColor(oUF.colors.restedBonus:GetRGB())
+	rested:SetSparkOffset(-1/10) -- offset in degrees from the end of the bar to the spark
+	rested:SetSparkInset(17) -- distance from outer diameter to start of spark
+	rested:SetSparkSize(24,34) -- width = thickness along ring bar, height = length across
+	rested:SetSparkFlash(nil, nil, 1, 1)
+	rested:SetSparkBlendMode("ADD")
+	rested:SetClockwise(true)
+	rested:SetDegreeOffset(256) -- offset from top center in degrees to the start of the ring bar
+	rested:SetDegreeSpan(332) -- degrees of the circle covered by the bar
+	self.XP.Rested = rested
+	
+	-- xp value text
+	local ringValue = ringFrame:CreateFontString(nil, "OVERLAY", nil, 1)
+	ringValue:SetFontObject(GetFont(24, true))
+	ringValue:SetPoint("CENTER", 0, 1)
+	ringValue:SetJustifyH("CENTER")
+	ringValue:SetJustifyV("MIDDLE")
+	ringValue:SetTextColor(oUF.colors.ui:GetRGB())
+	self.XP.Value = ringValue
+	
+	-- xp description text
+	local ringDescription = ringFrame:CreateFontString(nil, "OVERLAY", nil, 1)
+	ringDescription:SetFontObject(GetFont(12, true))
+	ringDescription:SetPoint("CENTER", 0, -16)
+	ringDescription:SetWidth(90) -- uh
+	ringDescription:SetJustifyH("CENTER")
+	ringDescription:SetJustifyV("MIDDLE")
+	ringDescription:SetTextColor(oUF.colors.quest.gray:GetRGB())
+	self.XP.Description = ringDescription
+
+	-- Todo: Add in a timer
+	local overBadge, overRing
+	local updateAlpha = function()
+		if (overBadge or overRing) then
+			self.RingFrame:Show()
+		else
+			self.RingFrame:Hide()
+		end
+	end
+	updateAlpha()
+
+	badge:SetScript("OnEnter", function()
+		overBadge = true
+		updateAlpha()
+	end)
+	
+	badge:SetScript("OnLeave", function() 
+		overBadge = false
+		updateAlpha()
+	end)
+
+	ringFrame:SetScript("OnEnter", function() 
+		overRing = true
+		updateAlpha()
+	end)
+	
+	ringFrame:SetScript("OnLeave", function() 
+		overRing = false
+		updateAlpha()
+	end)
+
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateXP")
+	self:RegisterEvent("PLAYER_XP_UPDATE", "UpdateXP")
+	self:RegisterEvent("PLAYER_LEVEL_UP", "UpdateXP")
+	self:RegisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
+
+	-- Only exists in Retail
+	if (ns.WoWMainline) then
+		self:RegisterEvent("ENABLE_XP_GAIN", "UpdateXP")
+		self:RegisterEvent("DISABLE_XP_GAIN", "UpdateXP")
+	end
+end
+
+MinimapModule.UpdateXP = function(self, event, ...)
+	if (event == "PLAYER_LEVEL_UP") then
+		self.playerLevel = ...
+	end
+	if (not self.playerLevel) then
+		self.playerLevel = UnitLevel("player")
+	end
+
+	-- At max level, just completely disable the widget
+	if (self.playerLevel >= GetMaxPlayerLevel()) then 
+		self.Badge:Hide() -- all other frames are parented to this
+
+		-- kill off events, we don't need them anymore
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD", "UpdateXP")
+		self:UnregisterEvent("PLAYER_XP_UPDATE", "UpdateXP")
+		self:UnregisterEvent("PLAYER_LEVEL_UP", "UpdateXP")
+		self:UnregisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
+
+		-- Only exists in Retail
+		if (ns.WoWMainline) then
+			self:UnregisterEvent("ENABLE_XP_GAIN", "UpdateXP")
+			self:UnregisterEvent("DISABLE_XP_GAIN", "UpdateXP")
+		end
+
+		return 
+	end
+
+	-- xp gains are disabled by the user
+	if (event == "DISABLE_XP_GAIN" or IsXPUserDisabled()) then
+		self.userDisabledXP = true
+		self.Badge:Hide() 
+
+		-- kill off xp tracking events
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD", "UpdateXP")
+		self:UnregisterEvent("PLAYER_XP_UPDATE", "UpdateXP")
+		self:UnregisterEvent("PLAYER_LEVEL_UP", "UpdateXP")
+		self:UnregisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
+
+		return
+	end
+
+	-- xp gains are enabled by the user
+	if (event == "ENABLE_XP_GAIN" and self.userDisabledXP) then
+		self.userDisabledXP = nil
+
+		-- register tracking events
+		self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateXP")
+		self:RegisterEvent("PLAYER_XP_UPDATE", "UpdateXP")
+		self:RegisterEvent("PLAYER_LEVEL_UP", "UpdateXP")
+		self:RegisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
+
+		-- enable the badge
+		self.Badge:Show()
+	end
+
+	local current = UnitXP("player")
+    local max = UnitXPMax("player")
+    local rested = GetXPExhaustion() or 0
+    local percent = current / max * 100
+	local r, g, b 
+
+	if (rested > 0) then
+		r, g, b = oUF.colors.rested:GetRGB()
+	else
+		r, g, b = oUF.colors.xp:GetRGB()
+	end
+
+	self.XP:SetMinMaxValues(0, max)
+	self.XP:SetValue(current)
+	self.XP:SetStatusBarColor(r, g, b)
+
+	local restedShown = self.XP.Rested:IsShown()
+	if (rested) then
+		self.XP.Rested:SetMinMaxValues(0, max, not restedShown)
+		self.XP.Rested:SetValue(math.min(max, current + rested), not restedShown)
+		if (not restedShown) then
+			self.XP.Rested:Show()
+		end
+	elseif (restedShown) then
+		self.XP.Rested:Hide()
+		self.XP.Rested:SetValue(0, true)
+		self.XP.Rested:SetMinMaxValues(0, 1, true)
+	end
+	
+	self.XP.Value:SetFormattedText("%s", AbbreviateNumber(max-current))
+	self.XP.Description:SetFormattedText(L["to level %s"], self.playerLevel + 1)
+	self.XP.Value:SetTextColor(r, g, b)
+	self.Badge.Value:SetTextColor(r, g, b)
+
+	local perc = math.floor(current/max*100)
+	if (perc > 0) then
+		self.Badge.Value:SetFormattedText("%.0f", perc)
+	else
+		self.Badge.Value:SetText(XP)
+	end
+
 end
 
 -- This is called by the options menu on settings changes,
@@ -180,11 +411,6 @@ MinimapModule.OnEnable = function(self)
 end
 
 MinimapModule.OnInitialize = function(self)
-	-- FATALITY! 
-	--if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
-	--	C_AddOns.LoadAddOn("Blizzard_TimeManager")
-	--end
-
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")

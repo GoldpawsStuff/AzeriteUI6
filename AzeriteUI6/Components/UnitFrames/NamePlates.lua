@@ -94,7 +94,6 @@ NamePlates.OnInitialize = function(self)
 end
 
 NamePlates.OnEnable = function(self)
-	print("enabling")
 	oUF:RegisterStyle("AzeriteNamePlates", style)
 	oUF:SetActiveStyle("AzeriteNamePlates")
 	oUF:SpawnNamePlates("Azerite", callback, cvars)

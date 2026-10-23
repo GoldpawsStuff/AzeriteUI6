@@ -49,5 +49,6 @@ L["Sets whether the Action Bar should fade out or not."] = true
 L["Sets which direction the Action Bar initially should expand in."] = true
 L["Sets which direction the Action Bar should start a new line of buttons in."] = true
 L["Start fading from button ID"] = true
+L["to level %s"] = true
 L["Which button to start the ZigZag pattern from"] = true
 L["ZigZag"] = true

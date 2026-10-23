@@ -41,7 +41,7 @@ ns.WoWBuild = tonumber(buildNumber) -- numerical build number for pure larger th
 ns.WoWVersion = interfaceVersion -- patch version as string for display purposes
 
 -- Flavor Flags
-ns.WoWRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- This only checks if the current client is Retail, not for expansion version
+ns.WoWRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and ns.WoWVersion >= 120000) -- Let's exclude Forever from this
 ns.WoWVanilla = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- Classic Era, SoD, SoM and Hardcore versions
 ns.WoWTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) -- TBC Classic Anniversary
 ns.WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC) -- Wrath of the Lich King Classic
@@ -49,6 +49,7 @@ ns.WoWCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC) -- Cataclysm Clas
 ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC) -- Mists of Pandaria Classic
 ns.WoWMidnight = (ns.WoWVersion >= 120000 and ns.WoWVersion < 130000) -- Retail changes, Midnight is a specific version
 ns.WoWCamelot = (ns.WoWVersion >= 16000 and ns.WoWVersion < 20000) -- Doesn't have its own projectID yet.
+ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- This includes Forever
 
 -- Seasonal Classic Realm Flags
 local seasonID = C_Seasons and C_Seasons.GetActiveSeason()

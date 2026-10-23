@@ -26,7 +26,7 @@
 local _, ns = ...
 
 -- Shorten as much as possible.
-ns.AbbreviateNumber = function(value) do return end
+ns.AbbreviateNumber = function(value) -- do return end -- is it bugged from secrecy?
 	value = tonumber(value)
 	if (not value) then return "" end
 	if (value >= 1e9) then
