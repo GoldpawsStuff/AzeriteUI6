@@ -40,6 +40,10 @@ local buildVersion, buildNumber, buildDate, interfaceVersion = GetBuildInfo()
 ns.WoWBuild = tonumber(buildNumber) -- numerical build number for pure larger than/smaller than comparisons
 ns.WoWVersion = interfaceVersion -- patch version as string for display purposes
 
+-- Flags to check for minimum version, useful for big API changes
+ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
+ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
+
 -- Flavor Flags
 ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- This includes Forever
 ns.WoWVanilla = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- Classic Era, SoD, SoM and Hardcore versions
@@ -47,8 +51,8 @@ ns.WoWTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) -- TBC Class
 ns.WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC) -- Wrath of the Lich King Classic
 ns.WoWCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC) -- Cataclysm Classic
 ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC) -- Mists of Pandaria Classic
-ns.WoWRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and ns.WoWVersion >= 120000) -- Let's exclude Forever from this
-ns.WoWMidnight = (ns.WoWVersion >= 120000 and ns.WoWVersion < 130000) -- Retail changes, Midnight is a specific version
+ns.WoWRetail = ((WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) and (ns.WoW12)) -- Mainline but excluding Forever
+ns.WoWMidnight = (ns.WoW12 and not ns.WoW13) -- Retail changes, Midnight is a specific version
 ns.WoWCamelot = (ns.WoWVersion >= 16000 and ns.WoWVersion < 20000) -- Doesn't have its own projectID yet.
 ns.WoWForever = ns.WoWCamelot -- I'm bound to forget the Camelot name eventually
 
@@ -64,10 +68,6 @@ ns.WoWVanillaHardcore = (seasonID == Enum.SeasonID and Enum.SeasonID.Hardcore)
 -- Classic Era Anniversary Hardcore realms
 -- *Unlike the regular Anniversary realm, these ones stayed at Classic Era level and did not progress to TBC
 ns.WoWVanillaAnniversaryHardcore = (seasonID == Enum.SeasonID and Enum.SeasonID.FreshHardcore) 
-
--- Flags to check for minimum version, useful for big API changes
-ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
-ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
 -- Tinkerers rejoyce!
 -- *We give public access through the WoW API, but adding this global for convenience.
