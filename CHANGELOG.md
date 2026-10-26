@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-23
+## [Unreleased] 2026-10-26
 - Hopefully some missing Classic UnitFrame auras and NamePlates for all versions.
 
 ### Added

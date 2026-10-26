@@ -217,29 +217,6 @@ MinimapModule.StyleMinimap = function(self)
 	-- *does this taint? seems dodgy
 	Minimap:HookScript("OnMouseUp", Minimap_OnMouseUp)
 	
-	-- Mail
---	local mailFrame = CreateFrame("Button", nil, frame)
---	mailFrame:SetFrameLevel(mailFrame:GetFrameLevel() + 5)
---	mailFrame:SetScript("OnEnter", Mail_OnEnter)
---	mailFrame:SetScript("OnLeave", Mail_OnLeave)
---
---	local mail = frame:CreateFontString(nil, "OVERLAY", nil, 1)
---	mail.frame = mailFrame
---	mail:SetFontObject(GetFont(15, true))
---	mail:SetTextColor(oUF.colors.offwhite:GetRGB())
---	mail:SetAlpha(.85)
---	mail:SetJustifyH("CENTER")
---	mail:SetJustifyV("BOTTOM")
---	mail:SetFormattedText("%s", MAIL_LABEL)
---	mail:SetPoint("BOTTOM", 0, 30)
---	mailFrame:SetAllPoints(mail)
---
---	self.mail = mail
---
---	self:RegisterEvent("CVAR_UPDATE", "UpdateTimers")
---	self:RegisterEvent("UPDATE_PENDING_MAIL", "UpdateMail")
---	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
-
 	-- XP bar
 	------------------------------------------
 	-- badge showing xp percent with hover functionality to show bars
@@ -359,7 +336,7 @@ MinimapModule.StyleMinimap = function(self)
 	self:RegisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
 
 	-- Only exists in Retail
-	if (ns.WoWMainline) then
+	if (ns.WoWRetail) then
 		self:RegisterEvent("ENABLE_XP_GAIN", "UpdateXP")
 		self:RegisterEvent("DISABLE_XP_GAIN", "UpdateXP")
 	end
@@ -384,7 +361,7 @@ MinimapModule.UpdateXP = function(self, event, ...)
 		self:UnregisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
 
 		-- Only exists in Retail
-		if (ns.WoWMainline) then
+		if (ns.WoWRetail) then
 			self:UnregisterEvent("ENABLE_XP_GAIN", "UpdateXP")
 			self:UnregisterEvent("DISABLE_XP_GAIN", "UpdateXP")
 		end
