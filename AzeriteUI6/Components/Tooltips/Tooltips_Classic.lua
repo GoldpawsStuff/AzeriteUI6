@@ -78,7 +78,7 @@ Tooltips.OnEnable = function(self)
 
 	local anchor = CreateFrame("Frame", "AZUI6_Tooltip", UIParent)
 	--anchor:SetPoint("BOTTOMRIGHT", -20, 70) -- blizz default
-	anchor:SetPoint("BOTTOMRIGHT", -244, 124) -- azerite default 
+	anchor:SetPoint("BOTTOMRIGHT", -319, 166) -- azerite default -- -244, 124 
 	anchor:SetSize(250, 120) -- just the anchor size, doesn't affect tooltip size
 
 	self.anchor = anchor

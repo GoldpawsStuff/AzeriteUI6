@@ -117,7 +117,7 @@ MinimapModule.StyleMinimap = function(self)
 	--MinimapCluster:EnableMouse(false)
 	MinimapCluster:SetFrameLevel(1)
 
-	Minimap:SetMaskTexture(ns.GetMedia("minimap-mask-transparent"))
+	Minimap:SetMaskTexture(GetMedia("minimap-mask-transparent"))
 	--Minimap:SetMovable(true)
 	Minimap:EnableMouseWheel(true)
 	Minimap:SetScript("OnMouseWheel", Minimap_OnMouseWheel)
@@ -127,7 +127,7 @@ MinimapModule.StyleMinimap = function(self)
 	MinimapCluster.BorderTop:SetParent(hider)
 	--MinimapCluster.Tracking:SetParent(hider)
 	MinimapCluster.ZoneTextButton:SetParent(hider)
-	MinimapBackdrop:SetParent(hider)
+	MinimapBackdrop:SetParent(hider) -- dungeon eye parented to this?
 	MinimapBorder:SetParent(hider)
 	MinimapZoomIn:SetParent(hider)
 	MinimapZoomOut:SetParent(hider)
@@ -138,33 +138,30 @@ MinimapModule.StyleMinimap = function(self)
 	TimeManagerClockButton:SetParent(hider)
 
 	-- create our custom backdrop
-	-- *not showing up?
 	local backdropFrame = CreateFrame("Frame", nil, Minimap)
 	backdropFrame:SetFrameLevel(Minimap:GetFrameLevel())
+	backdropFrame:SetPoint("CENTER")
+	backdropFrame:SetSize(140,140) -- 198,198
 
 	local backdrop = backdropFrame:CreateTexture(nil, "BACKGROUND", nil, -7)
-	--backdrop:SetIgnoreParentScale(true)
-	backdrop:SetScale(1/mapScale)
-	backdrop:SetTexture(ns.GetMedia("minimap-mask-opaque"))
+	--backdrop:SetScale(1/mapScale)
+	backdrop:SetTexture(GetMedia("minimap-mask-opaque"))
 	backdrop:SetVertexColor(0, 0, 0, .75)
-	backdrop:SetSize(198,198)
-	backdrop:SetPoint("CENTER", Minimap, "CENTER")
+	backdrop:SetPoint("CENTER")
+	backdrop:SetSize(140,140) -- 198,198
 
 	-- create our custom border
 	local borderFrame = CreateFrame("Frame", nil, Minimap)
-	--borderFrame:SetIgnoreParentScale(true)
-	borderFrame:SetScale(1/mapScale)
-	--borderFrame:SetFrameLevel(Minimap:GetFrameLevel() + 10)
+	--borderFrame:SetScale(1/mapScale)
+	borderFrame:SetFrameLevel(Minimap:GetFrameLevel() + 10) -- needed?
 	borderFrame:SetPoint("CENTER")
-	borderFrame:SetSize(398,398)
-	--borderFrame:SetAllPoints()
+	borderFrame:SetSize(280,280) -- 398,398
 
 	local borderTexture = borderFrame:CreateTexture(nil, "BORDER", nil, 5)
 	borderTexture:SetTexture(GetMedia("minimap-border"))
 	borderTexture:SetVertexColor(192/255, 192/255, 192/255)
 	borderTexture:SetPoint("CENTER")
-	--borderTexture:SetSize(360,360)
-	borderTexture:SetSize(398,398)
+	borderTexture:SetSize(280,280) -- 398,398
 
 	-- Create our custom elements
 	local frame = CreateFrame("Frame", nil, Minimap)
