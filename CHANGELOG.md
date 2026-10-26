@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] 2026-10-26
-- Magic.
+### Added
+- Added the forgotten Minimap backdrop texture to the Classics.
+
+### Changed
+- Adjusted the default Classic Tooltip position to match Retail.
 
 ## [1.0.17-RC] 2026-10-26
 ### Added
