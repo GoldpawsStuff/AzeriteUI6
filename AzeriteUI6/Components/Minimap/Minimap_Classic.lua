@@ -38,10 +38,6 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
--- Constants
---local TORGHAST_ZONE_ID = 2162
---local IN_TORGHAST = (not IsResting()) and (GetRealZoneText() == GetRealZoneText(TORGHAST_ZONE_ID))
-
 --local Minimap_OnMouseUp = function(self, button)
 --	if (button == "MiddleButton") then
 --		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
@@ -66,15 +62,6 @@ local Minimap_OnMouseUp = function(self, button)
 		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
 
-	--elseif (button == "MiddleButton" and ns.IsRetail) then
-	--	local GLP = GarrisonLandingPageMinimapButton or ExpansionLandingPageMinimapButton
-	--	if (GLP and GLP:IsShown()) and (not InCombatLockdown()) then
-	--		if (GLP.ToggleLandingPage) then
-	--			GLP:ToggleLandingPage()
-	--		else
-	--			GarrisonLandingPage_Toggle()
-	--		end
-	--	end
 	else
 		local func = Minimap.OnClick or Minimap_OnClick
 		if (func) then
@@ -112,15 +99,6 @@ local Mail_OnEnter = function(self)
 	else
 		GameTooltip:AddLine(L_HAVE_MAIL, unpack(oUF.colors.highlight))
 	end
-
-	-- Add crafting order notifier.
-	--if (ns.IsRetail) and (self.countInfos and #self.countInfos > 0) then
-	--	GameTooltip:AddLine(" ")
-	--	GameTooltip:AddLine(MAILFRAME_CRAFTING_ORDERS_TOOLTIP_TITLE)
-	--	for _,countInfo in ipairs(mail.countInfos) do
-	--		GameTooltip:AddLine(string.format(PERSONAL_CRAFTING_ORDERS_AVAIL_FMT, countInfo.numPersonalOrders, countInfo.professionName))
-	--	end
-	--end
 
 	GameTooltip:Show()
 end
@@ -262,16 +240,11 @@ MinimapModule.UpdateCompass = function(self)
 		end
 
 		local playerFacing = GetPlayerFacing()
-		if (not playerFacing) or (self.supressCompass) or (IN_TORGHAST) then
+		if (not playerFacing) or (self.supressCompass) then
 			compass:SetAlpha(0)
 		else
 			compass:SetAlpha(1)
 		end
-
-		-- In Torghast, map is always locked. Weird.
-		--local angle = (IN_TORGHAST) and 0 or (self.rotateMinimap and playerFacing) and -playerFacing or 0
-		--compass.north:SetPoint("CENTER", radius*math.cos(angle + math.pi/2), radius*math.sin(angle + math.pi/2))
-
 	else
 		compass:SetAlpha(0)
 	end
@@ -284,30 +257,8 @@ MinimapModule.UpdateMail = function(self)
 	end
 
 	local hasMail = HasNewMail()
-	local hasCraftingOrder
 
-	--[[--if (ns.IsRetail) then
-		mail.countInfos = C_CraftingOrders.GetPersonalOrdersInfo()
-		hasCraftingOrder = mail.countInfos and #mail.countInfos > 0
-
-		local mailText = ""
-
-		if (hasCraftingOrder) then
-			mailText = mailText .. string.format("%s |cff888888(|r"..ns.Colors.normal.colorCode..#mail.countInfos.."|r|cff888888)|r", PROFESSIONS_CRAFTING, L_MAIL, #mail.countInfos)
-		end
-
-		if (hasMail) then
-			if (hasCraftingOrder) then
-				mailText = string.format("%s %s", L_NEW, L_MAIL) .. "|n" .. mailText
-			else
-				mailText = string.format("%s %s", L_NEW, L_MAIL)
-			end
-		end
-
-		mail:SetText(mailText)
-	--]]--end
-
-	if (hasMail or hasCraftingOrder) then
+	if (hasMail) then
 		mail:Show()
 		mail.frame:Show()
 
@@ -330,12 +281,6 @@ MinimapModule.UpdateMail = function(self)
 end
 
 MinimapModule.UpdateTimers = function(self)
-
-	-- In Torghast, map is always locked. Weird.
-	-- *Note that this is only in the tower, not the antechamber.
-	-- *We're resting in the antechamber, and it's a sanctuary. Good indicators.
-	-- *Also, we know there is an API call for it. We like ours better.
-	--IN_TORGHAST = (not IsResting()) and (GetRealZoneText() == GetRealZoneText(TORGHAST_ZONE_ID))
 
 	self.rotateMinimap = GetCVarBool("rotateMinimap")
 
@@ -366,26 +311,10 @@ MinimapModule.RefreshConfig = function(self)
 end
 
 MinimapModule.OnEnable = function(self)
-	--local mapScale = 198/140 -- 1 in retail, larger in classics
-
-	--Minimap:SetScale(mapScale)
-	--Minimap:ClearAllPoints()
-	--Minimap:SetPoint("BOTTOMRIGHT", -30 * mapScale, 30 * mapScale)
-
 	self:StyleMinimap()
 end
 
 MinimapModule.OnInitialize = function(self)
-	--if (not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager")) then
-	--	C_AddOns.LoadAddOn("Blizzard_TimeManager")
-	--end
-
-	-- something else loads this in MoP, it bugs out when doing it twice
-	-- figure out how to do it properly or just wait for it to load naturally and hook into that. 
-	--if (not C_AddOns.IsAddOnLoaded("Blizzard_GroupFinder_VanillaStyle")) then
-	--	C_AddOns.LoadAddOn("Blizzard_GroupFinder_VanillaStyle") 
-	--end
-
 	self.db = ns.db:RegisterNamespace("Minimap", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")

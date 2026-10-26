@@ -48,6 +48,88 @@ local safecall = function(obj, method, ...)
     end
 end
 
+local Badge_FadeIn = function(self) 
+	-- continue the fade
+	if (self:IsMouseOver() or self.Ring:IsMouseOver()) then
+		local oldAlpha = self.Ring:GetAlpha()
+		local newAlpha = oldAlpha + 1/(self.fadeInDuration/self.fadeFreq)
+		if (newAlpha < 1) then
+			self.Ring:SetAlpha(newAlpha)
+		else
+			-- goal reached, set the final alpha and cancel timer
+			self.Ring:SetAlpha(1)
+			self.ringFadeDirection = nil
+		end
+	else
+		-- kill this timer and change fade direction
+		self:StartFadeOut()
+	end
+end
+
+local Badge_FadeOut = function(self)
+	-- kill this timer and change fade direction
+	if (self:IsMouseOver() or self.Ring:IsMouseOver()) then
+		self:StartFadeIn()
+	else
+		-- continue the fade
+		local oldAlpha = self.Ring:GetAlpha()
+		local newAlpha = oldAlpha - 1/(self.fadeOutDuration/self.fadeFreq)
+		if (newAlpha > 0) then
+			self.Ring:SetAlpha(newAlpha)
+		else
+			-- goal reached, set the final alpha and cancel timer
+			self.Ring:SetAlpha(0)
+			self.Ring:Hide() -- fully hide the frame
+			self.ringFadeDirection = nil
+		end
+	end
+end
+
+local Badge_StartFadeIn = function(self)
+	-- check for existing timers
+	if (self.ringTimer) then 
+		-- bail out if we already have the correct timer running
+		if (self.ringFadeDirection == "IN") then
+			return 
+		end
+		-- cancel the existing wrong timer
+		self.ringTimer:Cancel()
+	end
+	-- start a new timer
+	self.ringFadeDirection = "IN"
+	self.ringTimer = C_Timer.NewTicker(1/30, function() self:FadeIn() end)
+end
+
+local Badge_StartFadeOut = function(self)
+	-- check for existing timers
+	if (self.ringTimer) then 
+		-- bail out if we already have the correct timer running
+		if (self.ringFadeDirection == "OUT") then
+			return 
+		end
+		-- cancel the existing wrong timer
+		self.ringTimer:Cancel()
+	end
+	-- start a new timer
+	self.ringFadeDirection = "OUT"
+	self.ringTimer = C_Timer.NewTicker(1/30, function() self:FadeOut() end)
+end
+
+local Badge_OnEnter = function(self)
+	-- check if ring is visible
+	if (not self.Ring:IsShown()) then
+		self.Ring:SetAlpha(0)
+		self.Ring:Show()
+	end
+	self:StartFadeIn()
+end
+
+local Badge_OnLeave = function(self)
+	if (not self:IsMouseOver() and not self.Ring:IsMouseOver()) then
+		self:StartFadeOut()
+	end
+end
+
 -- Will this taint or create other problems now?
 local Minimap_OnMouseUp = function(self, button)
 	if (button == "MiddleButton") then
@@ -96,19 +178,17 @@ MinimapModule.StyleMinimap = function(self)
 	-- hide new retail coords, or move them inside the map
 
 	-- Readjust stock coordinate text to match classic azerite position and size
-	if (ns.WoWCamelot or ns.WoWRetail) then -- Only in Forever (+Retail now)
-		local coords = MinimapCluster.MinimapContainer.PlayerCoords
-		coords:ClearAllPoints()
-		coords:SetPoint("BOTTOM", Minimap, "BOTTOM", 1, 24)
+	local coords = MinimapCluster.MinimapContainer.PlayerCoords -- Only in Forever (+Retail now)
+	coords:ClearAllPoints()
+	coords:SetPoint("BOTTOM", Minimap, "BOTTOM", 1, 24)
 
-		local msg = coords.CoordText
-		msg:SetFontObject(GetFont(11, true))
-		msg:SetTextColor(oUF.colors.offwhite:GetRGB())
-		msg:SetAlpha(.66)
+	local msg = coords.CoordText
+	msg:SetFontObject(GetFont(11, true))
+	msg:SetTextColor(oUF.colors.offwhite:GetRGB())
+	msg:SetAlpha(.66)
 
-		local holder = msg:GetParent()
-		holder:SetParent(Minimap)
-	end
+	local holder = msg:GetParent()
+	holder:SetParent(Minimap)
 
 	-- get this out of the way
 	MinimapCluster:EnableMouse(false)
@@ -168,7 +248,11 @@ MinimapModule.StyleMinimap = function(self)
 	badge:SetFrameLevel(Minimap:GetFrameLevel() + 50)
 	badge:SetSize(50, 50)
 	badge:SetPoint("CENTER", Minimap, "BOTTOM", ns.WoWMainline and 2 or 0, -6*.9)
-	self.Badge = badge
+	badge.fadeInDuration = .3
+	badge.fadeOutDuration = .1
+	badge.fadeFreq = 1/30
+	badge.ringTimer = nil
+	badge.ringFadeDirection = nil
 
 	-- badge backdrop
 	local badgeBackdrop = badge:CreateTexture(nil, "BACKGROUND", nil, 1)
@@ -185,26 +269,25 @@ MinimapModule.StyleMinimap = function(self)
 	badgeValue:SetJustifyV("MIDDLE")
 	badgeValue:SetTextColor(oUF.colors.ui:GetRGB())
 	badgeValue:SetAlpha(.75)
-	self.Badge.Value = badgeValue
 
 	-- ringframe containing backdrops and bars
-	local ringFrame = CreateFrame("Frame", nil, badge)
-	ringFrame:SetFrameStrata("MEDIUM")
-	ringFrame:SetSize(182, 182)
-	ringFrame:SetPoint("CENTER", Minimap, "CENTER", 0, -2)
-	self.RingFrame = ringFrame
+	local ring = CreateFrame("Frame", nil, badge)
+	ring:SetFrameStrata("MEDIUM")
+	ring:SetSize(182, 182)
+	ring:SetPoint("CENTER", Minimap, "CENTER", 0, -2)
+	ring:SetAlpha(0)
+	ring:Hide()
 
 	-- ringframe backdrop
-	local ringBackdrop = ringFrame:CreateTexture(nil, "BACKGROUND", nil, 1)
+	local ringBackdrop = ring:CreateTexture(nil, "BACKGROUND", nil, 1)
 	ringBackdrop:SetSize(352, 352)
 	ringBackdrop:SetPoint("CENTER", -1, 0)
 	ringBackdrop:SetTexture(GetMedia("minimap-onebar-backdrop"))
 	ringBackdrop:SetVertexColor(oUF.colors.ui:GetRGB())
-	self.RingFrame.Backdrop = ringBackdrop
 
 	-- xp bar
-	local xp = LibSpinBar:CreateSpinBar(addonName.."XPBar", ringFrame)
-	xp:SetFrameLevel(ringFrame:GetFrameLevel() + 5)
+	local xp = LibSpinBar:CreateSpinBar(addonName.."XPBar", ring)
+	xp:SetFrameLevel(ring:GetFrameLevel() + 5)
 	xp:SetPoint("CENTER", -1, 1)
 	xp:SetSize(182,182)
 	xp:SetStatusBarTexture(GetMedia("minimap-bars-single"))
@@ -216,11 +299,10 @@ MinimapModule.StyleMinimap = function(self)
 	xp:SetClockwise(true)
 	xp:SetDegreeOffset(256) -- offset from top center in degrees to the start of the ring bar
 	xp:SetDegreeSpan(332) -- degrees of the circle covered by the bar
-	self.XP = xp
 
 	-- xp rested bonus bar
-	local rested = LibSpinBar:CreateSpinBar(addonName.."XPBar", ringFrame)
-	rested:SetFrameLevel(ringFrame:GetFrameLevel() + 2)
+	local rested = LibSpinBar:CreateSpinBar(addonName.."XPBar", ring)
+	rested:SetFrameLevel(ring:GetFrameLevel() + 2)
 	rested:SetPoint("CENTER", -1, 1)
 	rested:SetSize(182,182)
 	rested:SetStatusBarTexture(GetMedia("minimap-bars-single"))
@@ -233,57 +315,43 @@ MinimapModule.StyleMinimap = function(self)
 	rested:SetClockwise(true)
 	rested:SetDegreeOffset(256) -- offset from top center in degrees to the start of the ring bar
 	rested:SetDegreeSpan(332) -- degrees of the circle covered by the bar
-	self.XP.Rested = rested
 	
 	-- xp value text
-	local ringValue = ringFrame:CreateFontString(nil, "OVERLAY", nil, 1)
+	local ringValue = ring:CreateFontString(nil, "OVERLAY", nil, 1)
 	ringValue:SetFontObject(GetFont(24, true))
 	ringValue:SetPoint("CENTER", 0, 1)
 	ringValue:SetJustifyH("CENTER")
 	ringValue:SetJustifyV("MIDDLE")
 	ringValue:SetTextColor(oUF.colors.ui:GetRGB())
-	self.XP.Value = ringValue
 	
 	-- xp description text
-	local ringDescription = ringFrame:CreateFontString(nil, "OVERLAY", nil, 1)
+	local ringDescription = ring:CreateFontString(nil, "OVERLAY", nil, 1)
 	ringDescription:SetFontObject(GetFont(12, true))
 	ringDescription:SetPoint("CENTER", 0, -16)
 	ringDescription:SetWidth(90) -- uh
 	ringDescription:SetJustifyH("CENTER")
 	ringDescription:SetJustifyV("MIDDLE")
 	ringDescription:SetTextColor(oUF.colors.quest.gray:GetRGB())
+
+	self.XP = xp
+	self.XP.Rested = rested
 	self.XP.Description = ringDescription
+	self.XP.Value = ringValue
 
-	-- Todo: Add in a timer
-	local overBadge, overRing
-	local updateAlpha = function()
-		if (overBadge or overRing) then
-			self.RingFrame:Show()
-		else
-			self.RingFrame:Hide()
-		end
-	end
-	updateAlpha()
+	self.Badge = badge
+	self.Badge.Backdrop = badgeBackdrop
+	self.Badge.Value = badgeValue
 
-	badge:SetScript("OnEnter", function()
-		overBadge = true
-		updateAlpha()
-	end)
-	
-	badge:SetScript("OnLeave", function() 
-		overBadge = false
-		updateAlpha()
-	end)
+	self.Badge.Ring = ring
+	self.Badge.Ring.Backdrop = ringBackdrop
 
-	ringFrame:SetScript("OnEnter", function() 
-		overRing = true
-		updateAlpha()
-	end)
-	
-	ringFrame:SetScript("OnLeave", function() 
-		overRing = false
-		updateAlpha()
-	end)
+	self.Badge.FadeIn = Badge_FadeIn
+	self.Badge.FadeOut = Badge_FadeOut
+	self.Badge.StartFadeIn = Badge_StartFadeIn
+	self.Badge.StartFadeOut = Badge_StartFadeOut
+
+	self.Badge:SetScript("OnEnter", Badge_OnEnter)
+	self.Badge:SetScript("OnLeave", Badge_OnLeave)
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateXP")
 	self:RegisterEvent("PLAYER_XP_UPDATE", "UpdateXP")

@@ -70,9 +70,6 @@ local hideActionButton = function(button)
 	button:Hide()
 	button:UnregisterAllEvents()
 	button:SetAttribute("statehidden", true)
-
-	-- This disables keybinds. better not do it.
-	--button.bar = nil
 end
 
 HideBlizzardActionBars.HideBlizzard = function(self)
@@ -107,6 +104,12 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	hideActionBarFrame(StatusTrackingBarManager, false)
 	hideActionBarFrame(BagsBar, true)
 	hideActionBarFrame(MicroMenu, true)
+	hideActionBarFrame(MicroMenuContainer, true)
+
+	if (MicroMenu and MicroMenu.BorderArt and MicroMenu.BackgroundArt) then
+		MicroMenu.BorderArt:Hide()
+		MicroMenu.BackgroundArt:Hide()
+	end
 
 	-- these events drive visibility, we want the MainMenuBar to remain invisible
 	if (MainMenuBar) then -- <= 11.2.5
@@ -124,6 +127,73 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 
 	OverrideActionBar:SetParent(UIHider)
 	QueueStatusFrame:SetParent(UIParent)
+
+	-- Call once after the UI is ready
+	self:HideMicroMenuPopups()
+end
+
+HideBlizzardActionBars.HideMicroMenuPopups = function(self)
+	-- Modern path (Retail / Midnight / any client that has the HelpTip system)
+	if (type(MainMenuMicroButton_ShowAlert) == "function") then
+		hooksecurefunc("MainMenuMicroButton_ShowAlert", function(microButton)
+			if (HelpTip and HelpTip.HideAllSystem) then
+				HelpTip:HideAllSystem("MicroButtons")
+			elseif (type(MainMenuMicroButton_HideAlert) == "function") then
+				MainMenuMicroButton_HideAlert(microButton)
+			end
+		end)
+	end
+
+	-- Stop the pulsing glow on the buttons (works on most clients that have it)
+	if (type(MicroButtonPulse) == "function" and type(MicroButtonPulseStop) == "function") then
+		hooksecurefunc("MicroButtonPulse", function(self)
+			MicroButtonPulseStop(self)
+		end)
+	end
+
+	-- Legacy alert frames (Classic Era and older clients that still use *Alert frames)
+	local legacyAlerts = {
+		"TalentMicroButtonAlert",
+		"SpellbookMicroButtonAlert",
+		"CharacterMicroButtonAlert",
+		"CollectionsMicroButtonAlert",
+		"EJMicroButtonAlert",
+		"GuildMicroButtonAlert",
+		"QuestLogMicroButtonAlert",
+		"AchievementMicroButtonAlert",
+		"LFDMicroButtonAlert",
+		"PVPMicroButtonAlert",
+	}
+
+	for _, name in ipairs(legacyAlerts) do
+		local frame = _G[name]
+		if (frame and frame.HookScript) then
+			frame:HookScript("OnShow", function(self)
+				self:Hide()
+			end)
+			if (frame:IsShown()) then
+				frame:Hide()
+			end
+		end
+	end
+
+	-- Optional: also kill the small notification dots/overlays on the buttons
+	local buttons = {
+		PlayerSpellsMicroButton,	-- modern talents/spells
+		TalentMicroButton,			-- older clients
+		SpellbookMicroButton,
+		ProfessionMicroButton,
+		CollectionsMicroButton,
+		MainMenuMicroButton,
+	}
+	for _,button in ipairs(buttons) do
+		if (button and button.NotificationOverlay) then
+			button.NotificationOverlay:Hide()
+			button.NotificationOverlay:HookScript("OnShow", function(self)
+				self:Hide()
+			end)
+		end
+	end
 end
 
 HideBlizzardActionBars.NPE_LoadUI = function(self)
