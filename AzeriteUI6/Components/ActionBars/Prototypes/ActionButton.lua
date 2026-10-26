@@ -357,7 +357,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 	spellActivationAlert:Hide()
 
 	-- fully faking this one.
-	-- *can NOT guarantee it works with anything else than our buttons and Bartender,
+	-- *can NOT guarantee it works with anything else than our buttons,
 	--  will look into it and replace more frame methods if a problem occurs.
 	button.__LBGoverlay = {
 		-- We don't really do any anims out, we simply hide

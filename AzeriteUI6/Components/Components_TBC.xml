@@ -1,7 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
 	<!-- ActionBars -->
-	<Script file="ActionBars\Compatibility\HandleBartender.lua"/>
 	<Script file="ActionBars\Compatibility\HideBlizzard.lua"/>
 	<Script file="ActionBars\Prototypes\ActionButton.lua"/>
 	<Script file="ActionBars\Prototypes\PetButton.lua"/>

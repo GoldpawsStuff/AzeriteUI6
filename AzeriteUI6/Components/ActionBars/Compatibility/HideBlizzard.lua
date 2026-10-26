@@ -211,7 +211,7 @@ HideBlizzardActionBars.NPE_LoadUI = function(self)
 end
 
 HideBlizzardActionBars.HasConflicts = function(self)
-	for _,addon in next,{ "Bartender4", "ConsolePort_Bar" } do 
+	for _,addon in next,{ "Bartender4", "ConsolePort_Bar", "Dominos" } do 
 		if (C_AddOns.GetAddOnEnableState(addon, UnitGUID("player")) == Enum.AddOnEnableState.All) then
 			return true
 		end
@@ -220,6 +220,5 @@ end
 
 HideBlizzardActionBars.OnInitialize = function(self)
 	if (self:HasConflicts()) then return self:Disable() end
-
 	self:HideBlizzard()
 end

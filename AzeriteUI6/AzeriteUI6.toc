@@ -5,7 +5,7 @@
 ## Author: Lars Norberg, Daniel Troko
 ## Notes: Custom UnitFrames
 ## Version: 1.0.16-RC
-## OptionalDeps: Ace3, oUF, LibActionButton-1.0, Bartender4, Clique, SharedMedia
+## OptionalDeps: Ace3, oUF, LibActionButton-1.0, Bartender4, ConsolePort_Bar, Dominos, Clique, SharedMedia
 
 # https://warcraft.wiki.gg/wiki/Addon_Categories
 ## Category: UI Overhaul

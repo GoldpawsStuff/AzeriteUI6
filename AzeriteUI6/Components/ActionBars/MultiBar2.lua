@@ -30,7 +30,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local MultiBar2 = ns:NewModule("MultiBar2", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {
+local defaults = { profile = ns:Merge({
 	enabled = false,
 
 	layout = "grid", -- <grid, zigzag>
@@ -39,7 +39,7 @@ local defaults = { profile = {
 	layoutGrowthVertical = "DOWN", -- which direction the bar grows in vertically
 
 	enableBarFading = false, -- whether to enable non-combat/hover button fading
-}}
+}, ns.ActionBar.defaults)}
 
 MultiBar2.GetDefaults = function(self)
 	return defaults
@@ -67,7 +67,7 @@ MultiBar2.ReassignBindings = function(self)
 end
 
 MultiBar2.HasConflicts = function(self)
-	for _,addon in next,{ "ConsolePort_Bar" } do 
+	for _,addon in next,{ "Bartender4", "ConsolePort_Bar", "Dominos" } do 
 		if (C_AddOns.GetAddOnEnableState(addon, UnitGUID("player")) == Enum.AddOnEnableState.All) then
 			return true
 		end

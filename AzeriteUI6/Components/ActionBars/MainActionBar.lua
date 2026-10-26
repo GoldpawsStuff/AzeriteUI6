@@ -30,7 +30,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local MainActionBarMod = ns:NewModule("MainActionBar", nil, "AceConsole-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
-local defaults = { profile = {
+local defaults = { profile = ns:Merge({
 	enabled = true,
 
 	layout = "zigzag", -- <grid, zigzag>
@@ -54,7 +54,7 @@ local defaults = { profile = {
 		overridebar = true,
 		vehicleui = true
 	}
-}}
+}, ns.ActionBar.defaults)}
 
 MainActionBarMod.GetDefaults = function(self)
 	return defaults
@@ -89,7 +89,7 @@ MainActionBarMod.ReassignBindings = function(self)
 end
 
 MainActionBarMod.HasConflicts = function(self)
-	for _,addon in next,{ "ConsolePort_Bar" } do 
+	for _,addon in next,{ "Bartender4", "ConsolePort_Bar", "Dominos" } do 
 		if (C_AddOns.GetAddOnEnableState(addon, UnitGUID("player")) == Enum.AddOnEnableState.All) then
 			return true
 		end

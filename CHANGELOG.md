@@ -4,15 +4,21 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-26
-- Hopefully some missing Classic UnitFrame auras and NamePlates for all versions.
 
+## [Unreleased] 2026-10-26
 ### Added
 - Added XP bar to the Retail/Forever Minimap.
 
+### Changed
+- Now fully disables our own Action Bars when a conflicting addon like `Bartender4` or `Dominos` is detected.
+- May or may not make a few more Minimap icons fade out until moused over.
+
+### Fixed
+- Fixed an issue that caused a reset of the settings through the options menu to fail.
+
 ## [1.0.16-RC] 2026-10-22
 ### Added
-- Now creates an EditMode preset named "Azerite UI Default" if it doesn't exist, and applies it. 
+- Now creates an EditMode preset named "Azerite UI Default" if it doesn't exist, and applies it. The preset is a work in progress, more will be added to it.
 - Added the command `/resetlayout` to forcefully reset the aforementioned EditMode layout. Might change that command later. Or add a button. 
 
 ## [1.0.14-RC] 2026-10-21

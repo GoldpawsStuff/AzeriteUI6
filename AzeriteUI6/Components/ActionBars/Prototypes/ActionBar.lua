@@ -174,7 +174,7 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 
 	bar.id = id
 	bar.name = name or id
-	bar.config = ns:Merge(config or ns:Copy(ns.ActionBar.defaults), ns.ActionBar.defaults) -- wth?
+	bar.config = ns:Merge(config or ns:Copy(ns.ActionBar.defaults), ns.ActionBar.defaults) -- fails?
 
 	bar.buttons = {}
 	bar.buttonWidth = 64 -- why exactly are we storing it directly on the bar object?
@@ -360,7 +360,7 @@ ActionBar.UpdateButtonCount = function(self)
 	if (InCombatLockdown()) then return end
 
 	for id,button in next,self.buttons do
-		if (id <= self.config.numbuttons) then
+		if (id <= (self.numButtons or self.config.numbuttons or #self.buttons)) then
 			button:SetParent(self)
 			button:Show()
 			button:SetAttribute("statehidden", nil)
@@ -495,7 +495,7 @@ ActionBar.UpdateButtonLayout = function(self)
 		local buttonWidth = self.buttonWidth
 		local buttonHeight = self.buttonHeight
 
-		local totalbreaks = math.ceil(config.numbuttons/config.layoutGridSize)
+		local totalbreaks = math.ceil((self.numButtons or self.config.numbuttons or #self.buttons)/config.layoutGridSize)
 		local width, height
 
 		if (config.layoutGrowth == "horizontal") then

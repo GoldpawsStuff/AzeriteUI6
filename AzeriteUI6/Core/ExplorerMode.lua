@@ -457,7 +457,7 @@ ExplorerMode.UpdateSettings = function(self)
 		--"StanceBar"
 	} do 
 		local barModule = ns:GetModule(moduleName, true)
-		if (barModule) then
+		if (barModule and barModule:IsEnabled()) then
 			local bar = barModule:GetBar()
 			local fade = not self.FORCED and barModule:IsEnabled() and db.enabled and db.fadeActionBars
 

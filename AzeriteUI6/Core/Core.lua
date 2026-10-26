@@ -124,7 +124,7 @@ ns.GenerateOptions = function(self)
 	-- iterate submodules to get a list of titles
 	local subModules, subModuleNames = {}, {}
 	for name, module in self:IterateModules() do
-		if (module.GetOptions) then
+		if (module.GetOptions and module:IsEnabled()) then
 			local moduleOptions = module:GetOptions()
 			if (moduleOptions) then
 				subModules[name] = module
@@ -183,11 +183,16 @@ ns.HideClutter = function(self)
 		--["MainStatusTrackingBarContainer"] = "StatusBars",
 		--["MicroMenu"] = "MicroMenu",
 		--["MicroMenuContainer"] = "MicroMenu",
-		["LibDBIcon10_BugSack"] = true,
-		["LibDBIcon10_Max_Camera_Distance"] = true,
 	} do
 		if (_G[element]) then
 			self:RegisterFrameForFading(_G[element], fadeGroup == true and element or fadeGroup)
+		end
+	end
+	-- Just fade them all out
+	local lib = LibStub("LibDBIcon-1.0", true)
+	if (lib) then
+		for name,object in next,lib.objects do
+			self:RegisterFrameForFading(object, name)
 		end
 	end
 end
@@ -366,291 +371,6 @@ ns.Import = function(self, encoded)
 	end
 end
 
--- ID to barName
-local barToMod = {
-	["bar1"] 		= "MainActionBar",
-	["bar2"] 		= "MultiBar1", -- bottom left
-	["bar3"] 		= "MultiBar2", -- bottom right
-	["bar4"] 		= "MultiBar3", -- rightmost sidebar
-	["bar5"] 		= "MultiBar4", -- leftmost sidebar
-	["bar6"] 		= (ns.WoW12 or ns.WoWCamelot) and "MultiBar5" or nil,
-	["bar7"] 		= (ns.WoW12 or ns.WoWCamelot) and "MultiBar6" or nil,
-	["bar8"] 		= (ns.WoW12 or ns.WoWCamelot) and "MultiBar7" or nil,
-	["pet"] 		= "PetBar",
-	["petbar"] 		= "PetBar",
-	["stance"] 		= "StanceBar", 
-	["stancebar"] 	= "StanceBar",
-	["forms"] 		= "StanceBar"
-}
-for i = 1,8 do 
-	barToMod[tostring(i)] = barToMod["bar"..i] -- add a numeric alias (as string) for each bar
-end
-
-ns.EnableActionBar = function(self, input)
-	if (InCombatLockdown()) then return end
-
-	local barID = self:GetArgs(string.lower(input))
-	if (not barID or not barToMod[barID]) then return end
-
-	local mod = ns:GetModule(barToMod[barID], true)
-	if (mod) then
-		if (mod.db.profile.enabled) then return end
-
-		mod.db.profile.enabled = true
-
-		-- Tell bar mod to update bar settings
-		local bar = mod:GetBar()
-		if (bar) then bar:Update() end		
-	end
-end
-
-ns.DisableActionBar = function(self, input)
-	if (InCombatLockdown()) then return end
-
-	local barID = self:GetArgs(string.lower(input))
-	if (not barID or not barToMod[barID]) then return end
-
-	local mod = ns:GetModule(barToMod[barID], true)
-	if (mod) then
-		if (not mod.db.profile.enabled) then return end
-
-		mod.db.profile.enabled = false
-
-		-- Tell bar mod to update bar settings
-		local bar = mod:GetBar()
-		if (bar) then bar:Update() end
-	end
-end
-
-local stringsToTable = function(s)
-	local t = {}
-	for token in string.gmatch(s, "%S+") do
-		t[#t + 1] = token
-	end
-	return t
-end
-
-ns.SetActionBarLayout = function(self, input)
-	if (InCombatLockdown()) then return end
-
-	local args = stringsToTable(input)
-	--local args = { self:GetArgs(string.lower(input)) }
-
-	if (#args < 2) then return end -- nonsensical
-
-	local barID = args[1]
-	if (not barID or not barToMod[barID]) then return end -- invalid bar
-
-	local mod = ns:GetModule(barToMod[barID], true)
-	if (mod) then
-		if (not mod.db.profile.enabled) then return end
-
-		local db = mod.db.profile -- shorthand for bar settings
-
-		local layout -- layout type (grid or zigzag)
-		local growth, growthH, growthV -- first growth direction, horizontal growth direction, vertical growth direction
-		local numButtons, breakPoint -- maximum number of visible buttons, number of buttons pr row when grid or from where zigzagging begins
-		local fade, noFade, fadeFrom, fadeInCombat, noFadeInCombat -- fade switches
-
-		-- parse the remaining arguments and temporarily store values
-		local curArgID, numArgs = 2,#args -- current argument, total number of available arguments
-		local arg = string.lower((args[curArgID])) -- retrieve next argument
-
-		while (curArgID <= numArgs) 
-		do 
-			local prevArgID = curArgID
-
-			-- check for optional layout type
-			-- *will use existing layout if not provided
-			if (not layout) then
-				if (arg == "grid" or arg == "zigzag") then 
-					layout = arg -- assign the layout type
-
-					curArgID = curArgID + 1 -- increase argument counter
-					if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-					arg = string.lower(args[curArgID]) -- retrieve next argument
-
-					-- parse for grid width or zigzag start
-					if (not breakPoint) then
-
-						-- parse for maximum number of buttons in primary growth direction
-						if (layout == "grid" and arg == "size") then
-							curArgID = curArgID + 1 -- increase argument counter
-							if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-							arg = string.lower(args[curArgID]) -- retrieve next argument
-
-							breakPoint = tonumber(arg) -- verify it's a number 
-							if (breakPoint) then
-								curArgID = curArgID + 1 -- increase argument counter
-								if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-								arg = string.lower(args[curArgID]) -- retrieve next argument
-							end
-
-						-- parse for button to start zigzagging from
-						elseif (layout == "zigzag" and arg == "from") then
-							curArgID = curArgID + 1 -- increase argument counter
-							if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-							arg = string.lower(args[curArgID]) -- retrieve next argument
-
-							breakPoint = tonumber(arg) -- verify it's a number 
-							if (breakPoint) then
-								curArgID = curArgID + 1 -- increase argument counter
-								if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-								arg = string.lower(args[curArgID]) -- retrieve next argument
-							end
-						end
-					end
-
-				end
-			end
-
-			-- parse for primary growth direction
-			-- *always assume this is the first directional argument
-			if (not growth) then
-				if (arg == "right" or arg == "left") then
-					growth = "horizontal"
-					growthH = string.upper(arg)
-
-					curArgID = curArgID + 1 -- increase argument counter
-					if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-					arg = string.lower(args[curArgID]) -- retrieve next argument
-
-					-- parse for breakpoint growth direction
-					-- *this is technically optional, since all buttons can be on a row
-					if (arg == "up" or arg == "down") then
-						growthV = string.upper(arg)
-
-						curArgID = curArgID + 1 -- increase argument counter
-						if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-						arg = string.lower(args[curArgID]) -- retrieve next argument
-					end
-
-				elseif (arg == "up" or arg == "down") then
-					growth = "vertical"
-					growthV = string.upper(arg)
-
-					curArgID = curArgID + 1 -- increase argument counter
-					if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-					arg = string.lower(args[curArgID]) -- retrieve next argument
-
-					-- parse for breakpoint growth direction
-					-- *this is technically optional, since all buttons can be on a row
-					if (arg == "right" or arg == "left") then
-						growthH = string.upper(arg)
-
-						curArgID = curArgID + 1 -- increase argument counter
-						if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-						arg = string.lower(args[curArgID]) -- retrieve next argument
-					end
-				end
-			end
-
-			-- parse for maximum visible buttons
-			if (not numButtons) then
-				if (arg == "max") then
-					curArgID = curArgID + 1 -- increase argument counter
-					if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-					arg = string.lower(args[curArgID]) -- retrieve next argument
-
-					numButtons = tonumber(arg) -- verify it's a number 
-					if (numButtons) then
-						numButtons = math.max(math.min(numButtons, NUM_ACTIONBAR_BUTTONS), 1)
-
-						curArgID = curArgID + 1 -- increase argument counter
-						if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-						arg = string.lower(args[curArgID]) -- retrieve next argument
-					end
-				end
-			end
-
-			-- parse for button fading (unrelated to explorer mode which fades the entire bar)
-			if (arg == "fade" and not noFade) then -- ignore opposite args
-				fade = true
-
-				curArgID = curArgID + 1 -- increase argument counter
-				if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-				arg = string.lower(args[curArgID]) -- retrieve next argument
-
-				if (arg == "from") then
-					curArgID = curArgID + 1 -- increase argument counter
-					if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-					arg = string.lower(args[curArgID]) -- retrieve next argument
-
-					fadeFrom = tonumber(arg) -- retrieve first fade button
-					if (fadeFrom) then
-						curArgID = curArgID + 1 -- increase argument counter
-						if (curArgID > numArgs) then break end -- bail out if all args are parsed
-
-						arg = string.lower(args[curArgID]) -- retrieve next argument
-					end
-				end
-
-			elseif (arg == "nofade" and not fade) then -- ignore opposite args
-				noFade = true
-
-				curArgID = curArgID + 1 -- increase argument counter
-				if (curArgID > numArgs) then break end -- bail out if all args are parsed
-				
-				arg = string.lower(args[curArgID]) -- retrieve next argument
-			end
-
-			-- avoid a neverending loop on bad unrecognized input where nothing was parsed
-			if (curArgID == prevArgID) then 
-				curArgID = curArgID + 1
-			end
-		end
-
-		-- assign generic settings
-		if (layout) then db.layout = layout end
-		if (growth) then db.layoutGrowth = growth end
-		if (growthH) then db.layoutGrowthHorizontal = growthH end
-		if (growthV) then db.layoutGrowthVertical = growthV end
-		if (numButtons) then db.numbuttons = numButtons end
-		if (fade) then db.enableBarFading = true end
-		if (noFade) then db.enableBarFading = false end
-		if (fadeInCombat) then db.fadeInCombat = true end
-		if (noFadeInCombat) then db.fadeInCombat = false end
-		if (fadeFrom) then db.fadeFrom = fadeFrom end
-
-		-- assign layout depending settings
-		-- *note that breakPoint refers to different things in different layouts
-		if (breakPoint) then
-			if (db.layout == "grid") then
-				
-				-- illustrates maximum number of buttons on a line
-				db.layoutGridSize = breakPoint
-
-			elseif (db.layout == "zigzag") then
-
-				-- illustrates from which button the zigzag pattern begins
-				db.layoutZigZagStart = breakPoint
-
-				-- illustrates the fraction of the button size  
-				-- the buttons will zigzag relative to the main line
-				-- *will leave this uneditable for now
-				--db.layoutZigZagOffset
-			end
-		end
-
-		-- Tell bar mod to update bar settings
-		local bar = mod:GetBar()
-		if (bar) then bar:Update() end		
-	end
-end
-
 ns.RefreshConfig = function(self, event, ...)
 	if (event == "OnNewProfile") then
 		--local db, profileKey = ...
@@ -696,11 +416,9 @@ ns.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
 	self:RegisterChatCommand("lock", "ToggleFrameLocks") -- toggle movable frame anchors
-	self:RegisterChatCommand("enablebar", "EnableActionBar") -- enable an action bar
-	self:RegisterChatCommand("disablebar", "DisableActionBar") -- disable an action bar
-	self:RegisterChatCommand("setbar", "SetActionBarLayout") -- specify bar layout and button count
 	self:RegisterChatCommand("resetpositions", "ResetSavedPositions") -- reset all addon saved positions
 	self:RegisterChatCommand("resetsettings", "ResetDB") -- reset all addon settings
+
 	self:RegisterChatCommand("az", "OpenOptions") -- open options menu
 	self:RegisterChatCommand("azui", "OpenOptions") -- adding a bunch of aliases
 	self:RegisterChatCommand("azerite", "OpenOptions") -- since people all seem to 
