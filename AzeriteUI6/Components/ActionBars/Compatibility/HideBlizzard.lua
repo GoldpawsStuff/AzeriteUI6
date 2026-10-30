@@ -146,9 +146,7 @@ HideBlizzardActionBars.HideMicroMenuPopups = function(self)
 
 	-- Stop the pulsing glow on the buttons (works on most clients that have it)
 	if (type(MicroButtonPulse) == "function" and type(MicroButtonPulseStop) == "function") then
-		hooksecurefunc("MicroButtonPulse", function(self)
-			MicroButtonPulseStop(self)
-		end)
+		hooksecurefunc("MicroButtonPulse", MicroButtonPulseStop)
 	end
 
 	-- Legacy alert frames (Classic Era and older clients that still use *Alert frames)
@@ -162,15 +160,13 @@ HideBlizzardActionBars.HideMicroMenuPopups = function(self)
 		"QuestLogMicroButtonAlert",
 		"AchievementMicroButtonAlert",
 		"LFDMicroButtonAlert",
-		"PVPMicroButtonAlert",
+		"PVPMicroButtonAlert"
 	}
 
 	for _, name in ipairs(legacyAlerts) do
 		local frame = _G[name]
 		if (frame and frame.HookScript) then
-			frame:HookScript("OnShow", function(self)
-				self:Hide()
-			end)
+			frame:HookScript("OnShow", frame.Hide)
 			if (frame:IsShown()) then
 				frame:Hide()
 			end
@@ -184,14 +180,12 @@ HideBlizzardActionBars.HideMicroMenuPopups = function(self)
 		SpellbookMicroButton,
 		ProfessionMicroButton,
 		CollectionsMicroButton,
-		MainMenuMicroButton,
+		MainMenuMicroButton
 	}
 	for _,button in ipairs(buttons) do
 		if (button and button.NotificationOverlay) then
 			button.NotificationOverlay:Hide()
-			button.NotificationOverlay:HookScript("OnShow", function(self)
-				self:Hide()
-			end)
+			button.NotificationOverlay:HookScript("OnShow", button.NotificationOverlay.Hide)
 		end
 	end
 end
