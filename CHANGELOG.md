@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-26
+## [Unreleased] 2026-10-30
 ### Added
+- Added XP bar to the Classic Minimap.
 - Added the forgotten Minimap backdrop texture to the Classics.
 
 ### Changed
