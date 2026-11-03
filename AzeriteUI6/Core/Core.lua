@@ -45,7 +45,7 @@ ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
 ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
 -- Flavor Flags
-ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- This includes Forever
+ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- This includes Forever, we follow Blizzard's definition here
 ns.WoWVanilla = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- Classic Era, SoD, SoM and Hardcore versions
 ns.WoWTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) -- TBC Classic Anniversary
 ns.WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC) -- Wrath of the Lich King Classic
@@ -307,6 +307,7 @@ ns.GetProfiles = function(self)
 	return profiles
 end
 
+-- We just never finished this.
 ns.Export = function(self, ...)
 
 	-- Decide which modules to export.
@@ -349,6 +350,7 @@ ns.Export = function(self, ...)
 
 end
 
+-- Nor this.
 ns.Import = function(self, encoded)
 
 	-- return string encoded by LibDeflate:EncodeForPrint

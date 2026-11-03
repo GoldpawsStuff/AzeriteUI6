@@ -4,13 +4,17 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-10-30
+## [Unreleased] 2026-11-03
 ### Added
 - Added XP bar to the Classic Minimap.
 - Added the forgotten Minimap backdrop texture to the Classics.
+- Added two character specific layouts to the EditMode. One for regular Mouse/Keyboard, one for Gamepad. If you wish to enable Gamepad usage in non-Forever clients, use `/console GamePadEnable 1`.
 
 ### Changed
 - Adjusted the default Classic Tooltip position to match Retail.
+
+### Removed
+- Removed any existing account wide EditMode presets created by this UI.
 
 ## [1.0.17-RC] 2026-10-26
 ### Added

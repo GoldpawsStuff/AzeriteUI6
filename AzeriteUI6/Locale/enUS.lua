@@ -28,6 +28,8 @@ L["Target of Target"] = SHOW_TARGET_OF_TARGET_TEXT
 --  to make it easier to manually search through.
 --------------------------------------------------------------------
 L["Action Bar layout"] = true
+L["Azerite UI Default"] = true -- EditMode default layout name
+L["Azerite UI Default (Gamepad)"] = true -- EditMode default layout name with a Gamepad in Forever
 L["Enable Action Bar fading."] = true
 L["Choose a section on the left."] = true
 L["Grid"] = true
