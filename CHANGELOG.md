@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added XP bar to the Classic Minimap.
 - Added the forgotten Minimap backdrop texture to the Classics.
-- Added two character specific layouts to the EditMode. One for regular Mouse/Keyboard, one for Gamepad. If you wish to enable Gamepad usage in non-Forever clients, use `/console GamePadEnable 1`.
+- Added a character specific GamePad layout to the EditMode in Forever, since GamePads are more officially supported there. If you wish to enable GamePad usage in non-Forever clients, use `/console GamePadEnable 1`. Note that a specific GamePad EditMode layout is not created for this UI in any other clients than Forever. 
 
 ### Changed
 - Adjusted the default Classic Tooltip position to match Retail.
+- The default EditMode preset created by this UI is now Character specific, not Account wide.
 
 ### Removed
-- Removed any existing account wide EditMode presets created by this UI.
+- Removed any existing Account wide EditMode presets created by this UI.
 
 ## [1.0.17-RC] 2026-10-26
 ### Added
