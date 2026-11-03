@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 2026-11-03
+- Stuff.
+
 ## [1.0.18-Alpha] 2026-11-03
 ### Added
 - Added XP bar to the Classic Minimap.
