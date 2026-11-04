@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added a proper tracking menu to all the Classic minimaps. Currently testing.
 
 ### Fixed
-- Removed an annoying backdrop border that kept popping up on ActionButtons in TBC amongst others.
+- Removed an annoying backdrop border that kept popping up on ActionButtons in TBC Anniversary amongst others.
 
 ## [1.0.18-Alpha] 2026-11-03
 ### Added
