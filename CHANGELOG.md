@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-11-03
-- Stuff.
+## [Unreleased] 2026-11-04
+### Added
+- Added a proper tracking menu to all the Classic minimaps. Currently testing.
+
+### Fixed
+- Removed an annoying backdrop border that kept popping up on ActionButtons in TBC amongst others.
 
 ## [1.0.18-Alpha] 2026-11-03
 ### Added

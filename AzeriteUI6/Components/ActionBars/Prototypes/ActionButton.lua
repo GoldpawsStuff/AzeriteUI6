@@ -183,6 +183,9 @@ ns.ActionButton.Create = function(self, id, name, header)
 	if (button.SlotArt) then
 		button.SlotArt:SetParent(UIHider) -- more graphical crap we don't need
 	end
+	if (button.SlotBackground) then
+		button.SlotBackground:SetParent(UIHider) -- annoying TBC border backdrop
+	end
 	if (button.SpellCastAnimFrame) then
 		button.SpellCastAnimFrame:SetParent(UIHider) -- we sooo don't need a castbar in the button
 	end

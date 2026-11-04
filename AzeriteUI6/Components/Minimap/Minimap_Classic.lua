@@ -40,14 +40,6 @@ local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
---local Minimap_OnMouseUp = function(self, button)
---	if (button == "MiddleButton") then
---		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
---		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
---	end
---end
-
-
 local Badge_FadeIn = function(self) 
 	-- continue the fade
 	if (self:IsMouseOver() or self.Ring:IsMouseOver()) then
@@ -130,39 +122,6 @@ local Badge_OnLeave = function(self)
 	end
 end
 
-local Minimap_OnMouseUp = function(self, button)
-	if (button == "RightButton") then
-		if (ns.IsClassic or ns.IsTBC) then
-			if (MinimapModule.ShowMinimapTrackingMenu) then
-				MinimapModule:ShowMinimapTrackingMenu()
-			end
-		--elseif (ns.WoW11) then
-		--	MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
-		else
-			ToggleDropDownMenu(1, nil, _G[ns.Prefix.."MiniMapTrackingDropDown"], "cursor")
-			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
-		end
-
-	elseif (button == "MiddleButton") then
-		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
-
-	else
-		local func = Minimap.OnClick or Minimap_OnClick
-		if (func) then
-			func(self)
-		end
-	end
-end
-
-local Minimap_OnMouseWheel = function(self, delta)
-	if (delta > 0) then
-		(Minimap.ZoomIn or MinimapZoomIn):Click()
-	elseif (delta < 0) then
-		(Minimap.ZoomOut or MinimapZoomOut):Click()
-	end
-end
-
 local Mail_OnEnter = function(self)
 	if (GameTooltip:IsForbidden()) then return end
 
@@ -193,9 +152,148 @@ local Mail_OnLeave = function(self)
 	GameTooltip:Hide()
 end
 
+
+local GetTrackingCount = function()
+	if C_Minimap and C_Minimap.GetNumTrackingTypes then
+		return C_Minimap.GetNumTrackingTypes()
+	end
+	return GetNumTrackingTypes and GetNumTrackingTypes() or 0
+end
+
+local GetTrackingInfo = function(index)
+	if C_Minimap and C_Minimap.GetTrackingInfo then
+		return C_Minimap.GetTrackingInfo(index)
+	end
+	if GetTrackingInfo then
+		local name, texture, active, category = GetTrackingInfo(index)
+		if name then
+			return {
+				name = name,
+				texture = texture,
+				active = active,
+				type = category,
+				index = index,
+			}
+		end
+	end
+end
+
+local SetTracking = function(index, on)
+	if C_Minimap and C_Minimap.SetTracking then
+		C_Minimap.SetTracking(index, on)
+	elseif SetTracking then
+		SetTracking(index, on)
+	end
+end
+
+local ClearAllTracking = function()
+	if C_Minimap and C_Minimap.ClearAllTracking then
+		C_Minimap.ClearAllTracking()
+	elseif ClearAllTracking then
+		ClearAllTracking()
+	elseif CancelTrackingBuff then
+		CancelTrackingBuff()
+	end
+end
+
+local OpenTrackingMenu = function()
+	-- Prefer modern Menu system (TBC+, Mists, and modern Classic Era)
+	if MenuUtil and MenuUtil.CreateContextMenu then
+		MenuUtil.CreateContextMenu(UIParent, function(_, root)
+			root:CreateButton(MINIMAP_TRACKING_NONE or "None", function()
+				ClearAllTracking()
+				return MenuResponse and MenuResponse.Refresh
+			end)
+
+			local count = GetTrackingCount()
+			for i = 1, count do
+				local info = GetTrackingInfo(i)
+				if info and info.name then
+					root:CreateCheckbox(
+						info.name,
+						function()
+							local current = GetTrackingInfo(i)
+							return current and current.active
+						end,
+						function()
+							local current = GetTrackingInfo(i)
+							SetTracking(i, not (current and current.active))
+						end
+					):AddInitializer(function(button)
+						if info.texture then
+							local tex = button:AttachTexture()
+							tex:SetSize(16, 16)
+							tex:SetPoint("RIGHT", -4, 0)
+							tex:SetTexture(info.texture)
+							if info.type == "spell" then
+								tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+							end
+							button.fontString:SetPoint("RIGHT", tex, "LEFT", -4, 0)
+						end
+						return button.fontString:GetUnboundedStringWidth() + 28, 20
+					end)
+				end
+			end
+		end)
+		return
+	end
+
+	-- Fallback: old UIDropDownMenu (pure Classic Era)
+	local menu = CreateFrame("Frame", "ClassicTrackingMenu", UIParent, "UIDropDownMenuTemplate")
+	UIDropDownMenu_Initialize(menu, function(self, level)
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = MINIMAP_TRACKING_NONE or "None"
+		info.func = ClearAllTracking
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info)
+
+		local count = GetTrackingCount()
+		for i = 1, count do
+			local track = GetTrackingInfo(i)
+			if track and track.name then
+				info = UIDropDownMenu_CreateInfo()
+				info.text = track.name
+				info.icon = track.texture
+				info.checked = track.active
+				info.func = function()
+					SetTracking(i, not track.active)
+				end
+				UIDropDownMenu_AddButton(info)
+			end
+		end
+	end, "MENU")
+	ToggleDropDownMenu(1, nil, menu, "cursor")
+end
+
+local Minimap_OnMouseUp = function(self, button)
+	if (button == "LeftButton") then
+		-- Original ping behavior
+		local x, y = GetCursorPosition()
+		x = x / self:GetEffectiveScale()
+		y = y / self:GetEffectiveScale()
+
+		local cx, cy = self:GetCenter()
+		x = x - cx
+		y = y - cy
+
+		if (x * x + y * y) < ((self:GetWidth() / 2) ^ 2) then
+			Minimap:PingLocation(x, y)
+		end
+	elseif button == "RightButton" then
+		OpenTrackingMenu()
+	end
+end
+
+local Minimap_OnMouseWheel = function(self, delta)
+	if (delta > 0) then
+		(Minimap.ZoomIn or MinimapZoomIn):Click()
+	elseif (delta < 0) then
+		(Minimap.ZoomOut or MinimapZoomOut):Click()
+	end
+end
+
 MinimapModule.StyleMinimap = function(self)
 
-	local mapScale = 198/140 -- 1 in retail, larger in classics
 	local hider = CreateFrame("Frame")
 	hider:Hide()
 
@@ -203,24 +301,29 @@ MinimapModule.StyleMinimap = function(self)
 	MinimapCluster:SetFrameLevel(1)
 
 	Minimap:SetMaskTexture(GetMedia("minimap-mask-transparent"))
-	--Minimap:SetMovable(true)
 	Minimap:EnableMouseWheel(true)
 	Minimap:SetScript("OnMouseWheel", Minimap_OnMouseWheel)
-	Minimap:SetScript("OnMouseUp", Minimap_OnMouseUp) -- HookScript? Will SetScript taint?
+	Minimap:SetScript("OnMouseUp", Minimap_OnMouseUp)
 
 	-- hide the clutter
 	MinimapCluster.BorderTop:SetParent(hider)
-	--MinimapCluster.Tracking:SetParent(hider)
 	MinimapCluster.ZoneTextButton:SetParent(hider)
-	MinimapBackdrop:SetParent(hider) -- dungeon eye parented to this?
+	--MinimapBackdrop:SetParent(hider) -- dungeon eye parented to this? yes. and tracking.
 	MinimapBorder:SetParent(hider)
 	MinimapZoomIn:SetParent(hider)
 	MinimapZoomOut:SetParent(hider)
 	MinimapCompassTexture:SetParent(hider)
 	MinimapToggleButton:SetParent(hider)
-	--AddonCompartmentFrame:SetParent(hider)
 	GameTimeFrame:SetParent(hider)
 	TimeManagerClockButton:SetParent(hider)
+	if (MiniMapTracking) then
+		MiniMapTracking:Hide()
+		MiniMapTracking:UnregisterAllEvents()
+	end
+	if (MiniMapTrackingButton) then
+		MiniMapTrackingButton:Hide()
+		MiniMapTrackingButton:UnregisterAllEvents()
+	end
 
 	-- create our custom backdrop
 	local backdropFrame = CreateFrame("Frame", nil, Minimap)
@@ -229,7 +332,6 @@ MinimapModule.StyleMinimap = function(self)
 	backdropFrame:SetSize(140,140) -- 198,198
 
 	local backdrop = backdropFrame:CreateTexture(nil, "BACKGROUND", nil, -7)
-	--backdrop:SetScale(1/mapScale)
 	backdrop:SetTexture(GetMedia("minimap-mask-opaque"))
 	backdrop:SetVertexColor(0, 0, 0, .75)
 	backdrop:SetPoint("CENTER")
@@ -237,7 +339,6 @@ MinimapModule.StyleMinimap = function(self)
 
 	-- create our custom border
 	local borderFrame = CreateFrame("Frame", nil, Minimap)
-	--borderFrame:SetScale(1/mapScale)
 	borderFrame:SetFrameLevel(Minimap:GetFrameLevel() + 10) -- needed?
 	borderFrame:SetPoint("CENTER")
 	borderFrame:SetSize(280,280) -- 398,398
@@ -513,12 +614,6 @@ MinimapModule.UpdateXP = function(self, event, ...)
 		self:UnregisterEvent("PLAYER_XP_UPDATE", "UpdateXP")
 		self:UnregisterEvent("PLAYER_LEVEL_UP", "UpdateXP")
 		self:UnregisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
-
-		-- Only exists in Retail
-		if (ns.WoWRetail) then
-			self:UnregisterEvent("ENABLE_XP_GAIN", "UpdateXP")
-			self:UnregisterEvent("DISABLE_XP_GAIN", "UpdateXP")
-		end
 
 		return 
 	end
