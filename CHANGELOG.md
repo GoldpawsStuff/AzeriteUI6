@@ -4,15 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-11-04
+## [1.0.19-RC] 2026-11-04
 ### Added
 - Added a proper tracking menu to all the Classic minimaps. Currently testing.
-
-### Fixed
-- Removed an annoying backdrop border that kept popping up on ActionButtons in TBC Anniversary amongst others.
-
-## [1.0.18-Alpha] 2026-11-03
-### Added
 - Added XP bar to the Classic Minimap.
 - Added the forgotten Minimap backdrop texture to the Classics.
 - Added a character specific GamePad layout to the EditMode in Forever, since GamePads are more officially supported there. If you wish to enable GamePad usage in non-Forever clients, use `/console GamePadEnable 1`. Note that a specific GamePad EditMode layout is not created for this UI in any other clients than Forever. 
@@ -20,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Adjusted the default Classic Tooltip position to match Retail.
 - The default EditMode preset created by this UI is now Character specific, not Account wide.
+
+### Fixed
+- Removed an annoying backdrop border that kept popping up on ActionButtons in TBC Anniversary amongst others.
 
 ### Removed
 - Removed any existing Account wide EditMode presets created by this UI.
