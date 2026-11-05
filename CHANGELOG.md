@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.20-RC] 2026-11-05
+### Fixed
+- Fixed the neverending recreation loop of the Azerite UI EditMode presets. Auto switching to the new preset on first run still suddenly fails in Forever, though. 
+
 ## [1.0.19-RC] 2026-11-04
 ### Added
 - Added a proper tracking menu to all the Classic minimaps. Currently testing.

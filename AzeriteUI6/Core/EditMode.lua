@@ -210,7 +210,7 @@ EditModePreset.CreateOrUpdateLayout = function(self, forced)
 			-- We don't generally switch or change the existing layout, 
 			-- users should be able to modify or select another. 
 			if (not forced) then 
-				self.hasAppliedLayout = true
+				self.hasAppliedGamepadLayout = true
 				--return 
 			end
 
@@ -233,9 +233,16 @@ EditModePreset.CreateOrUpdateLayout = function(self, forced)
 			table.insert(info.layouts, target)
 			existingIndex = #info.layouts
 		end
-		if (not self.hasAppliedLayout) then
+		if (not self.hasAppliedGamepadLayout) then
 			self:ApplySystemSettings(target)
 		end
+
+		self.hasAppliedGamepadLayout = true
+	end
+
+	-- Messy
+	if (self.hasAppliedLayout) then
+		return
 	end
 
 	-- Set the flag before any API call that can re-enter the event
