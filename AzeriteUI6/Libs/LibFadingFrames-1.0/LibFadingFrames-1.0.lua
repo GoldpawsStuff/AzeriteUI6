@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 44 -- 43
+local MINOR_VERSION = 45 -- 44
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
@@ -389,9 +389,14 @@ lib.UnregisterFrameForFading = function(_, frame)
 	end
 
 	-- Return frames to full opacity.
-	--if (frameType ~= "actionbutton" and frameType ~= "petbutton") then
+	if (frameType == "actionbutton" or frameType == "petbutton") then
+		-- This still bugs out for actionbuttons on state/form changes
+		if (frame:HasAction()) then
+			setCurrentAlpha(frame, 1)
+		end
+	else
 		setCurrentAlpha(frame, 1)
-	--end
+	end
 
 	if (not next(FadeFrames)) then
 		lib:Disable()

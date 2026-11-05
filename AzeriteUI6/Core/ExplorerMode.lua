@@ -107,6 +107,7 @@ ExplorerMode.GetOptions = function(self)
 				name = L["Delay after reload"],
 				desc = L["Sets the delay in seconds after a manual user interface reload before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return self.db.profile.delayOnReload end,
 				set = function(info,val)
 					if InCombatLockdown() then return end
@@ -120,6 +121,7 @@ ExplorerMode.GetOptions = function(self)
 				name = L["Delay after zoning"],
 				desc = L["Sets the delay in seconds after zoning through an instance portal before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return self.db.profile.delayOnZoning end,
 				set = function(info,val)
 					if InCombatLockdown() then return end
@@ -133,6 +135,7 @@ ExplorerMode.GetOptions = function(self)
 				name = L["Delay after combat"],
 				desc = L["Sets the delay in seconds after combat ends before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return self.db.profile.delayOnCombatEnd end,
 				set = function(info,val)
 					if InCombatLockdown() then return end

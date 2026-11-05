@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.23-RC] 2026-11-05
+## [1.0.24-RC] 2026-11-05
 ### Added
 - Added the Explorer Mode. This is a mode that fades out a lot of frames when out of combat and not having a target. 
 - Added Exporer Mode to the options menu. 
@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Slightly reduced the height of the default chat frame size. 
 - Loosened up the filter criteria for the Player/Target unitframe aura filter in Retail and Forever. 
+
+### Fixed
+- Fixed an issue with the fading library that would sometimes leave ActionButtons "stuck" even when empty, especially on Form/Stance changes or when moving spells and abilities around.
 
 ## [1.0.21-RC] 2026-11-05
 ### Fixed 
