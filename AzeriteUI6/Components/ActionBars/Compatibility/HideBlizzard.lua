@@ -69,7 +69,7 @@ local hideActionButton = function(button)
 
 	button:Hide()
 	button:UnregisterAllEvents()
-	button:SetAttribute("statehidden", true)
+	--button:SetAttribute("statehidden", true)
 end
 
 HideBlizzardActionBars.HideBlizzard = function(self)

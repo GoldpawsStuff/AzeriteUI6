@@ -630,7 +630,8 @@ local style = function(self, unit)
 		auras.sortMethod = AuraContainerSortMethod.Expiration -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
 		auras.sortDirection = AuraContainerSortDirection.Normal -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
 
-		auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT", {
+		--auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT", {
+		auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY", {
 			-- Button options
 			size = 36,
 			tooltipAnchor = "ANCHOR_BOTTOMLEFT",
@@ -638,7 +639,8 @@ local style = function(self, unit)
 			tooltipOffsetY = -4,
 		})
 
-		auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE", {
+		--auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE", {
+		auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY", {
 			-- Button options
 			size = 36,
 			tooltipAnchor = "ANCHOR_BOTTOMLEFT",
