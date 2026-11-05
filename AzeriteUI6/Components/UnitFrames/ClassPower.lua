@@ -32,9 +32,6 @@ local ClassPower = ns:NewModule("ClassPower", nil, "LibMoreEvents-1.0", "LibMova
 
 -- Declare module defaults
 local defaults = { 
-	char = { 
-		showClassPower = true -- keep toggling a character specific setting
-	}, 
 	profile = {
 		enabled = true
 	} 
@@ -289,7 +286,7 @@ local ClassPower_PostUpdate = function(element, cur, max, hasMaxChanged, powerTy
 	end
 	
 	-- The user chose to hide it
-	if (not ClassPower.db.char.showClassPower) then
+	if (not ClassPower.db.profile.enabled) then
 		return element:Hide()
 	end
 
@@ -500,6 +497,32 @@ local style = function(self, unit)
 
 end
 
+ClassPower.GetDefaults = function(self)
+	return defaults
+end
+
+ClassPower.GetOptions = function(self)
+	return {
+		type = "group",
+		name = L["Player Class Power"],
+		order = 205,
+		args = {
+			enable = {
+				type = "toggle", width = "full",
+				name = L["Enable"],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.enabled end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.enabled = val 
+					self:UpdateSettings()
+				end,
+				order = 1
+			},
+		}
+	}
+end
+
 -- Return the unitframe
 ClassPower.GetFrame = function(self)
 	return self.frame
@@ -521,6 +544,11 @@ ClassPower.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Remove deprecated settings
+	if (self.db.char.showClassPower) then
+		self.db.char.showClassPower = nil
+	end
 end
 
 ClassPower.OnEnable = function(self)
@@ -534,6 +562,6 @@ ClassPower.OnEnable = function(self)
 
 		ClassPower.frame = frame
 
-		ClassPower:RegisterMovableFrameAnchor(frame, string.lower(COMBO_POINTS), "unitframes", AzeriteUI6_Positions_DB)
+		ClassPower:RegisterMovableFrameAnchor(frame, string.lower(L["Player Class Power"]), "unitframes", AzeriteUI6_Positions_DB)
 	end)
 end

@@ -115,12 +115,7 @@ EditModePreset.ApplySystemSettings = function(self, target)
 	-- Chat 
 	local chat = self:GetSystem(target.systems, Enum.EditModeSystem.ChatFrame)
 	self:SetSystemAnchor(chat, "BOTTOMLEFT", "BOTTOMLEFT", 60, 306)
-
-	if (ns.WoWTBC) then
-		self:SetChatSize(chat, 440, 180) 
-	else
-		self:SetChatSize(chat, 440, 220) 
-	end
+	self:SetChatSize(chat, 440, 180) -- was 220, too big
 
 	-- HUD Tooltip
 	local tooltip = self:GetSystem(target.systems, Enum.EditModeSystem.HudTooltip)

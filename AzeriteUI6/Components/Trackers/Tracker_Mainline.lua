@@ -34,6 +34,10 @@ local defaults = { profile = {
 	fadeOutTracker = true
 }}
 
+Trackers.GetDefaults = function(self)
+	return defaults
+end
+
 Trackers.UpdateObjectiveTrackerFading = function(self)
 	if (self.db.profile.fadeOutTracker) then
 		self:RegisterFrameForFading(ObjectiveTrackerFrame, "Trackers")

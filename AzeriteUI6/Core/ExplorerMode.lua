@@ -25,8 +25,10 @@
 --]]
 local _, ns = ...
 
-local ExplorerMode = ns:NewModule("ExplorerMode", nil, "AceTimer-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local LFF = LibStub("LibFadingFrames-1.0")
+
+local ExplorerMode = ns:NewModule("ExplorerMode", nil, "AceTimer-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0", "LibMovableFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
@@ -53,16 +55,244 @@ local defaults = { profile = {
 
 	-- Which elements to fade out
 	-- while in Explorer Mode.
-	--fadeActionBars = true,
+	fadeActionBars = true,
 	fadePetBar = true,
 	fadeStanceBar = true,
-	--fadePlayerFrame = true,
+	fadePlayerFrame = true,
 	fadePlayerClassPower = true,
-	--fadePetFrame = true,
+	fadePetFrame = true,
 	fadeFocusFrame = true,
-	--fadeTracker = true,
+	fadeTracker = true,
 	fadeChatFrames = true
 }}
+
+ExplorerMode.GetDefaults = function(self)
+	return defaults
+end
+
+ExplorerMode.GetOptions = function(self)
+	return {
+		type = "group",
+		name = L["Explorer Mode"],
+		order = 9000,
+		args = {
+			enable = {
+				type = "toggle", width = "full",
+				name = L["Enable"],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.enabled end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.enabled = val 
+					self:UpdateSettings()
+				end,
+				order = 1
+			},
+			delayOnLogin = {
+				type = "range", width = "full", min = 1, max = 15, step = 1,
+				name = L["Delay after login"],
+				desc = L["Sets the delay in seconds after the initial login on a character before elements are faded out."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.delayOnLogin end,
+				set = function(info,val)
+					if InCombatLockdown() then return end
+					self.db.profile.delayOnLogin = tonumber(val)
+					self:UpdateSettings()
+				end,
+				order = 100
+			}, 
+			delayOnReload = {
+				type = "range", width = "full", min = 1, max = 15, step = 1,
+				name = L["Delay after reload"],
+				desc = L["Sets the delay in seconds after a manual user interface reload before elements are faded out."],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.delayOnReload end,
+				set = function(info,val)
+					if InCombatLockdown() then return end
+					self.db.profile.delayOnReload = tonumber(val)
+					self:UpdateSettings()
+				end,
+				order = 101
+			},
+			delayOnZoning = {
+				type = "range", width = "full", min = 1, max = 15, step = 1,
+				name = L["Delay after zoning"],
+				desc = L["Sets the delay in seconds after zoning through an instance portal before elements are faded out."],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.delayOnZoning end,
+				set = function(info,val)
+					if InCombatLockdown() then return end
+					self.db.profile.delayOnZoning = tonumber(val)
+					self:UpdateSettings()
+				end,
+				order = 102
+			},
+			delayOnCombatEnd = {
+				type = "range", width = "full", min = 1, max = 15, step = 1,
+				name = L["Delay after combat"],
+				desc = L["Sets the delay in seconds after combat ends before elements are faded out."],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.delayOnCombatEnd end,
+				set = function(info,val)
+					if InCombatLockdown() then return end
+					self.db.profile.delayOnCombatEnd = tonumber(val)
+					self:UpdateSettings()
+				end,
+				order = 103
+			},
+			fadeActionBars = {
+				type = "toggle", width = "full",
+				name = L["Action Bars"],
+				desc = L["Fade out the Action Bars."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadeActionBars end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadeActionBars = val 
+					self:UpdateSettings()
+				end,
+				order = 210
+			},
+			fadePetBar = {
+				type = "toggle", width = "full",
+				name = L["Pet Bar"],
+				desc = L["Fade out the Pet Bar."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadePetBar end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadePetBar = val 
+					self:UpdateSettings()
+				end,
+				order = 310
+			},
+			fadeStanceBar = {
+				type = "toggle", width = "full",
+				name = L["Stance Bar"],
+				desc = L["Fade out the Stance Bar."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadeStanceBar end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadeStanceBar = val 
+					self:UpdateSettings()
+				end,
+				order = 320
+			},
+			fadePlayerFrame = {
+				type = "toggle", width = "full",
+				name = L["Player Frame"],
+				desc = L["Fade out the Player Frame."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadePlayerFrame end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadePlayerFrame = val 
+					self:UpdateSettings()
+				end,
+				order = 340
+			},
+			fadePlayerClassPower = {
+				type = "toggle", width = "full",
+				name = L["Player Class Power"],
+				desc = L["Fade out the Player Class Power Frame."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadePlayerClassPower end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadePlayerClassPower = val 
+					self:UpdateSettings()
+				end,
+				order = 350
+			},
+			fadePetFrame = {
+				type = "toggle", width = "full",
+				name = L["Pet Frame"],
+				desc = L["Fade out the Pet Frame."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadePetFrame end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadePetFrame = val 
+					self:UpdateSettings()
+				end,
+				order = 360
+			},
+			fadeFocusFrame = not ns.WoWVanilla and {
+				type = "toggle", width = "full",
+				name = L["Focus Frame"],
+				desc = L["Fade out the Focus Frame."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadeFocusFrame end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadeFocusFrame = val 
+					self:UpdateSettings()
+				end,
+				order = 370
+			} or nil,
+			fadeTracker = {
+				type = "toggle", width = "full",
+				name = L["Quest Objectives"],
+				desc = L["Fade out the Objectives Tracker."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() 
+					local tracker = ns:GetModule("ObjectiveTracker", true)
+					return not tracker or not self.db.profile.enabled 
+				end,
+				get = function(info) 
+					local tracker = ns:GetModule("ObjectiveTracker", true)
+					if (not tracker ) then return end
+					return tracker.db.profile.fadeOutTracker 
+				end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					local tracker = ns:GetModule("ObjectiveTracker", true)
+					if (not tracker ) then return end
+					tracker.db.profile.fadeOutTracker = val 
+					tracker:UpdateSettings()
+				end,
+				order = 410
+			},
+			--fadeTracker = {
+			--	type = "toggle", width = "full",
+			--	name = L["Quest Objectives"],
+			--	desc = L["Fade out the Objectives Tracker."],
+			--	disabled = function() return InCombatLockdown() end,
+			--	hidden = function() return not self.db.profile.enabled end,
+			--	get = function(info) return self.db.profile.fadeTracker end,
+			--	set = function(info, val) 
+			--		if InCombatLockdown() then return end
+			--		self.db.profile.fadeTracker = val 
+			--		self:UpdateSettings()
+			--	end,
+			--	order = 410
+			--},
+			fadeChatFrames = {
+				type = "toggle", width = "full",
+				name = L["Chat Windows"],
+				desc = L["Fade out the Chat Windows."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadeChatFrames end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadeChatFrames = val 
+					self:UpdateSettings()
+				end,
+				order = 420
+			}
+		}
+	}
+end
 
 -- Checks if an event has occurred requiring faded elements to be visible
 ExplorerMode.CheckForForcedState = function(self)

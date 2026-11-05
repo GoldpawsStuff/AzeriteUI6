@@ -61,7 +61,7 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
 Trackers.UpdateSettings = function(self)
-	self:UpdateTrackerFading()
+	--self:UpdateTrackerFading()
 	self:UpdateTrackerPosition()
 end
 

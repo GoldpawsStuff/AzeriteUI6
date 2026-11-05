@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.22-RC] 2026-11-05
+### Added
+- Added the Explorer Mode. This is a mode that fades out a lot of frames when out of combat and not having a target. 
+- Added Exporer Mode to the options menu. 
+
+### Changed
+- Slightly reduced the height of the default chat frame size. 
+
 ## [1.0.21-RC] 2026-11-05
 ### Fixed 
 - Fixed the Forever secrecy bug on regular combat feedback on the target frame.
