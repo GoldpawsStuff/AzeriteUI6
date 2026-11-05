@@ -146,90 +146,114 @@ local function createUpdateFrame()
 	end)
 end
 
+local function isSecret(value)
+	return issecretvalue and issecretvalue(value)
+end
+
 local function Update(self, event, unit, ...)
-	if(not unit) or (unit ~= self.__unit) then
+	if (not unit) or (unit ~= self.__unit) then
 		return
 	end
 
 	local element = self.CombatFeedback
 	local colors = element.colors or colors
 
-	local event, flagText, amount, schoolMask = ...
+	local event, flags, amount, schoolMask = ...
 	local color, fontType, text, arg
 
+	local amountIsSecret = isSecret(amount)
+
 	if (event == 'IMMUNE') then
-		fontType ='small'
+		fontType = 'small'
 		text = CombatFeedbackText[event]
 		color = colors.IMMUNE
 
 	elseif (event == 'WOUND') then
-		if (amount ~= 0) then
+		local showNumber = true
+		if (not amountIsSecret) then
+			showNumber = (amount ~= 0)
+		end
 
+		if (showNumber) then
 			if (flags == 'CRITICAL') then
-				fontType ='large'
+				fontType = 'large'
 				color = colors.CRITICAL
 
 			elseif (flags == 'CRUSHING') then
-				fontType ='large'
+				fontType = 'large'
 				color = colors.CRUSHING
 
 			elseif (flags == 'GLANCING') then
-				fontType ='small'
+				fontType = 'small'
 				color = colors.GLANCING
 			else
 				color = colors.DAMAGE
 			end
 
 			if (flags == 'BLOCK_REDUCED') then
-				text = COMBAT_TEXT_BLOCK_REDUCED:format(short(text))
+				if (amountIsSecret) then
+					text = COMBAT_TEXT_BLOCK_REDUCED:format(BreakUpLargeNumbers(amount))
+				else
+					text = COMBAT_TEXT_BLOCK_REDUCED:format(short(amount))
+				end
 			else
-				text = damage_format
-				arg = large(amount)
+				if (amountIsSecret) then
+					text = BreakUpLargeNumbers(amount)
+				else
+					text = damage_format
+					arg = large(amount)
+				end
 			end
 
 		elseif (flags == 'ABSORB') then
-			fontType ='small'
+			fontType = 'small'
 			text = CombatFeedbackText['ABSORB']
 			color = colors.ABSORB
 
 		elseif (flags == 'BLOCK') then
-			fontType ='small'
+			fontType = 'small'
 			text = CombatFeedbackText['BLOCK']
 			color = colors.BLOCK
 
 		elseif (flags == 'RESIST') then
-			fontType ='small'
+			fontType = 'small'
 			text = CombatFeedbackText['RESIST']
 			color = colors.RESIST
-
 		else
 			text = CombatFeedbackText['MISS']
 			color = colors.MISS
 		end
 
-	elseif (event == 'BLOCK') then
-		fontType ='small'
-		text = CombatFeedbackText[event]
-		color = colors.BLOCK
-
 	elseif (event == 'HEAL') then
-		text = heal_format
-		arg = large(amount)
+		if (amountIsSecret) then
+			text = BreakUpLargeNumbers(amount)
+		else
+			text = heal_format
+			arg = large(amount)
+		end
+
 		if (flags == 'CRITICAL') then
-			fontType ='large'
+			fontType = 'large'
 			color = colors.CRITHEAL
 		else
 			color = colors.HEAL
 		end
 
 	elseif (event == 'ENERGIZE') then
-		text = large(amount)
+		if (amountIsSecret) then
+			text = BreakUpLargeNumbers(amount)
+		else
+			text = heal_format
+			arg = large(amount)
+		end
+
 		if (flags == 'CRITICAL') then
 			fontType = 'large'
 			color = colors.CRITENERGIZE
 		else
 			color = colors.ENERGIZE
 		end
+
 	else
 		text = CombatFeedbackText[event]
 		color = colors.STANDARD
