@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] 2026-11-06
 ### Changed
-- Changed how actionbuttons are hidden in an attempt to battle the ever weirder taints.
+- Changed how actionbuttons are hidden in an attempt to battle the ever weirder taints. 
+- Rewrote a lot of the EditMode integration as well as adjusted our the default layouts a bit. The idea is to match legacy AzeriteUI for our custom presets as much as possible. 
+
+### Fixed
+- EditMode preset creation and automatic switching on first run should be smoother now. The automatic switch might still fail now and then, but a simple `/reload` finishes the job.  
 
 ## [1.0.24-RC] 2026-11-05
 ### Added
@@ -18,11 +22,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Loosened up the filter criteria for the Player/Target unitframe aura filter in Retail and Forever. 
 
 ### Fixed
-- Fixed an issue with the fading library that would sometimes leave ActionButtons "stuck" even when empty, especially on Form/Stance changes or when moving spells and abilities around.
+- Fixed an issue with the fading library that would sometimes leave ActionButtons "stuck" even when empty, especially on Form/Stance changes or when moving spells and abilities around. 
 
 ## [1.0.21-RC] 2026-11-05
 ### Fixed 
-- Fixed the Forever secrecy bug on regular combat feedback on the target frame.
+- Fixed the Forever secrecy bug on regular combat feedback on the target frame. 
 
 ## [1.0.20-RC] 2026-11-05
 ### Fixed
