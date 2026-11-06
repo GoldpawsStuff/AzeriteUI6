@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 2026-11-06
+### Changed
+- Changed how actionbuttons are hidden in an attempt to battle the ever weirder taints.
+
 ## [1.0.24-RC] 2026-11-05
 ### Added
 - Added the Explorer Mode. This is a mode that fades out a lot of frames when out of combat and not having a target. 

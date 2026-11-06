@@ -442,6 +442,7 @@ MinimapModule.StyleMinimap = function(self)
 	ring:SetSize(182, 182)
 	ring:SetPoint("CENTER", Minimap, "CENTER", 1, 0)
 	ring:SetAlpha(0)
+	ring:EnableMouse(true) -- avoid tooltips from map icons
 	ring:Hide()
 
 	-- ringframe backdrop

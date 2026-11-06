@@ -64,12 +64,24 @@ local hideActionBarFrame = function(frame, clearEvents)
 	end
 end
 
+local hideActionBarFrameSimple = function(frame)
+	if (frame) then
+		frame:SetParent(UIHider)
+		frame:UnregisterAllEvents()
+	end
+end
+
 local hideActionButton = function(button)
 	if (not button) then return end
 
 	button:Hide()
 	button:UnregisterAllEvents()
-	--button:SetAttribute("statehidden", true)
+	button:SetAttribute("statehidden", true)
+
+	-- Check if this works in the Classics without breaking keybinds again.
+	--if (not ns.WoWMainline and not ns.WoWCamelot) then
+	--	button.bar = nil
+	--end
 end
 
 HideBlizzardActionBars.HideBlizzard = function(self)
@@ -85,17 +97,19 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	hideActionBarFrame(MultiBar7, true)
 
 	-- Hide MultiBar Buttons, but keep the bars alive
-	for i = 1,12 do
-		hideActionButton(_G["ActionButton" .. i])
-		hideActionButton(_G["MultiBarBottomLeftButton" .. i])
-		hideActionButton(_G["MultiBarBottomRightButton" .. i])
-		hideActionButton(_G["MultiBarRightButton" .. i])
-		hideActionButton(_G["MultiBarLeftButton" .. i])
-		hideActionButton(_G["MultiBar5Button" .. i])
-		hideActionButton(_G["MultiBar6Button" .. i])
-		hideActionButton(_G["MultiBar7Button" .. i])
-	end
+	-- *this could be the source of the spellbook related taint?
+	--for i = 1,12 do
+	--	hideActionButton(_G["ActionButton" .. i])
+	--	hideActionButton(_G["MultiBarBottomLeftButton" .. i])
+	--	hideActionButton(_G["MultiBarBottomRightButton" .. i])
+	--	hideActionButton(_G["MultiBarRightButton" .. i])
+	--	hideActionButton(_G["MultiBarLeftButton" .. i])
+	--	hideActionButton(_G["MultiBar5Button" .. i])
+	--	hideActionButton(_G["MultiBar6Button" .. i])
+	--	hideActionButton(_G["MultiBar7Button" .. i])
+	--end
 
+	-- Non-action-button only
 	hideActionBarFrame(MicroButtonAndBagsBar, false)
 	hideActionBarFrame(StanceBar, true)
 	hideActionBarFrame(PossessActionBar, true)
@@ -111,13 +125,7 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 		MicroMenu.BackgroundArt:Hide()
 	end
 
-	-- these events drive visibility, we want the MainMenuBar to remain invisible
-	if (MainMenuBar) then -- <= 11.2.5
-		MainMenuBar:UnregisterEvent("PLAYER_REGEN_ENABLED")
-		MainMenuBar:UnregisterEvent("PLAYER_REGEN_DISABLED")
-		MainMenuBar:UnregisterEvent("ACTIONBAR_SHOWGRID")
-		MainMenuBar:UnregisterEvent("ACTIONBAR_HIDEGRID")
-	end
+	-- No event unregisters on MainMenuBar (we are not hiding it)
 
 	if (C_AddOns.IsAddOnLoaded("Blizzard_NewPlayerExperience")) then
 		self:NPE_LoadUI()
