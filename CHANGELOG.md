@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 2026-11-06
+## [1.0.25-RC] 2026-11-06
 ### Changed
 - Changed how actionbuttons are hidden in an attempt to battle the ever weirder taints. 
 - Rewrote a lot of the EditMode integration as well as adjusted our the default layouts a bit. The idea is to match legacy AzeriteUI for our custom presets as much as possible. 
