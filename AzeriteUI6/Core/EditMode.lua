@@ -28,6 +28,7 @@ local addonName, ns = ...
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local LAYOUT_NAME = L["Azerite UI Default"]
 local LAYOUT_NAME_GAMEPAD = L["Azerite UI Default (Gamepad)"]
+local EDITMODE_VERSION = 2  -- bump this whenever we want a forced reset on next login
 
 local EditModePreset = ns:NewModule("EditMode", nil, "AceConsole-3.0", "LibMoreEvents-1.0")
 
@@ -208,10 +209,28 @@ EditModePreset.CreateOrUpdateLayout = function(self, forced)
 	if (self.hasAppliedLayout or InCombatLockdown()) then return end
 	if (not C_EditMode or not EditModePresetLayoutManager) then return end
 
+	-- Force a full reset on addon update
+	local stored = self.db.profile.editModeVersion or 0
+	if (stored < EDITMODE_VERSION) then
+		forced = true
+		self.db.profile.editModeVersion = EDITMODE_VERSION
+	end
+
 	local info = C_EditMode.GetLayouts()
 	if (not info or not info.layouts) then return end
 
+	-- If forcing a reset, remove our layouts so they are recreated from scratch
+	if (forced) then
+		for i = #info.layouts, 1, -1 do
+			local layout = info.layouts[i]
+			if (layout.layoutName == LAYOUT_NAME or layout.layoutName == LAYOUT_NAME_GAMEPAD) then
+				table.remove(info.layouts, i)
+			end
+		end
+	end	
+
 	-- Remove any leftover account-wide layout with our name.
+	-- *this is from a very early beta version
 	for i, layout in ipairs(info.layouts) do
 		if (layout.layoutName == LAYOUT_NAME and layout.layoutType == Enum.EditModeLayoutType.Account) then
 			table.remove(info.layouts, i)
