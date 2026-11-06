@@ -125,8 +125,6 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 		MicroMenu.BackgroundArt:Hide()
 	end
 
-	-- No event unregisters on MainMenuBar (we are not hiding it)
-
 	if (C_AddOns.IsAddOnLoaded("Blizzard_NewPlayerExperience")) then
 		self:NPE_LoadUI()
 	elseif (NPE_LoadUI ~= nil) then

@@ -35,36 +35,39 @@ local defaults = { profile = {
 	enabled = true
 }}
 
--- Forever (possibly Classic Era?) fallback
--- *EditMode size settings are ignored here, we need to manually set them
+-- Forever (and some Classic) fallbacks.
+-- *EditMode size settings are ignored here, we need to manually set them.
 local ForceChatSize = function()
 	if (SetChatWindowSavedDimensions) then
 		SetChatWindowSavedDimensions(1, 440, 220)
 	end
 end
 
--- The MinimapCluster is sized differently on the initial login, for some obscure reason.
--- We're attempting to force its size to fix this misalignment.
--- This appears to do the trick in Era, TBC and Mists so far. 
+-- The MinimapCluster is sized differently on the initial login on some flavors.
+-- Forcing the cluster size corrects the first-login misalignment.
 local ForceMinimapSize = function()
-    if (ns.WoWCamelot or ns.WoWRetail) then return end
-    if (not MinimapCluster) then return end
-    MinimapCluster:SetSize(230, 216) -- All the classics appear to have this cluster size
+	if (ns.WoWCamelot or ns.WoWRetail) then return end
+	if (not MinimapCluster) then return end
+	MinimapCluster:SetSize(230, 216)
 end
 
-EditModePreset.GetSystem = function(self, systems, systemID)
+EditModePreset.GetSystem = function(self, systems, systemID, systemIndex)
 	for _, sys in ipairs(systems) do
-		if (sys.system == systemID) then return sys end
+		if (sys.system == systemID) then
+			if (not systemIndex or sys.systemIndex == systemIndex) then
+				return sys
+			end
+		end
 	end
 end
 
-EditModePreset.SetSystemAnchor = function(self, sys, point, relativePoint, x, y)
+EditModePreset.SetSystemAnchor = function(self, sys, point, relativePoint, x, y, relativeTo)
 	if (not sys) then return end
-	
+
 	sys.isInDefaultPosition = false
 	sys.anchorInfo = {
 		point = point,
-		relativeTo = "UIParent",
+		relativeTo = relativeTo or "UIParent",
 		relativePoint = relativePoint,
 		offsetX = x,
 		offsetY = y,
@@ -73,9 +76,9 @@ end
 
 EditModePreset.SetSystemSetting = function(self, sys, settingID, value)
 	if (not sys) then return end
-	
+
 	sys.settings = sys.settings or {}
-	
+
 	for _, row in ipairs(sys.settings) do
 		if (row.setting == settingID) then
 			row.value = value
@@ -87,14 +90,14 @@ end
 
 EditModePreset.SetChatSize = function(self, system, width, height)
 	if (not system) then return end
-	
+
 	width  = math.floor(width)
 	height = math.floor(height)
-	
-	self:SetSystemSetting(system, 0, math.floor(width  / 100)) 	-- WidthHundreds
-	self:SetSystemSetting(system, 1, width  % 100) 				-- WidthTensAndOnes
-	self:SetSystemSetting(system, 2, math.floor(height / 100)) 	-- HeightHundreds
-	self:SetSystemSetting(system, 3, height % 100) 				-- HeightTensAndOnes
+
+	self:SetSystemSetting(system, 0, math.floor(width  / 100))	-- WidthHundreds
+	self:SetSystemSetting(system, 1, width  % 100)				-- WidthTensAndOnes
+	self:SetSystemSetting(system, 2, math.floor(height / 100))	-- HeightHundreds
+	self:SetSystemSetting(system, 3, height % 100)				-- HeightTensAndOnes
 end
 
 EditModePreset.ApplySystemSettings = function(self, target)
@@ -103,19 +106,18 @@ EditModePreset.ApplySystemSettings = function(self, target)
 	-- Minimap
 	local minimap = self:GetSystem(target.systems, Enum.EditModeSystem.Minimap)
 	if (ns.WoWCamelot or ns.WoWRetail) then
-		self:SetSystemAnchor(minimap, "BOTTOMRIGHT", "BOTTOMRIGHT", -30, 30) 
+		self:SetSystemAnchor(minimap, "BOTTOMRIGHT", "BOTTOMRIGHT", -30, 30)
 	else
-		-- Note: Do NOT mess with header beneath/above minimap. It makes it unaligned and requires a /reload to fix! 
-		-- Note2: On the initial login on Era/TBC, the Minimap IS misaligned! Why?
-		self:SetSystemAnchor(minimap, "BOTTOMRIGHT", "BOTTOMRIGHT", -46, 74) 
+		-- Do not touch header-underneath. It desyncs the cluster and needs a /reload.
+		self:SetSystemAnchor(minimap, "BOTTOMRIGHT", "BOTTOMRIGHT", -46, 74)
 	end
-	self:SetSystemSetting(minimap, 0, 0) -- Header Underneath = off (this messes up our expected layout if enabled)
-	self:SetSystemSetting(minimap, 2, (ns.WoWRetail or ns.WoWCamelot) and 5 or 8) -- Size 5 ~ 100%, size 8 is 130% (matching)
+	self:SetSystemSetting(minimap, 0, 0) -- Header Underneath = off
+	self:SetSystemSetting(minimap, 2, (ns.WoWRetail or ns.WoWCamelot) and 5 or 8)
 
-	-- Chat 
+	-- Chat
 	local chat = self:GetSystem(target.systems, Enum.EditModeSystem.ChatFrame)
 	self:SetSystemAnchor(chat, "BOTTOMLEFT", "BOTTOMLEFT", 60, 306)
-	self:SetChatSize(chat, 440, 180) -- was 220, too big
+	self:SetChatSize(chat, 440, 180)
 
 	-- HUD Tooltip
 	local tooltip = self:GetSystem(target.systems, Enum.EditModeSystem.HudTooltip)
@@ -123,12 +125,83 @@ EditModePreset.ApplySystemSettings = function(self, target)
 
 	-- Objective Tracker
 	local tracker = self:GetSystem(target.systems, Enum.EditModeSystem.ObjectiveTracker)
-	self:SetSystemAnchor(tracker, "BOTTOMRIGHT", "BOTTOMRIGHT", -44, 330) 
-	self:SetSystemSetting(tracker, 0, 1) -- Height (1 equals 400-440ish)
+	self:SetSystemAnchor(tracker, "BOTTOMRIGHT", "BOTTOMRIGHT", -44, 330)
+	self:SetSystemSetting(tracker, 0, 1)
 
-	-- Group Finder Eye
-	-- Equipment Durability/Paper Doll
-	-- Buffs & Debuffs
+	-- Buffs
+	local buffs = self:GetSystem(target.systems, Enum.EditModeSystem.AuraFrame, Enum.EditModeAuraFrameSystemIndices and Enum.EditModeAuraFrameSystemIndices.BuffFrame or 1)
+	self:SetSystemAnchor(buffs, "TOPRIGHT", "TOPRIGHT", -36, -36)
+	-- Optional: orientation / size settings if you want them
+	-- self:SetSystemSetting(buffs, Enum.EditModeAuraFrameSetting.Orientation, 0) -- 0 = horizontal
+
+	-- Debuffs attached to the BuffFrame
+	local debuffs = self:GetSystem(target.systems, Enum.EditModeSystem.AuraFrame, Enum.EditModeAuraFrameSystemIndices and Enum.EditModeAuraFrameSystemIndices.DebuffFrame or 2)
+	self:SetSystemAnchor(debuffs, "TOPRIGHT", "BOTTOMRIGHT", -15, -4, "BuffFrame")
+
+	-- Equipment Durability
+	local durability = self:GetSystem(target.systems, Enum.EditModeSystem.DurabilityFrame)
+	self:SetSystemAnchor(durability, "BOTTOMRIGHT", "BOTTOMRIGHT", -319, 166)
+	self:SetSystemSetting(durability, 0, 5) -- Size (0–25, roughly 75% + n*5%)
+
+	-- Group Finder Eye (primarily Forever / later clients)
+	local groupFinder = self:GetSystem(target.systems, Enum.EditModeSystem.GroupFinder)
+	self:SetSystemAnchor(groupFinder, "TOPLEFT", "TOPLEFT", 10, -10, "Minimap")
+
+	-- Loot Window
+	local loot = self:GetSystem(target.systems, Enum.EditModeSystem.LootFrame)
+	self:SetSystemAnchor(loot, "BOTTOMRIGHT", "CENTER", -180, -20)
+
+	-- Cast Bar
+	local cast = self:GetSystem(target.systems, Enum.EditModeSystem.CastBar)
+	self:SetSystemAnchor(cast, "BOTTOM", "BOTTOM", 0, 220)
+
+	-- Duration Bars
+	local duration = self:GetSystem(target.systems, Enum.EditModeSystem.TimerBars)
+	self:SetSystemAnchor(duration, "BOTTOM", "CENTER", 0, 180)
+
+	-- Loss of Control
+	local loc = self:GetSystem(target.systems, Enum.EditModeSystem.LossOfControl)
+	self:SetSystemAnchor(loc, "BOTTOM", "CENTER", 0, 60)
+	-- self:SetSystemSetting(loc, 0, 5) -- Size if the setting exists
+
+	-- Raid Warning
+	local raidWarning = self:GetSystem(target.systems, Enum.EditModeSystem.RaidWarning)
+	self:SetSystemAnchor(raidWarning, "TOP", "TOP", 0, -120)
+
+	-- Boss Frames (UnitFrame subsystem)
+	local boss = self:GetSystem(target.systems, Enum.EditModeSystem.UnitFrame, Enum.EditModeUnitFrameSystemIndices and Enum.EditModeUnitFrameSystemIndices.Boss or 6)
+	self:SetSystemAnchor(boss, "RIGHT", "RIGHT", -50, 0)
+	-- Optional common settings:
+	-- self:SetSystemSetting(boss, Enum.EditModeUnitFrameSetting.UseLargerFrame, 0)
+	-- self:SetSystemSetting(boss, Enum.EditModeUnitFrameSetting.CastBarOnSide, 1)
+
+end
+
+-- Returns the full layout index (presets + custom index) for a layout name,
+-- or nil if it is not present in the given layouts table.
+local function GetFullIndexForName(layouts, layoutName)
+	if (not layouts) then return end
+
+	local customIndex
+	for i, layout in ipairs(layouts) do
+		if (layout.layoutName == layoutName) then
+			customIndex = i
+			break
+		end
+	end
+	if (not customIndex) then return end
+
+	local presets = EditModePresetLayoutManager and EditModePresetLayoutManager.GetCopyOfPresetLayouts and EditModePresetLayoutManager:GetCopyOfPresetLayouts()
+	local presetCount = (presets and #presets) or (Enum.EditModePresetLayoutsMeta and Enum.EditModePresetLayoutsMeta.NumValues) or 2
+	return presetCount + customIndex
+end
+
+-- Current interface style. Falls back to Mkb when the API is missing.
+local function GetCurrentInterfaceStyle()
+	if (InputUtil and InputUtil.GetCurrentInterfaceStyle) then
+		return InputUtil.GetCurrentInterfaceStyle()
+	end
+	return Enum.InputDeviceInterfaceType and Enum.InputDeviceInterfaceType.Mkb
 end
 
 EditModePreset.CreateOrUpdateLayout = function(self, forced)
@@ -138,16 +211,20 @@ EditModePreset.CreateOrUpdateLayout = function(self, forced)
 	local info = C_EditMode.GetLayouts()
 	if (not info or not info.layouts) then return end
 
-	-- See if the old Account wide layout is there, and remove it. We're using Character layouts now.
+	-- Remove any leftover account-wide layout with our name.
 	for i, layout in ipairs(info.layouts) do
 		if (layout.layoutName == LAYOUT_NAME and layout.layoutType == Enum.EditModeLayoutType.Account) then
 			table.remove(info.layouts, i)
-			--C_EditMode.SaveLayouts(info)
 			break
 		end
 	end
-	
-	-- Search for the standard keyboard/mouse layout
+
+	local createdNew = false
+	local createdNewGamepad = false
+
+	-- -------------------------------------------------
+	-- Standard (Mkb) layout
+	-- -------------------------------------------------
 	local existingIndex
 	for i, layout in ipairs(info.layouts) do
 		if (layout.layoutName == LAYOUT_NAME) then
@@ -156,23 +233,20 @@ EditModePreset.CreateOrUpdateLayout = function(self, forced)
 		end
 	end
 
-	-- Create or update standard layout
 	local target
 	if (existingIndex) then
-		-- We don't generally switch or change the existing layout, 
-		-- users should be able to modify or select another. 
-		if (not forced) then 
-			self.hasAppliedLayout = true
-			--return 
+		if (forced) then
+			target = info.layouts[existingIndex]
+			self:ApplySystemSettings(target)
 		end
-
-		-- if we're going to update the layout
-		target = info.layouts[existingIndex]
 	else
 		local presets = EditModePresetLayoutManager:GetCopyOfPresetLayouts()
 		local base
 		for _, p in ipairs(presets) do
-			if (p.layoutName == LAYOUT_STYLE_MODERN) then base = p break end
+			if (p.layoutName == LAYOUT_STYLE_MODERN) then
+				base = p
+				break
+			end
 		end
 		base = base or presets[1]
 		if (not base) then return end
@@ -180,134 +254,115 @@ EditModePreset.CreateOrUpdateLayout = function(self, forced)
 		target = CopyTable(base)
 		target.layoutName = LAYOUT_NAME
 		target.layoutType = Enum.EditModeLayoutType.Character
-		target.interfaceStyle = Enum.InputDeviceInterfaceType and Enum.InputDeviceInterfaceType.Mkb
+		if (Enum.InputDeviceInterfaceType) then
+			target.interfaceStyle = Enum.InputDeviceInterfaceType.Mkb
+		end
 
 		table.insert(info.layouts, target)
 		existingIndex = #info.layouts
-	end
-	if (not self.hasAppliedLayout) then
 		self:ApplySystemSettings(target)
+		createdNew = true
 	end
 
-	-- Search for the gamepad layout
+	-- -------------------------------------------------
+	-- Gamepad layout (Forever / Camelot only)
+	-- -------------------------------------------------
 	if (ns.WoWCamelot) then
-		local existingIndex
+		local gamepadIndex
 		for i, layout in ipairs(info.layouts) do
 			if (layout.layoutName == LAYOUT_NAME_GAMEPAD) then
-				existingIndex = i
+				gamepadIndex = i
 				break
 			end
 		end
 
-		-- Create or update gamepad layout
-		local target
-		if (existingIndex) then
-			-- We don't generally switch or change the existing layout, 
-			-- users should be able to modify or select another. 
-			if (not forced) then 
-				self.hasAppliedGamepadLayout = true
-				--return 
+		local gamepadTarget
+		if (gamepadIndex) then
+			if (forced) then
+				gamepadTarget = info.layouts[gamepadIndex]
+				self:ApplySystemSettings(gamepadTarget)
 			end
-
-			-- if we're going to update the layout
-			target = info.layouts[existingIndex]
 		else
 			local presets = EditModePresetLayoutManager:GetCopyOfPresetLayouts()
 			local base
 			for _, p in ipairs(presets) do
-				if (p.layoutName == LAYOUT_STYLE_GAMEPAD) then base = p break end
+				if (p.layoutName == LAYOUT_STYLE_GAMEPAD) then
+					base = p
+					break
+				end
 			end
 			base = base or presets[1]
-			if (not base) then return end
+			if (base) then
+				gamepadTarget = CopyTable(base)
+				gamepadTarget.layoutName = LAYOUT_NAME_GAMEPAD
+				gamepadTarget.layoutType = Enum.EditModeLayoutType.Character
+				if (Enum.InputDeviceInterfaceType) then
+					gamepadTarget.interfaceStyle = Enum.InputDeviceInterfaceType.Gamepad
+				end
 
-			target = CopyTable(base)
-			target.layoutName = LAYOUT_NAME_GAMEPAD
-			target.layoutType = Enum.EditModeLayoutType.Character
-			target.interfaceStyle = Enum.InputDeviceInterfaceType.Gamepad
-
-			table.insert(info.layouts, target)
-			existingIndex = #info.layouts
+				table.insert(info.layouts, gamepadTarget)
+				self:ApplySystemSettings(gamepadTarget)
+				createdNewGamepad = true
+			end
 		end
-		if (not self.hasAppliedGamepadLayout) then
-			self:ApplySystemSettings(target)
-		end
-
-		self.hasAppliedGamepadLayout = true
 	end
 
-	-- Messy
-	if (self.hasAppliedLayout) then
+	-- Nothing new was created and we are not forcing an update → done.
+	-- This is the "only on first run" gate for activation.
+	if (not createdNew and not createdNewGamepad and not forced) then
+		self.hasAppliedLayout = true
 		return
 	end
 
-	-- Set the flag before any API call that can re-enter the event
-	self.hasAppliedLayout = true
+	-- Decide which layout should become active (only matters on first creation).
+	local activateName = LAYOUT_NAME
+	if (ns.WoWCamelot) then
+		local style = GetCurrentInterfaceStyle()
+		if (style == Enum.InputDeviceInterfaceType.Gamepad) then
+			activateName = LAYOUT_NAME_GAMEPAD
+		end
+	end
 
-	-- Save layouts. This takes a moment to kick in.
+	local fullIndex = GetFullIndexForName(info.layouts, activateName)
+
+	-- Write the intended active layout into the table we are about to save.
+	-- Forever’s manager is much more reliable when the field is set before SaveLayouts.
+	if (fullIndex) then
+		info.activeLayout = fullIndex
+	end
+
+	self.hasAppliedLayout = true
 	C_EditMode.SaveLayouts(info)
 
-	-- Defer the switch so the save is processed first.
-	C_Timer.After(0, function()
-		if (InCombatLockdown()) then
-			return
-		end
+	-- Only switch on the first run (when we just created the layout).
+	-- Subsequent logins leave the player’s current choice alone.
+	if (fullIndex and (createdNew or createdNewGamepad)) then
+		C_Timer.After(0, function()
+			if (InCombatLockdown()) then return end
 
-		local fresh = C_EditMode.GetLayouts()
-		if (not fresh or not fresh.layouts) then return end
-
-		local customIndex
-		for i, layout in ipairs(fresh.layouts) do
-			if (layout.layoutName == ((ns.WoWCamelot and C_GamePad.IsEnabled()) and LAYOUT_NAME_GAMEPAD or LAYOUT_NAME)) then
-				customIndex = i
-				break
-			end
-		end
-		if (not customIndex) then return end
-
-		local presetCount = (Enum.EditModePresetLayoutsMeta and Enum.EditModePresetLayoutsMeta.NumValues) or #EditModePresetLayoutManager.presetLayoutInfo -- 2 or 3
-		local fullIndex = presetCount + customIndex
-
-		if (fresh.activeLayout ~= fullIndex) then
 			C_EditMode.SetActiveLayout(fullIndex)
-		end
 
-		-- Force a visual refresh by switching away and back,
-		-- this helps with the problem of changes getting "stuck"
-		-- until a layout change or reload.
-		C_Timer.After(.1, function()
-			if (InCombatLockdown()) then
-				return
-			end
+			-- Light visual refresh. Avoids the “stuck until reload” state on some clients.
+			C_Timer.After(0.1, function()
+				if (InCombatLockdown()) then return end
+				C_EditMode.SetActiveLayout(fullIndex)
+				ForceMinimapSize()
+			end)
 
-			local other = (fullIndex == presetCount + 1) and (presetCount + 2) or (presetCount + 1)
-			if (other ~= fullIndex) then
-				C_EditMode.SetActiveLayout(other)
-				C_Timer.After(.1, function()
-					if (InCombatLockdown()) then
-						return
-					end
-					C_EditMode.SetActiveLayout(fullIndex)
-					ForceMinimapSize()
-				end)
-			end
+			ForceChatSize()
+			ForceMinimapSize()
 		end)
-
-		ForceChatSize()
-		ForceMinimapSize()
-	end)
+	end
 end
 
 EditModePreset.ResetLayout = function(self)
-	self.hasAppliedLayout = false 
+	self.hasAppliedLayout = false
 	self:CreateOrUpdateLayout(true)
 end
 
 EditModePreset.OnEvent = function(self, event, ...)
 	if (event == "PLAYER_ENTERING_WORLD") then
-		-- EditMode loads more unpredictably on the initial login, 
-		-- so we need to add an extra delay here to make sure we catch it, 
-		-- or our custom preset won't get created until the next /reload.
-		local isInitialLogin, isReloadingUi = ...
+		local isInitialLogin = ...
 		if (isInitialLogin) then
 			C_Timer.After(1.5, function() self:CreateOrUpdateLayout() end)
 		else
@@ -317,20 +372,15 @@ EditModePreset.OnEvent = function(self, event, ...)
 		self:CreateOrUpdateLayout()
 	end
 
-	-- Remove events when no longer needed, or we'll get C stack overflows.
 	if (self.hasAppliedLayout) then
 		self:UnregisterEvent("EDIT_MODE_LAYOUTS_UPDATED", "OnEvent")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
 	end
 end
 
--- This is called by the options menu on settings changes,
--- and by the modules themselves on enabling.
 EditModePreset.UpdateSettings = function(self)
 end
 
--- This is called by the addon on full profile changes,
--- and should call a full settings update.
 EditModePreset.RefreshConfig = function(self)
 	self:UpdateSettings()
 end
