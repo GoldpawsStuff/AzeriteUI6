@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 2026-11-07
+There are hints that this might be a Forever only problem related to their pretty buggy gamepad handling. It taints everything, and that taint spreads to the actionbars from there. I am currently trying the following commands to prevent the new gamepad UI from running any code:  
+```Lua
+/console GamepadEnable 0  
+/console GamepadActionBarEnable 0  
+```
+
 ## [1.0.26-RC] 2026-11-07
 - Still bugging out.
 
