@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.27-Alpha] 2026-11-07
-There are hints that this might be a Forever only problem related to their pretty buggy gamepad handling. It taints everything, and that taint spreads to the actionbars from there. I am currently trying the following commands to prevent the new gamepad UI from running any code:  
+## [1.0.27-Release] 2026-11-07
+There are hints that there might be a Forever only problem related to Blizzard's not yet perfected gamepad handling. It taints everything, and that taint spreads to the actionbars from there. You can try the following commands to prevent the new gamepad UI from running any code:  
 ```Lua
 /console GamepadEnable 0  
 /console GamepadActionBarEnable 0  
 ```
+### Changed
+- Changed the actionbutton hiding code to minimize the chance of spellbook taint in Forever. Gamepads might still cause problems, but the above commands also might solve it.
+
 
 ## [1.0.26-RC] 2026-11-07
 - Still bugging out.
