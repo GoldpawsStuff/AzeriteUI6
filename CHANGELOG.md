@@ -17,7 +17,6 @@ There are hints that there might be a Forever only problem related to Blizzard's
 ### Changed
 - Changed the actionbutton hiding code to minimize the chance of spellbook taint in Forever. Gamepads might still cause problems, but the above commands also might solve it.
 
-
 ## [1.0.26-RC] 2026-11-07
 - Still bugging out.
 
