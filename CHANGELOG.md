@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.26-RC] 2026-11-07
+- Still bugging out.
+
+### Changed
+- Attempting yet another actionbutton hiding method to avoid the rare but sudden taint situations.
+
 ## [1.0.25-RC] 2026-11-06
 ### Changed
 - Changed how actionbuttons are hidden in an attempt to battle the ever weirder taints. 

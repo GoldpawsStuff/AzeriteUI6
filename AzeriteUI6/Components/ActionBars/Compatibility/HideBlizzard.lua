@@ -88,13 +88,35 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 
 	hideActionBarFrame(MainMenuBar, false) -- <= 11.2.5
 	hideActionBarFrame(MainActionBar, false) -- >= 11.2.7/12.0
-	hideActionBarFrame(MultiBarBottomLeft, true)
-	hideActionBarFrame(MultiBarBottomRight, true)
-	hideActionBarFrame(MultiBarLeft, true)
-	hideActionBarFrame(MultiBarRight, true)
-	hideActionBarFrame(MultiBar5, true)
-	hideActionBarFrame(MultiBar6, true)
-	hideActionBarFrame(MultiBar7, true)
+
+	-- Let's attempt without unregistering events first.
+	-- *got a bug of sorts
+	--hideActionBarFrame(MultiBarBottomLeft, false)
+	--hideActionBarFrame(MultiBarBottomRight, false)
+	--hideActionBarFrame(MultiBarLeft, false)
+	--hideActionBarFrame(MultiBarRight, false)
+	--hideActionBarFrame(MultiBar5, false)
+	--hideActionBarFrame(MultiBar6, false)
+	--hideActionBarFrame(MultiBar7, false)
+
+	-- We'll attempt this next one if the previous fails
+	if (Settings and Settings.GetSetting) then
+		for i = 2, 8 do
+			local setting = Settings.GetSetting("PROXY_SHOW_ACTIONBAR_" .. i)
+			if (setting) then
+				setting:SetValue(false)
+			end
+		end
+	else
+		-- Fallback for non Retail/Forever.
+		hideActionBarFrame(MultiBarBottomLeft, true)
+		hideActionBarFrame(MultiBarBottomRight, true)
+		hideActionBarFrame(MultiBarLeft, true)
+		hideActionBarFrame(MultiBarRight, true)
+		hideActionBarFrame(MultiBar5, true)
+		hideActionBarFrame(MultiBar6, true)
+		hideActionBarFrame(MultiBar7, true)
+	end
 
 	-- Hide MultiBar Buttons, but keep the bars alive
 	-- *this could be the source of the spellbook related taint?
