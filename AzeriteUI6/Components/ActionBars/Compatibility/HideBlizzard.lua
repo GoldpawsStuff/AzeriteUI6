@@ -95,14 +95,13 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	hideActionBarFrame(MainMenuBar, false) -- <= 11.2.5
 	hideActionBarFrame(MainActionBar, false) -- >= 11.2.7/12.0
 
-	-- Let's try just purging events and EditMode hooks?
-	removeEvents(MultiBarBottomLeft, true)
-	removeEvents(MultiBarBottomRight, true)
-	removeEvents(MultiBarLeft, true)
-	removeEvents(MultiBarRight, true)
-	removeEvents(MultiBar5, true)
-	removeEvents(MultiBar6, true)
-	removeEvents(MultiBar7, true)
+	--removeEvents(MultiBarBottomLeft, true)
+	--removeEvents(MultiBarBottomRight, true)
+	--removeEvents(MultiBarLeft, true)
+	--removeEvents(MultiBarRight, true)
+	--removeEvents(MultiBar5, true)
+	--removeEvents(MultiBar6, true)
+	--removeEvents(MultiBar7, true)
 
 	--hideActionBarFrame(MultiBarBottomLeft, true)
 	--hideActionBarFrame(MultiBarBottomRight, true)
@@ -113,17 +112,16 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	--hideActionBarFrame(MultiBar7, true)
 
 	-- Hide MultiBar Buttons, but keep the bars alive
-	-- *this could be the source of the spellbook related taint?
-	for i = 1,12 do
-		hideActionButton(_G["ActionButton" .. i])
-		hideActionButton(_G["MultiBarBottomLeftButton" .. i])
-		hideActionButton(_G["MultiBarBottomRightButton" .. i])
-		hideActionButton(_G["MultiBarRightButton" .. i])
-		hideActionButton(_G["MultiBarLeftButton" .. i])
-		hideActionButton(_G["MultiBar5Button" .. i])
-		hideActionButton(_G["MultiBar6Button" .. i])
-		hideActionButton(_G["MultiBar7Button" .. i])
-	end
+	--for i = 1,12 do
+	--	hideActionButton(_G["ActionButton" .. i])
+	--	hideActionButton(_G["MultiBarBottomLeftButton" .. i])
+	--	hideActionButton(_G["MultiBarBottomRightButton" .. i])
+	--	hideActionButton(_G["MultiBarRightButton" .. i])
+	--	hideActionButton(_G["MultiBarLeftButton" .. i])
+	--	hideActionButton(_G["MultiBar5Button" .. i])
+	--	hideActionButton(_G["MultiBar6Button" .. i])
+	--	hideActionButton(_G["MultiBar7Button" .. i])
+	--end
 
 	-- Non-action-button only
 	hideActionBarFrame(MicroButtonAndBagsBar, false)
@@ -148,10 +146,14 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	end
 
 	OverrideActionBar:SetParent(UIHider)
-	QueueStatusFrame:SetParent(UIParent)
+
+	if (QueueStatusFrame) then
+		QueueStatusFrame:SetParent(UIParent)
+	end
 
 	-- Call once after the UI is ready
-	self:HideMicroMenuPopups()
+	-- *we know touching the MultiBars taint things, but does this do it too?
+	--self:HideMicroMenuPopups()
 end
 
 HideBlizzardActionBars.HideMicroMenuPopups = function(self)
