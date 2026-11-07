@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased][1.0.28-Alpha] 2026-11-07
+### Changed
+- Slightly moved the default Chat Window position a bit up to make room for the focus frame. No forced reset this time, just a new default. 
+
 ## [1.0.27-Release] 2026-11-07
 There are hints that there might be a Forever only problem related to Blizzard's not yet perfected gamepad handling. It taints everything, and that taint spreads to the actionbars from there. You can try the following commands to prevent the new gamepad UI from running any code:  
 ```Lua

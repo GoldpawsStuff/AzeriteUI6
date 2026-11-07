@@ -117,7 +117,7 @@ EditModePreset.ApplySystemSettings = function(self, target)
 
 	-- Chat
 	local chat = self:GetSystem(target.systems, Enum.EditModeSystem.ChatFrame)
-	self:SetSystemAnchor(chat, "BOTTOMLEFT", "BOTTOMLEFT", 60, 306)
+	self:SetSystemAnchor(chat, "BOTTOMLEFT", "BOTTOMLEFT", 60, 356) -- need to make room for the focus frame too
 	self:SetChatSize(chat, 440, 180)
 
 	-- HUD Tooltip
