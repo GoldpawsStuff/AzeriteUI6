@@ -387,6 +387,14 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.AddToButtonFacade = function() end -- disables LAB from overriding it
 	button.AddToMasque = function() end -- disables LAB from overriding it
 
+	-- Make sure 
+	LAB.RegisterCallback(ns, "OnButtonUpdate", function(_, button)
+		local bar = button:GetParent()
+		if (bar and bar.UpdateFading) then
+			bar:UpdateFading()
+		end
+	end)
+
 	-- prevents empty hovering buttons from appearing on initial login
 	-- when currently mounted/dragonriding or when using another bar with 
 	-- less than the standard 12 buttons.
