@@ -4,9 +4,18 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.28-Alpha] 2026-11-07
+## [Unreleased][1.0.28-Alpha] 2026-11-08
+### Added
+- Added the command `/bind` to enter a hover mode to keybind action buttons. Click the exit button 
+
 ### Changed
-- Slightly moved the default Chat Window position a bit up to make room for the focus frame. No forced reset this time, just a new default. 
+- Slightly moved the default Chat Window position a bit up to make room for the focus frame. No forced reset of the EditMode preset this time, just a new default. People can always use `/resetlayout` if they so chooses.
+
+### Fixed
+- Fixed an issue where nearly all the actionbars accidentally had identical button names. This probably caused a few problems. It's like naming all your children the same name.
+
+### Fixed
+- Fixed an issue where actionbutton fading wouldn't get updated on button content changes like adding or removing spells until after a `/reload`.
 
 ## [1.0.27-Release] 2026-11-07
 There are hints that there might be a Forever only problem related to Blizzard's not yet perfected gamepad handling. It taints everything, and that taint spreads to the actionbars from there. You can try the following commands to prevent the new gamepad UI from running any code:  

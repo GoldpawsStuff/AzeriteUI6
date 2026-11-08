@@ -17,6 +17,7 @@
 	<Script file="ActionBars\PetBar.lua"/>
 	<Script file="ActionBars\StanceBar.lua"/>
 	<Script file="ActionBars\Options.lua"/>
+	<Script file="ActionBars\KeyBinds.lua"/>
 
 	<!-- Chat -->
 	<Script file="Chat\ChatFrames.lua"/>

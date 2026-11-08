@@ -15,6 +15,9 @@ Toggles the movable frame anchors for this user interface. *(Note that most of t
   - `Shift` + `Left Mouse Button` to return a frame to its previous position.  
   - `Shift` + `Right Mouse Button` to return a frame to its default position.  
 
+### /bind  
+Toggles a hover keybind mode. Hover the mouse cursor over an actionbutton, press the desired key combination, and your keybind is stored. To clear a bind, click `Esc` while hovering over the actionbutton. To exit the bind mode, click the `Cancel` button in the window, or simply click `Esc` while not hovering over any button.    
+
 ### /setbar  
 This command is used to configure a visible actionbar. It controls layout and number of buttons. Meant as an additional source of configuration, not a replacement for the options menu.    
 ```Lua

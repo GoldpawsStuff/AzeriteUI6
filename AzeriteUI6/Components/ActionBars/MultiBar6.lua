@@ -51,7 +51,7 @@ end
 
 MultiBar6.GetBar = function(self)
 	if (not self.Bar) then 
-		local bar = ns.ActionBar:Create(7, self.db.profile, "AZUI6_ActionBar1")
+		local bar = ns.ActionBar:Create(7, self.db.profile, "AZUI6_ActionBar7")
 		bar:SetScale(.9) -- default scale
 		bar:SetPoint("CENTER", 0, (100 + 64)/.9) -- default position
 		bar:Update() -- update size and layout

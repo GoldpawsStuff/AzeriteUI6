@@ -26,7 +26,7 @@
 local _, ns = ...
 local oUF = ns.oUF or oUF
 
-local KeyBound = LibStub("LibKeyBound-1.0", true)
+local KeyBound = LibStub("LibKeyBound-1.0")
 local LAB = LibStub("LibActionButton-1.0")
 
 -- Custom API locals

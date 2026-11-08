@@ -29,6 +29,7 @@ local _, ns = ...
 LoadBindings(GetCurrentBindingSet())
 
 local LFF = LibStub("LibFadingFrames-1.0")
+local KeyBound = LibStub("LibKeyBound-1.0")
 
 local defaults = {
 	enabled = true,

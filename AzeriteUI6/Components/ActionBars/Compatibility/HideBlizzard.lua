@@ -95,33 +95,18 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	hideActionBarFrame(MainMenuBar, false) -- <= 11.2.5
 	hideActionBarFrame(MainActionBar, false) -- >= 11.2.7/12.0
 
-	--removeEvents(MultiBarBottomLeft, true)
-	--removeEvents(MultiBarBottomRight, true)
-	--removeEvents(MultiBarLeft, true)
-	--removeEvents(MultiBarRight, true)
-	--removeEvents(MultiBar5, true)
-	--removeEvents(MultiBar6, true)
-	--removeEvents(MultiBar7, true)
-
-	--hideActionBarFrame(MultiBarBottomLeft, true)
-	--hideActionBarFrame(MultiBarBottomRight, true)
-	--hideActionBarFrame(MultiBarLeft, true)
-	--hideActionBarFrame(MultiBarRight, true)
-	--hideActionBarFrame(MultiBar5, true)
-	--hideActionBarFrame(MultiBar6, true)
-	--hideActionBarFrame(MultiBar7, true)
-
 	-- Hide MultiBar Buttons, but keep the bars alive
-	--for i = 1,12 do
-	--	hideActionButton(_G["ActionButton" .. i])
-	--	hideActionButton(_G["MultiBarBottomLeftButton" .. i])
-	--	hideActionButton(_G["MultiBarBottomRightButton" .. i])
-	--	hideActionButton(_G["MultiBarRightButton" .. i])
-	--	hideActionButton(_G["MultiBarLeftButton" .. i])
-	--	hideActionButton(_G["MultiBar5Button" .. i])
-	--	hideActionButton(_G["MultiBar6Button" .. i])
-	--	hideActionButton(_G["MultiBar7Button" .. i])
-	--end
+	-- *bound to bug out
+	for i = 1,12 do
+		hideActionButton(_G["ActionButton" .. i])
+		hideActionButton(_G["MultiBarBottomLeftButton" .. i])
+		hideActionButton(_G["MultiBarBottomRightButton" .. i])
+		hideActionButton(_G["MultiBarRightButton" .. i])
+		hideActionButton(_G["MultiBarLeftButton" .. i])
+		hideActionButton(_G["MultiBar5Button" .. i])
+		hideActionButton(_G["MultiBar6Button" .. i])
+		hideActionButton(_G["MultiBar7Button" .. i])
+	end
 
 	-- Non-action-button only
 	hideActionBarFrame(MicroButtonAndBagsBar, false)
