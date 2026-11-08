@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.28-Alpha] 2026-11-08
+## [1.0.28-RC] 2026-11-08
 ### Added
 - Added the command `/bind` to enter a hover mode to keybind action buttons. Click the exit button 
 
