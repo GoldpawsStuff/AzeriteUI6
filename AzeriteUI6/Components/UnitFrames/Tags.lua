@@ -26,6 +26,8 @@
 local _, ns = ...
 local oUF = ns.oUF or oUF
 
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
+
 -- Utility function to turn 'true','false' and 'nil' as text into actual booleans.
 local getargs = function(...)
 	local args = {}
@@ -73,7 +75,7 @@ oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 	if (not UnitIsConnected(unit)) then
 		return PLAYER_OFFLINE
 	elseif (UnitIsGhost(unit)) then
-		return GHOST
+		return L["Ghost"]
 	elseif (UnitIsDead(unit)) then
 		return DEAD
 	else

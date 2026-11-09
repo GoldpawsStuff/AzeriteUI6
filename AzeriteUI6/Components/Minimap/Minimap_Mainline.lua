@@ -284,7 +284,7 @@ MinimapModule.StyleMinimap = function(self)
 	rested:SetPoint("CENTER", -1, 1)
 	rested:SetSize(182,182)
 	rested:SetStatusBarTexture(GetMedia("minimap-bars-single"))
-	rested:SetStatusBarColor(oUF.colors.restedBonus:GetRGB())
+	rested:SetStatusBarColor(oUF.colors.rested:GetRGB()) -- oUF.colors.restedBonus:GetRGB()
 	rested:SetSparkOffset(-1/10) -- offset in degrees from the end of the bar to the spark
 	rested:SetSparkInset(17) -- distance from outer diameter to start of spark
 	rested:SetSparkSize(24,34) -- width = thickness along ring bar, height = length across
@@ -412,22 +412,20 @@ MinimapModule.UpdateXP = function(self, event, ...)
 		rR, rG, rB = oUF.colors.xpValue:GetRGB()
 	end
 
-	-- prettier?
-	r, g, b = oUF.colors.xp:GetRGB()
-	rR, rG, rB = oUF.colors.xpValue:GetRGB()
-
 	self.XP:SetMinMaxValues(0, max)
 	self.XP:SetValue(current)
 	self.XP:SetStatusBarColor(r, g, b)
 
 	local restedShown = self.XP.Rested:IsShown()
+
 	if (rested > 0) then
 		self.XP.Rested:SetMinMaxValues(0, max, not restedShown)
 		self.XP.Rested:SetValue(math.min(max, current + rested), not restedShown)
+		self.XP.Rested:SetStatusBarColor(r, g, b)
 		if (not restedShown) then
 			self.XP.Rested:Show()
 		end
-	elseif (restedShown) then
+	else -- if (restedShown) then
 		self.XP.Rested:Hide()
 		self.XP.Rested:SetValue(0, true)
 		self.XP.Rested:SetMinMaxValues(0, 1, true)

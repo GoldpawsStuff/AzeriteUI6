@@ -49,6 +49,7 @@ L["Fade out the Player Class Power Frame."] = true
 L["Fade out the Player Frame."] = true
 L["Fade out the Objectives Tracker."] = true
 L["Fade out the Stance Bar."] = true
+L["Ghost"] = true
 L["Grid"] = true -- ActionBar layout option
 L["Keep faded while engaged in combat."] = true
 L["Prevents the faded Action Buttons from automatically becoming visible when engaged in combat. Faded Action Buttons are still visible when moused over."] = true

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.29-Alpha] 2026-11-09
+## [Unreleased][1.0.29-Alpha] 2026-11-10
 - Working on nameplates and aura filter options.
 
 ### Changed
@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed some XP bar color inconsistencies.
+- Unitframes should now properly say "Ghost" when a player is dead and have released its spirit.
 
 ## [1.0.28-RC] 2026-11-08
 ### Added
