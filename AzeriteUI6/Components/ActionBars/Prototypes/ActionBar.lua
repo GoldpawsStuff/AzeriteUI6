@@ -162,8 +162,6 @@ local bonusBarOffsets =
 {} -- create an empty fallback for easier iterations
 
 -- Form number table based on expansion version and player class
--- *the goal of this is to visually illustrate which classes in which game flavors have extra action pages,
---  while the finished table itself is just a list of available form numbers for the player.
 -- *page = 6 + the corresponding bonusbar offset (not the form number)
 local formPages = 
 
@@ -696,6 +694,8 @@ ActionBar.UpdateStateDriver = function(self)
 	if (self.id == 1) then
 		statedriver = "[overridebar][possessbar][shapeshift]possess;[bonusbar:5]dragon;[form,noform]0;[bar:2]2;[bar:3]3;[bar:4]4;[bar:5]5;[bar:6]6;"
 
+		-- a game bug sometimes causes 'bonusbar' to return zero,
+		-- using 'form' instead avoids this problem.
 		for form, page in next, formPages do
 			statedriver = statedriver .. string.format("[form:%d]%d;", form, page)
 		end

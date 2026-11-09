@@ -841,7 +841,7 @@ local style = function(self, unit)
 
 			-- Whitelisted harmful auras
 			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = { 
-				[15007] = true, -- Resurrection Sickness
+				[15007] = true, -- Resurrection Sickness *doesn't always show up...?
 			}}}),
 
 			-- No duration harmful auras (lava on the floor, etc)
