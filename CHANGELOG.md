@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased][1.0.29-Alpha] 2026-11-09
+- Working on nameplates and aura filter options.
+
+### Changed
+- Changed the primary actionbar paging driver from using `bonusbar` to `form` conditionals to work around a known Forever bug where `bonusbar` sometimes reports 0, leaving the player with the wrong visible actionbar page.
+
+### Fixed
+- Fixed some XP bar color inconsistencies.
+
 ## [1.0.28-RC] 2026-11-08
 ### Added
 - Added the command `/bind` to enter a hover mode to keybind action buttons. Click the exit button 

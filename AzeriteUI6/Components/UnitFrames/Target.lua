@@ -32,7 +32,164 @@ local Target = ns:NewModule("Target", nil, "LibMoreEvents-1.0", "LibMovableFrame
 
 -- Declare module defaults
 local defaults = { profile = {
-	enabled = true
+	enabled = true,
+
+	enableClassColorFriend = true,
+	enableClassColorEnemy = true,
+	auras = {
+		enemyNPC = {
+			mobBuffs = true, 
+			personalDebuffs = true,
+			sharedCC = true,
+		},
+		enemyPlayer = {
+			enemyBuffs = true, 
+			personalDebuffs = true, 
+			bigDebuffs = true,
+		},
+		friendlyPlayer = {
+			personalBuffs = true, 
+			enemyDebuffs = true,
+			bigDebuff = true,
+		},
+	}
+
+
+	--[[
+	-- modern aura settings
+	auras = (ns.WoW12 or ns.WoWCamelot) and {
+		enabled = true,
+		groups = {
+			-- when unit is friendly to the player
+			friendlyTarget = {
+				helpful = {
+					boss = {
+						order = 100,
+						enabled = true,
+					},
+					whitelist = {
+						order = 100,
+						enabled = true,
+					,
+					noDuration = {
+						order = 100,
+						enabled = true,
+						showInCombat = false,
+						showOoC = true
+					},
+					shortDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 60, -- 1 minute
+						showInCombat = true,
+						showOoC = true
+					},
+					longDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 3600, -- 1 hour
+						showInCombat = false,
+						showOoC = true
+					}
+				},
+				harmful = {
+					boss = {
+						order = 100,
+						enabled = true,
+					},
+					whitelist = {
+						order = 100,
+						enabled = true,
+					},
+					noDuration = {
+						order = 100,
+						enabled = true,
+						showInCombat = false,
+						showOoC = true
+					},
+					shortDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 60, -- 1 minute
+						showInCombat = true,
+						showOoC = true
+					},
+					longDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 3600, -- 1 hour
+						showInCombat = false,
+						showOoC = false
+					}
+				}
+			},
+			-- when the player can attack the unit
+			hostileTarget = {
+				helpful = {
+					boss = {
+						order = 100,
+						enabled = true,
+					},
+					whitelist = {
+						order = 100,
+						enabled = true,
+					},
+					noDuration = {
+						order = 100,
+						enabled = true,
+						showInCombat = false,
+						showOoC = true
+					},
+					shortDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 60, -- 1 minute
+						showInCombat = true,
+						showOoC = true
+					},
+					longDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 3600, -- 1 hour
+						showInCombat = false,
+						showOoC = true
+					}
+				},
+				harmful = {
+					boss = {
+						order = 100,
+						enabled = true,
+					},
+					whitelist = {
+						order = 100,
+						enabled = true,
+					},
+					noDuration = {
+						order = 100,
+						enabled = true,
+						showInCombat = false,
+						showOoC = true
+					},
+					shortDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 60, -- 1 minute
+						showInCombat = true,
+						showOoC = true
+					},
+					longDuration = {
+						order = 100,
+						enabled = true,
+						maxDuration = 3600, -- 1 hour
+						showInCombat = false,
+						showOoC = true
+					}
+				}
+			}
+		}
+	} or nil
+	]]
+
 }}
 
 -- Custom API locals
@@ -49,6 +206,163 @@ local createAlphaCurve = function(min, max)
 	alphaCurve:AddPoint(0, CreateColor(1, 1, 1, min or 0)) -- At 0%: alpha=<min> (hide)
 	alphaCurve:AddPoint(.01, CreateColor(1, 1, 1, max or 1)) -- At 1%+: alpha=<max> (show)
 	return alphaCurve
+end
+
+-- Set the index of an aura group.
+local Auras_SetGroupIndex = function(element, groupKey, index)
+	element:SetAuraGroupLayout(groupKey, {
+		layoutIndex = index, -- the only actual change
+		elementSpacing = element.elementSpacing,
+		forceNewLine = element.forceNewLine,
+		groupLineSpacing = element.groupLineSpacing,
+		groupSpacing = element.groupSpacing,
+		lineSpacing = element.lineSpacing
+	})
+end
+
+-- Update aura filters based on unit alignment and combat state
+local Auras_PostUpdate = function(element, event)
+	local unit = element.__owner.__unit
+	if (not unit) then return end
+
+	local inCombat
+	if (event == "PLAYER_REGEN_DISABLED") then
+		inCombat = true
+	elseif (event ~= "PLAYER_REGEN_ENABLED") then
+		inCombat = UnitAffectingCombat(unit)
+	end
+
+	--[[--
+
+	Hostile Units
+		In combat
+
+		Not in combat
+
+
+	Friendly Units
+		In combat
+
+		Not in combat
+
+	--]] --
+
+	local canAttack = UnitCanAttack("player", unit)
+
+	-- Hostile unit
+	if (canAttack) then 
+		-- Prioritize your harmful running auras
+		if (inCombat) then
+			element:SetGroupIndex(element.Groups.HarmfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerLong, 1000)
+			element:SetGroupIndex(element.Groups.HelpfulNotPlayerLong, 1000)
+			element:SetGroupIndex(element.Groups.HarmfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllNotPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllDurationless, 1000)
+
+			element:SetAuraGroupEnabled(element.Groups.HarmfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulAllWhitelist, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulPlayer, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllWhitelist, true)
+
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerWhitelist, false)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerLong, false)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulNotPlayerLong, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllNotPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllDurationless, false)
+
+		-- Any difference at all?
+		else
+			element:SetGroupIndex(element.Groups.HarmfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerLong, 1)
+			element:SetGroupIndex(element.Groups.HelpfulNotPlayerLong, 1)
+			element:SetGroupIndex(element.Groups.HarmfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllNotPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllDurationless, 1)
+
+			element:SetAuraGroupEnabled(element.Groups.HarmfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulAllWhitelist, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulNotPlayerLong, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulPlayer, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllWhitelist, true)
+
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerWhitelist, false)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerLong, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllNotPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllDurationless, false)
+		end
+
+	-- Friendly unit
+	else
+		-- Prioritize your helpful running auras
+		-- Show harmful running DoTs
+		if (inCombat) then
+			element:SetGroupIndex(element.Groups.HarmfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerLong, 1)
+			element:SetGroupIndex(element.Groups.HelpfulNotPlayerLong, 1)
+			element:SetGroupIndex(element.Groups.HarmfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllNotPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllDurationless, 1)
+
+			element:SetAuraGroupEnabled(element.Groups.HarmfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulAllWhitelist, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerWhitelist, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayer, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllNotPlayer, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllWhitelist, true)
+
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerLong, false)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulNotPlayerLong, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllDurationless, false)
+
+		else
+			element:SetGroupIndex(element.Groups.HarmfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulBoss, 1)
+			element:SetGroupIndex(element.Groups.HelpfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HelpfulNotPlayerLong, 1)
+			element:SetGroupIndex(element.Groups.HelpfulPlayerLong, 1)
+			element:SetGroupIndex(element.Groups.HarmfulPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllNotPlayer, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllWhitelist, 1)
+			element:SetGroupIndex(element.Groups.HarmfulAllDurationless, 1)
+
+			element:SetAuraGroupEnabled(element.Groups.HarmfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulBoss, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulAllWhitelist, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerWhitelist, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayerLong, true)
+			element:SetAuraGroupEnabled(element.Groups.HelpfulNotPlayerLong, true)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllNotPlayer, true)
+
+			element:SetAuraGroupEnabled(element.Groups.HelpfulPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulPlayer, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllWhitelist, false)
+			element:SetAuraGroupEnabled(element.Groups.HarmfulAllDurationless, false)
+		end
+	end
 end
 
 -- Toggle cast text color on protected casts.
@@ -606,6 +920,13 @@ local style = function(self, unit)
 	--------------------------------------------
 	if (ns.WoW12 or ns.WoWCamelot) then
 
+		-- Little hack to avoid "stuck" numbers on auras with no duration
+		local binding = C_DurationUtil.CreateDurationTextBinding()
+		binding:SetZeroDurationText("") -- clears the stuck number
+		binding:SetExpiredText("") -- optional, for fully expired
+		--binding:SetFormatter(...) -- if you want custom formatting
+		--binding:SetUpdateInterval(0.1) -- optional
+
 		local auras = self:CreateAuras()
 		auras:SetSize(316, 76)
 		auras:SetPoint("TOPRIGHT", -150, -126)
@@ -614,42 +935,88 @@ local style = function(self, unit)
 		auras.PostCreateButton = ns.AuraButton_PostCreate
 		
 		-- Enable some sub-widgets
+		auras.durationBinding = binding
 		auras.showCount = true
+		auras.showDuration = true
 		auras.showBuffBorder = false
 
 		-- Group options
-		auras.num = 16
-		auras.maxFrameCount = 16 -- Number of buttons to display. Defaults to an infinite number (number)
+		auras.size = 36
 		auras.elementSpacing = 4 -- Spacing between each button (number) 
-		auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
+		auras.forceNewLine = false -- Whether to force a new row or column between each group (boolean)
 		auras.groupSpacing = 4 -- Spacing between each group (number) 
 		auras.groupLineSpacing = 4 -- Spacing between each group row or column 
-		auras.forceNewLine = false -- Whether to force a new row or column between each group (boolean)
+		auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
+		auras.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
+		auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
+		auras.tooltipOffsetX = 0
+		auras.tooltipOffsetY = -4
 
-		-- sorting 
-		auras.sortMethod = AuraContainerSortMethod.Expiration -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
-		auras.sortDirection = AuraContainerSortDirection.Normal -- https://warcraft.wiki.gg/wiki/API:AuraContainer_SetAuraGroupSortMethod
+		-- Aura Groups
+		-- *named and referenced for easy enabling/disabling
+		auras.Groups = {
 
-		--auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY|RAID_IN_COMBAT", {
-		auras:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY", {
-			-- Button options
-			size = 36,
-			tooltipAnchor = "ANCHOR_BOTTOMLEFT",
-			tooltipOffsetX = 0,
-			tooltipOffsetY = -4,
-		})
+			-- Out of Combat Buff display
 
-		--auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY|RAID_PLAYER_DISPELLABLE", {
-		auras:AddGroup("HARMFUL|INCLUDE_NAME_PLATE_ONLY", {
-			-- Button options
-			size = 36,
-			tooltipAnchor = "ANCHOR_BOTTOMLEFT",
-			tooltipOffsetX = 0,
-			tooltipOffsetY = -4,
-		})
+			-- Boss Auras, always top priority
+			HarmfulBoss = auras:AddGroup("HARMFUL", { layoutIndex = 1, candidateFilters = { isBossAura = true } }),
+			HelpfulBoss = auras:AddGroup("HELPFUL", { layoutIndex = 2, candidateFilters = { isBossAura = true } }),
+
+			-- Whitelisted buffs from anybody
+			HelpfulAllWhitelist = auras:AddGroup("HELPFUL", { layoutIndex = 10, candidateFilters = { includeSpellIDs = { 
+
+			}}}),
+
+			-- Whitelisted player selfbuffs
+			HelpfulPlayerWhitelist = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 11, candidateFilters = { includeSpellIDs = {
+
+			}}}),
+
+			-- Regular player selfbuffs, with spammy stuff blacklisted
+			HelpfulPlayer = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = {
+				maxDuration = 60,
+				excludeSpellIDs = {}
+			}}),
+
+			-- Helpful buffs, long duration
+			HelpfulPlayerLong = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = {
+				maxDuration = 3600,
+				excludeSpellIDs = {}
+			}}),
+
+			-- Non-player buffs, with spammy stuff blacklisted
+			HelpfulNotPlayerLong = auras:AddGroup("HELPFUL|!PLAYER", { layoutIndex = 12, candidateFilters = {
+				maxDuration = 3600,
+				excludeSpellIDs = {}
+			}}),
+
+			-- Whitelisted harmful auras
+			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = {
+				maxDuration = 60,
+				includeSpellIDs = {}
+			}}),
+
+			-- No duration harmful auras (lava on the floor, etc)
+			HarmfulAllDurationless = auras:AddGroup("HARMFUL", { layoutIndex = 101, candidateFilters = {
+				maxDuration = 0,
+				excludeSpellIDs = {}
+			}}),
+
+			HarmfulPlayer = auras:AddGroup("HARMFUL|PLAYER", { layoutIndex = 12, candidateFilters = {
+				maxDuration = 60,
+				excludeSpellIDs = {}
+			}}),
+
+			-- Non-player harmful auras
+			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL|!PLAYER", { layoutIndex = 102, candidateFilters = {
+				maxDuration = 60,
+				excludeSpellIDs = {}
+			}})
+		}
 
 		self.Auras = auras
-		--self.Auras.PostUpdateButton = ns.AuraButton_PostUpdateTarget -- gone?
+		self.Auras.PostUpdate = Auras_PostUpdate
+		self.Auras.SetGroupIndex = Auras_SetGroupIndex
 	end
 
 	-- General post update

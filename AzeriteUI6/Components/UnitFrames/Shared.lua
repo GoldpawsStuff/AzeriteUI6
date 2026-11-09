@@ -33,6 +33,41 @@ local GetMedia = ns.GetMedia
 
 -- Auras
 -----------------------------------------
+local whitelist = {
+
+	-- List of default auraIDs for general whitelisted buffs on anybody
+	buffs = {},
+
+	-- List of default auraIDs for general whitelisted debuffs on anybody
+	debuffs = {},
+
+	-- List of default auraIDs for whitelisted buffs on the Player unit frame
+	playerbuffs = {},
+
+	-- List of default auraIDs for whitelisted debuffs on the Player unit frame
+	playerdebuffs = {},
+
+	-- List of default auraIDs for whitelisted buffs on the Target unit frame
+	targetbuffs = {},
+
+	-- List of default auraIDs for whitelisted debuffs on the Target unit frame
+	targetdebuffs = {}
+}
+
+local cache, list = {}, {}
+
+local clear = function()
+	for i in next,cache do
+		cache[i] = nil
+	end
+end
+
+local copy = function(source)
+	for auraID in next,source do
+		cache[auraID] = true
+	end
+end
+
 --ns.AuraButton_PostCreate = function(element, options, button)
 ns.AuraButton_PostCreate = function(element, button, options)
 
@@ -153,6 +188,25 @@ ns.AuraButton_PostUpdateTarget = function(element, button, unit, data, position)
 
 end
 
+-- Generates a sorted list of whitelisted auras by keywords, with no duplicates
+-- *accepted keywords are the whitelist table indices
+ns.GetAuraWhitelistByKeywords = function(...)
+	clear()
+	for i = 1,select("#", ...) do
+		local key = select(i, ...)
+		local source = whitelist[(string.lower(key))]
+		if (source) then
+			copy(source)
+		end
+	end
+	for i in next,list do list[i] = nil end
+	for auraID in next,cache do
+		list[#list + 1] = auraID
+	end
+	table.sort(list)
+	return unpack(list)
+end
+
 -- Hover Scripts
 -----------------------------------------
 local UpdateTooltip = function(self)
@@ -264,4 +318,43 @@ ns.UpdateHealthColor = function(self, event, unit)
 	if(element.PostUpdateColor) then
 		element:PostUpdateColor(unit, color)
 	end
+end
+
+
+-- Add spell ID to aura tooltips in Forever
+local function OnAuraTooltip(tooltip)
+	local primaryInfo = tooltip.GetPrimaryTooltipInfo and tooltip:GetPrimaryTooltipInfo()
+	if not primaryInfo or not primaryInfo.getterName or not primaryInfo.getterArgs then
+		return
+	end
+
+	local getter = C_UnitAuras and C_UnitAuras[primaryInfo.getterName]
+	if not getter then
+		return
+	end
+
+	local ok, auraData = pcall(getter, unpack(primaryInfo.getterArgs))
+	if not ok or type(auraData) ~= "table" then
+		return
+	end
+
+	local spellId = auraData.spellId
+	if not spellId
+		or (issecretvalue and issecretvalue(spellId))
+		or type(spellId) ~= "number"
+		or spellId <= 0 then
+		return
+	end
+
+	local text = format("ID: %d", spellId)
+	local instanceId = auraData.auraInstanceID
+	if instanceId and type(instanceId) == "number" and not (issecretvalue and issecretvalue(instanceId)) then
+		text = text .. format(" (Instance: %d)", instanceId)
+	end
+
+	tooltip:AddLine(text, 0.6, 0.6, 0.6)
+end
+
+if TooltipDataProcessor and Enum and Enum.TooltipDataType and Enum.TooltipDataType.UnitAura then
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, OnAuraTooltip)
 end

@@ -402,20 +402,26 @@ MinimapModule.UpdateXP = function(self, event, ...)
     local max = UnitXPMax("player")
     local rested = GetXPExhaustion() or 0
     local percent = current / max * 100
-	local r, g, b 
+	local r, g, b, rR, rG, rB
 
 	if (rested > 0) then
 		r, g, b = oUF.colors.rested:GetRGB()
+		rR, rG, rB = oUF.colors.restedValue:GetRGB()
 	else
 		r, g, b = oUF.colors.xp:GetRGB()
+		rR, rG, rB = oUF.colors.xpValue:GetRGB()
 	end
+
+	-- prettier?
+	r, g, b = oUF.colors.xp:GetRGB()
+	rR, rG, rB = oUF.colors.xpValue:GetRGB()
 
 	self.XP:SetMinMaxValues(0, max)
 	self.XP:SetValue(current)
 	self.XP:SetStatusBarColor(r, g, b)
 
 	local restedShown = self.XP.Rested:IsShown()
-	if (rested) then
+	if (rested > 0) then
 		self.XP.Rested:SetMinMaxValues(0, max, not restedShown)
 		self.XP.Rested:SetValue(math.min(max, current + rested), not restedShown)
 		if (not restedShown) then
@@ -430,7 +436,7 @@ MinimapModule.UpdateXP = function(self, event, ...)
 	self.XP.Value:SetFormattedText("%s", AbbreviateNumber(max-current))
 	self.XP.Description:SetFormattedText(L["to level %s"], self.playerLevel + 1)
 	self.XP.Value:SetTextColor(r, g, b)
-	self.Badge.Value:SetTextColor(r, g, b)
+	self.Badge.Value:SetTextColor(rR, rG, rB)
 
 	local perc = math.floor(current/max*100)
 	if (perc > 0) then

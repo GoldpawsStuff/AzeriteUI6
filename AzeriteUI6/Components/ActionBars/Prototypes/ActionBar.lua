@@ -161,6 +161,74 @@ local bonusBarOffsets =
 
 {} -- create an empty fallback for easier iterations
 
+-- Form number table based on expansion version and player class
+-- *the goal of this is to visually illustrate which classes in which game flavors have extra action pages,
+--  while the finished table itself is just a list of available form numbers for the player.
+-- *page = 6 + the corresponding bonusbar offset (not the form number)
+local formPages = 
+
+	-- Season of Discovery
+	(ns.WoWSoD) and ({ 
+		DRUID 	= { [3] = 7, [2] = 8, [1] = 9, [4] = 10 }, 	-- Cat, Tree of Life, Bear, Moonkin
+		ROGUE 	= { [1] = 7 }, 								-- Stealth
+		WARRIOR = { [1] = 7, [2] = 8, [3] = 9 } 			-- Battle, Defensive, Berserker
+	})[playerClass] or
+
+	-- Classic Era, Classic Era Hardcore, Classic Era Anniversary Hardcore	
+	(ns.WoWVanilla) and ({ 
+		DRUID 	= { [3] = 7, [1] = 9, [4] = 10 }, 			-- Cat, Bear, Moonkin
+		ROGUE 	= { [1] = 7 }, 								-- Stealth
+		WARRIOR = { [1] = 7, [2] = 8, [3] = 9 } 			-- Battle, Defensive, Berserker
+	})[playerClass] or
+
+	-- The Burning Crusade Anniversary
+	(ns.WoWTBC) and ({ 
+		DRUID 	= { [3] = 7, [2] = 8, [1] = 9, [4] = 10 }, 	-- Cat, Tree of Life, Bear, Moonkin
+		PRIEST 	= { [1] = 7 }, 								-- Shadowform
+		ROGUE 	= { [1] = 7 }, 								-- Stealth
+		WARRIOR = { [1] = 7, [2] = 8, [3] = 9 } 			-- Battle, Defensive, Berserker
+	})[playerClass] or
+
+	-- Wrath of the Lich King Classic
+	(ns.WoWWrath) and ({ 
+		DRUID 	= { [3] = 7, [2] = 8, [1] = 9, [4] = 10 }, 	-- Cat, Tree of Life, Bear, Moonkin
+		PRIEST 	= { [1] = 7 }, 								-- Shadowform
+		ROGUE 	= { [1] = 7, [3] = 8 }, 					-- Stealth, Shadow Dance
+		WARRIOR = { [1] = 7, [2] = 8, [3] = 9 } 			-- Battle, Defensive, Berserker
+	})[playerClass] or
+
+	-- Cataclysm Classic
+	(ns.WoWCata) and ({ 
+		DRUID 	= { [3] = 7, [2] = 8, [1] = 9, [4] = 10 }, 	-- Cat, Tree of Life, Bear, Moonkin
+		PRIEST 	= { [1] = 7 }, 								-- Shadowform
+		ROGUE 	= { [1] = 7, [3] = 8 }, 					-- Stealth, Shadow Dance
+		WARRIOR = { [1] = 7, [2] = 8, [3] = 9 } 			-- Battle, Defensive, Berserker
+	})[playerClass] or
+
+	-- Mists of Pandaria Classic
+	(ns.WoWMists) and ({ 
+		DRUID 	= { [3] = 7, [2] = 8, [1] = 9, [4] = 10 }, 	-- Cat, Tree of Life, Bear, Moonkin
+		MONK 	= { [1] = 7, [2] = 8, [3] = 9 }, 			-- Tiger, Ox, Serpent
+		PRIEST 	= { [1] = 7, [2] = 8 }, 					-- Shadowform, Spirit of Redemption
+		ROGUE 	= { [1] = 7 } 								-- Stealth
+	})[playerClass] or
+
+	-- Forever
+	(ns.WoWCamelot) and ({ 
+		DRUID 	= { [3] = 7, [1] = 9, [4] = 10 }, 			-- Cat, Bear, Moonkin
+		ROGUE 	= { [1] = 7 }, 								-- Stealth
+		WARRIOR = { [1] = 7, [2] = 8, [3] = 9 } 			-- Battle, Defensive, Berserker
+	})[playerClass] or 
+
+	-- Midnight (Retail)
+	(ns.WoWMidnight or ns.WoWRetail) and ({ 
+		DRUID 	= { [3] = 7, [1] = 9, [4] = 10 }, 			-- Cat, Bear, Moonkin
+		EVOKER 	= { [1] = 7 }, 								-- Soar
+		ROGUE 	= { [1] = 7 } 								-- Stealth
+	})[playerClass] or 
+
+{} -- create an empty fallback for easier iterations
+
 local ActionBar = CreateFrame("Frame")
 local ActionBar_MT = { __index = ActionBar }
 
@@ -628,9 +696,13 @@ ActionBar.UpdateStateDriver = function(self)
 	if (self.id == 1) then
 		statedriver = "[overridebar][possessbar][shapeshift]possess;[bonusbar:5]dragon;[form,noform]0;[bar:2]2;[bar:3]3;[bar:4]4;[bar:5]5;[bar:6]6;"
 
-		for _,offset in next,bonusBarOffsets do
-			statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6) -- bonusbar paging is always bonusbar offset + 6
+		for form, page in next, formPages do
+			statedriver = statedriver .. string.format("[form:%d]%d;", form, page)
 		end
+
+		--for _,offset in next,bonusBarOffsets do
+		--	--statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6) -- bonusbar paging is always bonusbar offset + 6
+		--end
 
 		statedriver = statedriver .. "1"
 	else

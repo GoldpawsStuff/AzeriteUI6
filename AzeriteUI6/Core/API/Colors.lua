@@ -57,12 +57,12 @@ oUF.colors.anchor.unitframes = oUF:CreateColor(255, 160, 64)
 oUF.colors.anchor.floaters = oUF:CreateColor(255, 192, 128)
 
 -- xp, rep and artifact coloring
-oUF.colors.xp = oUF:CreateColor(116, 23, 229) -- xp bar
-oUF.colors.xpValue = oUF:CreateColor(145, 77, 229) -- xp bar text
-oUF.colors.rested = oUF:CreateColor(163, 23, 229) -- xp bar while being rested
-oUF.colors.restedValue = oUF:CreateColor(203, 77, 229) -- xp bar text while being rested
+oUF.colors.xp = oUF:CreateColor(96, 47, 229) -- xp bar 
+oUF.colors.xpValue = oUF:CreateColor(123, 77, 249) -- xp bar text
+oUF.colors.rested = oUF:CreateColor(43, 116, 229) -- xp bar rested
+oUF.colors.restedValue = oUF:CreateColor(53, 137, 249) -- xp bar rested text
 oUF.colors.restedBonus = oUF:CreateColor(69, 17, 134) -- rested bonus bar
-oUF.colors.artifact = oUF:CreateColor(229, 204, 127)
+oUF.colors.artifact = oUF:CreateColor(229, 204, 127) -- not really used anymore. 
 
 -- unit specifics
 oUF.colors.health = oUF:CreateColor(245, 0, 45)

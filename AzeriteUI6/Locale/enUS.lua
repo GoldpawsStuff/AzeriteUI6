@@ -76,3 +76,4 @@ L["Start fading from button ID"] = true
 L["to level %s"] = true -- Display text on the Minimap XP bar
 L["Which button to start the ZigZag pattern from"] = true
 L["ZigZag"] = true -- ActionBar layout option
+
