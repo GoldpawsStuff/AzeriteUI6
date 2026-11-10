@@ -22,6 +22,9 @@
 	<!-- Chat -->
 	<Script file="Chat\ChatFrames.lua"/>
 
+	<!-- Misc -->
+	<Script file="Misc\ErrorsFrame.lua"/>
+
 	<!-- Minimap -->
 	<Script file="Minimap\Minimap_Classic.lua"/>
 

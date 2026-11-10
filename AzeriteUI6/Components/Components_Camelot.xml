@@ -25,6 +25,9 @@
 	<!-- Minimap -->
 	<Script file="Minimap\Minimap_Mainline.lua"/>
 
+	<!-- Misc -->
+	<Script file="Misc\ErrorsFrame.lua"/>
+
 	<!-- Tooltips -->
 	<Script file="Tooltips\Tooltips_Mainline.lua"/>
 

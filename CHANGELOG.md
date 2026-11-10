@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][1.0.29-Alpha] 2026-11-10
 - Working on nameplates and aura filter options.
 
+### Added
+- Added Retail style flashing of repeat messages in the `UIErrorsFrame` to the Classics and Forever, instead of the old "repeat a message forever" style.
+
 ### Changed
 - Changed the primary actionbar paging driver from using `bonusbar` to `form` conditionals to work around a known Forever bug where `bonusbar` sometimes reports 0, leaving the player with the wrong visible actionbar page.
 
