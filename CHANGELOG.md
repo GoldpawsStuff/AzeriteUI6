@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.29-RC] 2026-11-10
+## [Unreleased][1.0.30-Alpha] 2026-11-10
 - Working on nameplates and aura filter options.
 
+## [1.0.29-RC] 2026-11-10
 ### Added
 - Added Retail style flashing of repeat messages in the `UIErrorsFrame` to the Classics and Forever, instead of the old "repeat a message forever" style.
 
