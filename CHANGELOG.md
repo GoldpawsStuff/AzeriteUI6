@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.29-Alpha] 2026-11-10
+## [1.0.29-RC] 2026-11-10
 - Working on nameplates and aura filter options.
 
 ### Added
