@@ -4,11 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.31-Alpha] 2026-11-11
-- Working on nameplates and aura filter options.
-
-## [1.0.30-RC] 2026-11-11
+## [1.0.31-RC]2026-11-11
 ### Changed
+- Reverted to using the ever bugged `bonusbar` conditional for druids, instead of the much better `form`, since the latter is based on order of learning and not fixed in place like bonusbar indices are. Why, oh why, Blizzard?
 - The rested bonus XP bar is slightly darker than the rest of the XP bar now. 
 
 ### Fixed

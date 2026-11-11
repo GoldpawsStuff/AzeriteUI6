@@ -163,6 +163,7 @@ local bonusBarOffsets =
 
 -- Form number table based on expansion version and player class
 -- *page = 6 + the corresponding bonusbar offset (not the form number)
+-- *druid forms depends on what the player has learned, thus it is unreliable
 local formPages = 
 
 	-- Season of Discovery
@@ -290,6 +291,7 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 	bar:SetAttribute("_onstate-page", [[
 		local hasVehicleBar, hasOverrideBar, hasTempShapeshiftBar, hasPossessBar, isDragonRiding;
 
+		-- newstate is 10 in travel form...?
 		if (newstate == "possess" or newstate == "dragon" or newstate == "11") then
 			if HasVehicleActionBar() then
 				newstate = GetVehicleBarIndex();
@@ -694,15 +696,16 @@ ActionBar.UpdateStateDriver = function(self)
 	if (self.id == 1) then
 		statedriver = "[overridebar][possessbar][shapeshift]possess;[bonusbar:5]dragon;[form,noform]0;[bar:2]2;[bar:3]3;[bar:4]4;[bar:5]5;[bar:6]6;"
 
-		-- a game bug sometimes causes 'bonusbar' to return zero,
-		-- using 'form' instead avoids this problem.
-		for form, page in next, formPages do
-			statedriver = statedriver .. string.format("[form:%d]%d;", form, page)
-		end
-
-		--for _,offset in next,bonusBarOffsets do
-		--	--statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6) -- bonusbar paging is always bonusbar offset + 6
+		-- *a game bug sometimes causes 'bonusbar' to return zero, using 'form' instead avoids this problem.
+		-- *form is not a static thing for druids, it all depends on what the user has learned.
+		--  this makes it pretty damn useless for our current usage situation.
+		--for form, page in next, formPages do
+		--	statedriver = statedriver .. string.format("[form:%d]%d;", form, page)
 		--end
+
+		for _,offset in next,bonusBarOffsets do
+			statedriver = statedriver .. string.format("[bonusbar:%d]%d;", offset, offset + 6) -- bonusbar paging is always bonusbar offset + 6
+		end
 
 		statedriver = statedriver .. "1"
 	else

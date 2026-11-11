@@ -1100,6 +1100,8 @@ Target.OnEnable = function(self)
 		Target:RegisterMovableFrameAnchor(frame, string.lower(TARGET), "unitframes", AzeriteUI6_Positions_DB)
 		Target:UpdateSettings()
 
+		-- It's gotten increasingly hard to track a cast or update a castbar, 
+		-- and oUF have restricted external access to a lot of information. 
 		--Target.frame:EnableElement("Castbar") -- not needed?
 		Target.frame.Castbar:HookScript("OnUpdate", Castbar_OnUpdate) -- hook it after creation
 	end)
