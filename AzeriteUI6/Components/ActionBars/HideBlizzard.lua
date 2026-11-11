@@ -138,7 +138,7 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 
 	-- Call once after the UI is ready
 	-- *we know touching the MultiBars taint things, but does this do it too?
-	--self:HideMicroMenuPopups()
+	self:HideMicroMenuPopups()
 end
 
 HideBlizzardActionBars.HideMicroMenuPopups = function(self)
