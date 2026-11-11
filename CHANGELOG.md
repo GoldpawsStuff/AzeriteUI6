@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - The rested bonus XP bar is slightly darker than the rest of the XP bar now. 
 
+### Fixed
+- Worked around secrecy restrictions that lately have prevented the target unit frame castbar from showing.
+
 ## [1.0.29-RC] 2026-11-10
 ### Added
 - Added Retail style flashing of repeat messages in the `UIErrorsFrame` to the Classics and Forever, instead of the old "repeat a message forever" style.

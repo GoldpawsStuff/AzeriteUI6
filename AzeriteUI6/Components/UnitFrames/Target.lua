@@ -382,46 +382,37 @@ local Castbar_PostUpdateTexts = function(element)
 		element.Text:Show()
 		element.Time:Show()
 		element.__owner.Health.Value:Hide()
+		element.__owner.Health.ValuePercent:Hide()
 	else
 		element.Text:Hide()
 		element.Time:Hide()
 		element.__owner.Health.Value:Show()
+		element.__owner.Health.ValuePercent:Show()
 	end
 end
 
 -- Custom castbar update to get our flipped textures
-local CastBar_OnUpdate = function(element, elapsed)
+local Castbar_OnUpdate = function(element, elapsed)
+	if (not element.__owner:IsEnabled()) then return end
 
-	if (element.casting or element.empowering) then
+	local name = UnitCastingInfo(element.__owner.__unit)
+	if (name) then
 		local durationObject = element:GetTimerDuration()
 		local perc = durationObject:GetElapsedPercent(0)
 
 		element.Texture:SetTexCoord(perc, 0, 0, 1)
-
-	elseif (element.channeling) then
-		local durationObject = element:GetTimerDuration()
-		local perc = durationObject:GetRemainingPercent(0)
-
-		element.Texture:SetTexCoord(perc, 0, 0, 1) 
-
-	-- The rest here is just a copy of oUF's code, 
-	-- since we're replacing it with this function.
-	elseif (element.holdTime and element.holdTime > 0) then
-		element.holdTime = element.holdTime - elapsed
+		element.Texture:Show()
 	else
-		element.castID = nil
-		element.casting = nil
-		element.channeling = nil
-		element.empowering = nil
-		element.notInterruptible = nil
-		element.spellID = nil
-		element.spellName = nil
+		name = UnitChannelInfo(element.__owner.__unit)
+		if (name) then
+			local durationObject = element:GetTimerDuration()
+			local perc = durationObject:GetRemainingPercent(0)
 
-		for _, pip in next, element.Pips do
-			pip:Hide()
+			element.Texture:SetTexCoord(perc, 0, 0, 1) 
+			element.Texture:Show()
+		else
+			return element.Texture:Hide()
 		end
-
-		element:Hide()
 	end
 end
 
@@ -700,6 +691,7 @@ local style = function(self, unit)
 	-- Register it with oUF
 	self.Health = health
 	self.Health.Value = healthValue
+	self.Health.ValuePercent = healthPerc
 	self.Health.Texture = healthTex
 	self.Health.UpdateColor = ns.UpdateHealthColor
 	self.Health.PostUpdateColor = Health_PostUpdateColor
@@ -771,8 +763,9 @@ local style = function(self, unit)
 	self.Castbar.Texture = castbarTex
 	self.Castbar.Text = castName
 	self.Castbar.Time = castbarTime
-	self.Castbar.OnUpdate = CastBar_OnUpdate
+	--self.Castbar.OnUpdate = Castbar_OnUpdate -- don't do this, we need oUFs code here
 	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
+
 
 	-- Power Crystal
 	--------------------------------------------
@@ -1106,5 +1099,8 @@ Target.OnEnable = function(self)
 
 		Target:RegisterMovableFrameAnchor(frame, string.lower(TARGET), "unitframes", AzeriteUI6_Positions_DB)
 		Target:UpdateSettings()
+
+		--Target.frame:EnableElement("Castbar")
+		Target.frame.Castbar:HookScript("OnUpdate", Castbar_OnUpdate) -- hook it after creation
 	end)
 end
