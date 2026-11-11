@@ -1064,7 +1064,7 @@ Target.UpdateSettings = function(self)
 
 	if (self.db.profile.enabled) then
 		if (not frame:IsEnabled()) then
-			frame:Enable()
+			frame:Enable() -- watch this, maybe I need to rehook the castbar script. doesn't look like it so far.
 		end
 	else
 		if (frame:IsEnabled()) then
@@ -1100,7 +1100,7 @@ Target.OnEnable = function(self)
 		Target:RegisterMovableFrameAnchor(frame, string.lower(TARGET), "unitframes", AzeriteUI6_Positions_DB)
 		Target:UpdateSettings()
 
-		--Target.frame:EnableElement("Castbar")
+		--Target.frame:EnableElement("Castbar") -- not needed?
 		Target.frame.Castbar:HookScript("OnUpdate", Castbar_OnUpdate) -- hook it after creation
 	end)
 end
