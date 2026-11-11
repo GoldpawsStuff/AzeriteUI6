@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibSpinBar-1.0"
-local MINOR_VERSION = 11
+local MINOR_VERSION = 12
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")
@@ -637,6 +637,10 @@ SpinBar.SetMinMaxValues = function(self, min, max, overrideSmoothing)
 	Update(self)
 end
 
+SpinBar.SetAlpha = function(self, ...)
+	Bars[self].scaffold:SetAlpha(...)
+end
+
 SpinBar.SetStatusBarColor = function(self, ...)
 	local data = Bars[self]
 	for id,bar in ipairs(data.quadrants) do
@@ -827,10 +831,6 @@ end
 
 SpinBar.SetFrameStrata = function(self, ...)
 	Bars[self].scaffold:SetFrameStrata(...)
-end
-
-SpinBar.SetAlpha = function(self, ...)
-	Bars[self].scaffold:SetAlpha(...)
 end
 
 SpinBar.SetParent = function(self, ...)

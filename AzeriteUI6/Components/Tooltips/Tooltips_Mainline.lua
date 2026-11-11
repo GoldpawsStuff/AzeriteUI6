@@ -25,4 +25,29 @@
 --]]
 local _, ns = ...
 
---local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0", "AceHook-3.0")
+local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0")
+
+-- Declare module defaults
+local defaults = { profile = {
+}}
+
+-- This is called by the options menu on settings changes,
+-- and by the modules themselves on enabling.
+Tooltips.UpdateSettings = function(self)
+end
+
+-- This is called by the addon on full profile changes,
+-- and should call a full settings update.
+Tooltips.RefreshConfig = function(self)
+	self:UpdateSettings()
+end
+
+Tooltips.OnInitialize = function(self)
+	self.db = ns.db:RegisterNamespace("Tooltips", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+end
+
+Tooltips.OnEnable = function(self)
+end

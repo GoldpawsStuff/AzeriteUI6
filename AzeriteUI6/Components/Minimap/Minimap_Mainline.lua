@@ -285,6 +285,7 @@ MinimapModule.StyleMinimap = function(self)
 	rested:SetSize(182,182)
 	rested:SetStatusBarTexture(GetMedia("minimap-bars-single"))
 	rested:SetStatusBarColor(oUF.colors.rested:GetRGB()) -- oUF.colors.restedBonus:GetRGB()
+	rested:SetAlpha(.3)
 	rested:SetSparkOffset(-1/10) -- offset in degrees from the end of the bar to the spark
 	rested:SetSparkInset(17) -- distance from outer diameter to start of spark
 	rested:SetSparkSize(24,34) -- width = thickness along ring bar, height = length across

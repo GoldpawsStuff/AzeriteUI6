@@ -23,8 +23,6 @@
 	SOFTWARE.
 
 --]]
-local addonName, ns = ...
-
 local _, ns = ...
 
 local ErrorsFrame = ns:NewModule("ErrorsFrame", nil, "LibMoreEvents-1.0")
