@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.30-RC] 2026-11-11
+## [Unreleased][1.0.31-Alpha] 2026-11-11
 - Working on nameplates and aura filter options.
 
+## [1.0.30-RC] 2026-11-11
 ### Changed
 - The rested bonus XP bar is slightly darker than the rest of the XP bar now. 
 
