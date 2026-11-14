@@ -4,9 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.32-Alpha] 2026-11-14
-- Working on aura filters and nameplate options.
-
+## [1.0.32-Alpha] 2026-11-15
 ### Added
 - Added nameplates with health, name and basic aura displays, similar to what the default Blizzard nameplates do.
 

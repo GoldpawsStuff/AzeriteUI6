@@ -359,6 +359,7 @@ local NamePlate_UpdateElements = function(self, event, unit)
 	local onlyShowName = (isFriendlyPlayer or isFriendlyNPC) and C_CVar.GetCVarBool("nameplateShowOnlyNameForFriendlyPlayerUnits")
 	if (onlyShowName) then
 		self.Name:SetAlpha(1)
+		self.Name:SetFontObject(self.Name.fontObjectLarge)
 		self.Health:Hide()
 		self.AurasHarmful:Hide()
 		self.AurasHelpful:Hide()
@@ -368,6 +369,7 @@ local NamePlate_UpdateElements = function(self, event, unit)
 		-- rarity icon
 	else
 		self.Name:SetAlpha(.75)
+		self.Name:SetFontObject(self.Name.fontObject)
 		self.Health:Show()
 		self.AurasHarmful:Show()
 		self.AurasHelpful:Show()
@@ -499,6 +501,8 @@ local style = function(self, unit)
 	name:SetAlpha(.75)
 	name:SetJustifyH("CENTER")
 	name:SetJustifyV("MIDDLE")
+	name.fontObject = GetFont(11, true)
+	name.fontObjectLarge = GetFont(13, true)
 
 	self:Tag(name, "[name]")
 
@@ -715,9 +719,17 @@ NamePlates.OnEvent = function(self, event, ...)
 	elseif (event == "CVAR_UPDATE") then
 		local cvarName, value = ...
 
-		if (not self.db.profile[cvarName]) then return end
+		-- Avoid a nightmare of mismatching lower and upper caps
+		local settingsName
+		for setting in next,defaults.profile do 
+			if (string.lower(setting) == string.lower(cvarName)) then
+				settingsName = setting
+				break
+			end
+		end
+		if (not settingsName or not self.db.profile[settingsName]) then return end
 		
-		self:LoadSettingFromCVar(cvarName, value)
+		self:LoadSettingFromCVar(settingsName, value)
 
 		for nameplate in next,ActiveNamePlates do
 			nameplate:UpdateAllElements("CVAR_UPDATE")
