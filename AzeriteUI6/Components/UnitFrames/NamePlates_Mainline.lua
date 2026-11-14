@@ -719,6 +719,11 @@ NamePlates.OnEvent = function(self, event, ...)
 		
 		self:LoadSettingFromCVar(cvarName, value)
 
+		for nameplate in next,ActiveNamePlates do
+			nameplate:UpdateAllElements("CVAR_UPDATE")
+			NamePlate_UpdateElements(nameplate)
+		end
+
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		IN_COMBAT = nil
 
