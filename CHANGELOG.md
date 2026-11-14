@@ -4,8 +4,15 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.32-Alpha] 2026-11-11
+## [Unreleased][1.0.32-Alpha] 2026-11-14
 - Working on aura filters and nameplate options.
+
+### Added
+- Added nameplates with health, name and basic aura displays, similar to what the default Blizzard nameplates do.
+
+### Fixed
+- Fixed an issue where empty actionbuttons would have their background remain visible when hovered over during a stance/form change. 
+- The Objectives Tracker follows the fading settings from Explorer Mode properly now.
 
 ## [1.0.31-RC]2026-11-11
 ### Changed

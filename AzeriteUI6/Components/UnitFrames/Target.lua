@@ -421,7 +421,7 @@ local Classification_Update = function(self, event, unit, ...)
 	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.Classification
-	unit = unit or self.__unit or self.__unit
+	unit = unit or self.__unit
 
 	if (UnitIsPlayer(unit)) then
 		return element:Hide()
@@ -513,7 +513,7 @@ local PvPIndicator_Override = function(self, event, unit)
 	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.PvPIndicator
-	unit = unit or self.__unit or self.__unit
+	unit = unit or self.__unit
 
 	local l = UnitEffectiveLevel(unit)
 	local c = (l and l < 1) and "worldboss" or UnitClassification(unit)
@@ -553,7 +553,7 @@ local TargetIndicator_Update = function(self, event, unit, ...)
 	if (unit and unit ~= self.__unit) then return end
 
 	local element = self.TargetIndicator
-	unit = unit or self.__unit or self.__unit
+	unit = unit or self.__unit
 
 	-- if we are targeting ourselves, hide the targeting eye
 	if (AreUnitsSame(unit, "player")) then
@@ -896,7 +896,7 @@ local style = function(self, unit)
 	name:SetJustifyH("RIGHT")
 	name:SetJustifyV("TOP")
 
-	self:Tag(name, "[azui:name(32)][azui:level(true)]")
+	self:Tag(name, "[azui:name(32)][azui:level(false,true)]")
 
 	self.Name = name
 

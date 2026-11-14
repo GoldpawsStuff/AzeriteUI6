@@ -96,7 +96,6 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	hideActionBarFrame(MainActionBar, false) -- >= 11.2.7/12.0
 
 	-- Hide MultiBar Buttons, but keep the bars alive
-	-- *bound to bug out
 	for i = 1,12 do
 		hideActionButton(_G["ActionButton" .. i])
 		hideActionButton(_G["MultiBarBottomLeftButton" .. i])
@@ -109,13 +108,13 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	end
 
 	-- Non-action-button only
-	hideActionBarFrame(MicroButtonAndBagsBar, false)
 	hideActionBarFrame(StanceBar, true)
-	hideActionBarFrame(PossessActionBar, true)
-	hideActionBarFrame(MultiCastActionBarFrame, false)
 	hideActionBarFrame(PetActionBar, true)
+	hideActionBarFrame(MultiCastActionBarFrame, false)
+	hideActionBarFrame(PossessActionBar, true)
 	hideActionBarFrame(StatusTrackingBarManager, false)
 	hideActionBarFrame(BagsBar, true)
+	hideActionBarFrame(MicroButtonAndBagsBar, false)
 	hideActionBarFrame(MicroMenu, true)
 	hideActionBarFrame(MicroMenuContainer, true)
 
@@ -134,6 +133,17 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 
 	if (QueueStatusFrame) then
 		QueueStatusFrame:SetParent(UIParent)
+	end
+
+	-- What will this break?
+	-- *problem is that the spellbook updates when leveling 
+	--  will attempt to show a tainted StanceBar
+	if (ActionBarController) then 
+		--ActionBarController:UnregisterAllEvents()
+		ActionBarController:UnregisterEvent("UPDATE_POSSESS_BAR")
+		ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
+		ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+		ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_USABLE")
 	end
 
 	-- Call once after the UI is ready

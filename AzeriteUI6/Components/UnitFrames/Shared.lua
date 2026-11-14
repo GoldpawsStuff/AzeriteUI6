@@ -272,6 +272,8 @@ ns.AreUnitsSame = function(u1, u2)
 	return g1 == g2 
 end
 
+-- Note that we still need to replace this method because of our  
+-- slightly adjusted threat coloring which is incompatible with secret values.
 ns.UpdateHealthColor = function(self, event, unit)
 	if(not unit or self.__unit ~= unit) then return end
 	local element = self.Health
@@ -281,8 +283,9 @@ ns.UpdateHealthColor = function(self, event, unit)
 		color = self.colors.disconnected
 	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		color = self.colors.tapped
-	elseif(element.colorThreat and not UnitPlayerControlled(unit) and UnitThreatSituation('player', unit) and not issecretvalue(UnitThreatSituation('player', unit))) then
-		color = self.colors.threat[UnitThreatSituation('player', unit)]
+	--elseif(element.colorThreat and not UnitPlayerControlled(unit) and not issecretvalue(UnitThreatSituation('player', unit)) and UnitThreatSituation('player', unit)) then
+	elseif(element.colorThreat and not UnitPlayerControlled(unit) and not issecretvalue(UnitThreatSituation('player', unit)) and UnitThreatSituation('player', unit)) then
+		color = self.colors.reaction[4 - UnitThreatSituation('player', unit)] -- prettier, but not secret
 	elseif(element.colorClass and (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
 		or (element.colorClassNPC and not (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)))
 		or (element.colorClassPet and UnitPlayerControlled(unit) and not UnitIsPlayer(unit)) then

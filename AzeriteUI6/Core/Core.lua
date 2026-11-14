@@ -38,7 +38,7 @@ ns.SETTINGS_VERSION = -1
 -- WoW client version
 local buildVersion, buildNumber, buildDate, interfaceVersion = GetBuildInfo()
 ns.WoWBuild = tonumber(buildNumber) -- numerical build number for pure larger than/smaller than comparisons
-ns.WoWVersion = interfaceVersion -- patch version as string for display purposes
+ns.WoWVersion = interfaceVersion -- patch build version as number
 
 -- Flags to check for minimum version, useful for big API changes
 ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion

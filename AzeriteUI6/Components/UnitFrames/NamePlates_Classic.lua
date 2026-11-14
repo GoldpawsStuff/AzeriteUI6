@@ -30,21 +30,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
 local NamePlates = ns:NewModule("NamePlates", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
 
--- Declare module defaults
-local defaults = { profile = {
-	enabled = true
-}}
-
--- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
-local GetFont = ns.GetFont
-local GetMedia = ns.GetMedia
-
-local style = function(self, unit)
-
-
-
-end
 
 NamePlates.HasConflicts = function(self)
 	for _,addon in next,{
@@ -95,6 +80,7 @@ end
 
 NamePlates.OnEnable = function(self)
 	oUF:RegisterStyle("AzeriteNamePlates", style)
-	oUF:SetActiveStyle("AzeriteNamePlates")
-	oUF:SpawnNamePlates("Azerite", callback, cvars)
+	oUF:Factory(function(self) 
+		self:SetActiveStyle("AzeriteNamePlates")
+	end)
 end

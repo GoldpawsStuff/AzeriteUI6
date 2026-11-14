@@ -284,8 +284,7 @@ MinimapModule.StyleMinimap = function(self)
 	rested:SetPoint("CENTER", -1, 1)
 	rested:SetSize(182,182)
 	rested:SetStatusBarTexture(GetMedia("minimap-bars-single"))
-	rested:SetStatusBarColor(oUF.colors.rested:GetRGB()) -- oUF.colors.restedBonus:GetRGB()
-	rested:SetAlpha(.3)
+	rested:SetStatusBarColor(oUF.colors.restedBonus:GetRGB()) 
 	rested:SetSparkOffset(-1/10) -- offset in degrees from the end of the bar to the spark
 	rested:SetSparkInset(17) -- distance from outer diameter to start of spark
 	rested:SetSparkSize(24,34) -- width = thickness along ring bar, height = length across
@@ -294,7 +293,7 @@ MinimapModule.StyleMinimap = function(self)
 	rested:SetClockwise(true)
 	rested:SetDegreeOffset(256) -- offset from top center in degrees to the start of the ring bar
 	rested:SetDegreeSpan(332) -- degrees of the circle covered by the bar
-	
+
 	-- xp value text
 	local ringValue = ring:CreateFontString(nil, "OVERLAY", nil, 1)
 	ringValue:SetFontObject(GetFont(24, true))
@@ -422,7 +421,6 @@ MinimapModule.UpdateXP = function(self, event, ...)
 	if (rested > 0) then
 		self.XP.Rested:SetMinMaxValues(0, max, not restedShown)
 		self.XP.Rested:SetValue(math.min(max, current + rested), not restedShown)
-		self.XP.Rested:SetStatusBarColor(r, g, b)
 		if (not restedShown) then
 			self.XP.Rested:Show()
 		end

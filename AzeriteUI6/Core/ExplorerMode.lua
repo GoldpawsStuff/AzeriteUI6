@@ -645,6 +645,7 @@ ExplorerMode.UpdateSettings = function(self)
 		--end
 
 		self.enabled = true
+		ns:Fire("ExplorerModeEnabled")
 
 	elseif (not db.enabled and self.enabled) then
 
@@ -671,6 +672,7 @@ ExplorerMode.UpdateSettings = function(self)
 		--end
 
 		self.enabled = nil
+		ns:Fire("ExplorerModeDisabled")
 	end
 
 	self.FORCED = not db.enabled or self:CheckForForcedState()

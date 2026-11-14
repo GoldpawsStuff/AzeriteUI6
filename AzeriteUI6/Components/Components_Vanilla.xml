@@ -40,7 +40,7 @@
 	<Script file="UnitFrames\Target.lua"/>
 	<Script file="UnitFrames\ToT.lua"/>
 	<!--<Script file="UnitFrames\Focus.lua"/>-->
-	<Script file="UnitFrames\NamePlates.lua"/>
+	<Script file="UnitFrames\NamePlates_Classic.lua"/>
 	<!--<Script file="UnitFrames\Party.lua"/>-->
 	<!--<Script file="UnitFrames\Raid.lua"/>-->
 	<!--<Script file="UnitFrames\ArenaPrep.lua"/>-->

@@ -64,7 +64,7 @@ local defaults = {
 	text = {
 		hotkey = {
 			font = {
-				fontObject = GetFont(15, "Outline", "Number"),
+				fontObject = GetFont(15, true, "Number"),
 				size = 17,
 				flags = "THINOUTLINE"
 			},
@@ -80,7 +80,7 @@ local defaults = {
 		},
 		count = {
 			font = {
-				fontObject = GetFont(16, "Outline", "Number"),
+				fontObject = GetFont(16, true, "Number"),
 				size = 18,
 				flags = "THINOUTLINE"
 			},
@@ -96,7 +96,7 @@ local defaults = {
 		},
 		macro = {
 			font = {
-				fontObject = GetFont(10, "Outline", "Number"),
+				fontObject = GetFont(10, true, "Number"),
 				size = 10,
 				flags = "THINOUTLINE"
 			},
@@ -125,6 +125,82 @@ local exitButton = {
 	tooltip = LEAVE_VEHICLE,
 	texture = [[Interface\Icons\achievement_bg_kill_carrier_opposing_flagroom]]
 }
+
+local cooldownFormatter = C_StringUtil.CreateNumericRuleFormatter()
+cooldownFormatter:SetBreakpoints({
+	-- ≥ 1 day
+	{
+		threshold = 86400,
+		format = "%.0fd",
+		components = {
+			{ div = 86400, rounding = Enum.NumericRuleFormatRounding.Down },
+		}
+	},
+	-- ≥ 1 hour
+	{
+		threshold = 3600,
+		format = "%.0fh",
+		components = {
+			{ div = 3600, rounding = Enum.NumericRuleFormatRounding.Down },
+		}
+	},
+	-- ≥ 1 minute
+	{
+		threshold = 60,
+		format = "%.0fm",
+		components = {
+			{ div = 60, rounding = Enum.NumericRuleFormatRounding.Down },
+		}
+	},
+	-- ≥ 5 seconds → whole seconds
+	{
+		threshold = 5.5,
+		format = "%.0f",
+		components = {
+			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
+		}
+	},
+	-- ≥ 1 second → whole seconds
+	{
+		threshold = .9,
+		format = "|cffff8800%.0f|r",
+		components = {
+			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
+		}
+	},
+	-- < 1 second, tenths of a second
+	{
+		threshold = .05,
+		format = "|cffff0000%.0f|r",
+		components = {
+			{ div = 0.1, rounding = Enum.NumericRuleFormatRounding.Up },
+		}
+	},
+	-- < 1/20 second
+	{
+		threshold = 0,
+		format = ""
+	}
+})
+
+local StyleCooldownText = function(button)
+	local cooldown = button.cooldown or button.Cooldown
+	if (not cooldown) then return end
+
+	cooldown:SetCountdownFormatter(cooldownFormatter)
+	cooldown:SetHideCountdownNumbers(false)
+
+	local cooldownText = cooldown:GetCountdownFontString()
+	if (cooldownText) then
+		cooldownText:SetFontObject(GetFont(16, true))
+		cooldownText:SetTextColor(oUF.colors.highlight:GetRGB())
+		cooldownText:SetJustifyH("CENTER")
+		cooldownText:SetJustifyV("MIDDLE")
+		cooldownText:SetAlpha(.85)
+		cooldownText:ClearAllPoints()
+		cooldownText:SetPoint("CENTER", 1, 0)
+	end
+end
 
 -- our glorious template with very few methods
 local ActionButton = {}
@@ -233,6 +309,8 @@ ns.ActionButton.Create = function(self, id, name, header)
 	button.cooldown:SetEdgeTexture(GetMedia("blank"))
 	button.cooldown:SetDrawEdge(false)
 	button.cooldown:SetHideCountdownNumbers(true)
+
+	StyleCooldownText(button)
 
 	-- gloss
 	-- *do we really want this? it just makes it harder to view
@@ -468,13 +546,13 @@ ActionButton.GetHotkey = function(self)
 				if (not self.GamePadHotKey) then
 					self.GamePadHotKey = self.OverlayFrame:CreateFontString(nil, "ARTWORK")
 					self.GamePadHotKey:SetPoint("CENTER", self, "TOPLEFT", 10, -10)
-					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
+					self.GamePadHotKey:SetFontObject(ns.GetFont(18, true, "Number"))
 				end
 				-- adjust font size for multiple keys
 				if (key:find("-")) then
-					self.GamePadHotKey:SetFontObject(ns.GetFont(15, "Outline", "Number"))
+					self.GamePadHotKey:SetFontObject(ns.GetFont(15, true, "Number"))
 				else
-					self.GamePadHotKey:SetFontObject(ns.GetFont(18, "Outline", "Number"))
+					self.GamePadHotKey:SetFontObject(ns.GetFont(18, true, "Number"))
 				end
 				self.GamePadHotKey:SetText(abbr) -- set our custom gamepad bind text
 
@@ -490,3 +568,20 @@ ActionButton.GetHotkey = function(self)
 		return KeyBound and KeyBound:ToShortKey(key) or key
 	end
 end
+
+-- LibActionButton attempts to do this, but relies solely on CVAR_UPDATE,
+-- which very often never actually fires on initial logins anymore, just on manual changes.
+local CooldownCountUpdater = CreateFrame("Frame")
+CooldownCountUpdater:RegisterEvent("PLAYER_ENTERING_WORLD")
+CooldownCountUpdater:RegisterEvent("CVAR_UPDATE")
+CooldownCountUpdater:SetScript("OnEvent", function(self, event, ...)
+	for button in next,ns.ActionButtons do
+		local shouldBeHidden
+		if (button.config.cooldownCount == nil) then
+			shouldBeHidden = GetCVarBool("countdownForCooldowns") ~= true
+		else
+			shouldBeHidden = not self.config.cooldownCount
+		end
+		button.cooldown:SetHideCountdownNumbers(shouldBeHidden)
+	end
+end)

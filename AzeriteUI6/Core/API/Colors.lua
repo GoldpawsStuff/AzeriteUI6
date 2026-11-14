@@ -60,8 +60,8 @@ oUF.colors.anchor.floaters = oUF:CreateColor(255, 192, 128)
 oUF.colors.xp = oUF:CreateColor(96, 47, 229) -- xp bar 
 oUF.colors.xpValue = oUF:CreateColor(123, 77, 249) -- xp bar text
 oUF.colors.rested = oUF:CreateColor(43, 116, 229) -- xp bar rested
+oUF.colors.restedBonus = oUF:CreateColor(21, 58, 114) -- rested bonus bar
 oUF.colors.restedValue = oUF:CreateColor(53, 137, 249) -- xp bar rested text
---oUF.colors.restedBonus = oUF:CreateColor(69, 17, 134) -- rested bonus bar
 oUF.colors.artifact = oUF:CreateColor(229, 204, 127) -- not really used anymore. 
 
 -- unit specifics
@@ -201,10 +201,11 @@ oUF.colors.selection[oUF.Enum.SelectionType.PartyPvPInBattleground] = oUF:Create
 oUF.colors.selection[oUF.Enum.SelectionType.RecentAlly] = oUF:CreateColor(83, 201, 255)
 
 -- threat coloring
-oUF.colors.threat[0] = oUF.colors.reaction[4] --  low on threat (healer or smart dps) *default coloring is gray, we changed it to yellow
-oUF.colors.threat[1] = oUF.colors.reaction[3] --  high threat (dps overnuking and about to grab aggro)
-oUF.colors.threat[2] = oUF.colors.reaction[2] --  primary target but not on high threat  (tank about to lose aggro)
-oUF.colors.threat[3] = oUF.colors.reaction[1] --  primary target and high threat (tank securely tanking)
+-- *do not replace, it causes a secrecy violation
+--oUF.colors.threat[0] = oUF.colors.reaction[4] --  low on threat (healer or smart dps) *default coloring is gray, we changed it to yellow
+--oUF.colors.threat[1] = oUF.colors.reaction[3] --  high threat (dps overnuking and about to grab aggro)
+--oUF.colors.threat[2] = oUF.colors.reaction[2] --  primary target but not on high threat  (tank about to lose aggro)
+--oUF.colors.threat[3] = oUF.colors.reaction[1] --  primary target and high threat (tank securely tanking)
 
 -- power colors
 oUF.colors.power.MANA = oUF:CreateColor(80, 116, 255)

@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 45 -- 44
+local MINOR_VERSION = 46 -- 45
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
@@ -82,12 +82,14 @@ local HoverCount = lib.hoverCount
 
 -- Game flavor constants
 local patch, build, date, version = GetBuildInfo()
-local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
+local isMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- Also Forever
+local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) and (version >= 120000) -- Only Retail
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 local isTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 local isMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
+local isCamelot = version >= 16000 and version < 20000 -- Only Forever
 local WoW10 = version >= 100000
 local WoW11 = version >= 110000
 local WoW12 = version >= 120000
@@ -209,7 +211,7 @@ local updateTargetAlpha = function(frame)
 
 		elseif (frameType == "actionbutton") then
 			if (lib.flyoutShown)
-			or (lib.inCombat and not(frame.header and frame.header.config and frame.header.config.fadeInCombat)) or (lib.gridCounter > 0 and not frame.ignoreGridCounterOnHover and (lib.cursorType ~= "petaction" or isRetail))
+			or (lib.inCombat and not(frame.header and frame.header.config and frame.header.config.fadeInCombat)) or (lib.gridCounter > 0 and not frame.ignoreGridCounterOnHover and (lib.cursorType ~= "petaction" or isMainline))
 			then
 				forceShow = true
 			end
@@ -371,7 +373,7 @@ lib.RegisterFrameForFading = function(_, frame, fadeGroup, ...)
 	lib:UpdateTargetAlphas()
 end
 
-lib.UnregisterFrameForFading = function(_, frame)
+lib.UnregisterFrameForFading = function(_, frame, force)
 	if (not FadeFrames[frame]) then
 		return
 	end
@@ -390,9 +392,11 @@ lib.UnregisterFrameForFading = function(_, frame)
 
 	-- Return frames to full opacity.
 	if (frameType == "actionbutton" or frameType == "petbutton") then
-		-- This still bugs out for actionbuttons on state/form changes
-		if (frame:HasAction()) then
+		-- This still isn't smooth on form/stance changes
+		if (frame:GetTexture()) then -- frame:HasAction()
 			setCurrentAlpha(frame, 1)
+		else
+			setCurrentAlpha(frame, 0)
 		end
 	else
 		setCurrentAlpha(frame, 1)

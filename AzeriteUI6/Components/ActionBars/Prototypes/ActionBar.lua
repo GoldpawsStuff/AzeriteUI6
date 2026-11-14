@@ -404,8 +404,9 @@ ActionBar.UpdateFading = function(self)
 				else
 					-- unregister fade for buttons with no content
 					if (isRegistered) then
-						LFF:UnregisterFrameForFading(button)
+						LFF:UnregisterFrameForFading(button, true)
 					end
+					button:SetAlpha(0) -- Fixes buttons stuck on hover, but flickers (need exceptions for form changes, do not fade in/fade out new buttons)
 				end
 			else
 				-- unregister fade for buttons that no longer should be faded

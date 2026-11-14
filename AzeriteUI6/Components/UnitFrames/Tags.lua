@@ -135,8 +135,18 @@ oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
 	end
 end
 
+-- Name function that ignores Forever last names
+oUF.Tags.Events["azui:firstname"] = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
+oUF.Tags.Methods["azui:firstname"] = function(unit, realUnit, ...)
+	if (ns.WoWCamelot) then
+		return NameUtil.GetUnitFirstName(realUnit or unit)
+	else
+		return oUF.Tags.Methods["name"](unit, realUnit)
+	end
+end
+
 -- Show level when appropriate
--- self:Tag(fontString, "[azui:level(showLast)]")
+-- self:Tag(fontString, "[azui:level(isPrefix,isSuffix,noBrackets)]")
 oUF.Tags.Events["azui:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
 oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 	local level = UnitEffectiveLevel(realUnit or unit)
@@ -144,11 +154,24 @@ oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 		local color = GetDifficultyColorForUnit(unit)
 		local levelText = color:GenerateHexColorMarkup() .. level .. "|r"
 
-		local showLast = getargs(...)
-		if (showLast) then
-			return " |cff888888:|r" .. levelText
-		else
-			return levelText .. "|cff888888:|r "
+		local isPrefix, isSuffix, noBrackets = getargs(...)
+		if (isPrefix) then
+			if (noBrackets) then
+				return levelText .. "|cff666666:|r "
+			else
+				return "|cff666666[|r" .. levelText .. "|cff666666]|r "
+			end 
+		elseif (isSuffix) then
+			if (noBrackets) then
+				return " " .. levelText
+			else
+				return " |cff666666[|r" .. levelText .. "|cff666666]|r"
+			end
 		end
+
+		return levelText
+	else
+		-- For bosses
+		return ""
 	end
 end

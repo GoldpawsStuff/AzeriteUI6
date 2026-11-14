@@ -64,7 +64,7 @@ local defaults = {
 	text = {
 		hotkey = {
 			font = {
-				fontObject = GetFont(15, "Outline", "Number"),
+				fontObject = GetFont(15, true, "Number"),
 				size = 17,
 				flags = "THINOUTLINE"
 			},
@@ -80,7 +80,7 @@ local defaults = {
 		},
 		count = {
 			font = {
-				fontObject = GetFont(16, "Outline", "Number"),
+				fontObject = GetFont(16, true, "Number"),
 				size = 18,
 				flags = "THINOUTLINE"
 			},
@@ -96,7 +96,7 @@ local defaults = {
 		},
 		macro = {
 			font = {
-				fontObject = GetFont(10, "Outline", "Number"),
+				fontObject = GetFont(10, true, "Number"),
 				size = 10,
 				flags = "THINOUTLINE"
 			},
