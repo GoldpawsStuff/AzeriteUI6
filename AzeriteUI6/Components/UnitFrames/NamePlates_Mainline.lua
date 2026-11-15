@@ -369,9 +369,14 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 	local isFriendlyNPC = UnitIsFriendlyNPC(unit)
 	local isFocusNamePlate = UnitIsUnit("focus", unit)
 	local isTargetNamePlate = UnitIsUnit("target", unit)
+	local isSoftEnemyPlate = UnitIsUnit("softenemy", unit)
+	local isSoftFriendlyPlate = UnitIsUnit("softfriend", unit)
+	local isSoftInteractPlate = UnitIsUnit("softinteract", unit)
 
-	local onlyShowName = isFriendlyPlayer and not isTargetNamePlate and not isFocusNamePlate and db.nameplateShowOnlyNameForFriendlyPlayerUnits
-	local onlyShowNPCName = isFriendlyNPC and not isTargetNamePlate and not isFocusNamePlate and db.nameplateShowOnlyNameForFriendlyNPCUnits
+	local isPriorityUnit = isTargetNamePlate or isFocusNamePlate or isSoftInteractPlate or isSoftEnemyPlate or isSoftFriendlyPlate
+
+	local onlyShowName = isFriendlyPlayer and not isPriorityUnit and db.nameplateShowOnlyNameForFriendlyPlayerUnits
+	local onlyShowNPCName = isFriendlyNPC and not isPriorityUnit and db.nameplateShowOnlyNameForFriendlyNPCUnits
 
 	local shouldClassColorName = db.nameplateUseClassColorForFriendlyPlayerUnitNames
 	local shouldClassColorNPCName = db.nameplateUseReactionColorForFriendlyNPCUnitNames
@@ -384,8 +389,8 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 		self.AurasHelpful:Hide()
 		self.AurasCC:Hide()
 		self.Classification:Hide()
-		-- castbar
-		-- rarity icon
+
+		self:DisableElement("Castbar")
 	else
 		self.Name:SetAlpha(.75)
 		self.Name:SetFontObject(self.Name.fontObject)
@@ -394,6 +399,8 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 		self.AurasHelpful:Show()
 		self.AurasCC:Show()
 		self.Classification:Show()
+
+		self:EnableElement("Castbar")
 	end
 
 	-- Update name coloring
@@ -608,6 +615,33 @@ local style = function(self, unit)
 	self.Health = health
 	self.Health.Backdrop = healthBg
 	self.Health.UpdateColor = ns.UpdateHealthColor -- work around secret bug in oUF
+
+	-- Castbar
+	--------------------------------------------
+	local castbar = CreateFrame("StatusBar", nil, self)
+	castbar:SetFrameLevel(self:GetFrameLevel() + 5)
+	castbar:SetSize(84, 14)
+	castbar:SetPoint("TOP", 0, -20)
+	castbar:SetStatusBarTexture(GetMedia("nameplate_bar_scaled"))
+	castbar:SetStatusBarColor(self.colors.normal:GetRGB())
+	castbar.timeToHold = .5
+
+	local castBackdrop = castbar:CreateTexture(nil, "BACKGROUND", nil, -1)
+	castBackdrop:SetSize(94, 24)
+	castBackdrop:SetPoint("CENTER", 0, 0)
+	castBackdrop:SetTexture(GetMedia("nameplate_backdrop"))
+
+	local castText = castbar:CreateFontString(nil, "OVERLAY", nil, 1)
+	castText:SetPoint("TOP", 0, -18)
+	castText:SetJustifyH("CENTER")
+	castText:SetJustifyV("MIDDLE")
+	castText:SetFontObject(GetFont(12, true))
+	castText:SetTextColor(self.colors.highlight:GetRGB())
+	castText:SetAlpha(.5)
+
+	self.Castbar = castbar
+	self.Castbar.Backdrop = castBackdrop
+	self.Castbar.Text = castText
 
 	-- Name
 	local name = overlay:CreateFontString(nil, "OVERLAY")
