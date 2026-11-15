@@ -76,10 +76,11 @@ local defaults = { profile = {
 	nameplateShowClassColor = 1, 							-- Class colored enemy nameplates
 	nameplateShowFriendlyClassColor = 0, 					-- Class colored friendly player nameplates
 	nameplateShowOnlyNameForFriendlyPlayerUnits = 1, 		-- Only show the unit name for friendly player units
+	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
 	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Class colored friendly player unitname
+	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
+
 	--[[--
-
-
 
 	layout
 
@@ -116,6 +117,14 @@ local defaults = { profile = {
 	--]]--
 }}
 
+-- Cache of current targets
+local ActiveTargetPlates = {
+	target = nil, 
+	focus = nil, 
+	softenemy = nil,
+	softfriend = nil, -- not used
+	softinteract = nil
+}
 
 local timeFormatter = C_StringUtil.CreateNumericRuleFormatter()
 timeFormatter:SetBreakpoints({
@@ -280,6 +289,7 @@ local UnitIsFriendlyPlayerUnit = function(unit)
 	return (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)) and not UnitCanAttack("player", unit)
 end
 
+-- Unit is a friendly NPC
 local UnitIsFriendlyNPC = function(unit)
 	return not UnitIsPlayer(unit) and not UnitCanAttack("player", unit)	
 end
@@ -349,15 +359,24 @@ local NamePlate_UpdateAlpha = function(self)
 end
 
 -- Update visibility and elements based on CVar changes
-local NamePlate_UpdateElements = function(self, event, unit)
+-- *todo: update on faction changes / quest mobs becoming attackable
+local NamePlate_PostUpdateElements = function(self, event, unit)
 	unit = unit or self.__unit
+
+	local db = NamePlates.db.profile
 
 	local isFriendlyPlayer = UnitIsFriendlyPlayerUnit(unit)
 	local isFriendlyNPC = UnitIsFriendlyNPC(unit)
-	local shouldClassColorName = C_CVar.GetCVarBool("nameplateUseClassColorForFriendlyPlayerUnitNames")
+	local isFocusNamePlate = UnitIsUnit("focus", unit)
+	local isTargetNamePlate = UnitIsUnit("target", unit)
 
-	local onlyShowName = (isFriendlyPlayer or isFriendlyNPC) and C_CVar.GetCVarBool("nameplateShowOnlyNameForFriendlyPlayerUnits")
-	if (onlyShowName) then
+	local onlyShowName = isFriendlyPlayer and not isTargetNamePlate and not isFocusNamePlate and db.nameplateShowOnlyNameForFriendlyPlayerUnits
+	local onlyShowNPCName = isFriendlyNPC and not isTargetNamePlate and not isFocusNamePlate and db.nameplateShowOnlyNameForFriendlyNPCUnits
+
+	local shouldClassColorName = db.nameplateUseClassColorForFriendlyPlayerUnitNames
+	local shouldClassColorNPCName = db.nameplateUseReactionColorForFriendlyNPCUnitNames
+
+	if (onlyShowName or onlyShowNPCName) then
 		self.Name:SetAlpha(1)
 		self.Name:SetFontObject(self.Name.fontObjectLarge)
 		self.Health:Hide()
@@ -378,7 +397,7 @@ local NamePlate_UpdateElements = function(self, event, unit)
 	end
 
 	-- Update name coloring
-	if (onlyShowName and isFriendlyPlayer and shouldClassColorName) then
+	if (onlyShowName and shouldClassColorName) then
 		local color
 		local _, class = UnitClass(unit)
 		if(issecretvalue(class)) then
@@ -393,7 +412,7 @@ local NamePlate_UpdateElements = function(self, event, unit)
 		else
 			self.Name:SetTextColor(self.colors.highlight:GetRGB())
 		end
-	elseif (onlyShowName and isFriendlyNPC) then -- shouldReactionColorName
+	elseif (onlyShowNPCName and shouldClassColorNPCName) then
 		if (UnitReaction(unit, "player")) then 
 			self.Name:SetTextColor(self.colors.reaction[UnitReaction(unit, "player")]:GetRGB())
 		else
@@ -404,10 +423,19 @@ local NamePlate_UpdateElements = function(self, event, unit)
 	end
 
 	Classification_Update(self, event, unit)
+	TargetHighlight_Update(self, event, unit)
+end
+
+-- This is called on UpdateAllElements,
+-- which is called when a frame is shown or its unit changed.
+local NamePlate_PostUpdate = function(self, event)
+	NamePlate_UpdateAlpha(self, event, self.__unit)
+	NamePlate_PostUpdateElements(self, event, self.__unit)
 end
 
 -- NAME_PLATE_UNIT_ADDED
 local NamePlate_OnShow = function(self, event, unit)
+
 	self.inCombat = IN_COMBAT
 	self.isTarget = UnitIsUnit(unit, "target")
 	self.isFocus = UnitIsUnit(unit, "focus")
@@ -415,16 +443,23 @@ local NamePlate_OnShow = function(self, event, unit)
 	self.isSoftFriend = UnitIsUnit(unit, "softfriend")
 	self.isSoftInteract = UnitIsUnit(unit, "softinteract")
 
+	-- We must update this each time the nameplate is shown, 
+	-- since the actual nameplate frame can change for the unit.
+	ActiveTargetPlates.target = self.isTarget and self or ActiveTargetPlates.target
+	ActiveTargetPlates.focus = self.isFocus and self or ActiveTargetPlates.focus
+	ActiveTargetPlates.softenemy = self.isSoftEnemy and self or ActiveTargetPlates.softenemy
+	ActiveTargetPlates.softfriend = self.isSoftFriend and self or ActiveTargetPlates.softfriend
+	ActiveTargetPlates.softinteract = self.isSoftInteract and self or ActiveTargetPlates.softinteract
+
 	ActiveNamePlates[self] = true
 	InActiveNamePlates[self] = nil
 
-	NamePlate_UpdateElements(self, event, unit)
+	NamePlate_PostUpdateElements(self, event, unit)
 end
 
 -- NAME_PLATE_UNIT_REMOVED
 local NamePlate_OnHide = function(self, event, unit)
 
-	self.TargetHighlight:Hide()
 	self.inCombat = nil
 	self.isFocus = nil
 	self.isTarget = nil
@@ -435,11 +470,92 @@ local NamePlate_OnHide = function(self, event, unit)
 	ActiveNamePlates[self] = nil
 	InActiveNamePlates[self] = true
 
-	NamePlate_UpdateElements(self, event, unit)
+	NamePlate_PostUpdateElements(self, event, unit)
 end
 
-local NamePlate_PostUpdate = function(self)
-	NamePlate_UpdateAlpha(self)
+local NamePlate_OnEvent = function(self, event, unit, ...)
+	if (unit and unit ~= self.__unit) then return end
+
+	unit = unit or self.__unit
+
+	NamePlate_PostUpdateElements(self, event, unit, ...)
+end
+
+-- Update the target units
+local UpdateActiveTargets = function(event)
+
+	local unit, flag
+	if (event == "PLAYER_TARGET_CHANGED") then
+		unit = "target"
+		flag = "isTarget"
+	elseif (event == "PLAYER_FOCUS_CHANGED") then
+		unit = "focus"
+		flag = "isFocus"
+	elseif (event == "PLAYER_SOFT_ENEMY_CHANGED") then
+		unit = "softenemy"
+		flag = "isSoftEnemy"
+	elseif (event == "PLAYER_SOFT_FRIEND_CHANGED") then
+		unit = "softfriend"
+		flag = "isSoftFriend"
+	elseif (event == "PLAYER_SOFT_INTERACT_CHANGED") then
+		unit = "softinteract"
+		flag = "isSoftInteract"
+	end
+	if (not unit) then return end
+
+	local oldTargetNamePlate, newTargetNamePlate = ActiveTargetPlates[unit]
+
+	-- The player has a target
+	local hasTarget = UnitExists(unit)
+	if (hasTarget) then
+
+		-- Does a target nameplate exist?
+		for nameplate in next,ActiveNamePlates do
+
+			-- Is this nameplate the target nameplate?
+			local isTargetNamePlate = UnitIsUnit(nameplate.__unit, unit)
+			if (isTargetNamePlate and nameplate ~= oldTargetNamePlate) then
+
+				-- The target nameplate has changed
+				newTargetNamePlate = nameplate -- store the new one
+				break
+			end
+		end
+
+		-- A new target nameplate was found
+		if (newTargetNamePlate and newTargetNamePlate ~= oldTargetNamePlate) then
+
+			-- Clear the old one
+			if (oldTargetNamePlate) then
+				oldTargetNamePlate[flag] = nil -- clear the flag
+				--TargetHighlight_Update(oldTargetNamePlate, event, oldTargetNamePlate.__unit) -- update the border
+				NamePlate_PostUpdateElements(oldTargetNamePlate, event, oldTargetNamePlate.__unit)
+			end
+
+			-- Set the flags
+			newTargetNamePlate[flag] = true
+
+			-- Update the border
+			--TargetHighlight_Update(newTargetNamePlate, event, newTargetNamePlate.__unit)
+			NamePlate_PostUpdateElements(newTargetNamePlate, event, newTargetNamePlate.__unit)
+
+			-- Store the new one
+			ActiveTargetPlates[unit] = newTargetNamePlate
+		end
+
+	else
+		-- Does an old target plate exist?
+		if (oldTargetNamePlate) then
+			oldTargetNamePlate[flag] = nil -- clear the flag
+
+			--TargetHighlight_Update(oldTargetNamePlate, event, oldTargetNamePlate.__unit) -- update the border
+			NamePlate_PostUpdateElements(oldTargetNamePlate, event, oldTargetNamePlate.__unit)
+
+			-- Clear the old one
+			ActiveTargetPlates[unit] = nil
+		end
+	end
+
 end
 
 local style = function(self, unit)
@@ -494,7 +610,7 @@ local style = function(self, unit)
 	self.Health.UpdateColor = ns.UpdateHealthColor -- work around secret bug in oUF
 
 	-- Name
-	local name = self:CreateFontString(nil, "OVERLAY")
+	local name = overlay:CreateFontString(nil, "OVERLAY")
 	name:SetPoint("BOTTOM", health, "TOP", 0, -2)
 	name:SetFontObject(GetFont(11, true))
 	name:SetTextColor(self.colors.highlight:GetRGB())
@@ -509,9 +625,9 @@ local style = function(self, unit)
 	self.Name = name
 
 	-- Target highlight
-	local targetHighlight = health:CreateTexture(nil, "BACKGROUND", nil, -2)
+	local targetHighlight = overlay:CreateTexture(nil, "BACKGROUND", nil, -2)
 	targetHighlight:Hide()
-	targetHighlight:SetPoint("CENTER", 0, 0)
+	targetHighlight:SetPoint("CENTER", health, "CENTER", 0, 0)
 	targetHighlight:SetSize(96, 28)
 	targetHighlight:SetTexture(GetMedia("nameplate_outline"))
 
@@ -591,15 +707,16 @@ local style = function(self, unit)
 
 	self.AurasCC = aurasCC
 
-	self.PostUpdate = NamePlate_PostUpdate
-
 	-- Make our nameplates obey UIParent alpha and fade out when Immersion says so.
 	hooksecurefunc(UIParent, "SetAlpha", function() NamePlate_UpdateAlpha(self) end)
 
 	-- Callbacks
 	--------------------------------------------
-	self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED", Classification_Update)
+	self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED", NamePlate_OnEvent)
+	self:RegisterEvent("UNIT_FACTION", NamePlate_OnEvent)
 
+	-- General PostUpdate
+	self.PostUpdate = NamePlate_PostUpdate
 end
 
 NamePlates.LoadSettingFromCVar = function(self, cvarName, value)
@@ -733,7 +850,7 @@ NamePlates.OnEvent = function(self, event, ...)
 
 		for nameplate in next,ActiveNamePlates do
 			nameplate:UpdateAllElements("CVAR_UPDATE")
-			NamePlate_UpdateElements(nameplate)
+			NamePlate_PostUpdateElements(nameplate)
 		end
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
@@ -745,94 +862,13 @@ NamePlates.OnEvent = function(self, event, ...)
 	elseif (event == "PLAYER_REGEN_ENABLED") then
 		IN_COMBAT = nil
 
-	elseif (event == "PLAYER_TARGET_CHANGED") then
+	elseif (event == "PLAYER_TARGET_CHANGED") 
+		or (event == "PLAYER_FOCUS_CHANGED") 
+		or (event == "PLAYER_SOFT_ENEMY_CHANGED") 
+		or (event == "PLAYER_SOFT_FRIEND_CHANGED") 
+		or (event == "PLAYER_SOFT_INTERACT_CHANGED") then
 
-		local ActiveTargetPlates = {
-			target = nil, 
-			focus = nil, 
-			softenemy = nil,
-			softfriend = nil, -- not used
-			softinteract = nil
-		}
-
-		-- target priority: target, focus, softenemy, softinteract
-		-- *only show the highest priority target type if multiple are the same unit
-
-		-- Figure out what highlight borders are visible
-		-- Check active target units if they exist
-		-- Iterate plates for potential new target plates
-		-- Clear or change any old target plates that does not match the new ones
-
-		-- Does a target exist? 
-		-- yes - remove flags from old, add to new
-		-- no -- remove flags from old
-
-
-
-		local unit = "target"
-		local oldTargetNamePlate, newTargetNamePlate = ActiveTargetPlates[unit]
-
-		-- The player has a target
-		local hasTarget = UnitExists(unit)
-		if (hasTarget) then
-
-			-- Does a target nameplate exist?
-			for nameplate in next,ActiveNamePlates do
-
-				-- Is this nameplate the target nameplate?
-				local isTargetNamePlate = UnitIsUnit(nameplate.__unit, unit)
-				if (isTargetNamePlate and nameplate ~= oldTargetNamePlate) then
-
-					-- The target nameplate has changed
-					newTargetNamePlate = nameplate -- store the new one
-					break
-				end
-			end
-
-			-- A new target nameplate was found
-			if (newTargetNamePlate) then
-
-				-- Does an old one exist?
-				if (oldTargetNamePlate) then
-					-- Clear the highlight border
-				end
-
-				-- Store the new one
-				ActiveTargetPlates[unit] = newTargetNamePlate
-			end
-
-		else
-			-- Does an old target plate exist?
-			if (oldTargetNamePlate) then
-
-				-- Clear the highlight border
-				if (oldTargetNamePlate.TargetHighlight.targetType == unit) then
-					-- clear
-				else
-
-				end
-
-				-- Clear the old one
-				ActiveTargetPlates[unit] = nil
-			end
-		end
-
-
-
-		-- Update flags on all plates
-		-- Iterate plate flags
-			-- Figure out if plate has border at all
-			-- Figure out highest priority border
-
-
-	elseif (event == "PLAYER_FOCUS_CHANGED") then
-
-	elseif (event == "PLAYER_SOFT_ENEMY_CHANGED") then
-	
-	elseif (event == "PLAYER_SOFT_FRIEND_CHANGED") then
-	
-	elseif (event == "PLAYER_SOFT_INTERACT_CHANGED") then
-	
+		UpdateActiveTargets(event)
 	end
 end
 
