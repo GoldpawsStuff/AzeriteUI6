@@ -138,13 +138,13 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	-- What will this break?
 	-- *problem is that the spellbook updates when leveling 
 	--  will attempt to show a tainted StanceBar
-	if (ActionBarController) then 
-		--ActionBarController:UnregisterAllEvents()
-		ActionBarController:UnregisterEvent("UPDATE_POSSESS_BAR")
-		ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
-		ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
-		ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_USABLE")
-	end
+	--if (ActionBarController) then 
+	--	--ActionBarController:UnregisterAllEvents()
+	--	ActionBarController:UnregisterEvent("UPDATE_POSSESS_BAR")
+	--	ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
+	--	ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	--	ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_USABLE")
+	--end
 
 	-- Call once after the UI is ready
 	-- *we know touching the MultiBars taint things, but does this do it too?
@@ -161,7 +161,7 @@ HideBlizzardActionBars.BattleCamelotGamepadTaint = function(self)
 		local function ProtectGamepadClassButtons()
 			if (not GamepadMainActionBarFrame or not GamepadMainActionBarFrame.PageUnit) then return end
 
-			local wrap = function(button)
+			local function wrap(button)
 				if (not button or button.azuiProtected) then return end
 				local orig = button:GetScript("OnEvent")
 				if (not orig) then return end
@@ -176,34 +176,33 @@ HideBlizzardActionBars.BattleCamelotGamepadTaint = function(self)
 			wrap(GamepadMainActionBarFrame.PageUnit.RightClassAction)
 		end
 
-		-- Run after ClassSpellFlyout's ContinueOnPlayerLogin mixin
 		EventUtil.ContinueOnPlayerLogin(ProtectGamepadClassButtons)
-		-- safety net in case the mixin is delayed
 		C_Timer.After(1, ProtectGamepadClassButtons)
 
-		-- Stop StanceBar updates from reaching EditMode SetPoint on the hidden MainActionBar
-		if (StanceBar and StanceBar.Update) then
-			hooksecurefunc(StanceBar, "Update", function(self)
-				if (InCombatLockdown() or self:GetParent() == UIHider) then
-					return
-				end
-			end)
-			-- also short-circuit the state update that triggers the grid/layout path
-			if (StanceBar.UpdateState) then
-				hooksecurefunc(StanceBar, "UpdateState", function(self)
-					if (InCombatLockdown() or self:GetParent() == UIHider) then
-						return
-					end
-				end)
-			end
-		end
-
-		-- extra: silence the controller on Camelot if the above is not enough
+		-- Keep the controller from driving StanceBar updates that hit EditMode
 		if (ActionBarController) then
 			ActionBarController:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
 			ActionBarController:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
 			ActionBarController:UnregisterEvent("UPDATE_OVERRIDE_ACTIONBAR")
 			ActionBarController:UnregisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+			ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
+			ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+			ActionBarController:UnregisterEvent("UPDATE_SHAPESHIFT_USABLE")
+			ActionBarController:UnregisterEvent("UPDATE_POSSESS_BAR")
+			ActionBarController:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			ActionBarController:UnregisterEvent("UPDATE_MULTI_CAST_ACTIONBAR")
+		end
+
+		-- Safer than replacing StanceBar methods: skip the layout update that
+		-- actually calls the protected SetPointBase on MainActionBar
+		if (EditModeManager and EditModeManager.UpdateBottomActionBarPositions) then
+			local orig = EditModeManager.UpdateBottomActionBarPositions
+			EditModeManager.UpdateBottomActionBarPositions = function(self, ...)
+				if (MainActionBar and MainActionBar:GetParent() == UIHider) then
+					return
+				end
+				return orig(self, ...)
+			end
 		end
 	end
 end
