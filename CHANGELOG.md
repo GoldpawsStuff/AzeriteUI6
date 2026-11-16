@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][1.0.34-Alpha] 2026-11-16
 - Working on aura- and nameplate options.
 
-## [1.0.33-Alpha] 2026-11-15
 ### Added
 - Added nameplates with health, name and basic aura displays, similar to what the default Blizzard nameplates do.
+
+### Changed
+- Put the `GameTooltipStatusBar` inside the tooltip. Because it's cleaner. 
+- Toned down Forever's bright golden tooltip. Made it more fitting to OUR user interface.
 
 ### Fixed
 - Fixed an issue where empty actionbuttons would have their background remain visible when hovered over during a stance/form change. 

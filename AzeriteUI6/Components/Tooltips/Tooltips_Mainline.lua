@@ -25,11 +25,64 @@
 --]]
 local _, ns = ...
 
-local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0")
+local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0", "AceHook-3.0")
 
 -- Declare module defaults
 local defaults = { profile = {
 }}
+
+local StyleTooltip = function(tooltip)
+	if (not tooltip or tooltip:IsForbidden()) then
+		return
+	end
+
+	local nineSlice = tooltip.NineSlice
+	if (not nineSlice) then
+		return
+	end
+
+	-- Darker background (near-black with slight blue-gray)
+	nineSlice:SetCenterColor(.05, .05, .15, .96)
+
+	-- Darker, more neutral border (instead of the bright gold)
+	nineSlice:SetBorderColor(.45, .45, .55, 1)
+
+	-- Optional: hide any overlay textures Forever may add
+	if (tooltip.TopOverlay) then
+		tooltip.TopOverlay:Hide()
+	end
+	if (tooltip.BottomOverlay) then
+		tooltip.BottomOverlay:Hide()
+	end
+end
+
+Tooltips.StyleGameTooltip = function(self)
+
+	-- Apply on show and after style resets
+	self:HookScript(GameTooltip, "OnShow", StyleTooltip)
+	self:HookScript(GameTooltip, "OnTooltipCleared", StyleTooltip)
+
+	-- Also catch the common style reset path
+	if (SharedTooltip_SetBackdropStyle) then
+		self:SecureHook("SharedTooltip_SetBackdropStyle", StyleTooltip)
+	end
+
+	-- Shopping / compare tooltips if you want them matching
+	for _,tooltipName in ipairs({ "ShoppingTooltip1", "ShoppingTooltip2", "ItemRefTooltip" }) do
+		local tooltip = _G[tooltipName]
+		if (tooltip) then
+			self:HookScript(tooltip, "OnShow", StyleTooltip)
+		end
+	end
+
+	-- Put the statusbar inside the tooltip. It's cleaner. 
+	if (GameTooltipStatusBar) then
+		GameTooltipStatusBar:SetHeight(2)
+		GameTooltipStatusBar:ClearAllPoints()
+		GameTooltipStatusBar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT", 6, 5)
+		GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "BOTTOMRIGHT", -6, 5)
+	end
+end
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
@@ -50,4 +103,5 @@ Tooltips.OnInitialize = function(self)
 end
 
 Tooltips.OnEnable = function(self)
+	self:StyleGameTooltip()
 end
