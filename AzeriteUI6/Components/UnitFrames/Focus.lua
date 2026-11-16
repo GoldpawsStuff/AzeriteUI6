@@ -150,10 +150,13 @@ local style = function(self, unit)
 
 	-- Target highlight
 	--------------------------------------------
-	local targetHighlight = overlay:CreateTexture(nil, "BACKGROUND", nil, -2)
-	targetHighlight:SetPoint("CENTER", 1, -2)
-	targetHighlight:SetSize(193,93)
-	targetHighlight:SetTexture(GetMedia("cast_back_outline"))
+	local targetHighlight = overlay:CreateTexture(nil, "OVERLAY", nil, -2)
+	--targetHighlight:SetPoint("CENTER", 1, -2)
+	--targetHighlight:SetSize(193,93)
+	--targetHighlight:SetTexture(GetMedia("cast_back_outline"))
+	targetHighlight:SetPoint("CENTER", health, "CENTER", 0, 1)
+	targetHighlight:SetSize(152, 54)
+	targetHighlight:SetTexture(GetMedia("nameplate_outline"))
 	targetHighlight:SetVertexColor(255/255, 239/255, 169/255) -- only target highlighting
 
 	self.TargetHighlight = targetHighlight

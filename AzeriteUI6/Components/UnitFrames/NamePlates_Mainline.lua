@@ -288,8 +288,12 @@ local UnitIsFriendlyNPC = function(unit)
 	return not UnitIsPlayer(unit) and not UnitCanAttack("player", unit)	
 end
 
--- Update the target units
-local UpdateActiveTargets = function(event)
+-- Do we need a single nameplate version? Isn't the problem flags not getting cleared on non-targets? 
+local UpdateActiveTargets = function(self, event, unit)
+end
+
+-- Update all target units
+local UpdateAllActiveTargets = function(event)
 
 	local hasTarget = UnitExists("target")
 	local hasFocus = UnitExists("target")
@@ -332,11 +336,11 @@ local UpdateActiveTargets = function(event)
 		end
 	end
 
-	ActiveTargetPlates.target = targetUnit
-	ActiveTargetPlates.focus = focusUnit
-	ActiveTargetPlates.softenemy = enemyUnit
-	ActiveTargetPlates.softfriend = friendUnit
-	ActiveTargetPlates.softinteract = interactUnit
+	ActiveTargetPlates.target = hasTarget and targetUnit
+	ActiveTargetPlates.focus = hasFocus and focusUnit
+	ActiveTargetPlates.softenemy = hasEnemy and enemyUnit
+	ActiveTargetPlates.softfriend = hasFriend and friendUnit
+	ActiveTargetPlates.softinteract = hasInteract and interactUnit
 end
 
 -- Update NPC classification badge for rares, elites and bosses.
@@ -399,8 +403,9 @@ local TargetHighlight_Update = function(self, event, unit, ...)
 	end
 end
 
+-- Hook used to fade out nameplates along with UIParent. Not sure it's always a good idea.
 local NamePlate_UpdateAlpha = function(self)
-	self:SetAlpha(UIParent:GetAlpha())
+	--self:SetAlpha(UIParent:GetAlpha())
 end
 
 -- Update visibility and elements based on CVar changes
@@ -476,8 +481,11 @@ end
 -- This is called on UpdateAllElements,
 -- which is called when a frame is shown or when its unit changed.
 local NamePlate_PostUpdate = function(self, event, unit)
+	-- Too spammy here? Will fire for ALL nameplates, on every nameplate update. 
+	-- Make a single nameplate version? Still have to do all the checks.
+	UpdateAllActiveTargets(event) 
+
 	NamePlate_UpdateAlpha(self, event, unit or self.__unit)
-	UpdateActiveTargets(event) -- too spammy here?
 	NamePlate_PostUpdateElements(self, event, unit or self.__unit)
 end
 
@@ -867,7 +875,7 @@ NamePlates.OnEvent = function(self, event, ...)
 		or (event == "NAME_PLATE_UNIT_ADDED") 
 		or (event == "NAME_PLATE_UNIT_REMOVED") then
 
-		UpdateActiveTargets(event)
+		UpdateAllActiveTargets(event)
 
 		for nameplate in next,ActiveNamePlates do
 			NamePlate_PostUpdateElements(nameplate, event, nameplate.__unit)
