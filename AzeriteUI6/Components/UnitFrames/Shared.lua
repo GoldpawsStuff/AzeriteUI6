@@ -34,24 +34,15 @@ local GetMedia = ns.GetMedia
 -- Auras
 -----------------------------------------
 local whitelist = {
-
-	-- List of default auraIDs for general whitelisted buffs on anybody
-	buffs = {},
-
-	-- List of default auraIDs for general whitelisted debuffs on anybody
-	debuffs = {},
-
-	-- List of default auraIDs for whitelisted buffs on the Player unit frame
-	playerbuffs = {},
-
-	-- List of default auraIDs for whitelisted debuffs on the Player unit frame
-	playerdebuffs = {},
-
-	-- List of default auraIDs for whitelisted buffs on the Target unit frame
-	targetbuffs = {},
-
-	-- List of default auraIDs for whitelisted debuffs on the Target unit frame
-	targetdebuffs = {}
+	buffs = {}, -- General whitelisted buffs on anybody
+	debuffs = {}, -- General whitelisted debuffs on anybody
+	playerbuffs = {}, -- Whitelisted buffs on the Player unit frame
+	playerdebuffs = {}, -- Whitelisted debuffs on the Player unit frame
+	targetbuffs = {}, -- Whitelisted buffs on the Target unit frame
+	targetdebuffs = {}, -- Whitelisted debuffs on the Target unit frame
+	nameplateccs = {}, -- Whitelisted CC on the nameplates
+	nameplatebuffs = {}, -- Whitelisted self buffs on the nameplates
+	nameplatedebuffs = {} -- Whitelisted debuffs on the nameplates
 }
 
 local cache, list = {}, {}

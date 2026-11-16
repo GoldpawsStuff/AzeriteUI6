@@ -213,6 +213,7 @@ ns.ActionButton.defaults = defaults
 ns.ActionButton.Create = function(self, id, name, header)
 
 	local button = LAB:CreateButton(id, name, header, defaults)
+	button.config.actionButtonUI = false
 
 	-- Overwrite some default methods with our own
 	for name,method in pairs(ActionButton) do

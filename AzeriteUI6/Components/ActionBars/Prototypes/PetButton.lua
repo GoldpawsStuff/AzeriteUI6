@@ -163,6 +163,7 @@ ns.PetActionButton.Create = function(self, id, name, header)
 	button.id = id
 	button.parent = header
 	button.config = ns:Copy(defaults)
+	button.config.actionButtonUI = false
 
 	button:SetFrameStrata("MEDIUM")
 	button:SetSize(header.buttonWidth, header.buttonHeight)
