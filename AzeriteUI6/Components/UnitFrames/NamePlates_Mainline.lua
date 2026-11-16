@@ -118,13 +118,7 @@ local defaults = { profile = {
 }}
 
 -- Cache of current targets
-local ActiveTargetPlates = {
-	target = nil, 
-	focus = nil, 
-	softenemy = nil,
-	softfriend = nil, -- not used
-	softinteract = nil
-}
+local ActiveTargetPlates = {}
 
 local timeFormatter = C_StringUtil.CreateNumericRuleFormatter()
 timeFormatter:SetBreakpoints({
@@ -433,17 +427,17 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 	TargetHighlight_Update(self, event, unit)
 end
 
--- This is called on UpdateAllElements,
--- which is called when a frame is shown or its unit changed.
-local NamePlate_PostUpdate = function(self, event)
-	NamePlate_UpdateAlpha(self, event, self.__unit)
-	NamePlate_PostUpdateElements(self, event, self.__unit)
+local NamePlate_ClearTargets = function(self, event, unit)
+	self.isFocus = nil
+	self.isTarget = nil
+	self.isSoftEnemy = nil
+	self.isSoftFriend = nil
+	self.isSoftInteract = nil
 end
 
--- NAME_PLATE_UNIT_ADDED
-local NamePlate_OnShow = function(self, event, unit)
+local NamePlate_UpdateTargets = function(self, event, unit)
+	unit = unit or self.__unit
 
-	self.inCombat = IN_COMBAT
 	self.isTarget = UnitIsUnit(unit, "target")
 	self.isFocus = UnitIsUnit(unit, "focus")
 	self.isSoftEnemy = UnitIsUnit(unit, "softenemy")
@@ -457,10 +451,25 @@ local NamePlate_OnShow = function(self, event, unit)
 	ActiveTargetPlates.softenemy = self.isSoftEnemy and self or ActiveTargetPlates.softenemy
 	ActiveTargetPlates.softfriend = self.isSoftFriend and self or ActiveTargetPlates.softfriend
 	ActiveTargetPlates.softinteract = self.isSoftInteract and self or ActiveTargetPlates.softinteract
+end
+
+-- This is called on UpdateAllElements,
+-- which is called when a frame is shown or its unit changed.
+local NamePlate_PostUpdate = function(self, event)
+	NamePlate_UpdateAlpha(self, event, self.__unit)
+	NamePlate_UpdateTargets(self, event, self.__unit)
+	NamePlate_PostUpdateElements(self, event, self.__unit)
+end
+
+-- NAME_PLATE_UNIT_ADDED
+local NamePlate_OnShow = function(self, event, unit)
+
+	self.inCombat = IN_COMBAT
 
 	ActiveNamePlates[self] = true
 	InActiveNamePlates[self] = nil
 
+	NamePlate_UpdateTargets(self, event, unit)
 	NamePlate_PostUpdateElements(self, event, unit)
 end
 
@@ -468,15 +477,11 @@ end
 local NamePlate_OnHide = function(self, event, unit)
 
 	self.inCombat = nil
-	self.isFocus = nil
-	self.isTarget = nil
-	self.isSoftEnemy = nil
-	self.isSoftFriend = nil
-	self.isSoftInteract = nil
 
 	ActiveNamePlates[self] = nil
 	InActiveNamePlates[self] = true
 
+	NamePlate_ClearTargets(self, event, unit)
 	NamePlate_PostUpdateElements(self, event, unit)
 end
 
@@ -521,16 +526,14 @@ local UpdateActiveTargets = function(event)
 
 			-- Is this nameplate the target nameplate?
 			local isTargetNamePlate = UnitIsUnit(nameplate.__unit, unit)
-			if (isTargetNamePlate and nameplate ~= oldTargetNamePlate) then
-
-				-- The target nameplate has changed
-				newTargetNamePlate = nameplate -- store the new one
+			if (isTargetNamePlate) then
+				newTargetNamePlate = nameplate
 				break
 			end
 		end
 
-		-- A new target nameplate was found
-		if (newTargetNamePlate and newTargetNamePlate ~= oldTargetNamePlate) then
+		-- A target nameplate was found
+		if (newTargetNamePlate) then
 
 			-- Clear the old one
 			if (oldTargetNamePlate) then
@@ -542,12 +545,12 @@ local UpdateActiveTargets = function(event)
 			-- Set the flags
 			newTargetNamePlate[flag] = true
 
+			-- Store the new one
+			ActiveTargetPlates[unit] = newTargetNamePlate
+
 			-- Update the border
 			--TargetHighlight_Update(newTargetNamePlate, event, newTargetNamePlate.__unit)
 			NamePlate_PostUpdateElements(newTargetNamePlate, event, newTargetNamePlate.__unit)
-
-			-- Store the new one
-			ActiveTargetPlates[unit] = newTargetNamePlate
 		end
 
 	else
@@ -555,11 +558,11 @@ local UpdateActiveTargets = function(event)
 		if (oldTargetNamePlate) then
 			oldTargetNamePlate[flag] = nil -- clear the flag
 
-			--TargetHighlight_Update(oldTargetNamePlate, event, oldTargetNamePlate.__unit) -- update the border
-			NamePlate_PostUpdateElements(oldTargetNamePlate, event, oldTargetNamePlate.__unit)
-
 			-- Clear the old one
 			ActiveTargetPlates[unit] = nil
+
+			--TargetHighlight_Update(oldTargetNamePlate, event, oldTargetNamePlate.__unit) -- update the border
+			NamePlate_PostUpdateElements(oldTargetNamePlate, event, oldTargetNamePlate.__unit)
 		end
 	end
 
@@ -618,26 +621,28 @@ local style = function(self, unit)
 
 	-- Castbar
 	--------------------------------------------
-	local castbar = CreateFrame("StatusBar", nil, self)
-	castbar:SetFrameLevel(self:GetFrameLevel() + 5)
-	castbar:SetSize(84, 14)
-	castbar:SetPoint("TOP", 0, -20)
+	local castbar = CreateFrame("StatusBar", nil, overlay)
+	castbar:SetFrameLevel(castbar:GetFrameLevel() + 5)
+	castbar:SetSize(84, 22)
+	castbar:SetPoint("TOP", health, "BOTTOM", 0, 9)
 	castbar:SetStatusBarTexture(GetMedia("nameplate_bar_scaled"))
 	castbar:SetStatusBarColor(self.colors.normal:GetRGB())
 	castbar.timeToHold = .5
 
 	local castBackdrop = castbar:CreateTexture(nil, "BACKGROUND", nil, -1)
-	castBackdrop:SetSize(94, 24)
+	castBackdrop:SetSize(94, 25)
 	castBackdrop:SetPoint("CENTER", 0, 0)
 	castBackdrop:SetTexture(GetMedia("nameplate_backdrop"))
+	castBackdrop:SetAlpha(.96)
 
 	local castText = castbar:CreateFontString(nil, "OVERLAY", nil, 1)
-	castText:SetPoint("TOP", 0, -18)
+	castText:SetPoint("TOP", castbar, "BOTTOM", 0, 4)
 	castText:SetJustifyH("CENTER")
 	castText:SetJustifyV("MIDDLE")
-	castText:SetFontObject(GetFont(12, true))
+	castText:SetFontObject(GetFont(11, true))
 	castText:SetTextColor(self.colors.highlight:GetRGB())
-	castText:SetAlpha(.5)
+	castText:SetAlpha(.75)
+	castText:SetScale(.9)
 
 	self.Castbar = castbar
 	self.Castbar.Backdrop = castBackdrop
@@ -681,9 +686,9 @@ local style = function(self, unit)
 	local skull
 
 	-- Classification Badge (elite, rare)(left)
-	local classification = health:CreateTexture(nil, "OVERLAY", nil, -2)
+	local classification = overlay:CreateTexture(nil, "BACKGROUND", nil, 2)
 	classification:SetSize(40, 40)
-	classification:SetPoint("RIGHT", 20, -1)
+	classification:SetPoint("RIGHT", health, "RIGHT", 20, -1)
 	classification.bossTexture = GetMedia("icon_badges_boss")
 	classification.eliteTexture = GetMedia("icon_classification_elite")
 	classification.rareTexture = GetMedia("icon_classification_rare")
@@ -697,7 +702,9 @@ local style = function(self, unit)
 	aurasHarmful:SetWidth(100)
 	aurasHarmful:AddGroup("HARMFUL|PLAYER|INCLUDE_NAME_PLATE_ONLY|!CROWD_CONTROL", {
 		candidateFilters = {
-			nameplateShowPersonal = true
+			nameplateShowPersonal = true,
+			excludeSpellIDs = {
+			}
 		},
 		maxFrameCount = 4, -- blizz default
 		initializeFrame = AuraButton_Initialize,
@@ -714,7 +721,8 @@ local style = function(self, unit)
 	aurasHelpful:SetPoint("LEFT", self.Classification, "RIGHT", 4, 1)
 	aurasHelpful:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY", {
 		candidateFilters = {
-			nameplateShowAll = true
+			nameplateShowAll = true,
+			excludeSpellIDs = {}
 		},
 		maxFrameCount = 2,
 		initializeFrame = AuraButton_InitializeSmall,
@@ -730,6 +738,10 @@ local style = function(self, unit)
 	local aurasCC = self:CreateAuras()
 	aurasCC:SetPoint("RIGHT", self.Health, "LEFT", -4, 0)
 	aurasCC:AddGroup("HARMFUL|CROWD_CONTROL", {
+		candidateFilters = {
+			excludeSpellIDs = {
+			}
+		},
 		maxFrameCount = 2,
 		initializeFrame = AuraButton_InitializeSmall,
 		layout = {
@@ -900,7 +912,9 @@ NamePlates.OnEvent = function(self, event, ...)
 		or (event == "PLAYER_FOCUS_CHANGED") 
 		or (event == "PLAYER_SOFT_ENEMY_CHANGED") 
 		or (event == "PLAYER_SOFT_FRIEND_CHANGED") 
-		or (event == "PLAYER_SOFT_INTERACT_CHANGED") then
+		or (event == "PLAYER_SOFT_INTERACT_CHANGED") 
+		or (event == "NAME_PLATE_UNIT_ADDED") 
+		or (event == "NAME_PLATE_UNIT_REMOVED") then
 
 		UpdateActiveTargets(event)
 	end

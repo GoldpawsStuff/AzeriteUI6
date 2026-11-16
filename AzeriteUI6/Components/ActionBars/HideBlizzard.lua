@@ -149,6 +149,31 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	-- Call once after the UI is ready
 	-- *we know touching the MultiBars taint things, but does this do it too?
 	self:HideMicroMenuPopups()
+
+	-- Attempting to fight a weird, gamepad related taint in Forever, 
+	-- which occurs even when gamepad hasn't been enabled at all.
+	-- It specifically happens after leveling up.
+	self:BattleCamelotGamepadTaint()
+end
+
+HideBlizzardActionBars.BattleCamelotGamepadTaint = function(self)
+	if (ns.WoWCamelot and GamepadMainActionBarFrame and GamepadMainActionBarFrame.PageUnit) then
+		local ProtectClassAction = function(button)
+			if (not button or button.azuiProtected) then return end
+
+			local orig = button:GetScript("OnEvent")
+			if (not orig) then return end
+
+			button:SetScript("OnEvent", function(self, event, ...)
+				pcall(orig, self, event, ...)
+			end)
+
+			button.azuiProtected = true
+		end
+
+		ProtectClassAction(GamepadMainActionBarFrame.PageUnit.LeftClassAction)
+		ProtectClassAction(GamepadMainActionBarFrame.PageUnit.RightClassAction)
+	end
 end
 
 HideBlizzardActionBars.HideMicroMenuPopups = function(self)
