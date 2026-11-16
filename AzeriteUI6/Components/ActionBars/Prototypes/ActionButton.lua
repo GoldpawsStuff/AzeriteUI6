@@ -58,7 +58,7 @@ local defaults = {
 	cooldownCount = nil, -- nil: use cvar, true/false: enable/disable
 	lossOfControlCooldown = true,
 	flyoutDirection = "UP",
-	actionButtonUI = true, -- register the button with SetActionUIButton, this has some side-effects if the button changes from action type to another type, but is required for certain UI integrations. Recommended to only set on pure type=action buttons
+	actionButtonUI = false, -- true, -- register the button with SetActionUIButton, this has some side-effects if the button changes from action type to another type, but is required for certain UI integrations. Recommended to only set on pure type=action buttons
 	assistedHighlight = true, -- requires actionButtonUI to be set to work
 	spellCastVFX = false, -- enable cast vfx
 	text = {

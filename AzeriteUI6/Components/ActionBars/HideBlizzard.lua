@@ -83,7 +83,10 @@ local hideActionButton = function(button)
 
 	button:Hide()
 	button:UnregisterAllEvents()
-	button:SetAttribute("statehidden", true)
+
+	if (not ns.WoWCamelot) then
+		button:SetAttribute("statehidden", true)
+	end
 
 	if (ns.WoWRetail or ns.WoWCamelot) then
 		button.bar = nil
@@ -150,36 +153,38 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 	-- *we know touching the MultiBars taint things, but does this do it too?
 	self:HideMicroMenuPopups()
 
-	-- Attempting to fight a weird, gamepad related taint in Forever, 
-	-- which occurs even when gamepad hasn't been enabled at all.
-	-- It specifically happens after leveling up.
+	-- The damn annoying "we just leveld up"-taint
 	self:BattleCamelotGamepadTaint()
 end
 
+	-- Attempting to fight a weird, gamepad related taint in Forever, 
+	-- which occurs even when gamepad hasn't been enabled at all.
+	-- It specifically happens after leveling up.
 HideBlizzardActionBars.BattleCamelotGamepadTaint = function(self)
 	if (ns.WoWCamelot) then
-		local function ProtectGamepadClassButtons()
-			if (not GamepadMainActionBarFrame or not GamepadMainActionBarFrame.PageUnit) then return end
-
-			local function wrap(button)
-				if (not button or button.azuiProtected) then return end
-				local orig = button:GetScript("OnEvent")
-				if (not orig) then return end
-
-				button:SetScript("OnEvent", function(self, event, ...)
-					pcall(orig, self, event, ...)
-				end)
-				button.azuiProtected = true
-			end
-
-			wrap(GamepadMainActionBarFrame.PageUnit.LeftClassAction)
-			wrap(GamepadMainActionBarFrame.PageUnit.RightClassAction)
-		end
-
-		EventUtil.ContinueOnPlayerLogin(ProtectGamepadClassButtons)
-		C_Timer.After(1, ProtectGamepadClassButtons)
+		--local function ProtectGamepadClassButtons()
+		--	if (not GamepadMainActionBarFrame or not GamepadMainActionBarFrame.PageUnit) then return end
+		--
+		--	local function wrap(button)
+		--		if (not button or button.azuiProtected) then return end
+		--		local orig = button:GetScript("OnEvent")
+		--		if (not orig) then return end
+		--
+		--		button:SetScript("OnEvent", function(self, event, ...)
+		--			pcall(orig, self, event, ...)
+		--		end)
+		--		button.azuiProtected = true
+		--	end
+		--
+		--	wrap(GamepadMainActionBarFrame.PageUnit.LeftClassAction)
+		--	wrap(GamepadMainActionBarFrame.PageUnit.RightClassAction)
+		--end
+		--
+		--EventUtil.ContinueOnPlayerLogin(ProtectGamepadClassButtons)
+		--C_Timer.After(1, ProtectGamepadClassButtons)
 
 		-- Keep the controller from driving StanceBar updates that hit EditMode
+		-- *spellbook updates when leveling will attempt to show a tainted StanceBar
 		if (ActionBarController) then
 			ActionBarController:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
 			ActionBarController:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
@@ -193,17 +198,42 @@ HideBlizzardActionBars.BattleCamelotGamepadTaint = function(self)
 			ActionBarController:UnregisterEvent("UPDATE_MULTI_CAST_ACTIONBAR")
 		end
 
-		-- Safer than replacing StanceBar methods: skip the layout update that
-		-- actually calls the protected SetPointBase on MainActionBar
-		if (EditModeManager and EditModeManager.UpdateBottomActionBarPositions) then
-			local orig = EditModeManager.UpdateBottomActionBarPositions
-			EditModeManager.UpdateBottomActionBarPositions = function(self, ...)
-				if (MainActionBar and MainActionBar:GetParent() == UIHider) then
-					return
-				end
-				return orig(self, ...)
-			end
-		end
+		--if (ns.WoWCamelot and type(ActionButton_ApplyCooldown) == "function") then
+		--	local orig = ActionButton_ApplyCooldown
+		--	ActionButton_ApplyCooldown = function(...)
+		--		pcall(orig, ...)
+		--	end
+		--end
+
+		--if (ns.WoWCamelot and ActionBarButtonEventsFrame) then
+		--	--local orig = ActionBarButtonEventsFrame.OnEvent
+		--	--ActionBarButtonEventsFrame.OnEvent = function(self, event, ...)
+		--	--	for _, frame in pairs(self.frames) do
+		--	--		if (frame and frame.OnEvent) then
+		--	--			pcall(frame.OnEvent, frame, event, ...)
+		--	--		end
+		--	--	end
+		--	--end
+		--	ActionBarButtonEventsFrame:SetScript("OnEvent", function(self, event, ...)
+		--		for _, frame in pairs(self.frames) do
+		--			if (frame and frame.OnEvent) then
+		--				pcall(frame.OnEvent, frame, event, ...)
+		--			end
+		--		end
+		--	end)
+		--end
+
+		---- Safer than replacing StanceBar methods: skip the layout update that
+		---- actually calls the protected SetPointBase on MainActionBar
+		--if (EditModeManager and EditModeManager.UpdateBottomActionBarPositions) then
+		--	local orig = EditModeManager.UpdateBottomActionBarPositions
+		--	EditModeManager.UpdateBottomActionBarPositions = function(self, ...)
+		--		if (MainActionBar and MainActionBar:GetParent() == UIHider) then
+		--			return
+		--		end
+		--		return orig(self, ...)
+		--	end
+		--end
 	end
 end
 

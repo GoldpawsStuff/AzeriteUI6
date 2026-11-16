@@ -68,7 +68,6 @@ local copy = function(source)
 	end
 end
 
---ns.AuraButton_PostCreate = function(element, options, button)
 ns.AuraButton_PostCreate = function(element, button, options)
 
 	-- adjust the stack count
