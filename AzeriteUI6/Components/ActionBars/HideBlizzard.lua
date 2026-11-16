@@ -157,22 +157,54 @@ HideBlizzardActionBars.HideBlizzard = function(self)
 end
 
 HideBlizzardActionBars.BattleCamelotGamepadTaint = function(self)
-	if (ns.WoWCamelot and GamepadMainActionBarFrame and GamepadMainActionBarFrame.PageUnit) then
-		local ProtectClassAction = function(button)
-			if (not button or button.azuiProtected) then return end
+	if (ns.WoWCamelot) then
+		local function ProtectGamepadClassButtons()
+			if (not GamepadMainActionBarFrame or not GamepadMainActionBarFrame.PageUnit) then return end
 
-			local orig = button:GetScript("OnEvent")
-			if (not orig) then return end
+			local wrap = function(button)
+				if (not button or button.azuiProtected) then return end
+				local orig = button:GetScript("OnEvent")
+				if (not orig) then return end
 
-			button:SetScript("OnEvent", function(self, event, ...)
-				pcall(orig, self, event, ...)
-			end)
+				button:SetScript("OnEvent", function(self, event, ...)
+					pcall(orig, self, event, ...)
+				end)
+				button.azuiProtected = true
+			end
 
-			button.azuiProtected = true
+			wrap(GamepadMainActionBarFrame.PageUnit.LeftClassAction)
+			wrap(GamepadMainActionBarFrame.PageUnit.RightClassAction)
 		end
 
-		ProtectClassAction(GamepadMainActionBarFrame.PageUnit.LeftClassAction)
-		ProtectClassAction(GamepadMainActionBarFrame.PageUnit.RightClassAction)
+		-- Run after ClassSpellFlyout's ContinueOnPlayerLogin mixin
+		EventUtil.ContinueOnPlayerLogin(ProtectGamepadClassButtons)
+		-- safety net in case the mixin is delayed
+		C_Timer.After(1, ProtectGamepadClassButtons)
+
+		-- Stop StanceBar updates from reaching EditMode SetPoint on the hidden MainActionBar
+		if (StanceBar and StanceBar.Update) then
+			hooksecurefunc(StanceBar, "Update", function(self)
+				if (InCombatLockdown() or self:GetParent() == UIHider) then
+					return
+				end
+			end)
+			-- also short-circuit the state update that triggers the grid/layout path
+			if (StanceBar.UpdateState) then
+				hooksecurefunc(StanceBar, "UpdateState", function(self)
+					if (InCombatLockdown() or self:GetParent() == UIHider) then
+						return
+					end
+				end)
+			end
+		end
+
+		-- extra: silence the controller on Camelot if the above is not enough
+		if (ActionBarController) then
+			ActionBarController:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
+			ActionBarController:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
+			ActionBarController:UnregisterEvent("UPDATE_OVERRIDE_ACTIONBAR")
+			ActionBarController:UnregisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+		end
 	end
 end
 
