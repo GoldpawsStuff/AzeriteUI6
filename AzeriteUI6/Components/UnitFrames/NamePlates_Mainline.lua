@@ -369,21 +369,23 @@ local TargetHighlight_Update = function(self, event, unit, ...)
 	end
 end
 
+local GetNamePlateScale = function()
+	local entry = NamePlateConstants.NAME_PLATE_SCALES[(tonumber(C_CVar.GetCVar("nameplateSize")) or Enum.NamePlateSize.Small)]
+				or NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small]
+
+	--return entry.horizontal / NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small].horizontal
+	return entry.horizontal
+end
+
 -- Hook used to fade out nameplates along with UIParent. Not sure it's always a good idea.
 local NamePlate_UpdateAlpha = function(self)
 	--self:SetAlpha(UIParent:GetAlpha())
 end
 
-local GetNamePlateScale = function()
-	local entry = NamePlateConstants.NAME_PLATE_SCALES[(tonumber(C_CVar.GetCVar("nameplateSize")) or Enum.NamePlateSize.Small)]
-			   or NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small]
-
-	-- Normalize numbers so the smallest scale is 1
-   return entry.horizontal / NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small].horizontal
-end
-
 local NamePlate_UpdateScale = function(self)
 	self:SetScale(GetNamePlateScale() or 1)
+	self:ClearAllPoints()
+	self:SetPoint("BOTTOM")
 end
 
 -- Update visibility and elements based on CVar changes
@@ -515,7 +517,9 @@ local style = function(self, unit)
 	end
 
 	-- General frame settings
-	self:SetSize(90, 26)
+	self:SetSize(90, 32)
+	self:ClearAllPoints()
+	self:SetPoint("BOTTOM") -- other anchorpoints create weirdness when plates change size or scale
 	self:SetFrameLevel(self:GetFrameLevel() + 5)
 
 	-- Frame for font Overlays
@@ -969,7 +973,7 @@ NamePlates.OnEnable = function(self)
 		self:SetActiveStyle("AzeriteNamePlates")
 
 		local nameplates = self:SpawnNamePlates("AzeriteNamePlate")
-		nameplates:SetSize(90,32) 
+		nameplates:SetSize(90,32)
 		nameplates:SetAddedCallback(NamePlate_OnShow)
 		nameplates:SetRemovedCallback(NamePlate_OnHide)
 	end)
