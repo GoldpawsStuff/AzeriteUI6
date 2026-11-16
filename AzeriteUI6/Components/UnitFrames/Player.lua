@@ -900,7 +900,7 @@ Player.GetOptions = function(self)
 			aurasdescription = { 
 				type = "description", fontSize = "medium", name = " ", 
 				disabled = function() return InCombatLockdown() end,
-				hidden = function() return not mod.db.profile.enabled end,
+				hidden = function() return not self.db.profile.enabled end,
 				order = 29
 			},
 			enableauras = {

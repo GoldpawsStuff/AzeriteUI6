@@ -68,6 +68,7 @@ local defaults = { profile = {
 	nameplateNotSelectedAlpha = .4, 						-- Non-target alpha when having a target. (Default .6)
 	nameplateOccludedAlphaMult = .3, 						-- Alpha of occluded nameplates. (Behind walls, etc) (Default .4)
 
+	nameplateSize = 1, 										-- Scale slider in the UI (1-5)
 	nameplateMinScale = .6, 								-- Distance-based minimum scale. (Default .8) 
 	nameplateMaxScale = .9,									-- Distance-based maximum scale. (Default 1)
 	nameplateSelectedScale = 1.1, 							-- Extra scale on current target. (Default 1.2)
@@ -80,44 +81,9 @@ local defaults = { profile = {
 	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Class colored friendly player unitname
 	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
 
-	--[[--
-
-	layout
-
-	scale
-
-	visibility
-
-	showHostile = true,
-		classColorHostilePlayer = true,
-		showHostilePlayerMinion = true,
-			showOnlyNameHostilePlayerMinion = false,
-		showHostilePlayerMinor = true,
-			showOnlyNameHostilePlayerMinor = true,
-
-		reverseEnemyOrientation = true,
-
-	showFriendly = true,
-		showFriendlyNPC = true,
-			showOnlyNameFriendlyNPC = true,
-			reactionColorFriendlyNPCName = true,
-		showFriendlyPlayer = true,
-			showOnlyNameFriendlyPlayer = true,
-			classColorFriendlyPlayer = false, 
-			classColorFriendlyPlayerName = true,
-		showFriendlyPlayerMinion = true,
-			showOnlyNameFriendlyPlayerMinion = true,
-
-
-		showAuras
-
-
-
-
-	--]]--
 }}
 
--- Cache of current targets
+-- Cache of current targets (target, focus, softenemy, softinteract, softfriend)
 local ActiveTargetPlates = {}
 
 local timeFormatter = C_StringUtil.CreateNumericRuleFormatter()
@@ -408,6 +374,18 @@ local NamePlate_UpdateAlpha = function(self)
 	--self:SetAlpha(UIParent:GetAlpha())
 end
 
+local GetNamePlateScale = function()
+	local entry = NamePlateConstants.NAME_PLATE_SCALES[(tonumber(C_CVar.GetCVar("nameplateSize")) or Enum.NamePlateSize.Small)]
+			   or NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small]
+
+	-- Normalize numbers so the smallest scale is 1
+   return entry.horizontal / NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small].horizontal
+end
+
+local NamePlate_UpdateScale = function(self)
+	self:SetScale(GetNamePlateScale() or 1)
+end
+
 -- Update visibility and elements based on CVar changes
 -- *todo: update on faction changes / quest mobs becoming attackable
 local NamePlate_PostUpdateElements = function(self, event, unit)
@@ -474,6 +452,7 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 		self.Name:SetTextColor(self.colors.highlight:GetRGB())
 	end
 
+	NamePlate_UpdateScale(self)
 	Classification_Update(self, event, unit)
 	TargetHighlight_Update(self, event, unit)
 end
@@ -899,13 +878,27 @@ NamePlates.GetOptions = function(self)
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
-					if InCombatLockdown() then return end
+					if (InCombatLockdown()) then return end
 					self.db.profile.enabled = val 
 					self:UpdateSettings()
 				end,
 				order = 1
 			},
-
+			nameplateSize = {
+				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1,
+				name = UNIT_NAMEPLATES_GLOBAL_SCALE, -- "Size"
+				desc = UNIT_NAMEPLATES_GLOBAL_SCALE_TOOLTIP, -- "Controls the size nameplates are displayed on the screen."
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function()
+					return tonumber(C_CVar.GetCVar(NamePlateConstants and NamePlateConstants.SIZE_CVAR or "nameplateSize")) or Enum.NamePlateSize.Small
+				end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					C_CVar.SetCVar(NamePlateConstants and NamePlateConstants.SIZE_CVAR or "nameplateSize", (math.floor(value + .5)))
+				end,
+				order = 100,
+			},
 
 		}
 	}
