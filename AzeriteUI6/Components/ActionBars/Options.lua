@@ -182,7 +182,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 			layout = {
 				type = "select", style = "dropdown", 
 				name = L["Action Bar layout"],
-				desc = L["Sets the layout type of the Action Bar.|n|n|cff4488ffGrid:|r|nDisplay the Action Bar as a standard row, column or retangular grid of buttons.|n|n|cff4488ffZigZag:|r|nDisplay the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."],
+				desc = L["Sets the layout type of the Action Bar. Grid: Display the Action Bar as a standard row, column or retangular grid of buttons. ZigZag: Display the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."],
 				values = { ["grid"] = L["Grid"], ["zigzag"] = L["ZigZag"] },
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not mod.db.profile.enabled end,

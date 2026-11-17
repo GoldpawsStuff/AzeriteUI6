@@ -1,9 +1,8 @@
 local L = LibStub("AceLocale-3.0"):NewLocale((...), "enUS", true, false)
 
--- Addon Localization
--- *Keep in alphanumerical order by the key
---  to make it easier to manually search through.
---------------------------------------------------------------------
+-- *Keep in alphanumerical order by the key to make it easier to manually search through.
+-- *Keep formatting and coloring out of the key, put it in the value.
+
 L["AB: Primary"] = "|cff40c0ffAB:|r Primary"
 L["AB: Multi Bar %d"] = "|cff40c0ffAB:|r Multi Bar %d"
 L["AB: Pet Bar"] = "|cff40c0ffAB:|r Pet Bar"
@@ -50,7 +49,7 @@ L["Sets the delay in seconds after a manual user interface reload before element
 L["Sets the delay in seconds after combat ends before elements are faded out."] = true
 L["Sets the delay in seconds after the initial login on a character before elements are faded out."] = true
 L["Sets the delay in seconds after zoning through an instance portal before elements are faded out."] = true
-L["Sets the layout type of the Action Bar.|n|n|cff4488ffGrid:|r|nDisplay the Action Bar as a standard row, column or retangular grid of buttons.|n|n|cff4488ffZigZag:|r|nDisplay the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."] = true
+L["Sets the layout type of the Action Bar. Grid: Display the Action Bar as a standard row, column or retangular grid of buttons. ZigZag: Display the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."] = "Sets the layout type of the Action Bar.|n|n|cff4488ffGrid:|r|nDisplay the Action Bar as a standard row, column or retangular grid of buttons.|n|n|cff4488ffZigZag:|r|nDisplay the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."
 L["Sets the number of visible buttons on the Action Bar."] = true
 L["Sets the offset in fractions of a single button the second row of a ZigZag pattern should appear at."] = true
 L["Sets the horizontal padding between buttons on the Action Bar."] = true
