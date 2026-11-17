@@ -39,7 +39,7 @@ local defaults = { profile = {
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
-local AreUnitsSame = ns.AreUnitsSame
+local UnitIsUnit = ns.UnitIsUnit
 
 -- Update targeting highlight outline
 local TargetHighlight_PostUpdate = function(self, event, unit, ...)
@@ -48,7 +48,7 @@ local TargetHighlight_PostUpdate = function(self, event, unit, ...)
 	local element = self.TargetHighlight
 	unit = unit or self.__unit
 
-	if (AreUnitsSame(unit, "target")) then
+	if (UnitIsUnit(unit, "target")) then
 		element:Show()
 	else
 		element:Hide()

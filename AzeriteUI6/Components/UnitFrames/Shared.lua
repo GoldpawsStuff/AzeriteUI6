@@ -412,7 +412,7 @@ ns.GetAuraWhitelistByKeywords = function(...)
 	return unpack(list)
 end
 
--- Hover Scripts
+-- oUF Scripts
 -----------------------------------------
 local UpdateTooltip = function(self)
 	if (GameTooltip:IsForbidden()) then return end
@@ -444,6 +444,8 @@ local RegisterMouseScripts = function(self)
 	self:SetScript("OnLeave", OnLeave)
 end
 
+oUF:RegisterMetaFunction("RegisterMouseScripts", RegisterMouseScripts)
+
 -- Classic oUF parents new frames to its own frame, 
 -- but that frame hasn't had its points set.
 -- This messes up our movable frame system.
@@ -456,26 +458,6 @@ local SetAllParentPoints = function(self)
 end
 
 oUF:RegisterMetaFunction("SetAllParentPoints", SetAllParentPoints)
-oUF:RegisterMetaFunction("RegisterMouseScripts", RegisterMouseScripts)
-
-ns.AreUnitsSame = function(u1, u2)
-	local g1 = UnitGUID(u1)
-	local g2 = UnitGUID(u2)
-
-	-- Bail if different secrecy levels (can't be equal, avoids mixed == error)
-	if (issecretvalue(g1) ~= issecretvalue(g2)) then
-		return false
-	end
-
-	-- Now appears to create problems if both are secret too?
-	-- *"attempt to compare local 'g1' (a secret string value tainted by..."
-	if (issecretvalue(g1) and issecretvalue(g2)) then
-		return false
-	end
-
-	-- Now safe: both non-secret or both secret
-	return g1 == g2 
-end
 
 -- Note that we still need to replace this method because of our  
 -- slightly adjusted threat coloring which is incompatible with secret values.

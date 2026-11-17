@@ -196,7 +196,7 @@ local defaults = { profile = {
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
-local AreUnitsSame = ns.AreUnitsSame
+local UnitIsUnit = ns.UnitIsUnit
 
 -- Function to create an alpha curve based on min/max values.
 -- Useful to hide elements when at (almost) zero.
@@ -566,7 +566,7 @@ local TargetIndicator_Update = function(self, event, unit, ...)
 	unit = unit or self.__unit
 
 	-- if we are targeting ourselves, hide the targeting eye
-	if (AreUnitsSame(unit, "player")) then
+	if (UnitIsUnit(unit, "player")) then
 		return element:Hide()
 	end
 
@@ -577,18 +577,18 @@ local TargetIndicator_Update = function(self, event, unit, ...)
 	if (UnitExists(tot) and UnitCanAttack("player", unit)) then
 
 		-- if our hostile target is targeting us
-		if (AreUnitsSame(tot, "player")) then
+		if (UnitIsUnit(tot, "player")) then
 			element:SetTexture(element.enemyTexture)
 
 		-- if our hostile target is targeting our pet 
-		elseif (AreUnitsSame(tot, "pet")) then
+		elseif (UnitIsUnit(tot, "pet")) then
 			element:SetTexture(element.petTexture)
 		else
 			return element:Hide()
 		end
 
 	-- if our target is friendly and targeting us
-	elseif (AreUnitsSame(tot, "player")) then
+	elseif (UnitIsUnit(tot, "player")) then
 		element:SetTexture(element.friendTexture)
 	else
 		return element:Hide()

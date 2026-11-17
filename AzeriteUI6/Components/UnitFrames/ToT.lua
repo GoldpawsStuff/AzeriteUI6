@@ -41,7 +41,7 @@ local defaults = { profile = {
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
-local AreUnitsSame = ns.AreUnitsSame
+local UnitIsUnit = ns.UnitIsUnit
 
 -- Update targeting highlight outline
 local TargetHighlight_PostUpdate = function(self, event, unit, ...)
@@ -50,7 +50,7 @@ local TargetHighlight_PostUpdate = function(self, event, unit, ...)
 	local element = self.TargetHighlight
 	unit = unit or self.__unit
 
-	if (AreUnitsSame(unit, "focus")) then
+	if (UnitIsUnit(unit, "focus")) then
 		element:Show()
 	else
 		element:Hide()
@@ -64,8 +64,8 @@ local Unitframe_PostUpdateAlpha = function(self, event, unit, ...)
 
 	unit = unit or self.__unit
 
-	if (ToT.db.profile.hideWhenTargetingPlayer and AreUnitsSame(unit, "player"))
-	or (ToT.db.profile.hideWhenTargetingSelf and AreUnitsSame(unit, unit.."target")) then
+	if (ToT.db.profile.hideWhenTargetingPlayer and UnitIsUnit(unit, "player"))
+	or (ToT.db.profile.hideWhenTargetingSelf and UnitIsUnit(unit, unit.."target")) then
 		self:SetAlpha(0)
 	else
 		self:SetAlpha(1)

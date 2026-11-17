@@ -4,6 +4,7 @@
 	<Script file="API\Fonts.lua"/>
 	<Script file="API\Media.lua"/>
 	<Script file="API\Numbers.lua"/>
+	<Script file="API\Secrets.lua"/>
 	<Script file="API\Tables.lua"/>
 	<!--<Script file="API\Time.lua"/>-->
 

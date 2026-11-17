@@ -34,6 +34,7 @@ local NamePlates = ns:NewModule("NamePlates", nil, "LibMoreEvents-1.0", "AceTime
 local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
+local UnitIsUnit = ns.UnitIsUnit
 
 local AllNamePlates, ActiveNamePlates, InActiveNamePlates = {}, {}, {}
 local TargetNamePlate, FocusNamePlate
@@ -153,11 +154,6 @@ end
 local GetCVarDefault = function(cvar)
 	local value = C_CVar.GetCVarDefault(cvar)
 	return tonumber(value) or value
-end
-
--- Unit comparison compatible with secrets
-local UnitIsUnit = function(unit1, unit2)
-	return unit1 and unit2 and C_Secrets.CanCompareUnitTokens(unit1, unit2) and _G.UnitIsUnit(unit1, unit2) -- use the global
 end
 
 -- Check if unit is a player pet or minion
