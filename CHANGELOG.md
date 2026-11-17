@@ -13,12 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Put the `GameTooltipStatusBar` inside the tooltip. Because it's cleaner. 
 - Toned down Forever's bright golden tooltip. Made it more fitting to OUR user interface.
-- Properly styled player and target debuff aura border colors and all aura timer displays in Forever/Retail. 
+- Properly styled Player and Target debuff aura border colors and all aura timer displays in Forever/Retail. 
 
 ### Fixed
 - The Objectives Tracker follows the fading settings from Explorer Mode properly now.
 - Fixed an issue where empty actionbuttons would have their background remain visible when hovered over during a stance/form change. 
-- Fixed the Classic Era player castbar.
+- Fixed the Classic Era Player castbar.
 
 ## [1.0.31-RC]2026-11-11
 ### Changed
@@ -26,18 +26,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The rested bonus XP bar is slightly darker than the rest of the XP bar now. 
 
 ### Fixed
-- Worked around secrecy restrictions that lately have prevented the target unit frame castbar from showing.
+- Worked around secrecy restrictions that lately have prevented the Target unit frame castbar from showing.
 
 ## [1.0.29-RC] 2026-11-10
 ### Added
 - Added Retail style flashing of repeat messages in the `UIErrorsFrame` to the Classics and Forever, instead of the old "repeat a message forever" style.
 
 ### Changed
-- Changed the primary actionbar paging driver from using `bonusbar` to `form` conditionals to work around a known Forever bug where `bonusbar` sometimes reports 0, leaving the player with the wrong visible actionbar page.
+- Changed the primary actionbar paging driver from using `bonusbar` to `form` conditionals to work around a known Forever bug where `bonusbar` sometimes reports 0, leaving the Player with the wrong visible actionbar page.
 
 ### Fixed
 - Fixed some XP bar color inconsistencies.
-- Unitframes should now properly say "Ghost" when a player is dead and have released its spirit.
+- Unitframes should now properly say "Ghost" when a Player is dead and have released its spirit.
 
 ## [1.0.28-RC] 2026-11-08
 ### Added
@@ -77,7 +77,7 @@ There are hints that there might be a Forever only problem related to Blizzard's
 
 ## [1.0.24-RC] 2026-11-05
 ### Added
-- Added the Explorer Mode. This is a mode that fades out a lot of frames when out of combat and not having a target. 
+- Added the Explorer Mode. This is a mode that fades out a lot of frames when out of combat and not having a Target. 
 - Added Exporer Mode to the options menu. 
 
 ### Changed
@@ -89,7 +89,7 @@ There are hints that there might be a Forever only problem related to Blizzard's
 
 ## [1.0.21-RC] 2026-11-05
 ### Fixed 
-- Fixed the Forever secrecy bug on regular combat feedback on the target frame. 
+- Fixed the Forever secrecy bug on regular combat feedback on the Target frame. 
 
 ## [1.0.20-RC] 2026-11-05
 ### Fixed
