@@ -63,17 +63,17 @@ local defaults = { profile = {
 	--nameplateTargetBehindMaxDistance = .1, 				-- Target plate when behind camera.
 	--nameplateTargetRadialPosition = 0, 					-- Radial positioning of target plate.
 
-	nameplateMinAlpha = .45,								-- Distance-based minimum alpha. (Default .6)
-	nameplateMaxAlpha = .75,								-- Distance-based maximum alpha. (Default 1)
+	nameplateMinAlpha = .6,									-- Distance-based minimum alpha. (Default .6) (.45 super immersive)
+	nameplateMaxAlpha = .9,									-- Distance-based maximum alpha. (Default 1) (.75 very unintrusive)
 	nameplateSelectedAlpha = 1, 							-- Selected nameplate alpha. (Default 1)
-	nameplateNotSelectedAlpha = .4, 						-- Non-target alpha when having a target. (Default .6)
-	nameplateOccludedAlphaMult = .3, 						-- Alpha of occluded nameplates. (Behind walls, etc) (Default .4)
+	nameplateNotSelectedAlpha = .6, 						-- Non-target alpha when having a target. (Default .6) (.4 for invisible ones)
+	nameplateOccludedAlphaMult = .4, 						-- Alpha of occluded nameplates. (Behind walls, etc) (Default .4) (.3 for invisible ones)
 
 	nameplateSize = 1, 										-- Scale slider in the UI (1-5)
 	nameplateMinScale = .6, 								-- Distance-based minimum scale. (Default .8) 
 	nameplateMaxScale = .9,									-- Distance-based maximum scale. (Default 1)
 	nameplateSelectedScale = 1.1, 							-- Extra scale on current target. (Default 1.2)
-	nameplateGlobalScale = 1, 								-- Overall size multiplier. (Default 1)
+	nameplateGlobalScale = 1, 								-- Overall size multiplier. (Default 1) (Not really used anymore)
 
 	nameplateShowClassColor = 1, 							-- Class colored enemy nameplates
 	nameplateShowFriendlyClassColor = 0, 					-- Class colored friendly player nameplates
