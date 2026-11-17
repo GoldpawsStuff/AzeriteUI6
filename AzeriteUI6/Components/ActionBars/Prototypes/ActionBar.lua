@@ -153,7 +153,7 @@ local bonusBarOffsets =
 	})[playerClass] or 
 
 	-- Midnight (Retail)
-	(ns.WoWMidnight or ns.WoWRetail) and ({ 
+	(ns.WoWMidnight or ns.WoWMainline) and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		EVOKER 	= { 1 }, 			-- Soar
 		ROGUE 	= { 1 } 			-- Stealth
@@ -220,7 +220,7 @@ local formPages =
 	})[playerClass] or 
 
 	-- Midnight (Retail)
-	(ns.WoWMidnight or ns.WoWRetail) and ({ 
+	(ns.WoWMidnight or ns.WoWMainline) and ({ 
 		DRUID 	= { [3] = 7, [1] = 9, [4] = 10 }, 			-- Cat, Bear, Moonkin
 		EVOKER 	= { [1] = 7 }, 								-- Soar
 		ROGUE 	= { [1] = 7 } 								-- Stealth

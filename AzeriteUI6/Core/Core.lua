@@ -45,16 +45,16 @@ ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
 ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
 -- Flavor Flags
-ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- This includes Forever, we follow Blizzard's definition here
+ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- Retail
+ns.WoWCamelot = (WOW_PROJECT_ID == WOW_PROJECT_CAMELOT) -- Forever
 ns.WoWVanilla = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- Classic Era, SoD, SoM and Hardcore versions
 ns.WoWTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) -- TBC Classic Anniversary
 ns.WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC) -- Wrath of the Lich King Classic
 ns.WoWCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC) -- Cataclysm Classic
 ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC) -- Mists of Pandaria Classic
-ns.WoWRetail = ((WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) and (ns.WoW12)) -- Mainline but excluding Forever
 ns.WoWMidnight = (ns.WoW12 and not ns.WoW13) -- Retail changes, Midnight is a specific version
-ns.WoWCamelot = (ns.WoWVersion >= 16000 and ns.WoWVersion < 20000) -- Doesn't have its own projectID yet.
-ns.WoWForever = ns.WoWCamelot -- I'm bound to forget the Camelot name eventually
+ns.WoWForever = ns.WoWCamelot
+ns.WoWRetail = ns.WoWMainline
 
 -- Seasonal Classic Realm Flags
 local seasonID = C_Seasons and C_Seasons.GetActiveSeason()
@@ -176,18 +176,18 @@ end
 -- Temporary solution while developing. 
 -- *Doesn't actually hide anything, just adds hover visibility.
 ns.HideClutter = function(self)
-	for element, fadeGroup in next,{
-		--["BagsBar"] = "BagsBar",
-		["BuffFrame"] = "PlayerAuras",
-		["DebuffFrame"] = "PlayerAuras",
-		--["MainStatusTrackingBarContainer"] = "StatusBars",
-		--["MicroMenu"] = "MicroMenu",
-		--["MicroMenuContainer"] = "MicroMenu",
-	} do
-		if (_G[element]) then
-			self:RegisterFrameForFading(_G[element], fadeGroup == true and element or fadeGroup)
-		end
-	end
+	--for element, fadeGroup in next,{
+	--	--["BagsBar"] = "BagsBar",
+	--	--["BuffFrame"] = "PlayerAuras",
+	--	--["DebuffFrame"] = "PlayerAuras",
+	--	--["MainStatusTrackingBarContainer"] = "StatusBars",
+	--	--["MicroMenu"] = "MicroMenu",
+	--	--["MicroMenuContainer"] = "MicroMenu",
+	--} do
+	--	if (_G[element]) then
+	--		self:RegisterFrameForFading(_G[element], fadeGroup == true and element or fadeGroup)
+	--	end
+	--end
 	-- Just fade them all out
 	local lib = LibStub("LibDBIcon-1.0", true)
 	if (lib) then

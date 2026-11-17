@@ -936,7 +936,6 @@ NamePlates.UpdateSettings = function(self)
 
 	-- These two only fires on manual settings changes
 	if (self.db.profile.enabled) and (not self:IsEnabled()) then
-		self:Enable()
 		ReloadUI()
 	
 	elseif (not self.db.profile.enabled) and (self:IsEnabled()) then

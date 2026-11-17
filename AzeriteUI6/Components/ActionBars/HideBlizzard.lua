@@ -88,7 +88,7 @@ local hideActionButton = function(button)
 		button:SetAttribute("statehidden", true)
 	end
 
-	if (ns.WoWRetail or ns.WoWCamelot) then
+	if (ns.WoWMainline or ns.WoWCamelot) then
 		button.bar = nil
 	end
 end

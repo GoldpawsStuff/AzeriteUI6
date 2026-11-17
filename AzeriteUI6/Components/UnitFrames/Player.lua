@@ -826,7 +826,8 @@ local style = function(self, unit)
 
 			-- Whitelisted buffs from anybody
 			HelpfulAllWhitelist = auras:AddGroup("HELPFUL", { layoutIndex = 10, candidateFilters = { includeSpellIDs = {
-
+				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
+				--[1328827] = true, -- Poised
 			}}}),
 
 			-- Whitelisted player selfbuffs
@@ -841,7 +842,7 @@ local style = function(self, unit)
 
 			-- Whitelisted harmful auras
 			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = { 
-				[15007] = true, -- Resurrection Sickness *doesn't always show up...?
+				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
 			}}}),
 
 			-- No duration harmful auras (lava on the floor, etc)
@@ -850,7 +851,7 @@ local style = function(self, unit)
 			}}}),
 
 			-- Regular harmful auras
-			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL", { layoutIndex = 102, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL", { layoutIndex = 102, candidateFilters = { maxDuration = 600, excludeSpellIDs = { -- res sickness is 10 mins
 
 			}}})
 		}

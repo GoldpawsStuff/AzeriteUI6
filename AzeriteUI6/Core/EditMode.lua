@@ -47,7 +47,7 @@ end
 -- The MinimapCluster is sized differently on the initial login on some flavors.
 -- Forcing the cluster size corrects the first-login misalignment.
 local ForceMinimapSize = function()
-	if (ns.WoWCamelot or ns.WoWRetail) then return end
+	if (ns.WoWCamelot or ns.WoWMainline) then return end
 	if (not MinimapCluster) then return end
 	MinimapCluster:SetSize(230, 216)
 end
@@ -106,14 +106,14 @@ EditModePreset.ApplySystemSettings = function(self, target)
 
 	-- Minimap
 	local minimap = self:GetSystem(target.systems, Enum.EditModeSystem.Minimap)
-	if (ns.WoWCamelot or ns.WoWRetail) then
+	if (ns.WoWCamelot or ns.WoWMainline) then
 		self:SetSystemAnchor(minimap, "BOTTOMRIGHT", "BOTTOMRIGHT", -30, 30)
 	else
 		-- Do not touch header-underneath. It desyncs the cluster and needs a /reload.
 		self:SetSystemAnchor(minimap, "BOTTOMRIGHT", "BOTTOMRIGHT", -46, 74)
 	end
 	self:SetSystemSetting(minimap, 0, 0) -- Header Underneath = off
-	self:SetSystemSetting(minimap, 2, (ns.WoWRetail or ns.WoWCamelot) and 5 or 8)
+	self:SetSystemSetting(minimap, 2, (ns.WoWMainline or ns.WoWCamelot) and 5 or 8)
 
 	-- Chat
 	local chat = self:GetSystem(target.systems, Enum.EditModeSystem.ChatFrame)

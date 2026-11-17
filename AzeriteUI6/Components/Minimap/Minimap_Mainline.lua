@@ -224,7 +224,7 @@ MinimapModule.StyleMinimap = function(self)
 	badge:SetFrameStrata("HIGH")
 	badge:SetFrameLevel(Minimap:GetFrameLevel() + 50)
 	badge:SetSize(50, 50)
-	badge:SetPoint("CENTER", Minimap, "BOTTOM", ns.WoWMainline and 2 or 0, -6*.9)
+	badge:SetPoint("CENTER", Minimap, "BOTTOM", 2, -6*.9)
 	badge.fadeInDuration = .3
 	badge.fadeOutDuration = .1
 	badge.fadeFreq = 1/30
@@ -337,7 +337,7 @@ MinimapModule.StyleMinimap = function(self)
 	self:RegisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
 
 	-- Only exists in Retail
-	if (ns.WoWRetail) then
+	if (ns.WoWMainline) then
 		self:RegisterEvent("ENABLE_XP_GAIN", "UpdateXP")
 		self:RegisterEvent("DISABLE_XP_GAIN", "UpdateXP")
 	end
@@ -362,7 +362,7 @@ MinimapModule.UpdateXP = function(self, event, ...)
 		self:UnregisterEvent("UPDATE_EXHAUSTION", "UpdateXP")
 
 		-- Only exists in Retail
-		if (ns.WoWRetail) then
+		if (ns.WoWMainline) then
 			self:UnregisterEvent("ENABLE_XP_GAIN", "UpdateXP")
 			self:UnregisterEvent("DISABLE_XP_GAIN", "UpdateXP")
 		end

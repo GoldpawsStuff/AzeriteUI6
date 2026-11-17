@@ -962,49 +962,42 @@ local style = function(self, unit)
 
 			-- Whitelisted player selfbuffs
 			HelpfulPlayerWhitelist = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 11, candidateFilters = { includeSpellIDs = {
-
+				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
 			}}}),
 
 			-- Regular player selfbuffs, with spammy stuff blacklisted
-			HelpfulPlayer = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = {
-				maxDuration = 60,
-				excludeSpellIDs = {}
-			}}),
+			HelpfulPlayer = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+
+			}}}),
 
 			-- Helpful buffs, long duration
-			HelpfulPlayerLong = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = {
-				maxDuration = 3600,
-				excludeSpellIDs = {}
-			}}),
+			HelpfulPlayerLong = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
+
+			}}}),
 
 			-- Non-player buffs, with spammy stuff blacklisted
-			HelpfulNotPlayerLong = auras:AddGroup("HELPFUL|!PLAYER", { layoutIndex = 12, candidateFilters = {
-				maxDuration = 3600,
-				excludeSpellIDs = {}
-			}}),
+			HelpfulNotPlayerLong = auras:AddGroup("HELPFUL|!PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
+
+			}}}),
 
 			-- Whitelisted harmful auras
-			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = {
-				maxDuration = 60,
-				includeSpellIDs = {}
-			}}),
+			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = {
+				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
+			}}}),
 
 			-- No duration harmful auras (lava on the floor, etc)
-			HarmfulAllDurationless = auras:AddGroup("HARMFUL", { layoutIndex = 101, candidateFilters = {
-				maxDuration = 0,
-				excludeSpellIDs = {}
-			}}),
+			HarmfulAllDurationless = auras:AddGroup("HARMFUL", { layoutIndex = 101, candidateFilters = { maxDuration = 0, excludeSpellIDs = {
 
-			HarmfulPlayer = auras:AddGroup("HARMFUL|PLAYER", { layoutIndex = 12, candidateFilters = {
-				maxDuration = 60,
-				excludeSpellIDs = {}
-			}}),
+			}}}),
+
+			HarmfulPlayer = auras:AddGroup("HARMFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+
+			}}}),
 
 			-- Non-player harmful auras
-			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL|!PLAYER", { layoutIndex = 102, candidateFilters = {
-				maxDuration = 60,
-				excludeSpellIDs = {}
-			}})
+			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL|!PLAYER", { layoutIndex = 102, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+
+			}}})
 		}
 
 		self.Auras = auras
