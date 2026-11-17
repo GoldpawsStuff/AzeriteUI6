@@ -208,6 +208,16 @@ local createAlphaCurve = function(min, max)
 	return alphaCurve
 end
 
+-- Add an aura filter group and apply styling
+local Auras_AddGroup = function(element, filter, data)
+	if (string.find(filter, "HARM")) then
+		data.initializeFrame = ns.AuraButton_InitializeBigDebuff
+	else
+		data.initializeFrame = ns.AuraButton_InitializeBigBuff
+	end 
+	return element:AddGroup(filter, data)
+end
+
 -- Set the index of an aura group.
 local Auras_SetGroupIndex = function(element, groupKey, index)
 	element:SetAuraGroupLayout(groupKey, {
@@ -952,50 +962,50 @@ local style = function(self, unit)
 			-- Out of Combat Buff display
 
 			-- Boss Auras, always top priority
-			HarmfulBoss = auras:AddGroup("HARMFUL", { layoutIndex = 1, candidateFilters = { isBossAura = true } }),
-			HelpfulBoss = auras:AddGroup("HELPFUL", { layoutIndex = 2, candidateFilters = { isBossAura = true } }),
+			HarmfulBoss = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 1, candidateFilters = { isBossAura = true } }),
+			HelpfulBoss = Auras_AddGroup(auras, "HELPFUL", { layoutIndex = 2, candidateFilters = { isBossAura = true } }),
 
 			-- Whitelisted buffs from anybody
-			HelpfulAllWhitelist = auras:AddGroup("HELPFUL", { layoutIndex = 10, candidateFilters = { includeSpellIDs = { 
+			HelpfulAllWhitelist = Auras_AddGroup(auras, "HELPFUL", { layoutIndex = 10, candidateFilters = { includeSpellIDs = { 
 
 			}}}),
 
 			-- Whitelisted player selfbuffs
-			HelpfulPlayerWhitelist = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 11, candidateFilters = { includeSpellIDs = {
+			HelpfulPlayerWhitelist = Auras_AddGroup(auras, "HELPFUL|PLAYER", { layoutIndex = 11, candidateFilters = { includeSpellIDs = {
 				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
 			}}}),
 
 			-- Regular player selfbuffs, with spammy stuff blacklisted
-			HelpfulPlayer = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+			HelpfulPlayer = Auras_AddGroup(auras, "HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
 
 			}}}),
 
 			-- Helpful buffs, long duration
-			HelpfulPlayerLong = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
+			HelpfulPlayerLong = Auras_AddGroup(auras, "HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
 
 			}}}),
 
 			-- Non-player buffs, with spammy stuff blacklisted
-			HelpfulNotPlayerLong = auras:AddGroup("HELPFUL|!PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
+			HelpfulNotPlayerLong = Auras_AddGroup(auras, "HELPFUL|!PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
 
 			}}}),
 
 			-- Whitelisted harmful auras
-			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = {
+			HarmfulAllWhitelist = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = {
 				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
 			}}}),
 
 			-- No duration harmful auras (lava on the floor, etc)
-			HarmfulAllDurationless = auras:AddGroup("HARMFUL", { layoutIndex = 101, candidateFilters = { maxDuration = 0, excludeSpellIDs = {
+			HarmfulAllDurationless = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 101, candidateFilters = { maxDuration = 0, excludeSpellIDs = {
 
 			}}}),
 
-			HarmfulPlayer = auras:AddGroup("HARMFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+			HarmfulPlayer = Auras_AddGroup(auras, "HARMFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
 
 			}}}),
 
 			-- Non-player harmful auras
-			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL|!PLAYER", { layoutIndex = 102, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+			HarmfulAllNotPlayer = Auras_AddGroup(auras, "HARMFUL|!PLAYER", { layoutIndex = 102, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
 
 			}}})
 		}

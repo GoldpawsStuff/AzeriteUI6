@@ -155,83 +155,6 @@ local GetCVarDefault = function(cvar)
 	return tonumber(value) or value
 end
 
--- Player-applied debuffs (top)
-local AuraButton_Initialize = function(button)
-	local icon = button:CreateTexture(nil, "BORDER")
-	icon:SetAllPoints()
-	icon:SetTexCoord(5/64, 59/64, 5/64, 59/64)
-	button.Icon = icon
-
-	local backdrop = button:CreateTexture(nil, "BACKGROUND")
-	backdrop:SetAllPoints()
-	backdrop:SetColorTexture(1, 1, 1, 1)
-	backdrop:SetVertexColor(.15, .15, .15, .7)
-	button.Backdrop = backdrop
-
-	local border = CreateFrame("Frame", nil, button, "BackdropTemplate")
-	border:SetBackdrop({ edgeFile = GetMedia("border-aura"), edgeSize = 12 })
-	border:SetBackdropBorderColor(oUF.colors.verydarkgray:GetRGB())
-	border:SetPoint("TOPLEFT", -6, 6)
-	border:SetPoint("BOTTOMRIGHT", 6, -6)
-	border:SetFrameLevel(button:GetFrameLevel() + 2)
-	button.Border = border
-
-	local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
-	cooldown:SetAllPoints()
-	cooldown:SetHideCountdownNumbers(true)
-	cooldown:SetDrawBling(false)
-	cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
-	button.Cooldown = cooldown
-
-	local time = border:CreateFontString(nil, "OVERLAY")
-	time:SetFontObject(GetFont(11, true))
-	time:SetPoint("CENTER", button, "TOPLEFT", 0, 0)
-	button.Time = time
-
-	button:SetSize(22, 22)
-	button:SetIcon(icon)
-	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
-end
-
-local AuraButton_InitializeSmall = function(button)
-	local icon = button:CreateTexture(nil, "BORDER")
-	icon:SetAllPoints()
-	icon:SetTexCoord(5/64, 59/64, 5/64, 59/64)
-	button.Icon = icon
-
-	local backdrop = button:CreateTexture(nil, "BACKGROUND")
-	backdrop:SetAllPoints()
-	backdrop:SetColorTexture(1, 1, 1, 1)
-	backdrop:SetVertexColor(.15, .15, .15, .7)
-	button.Backdrop = backdrop
-
-	local border = CreateFrame("Frame", nil, button, "BackdropTemplate")
-	border:SetBackdrop({ edgeFile = GetMedia("border-aura"), edgeSize = 12 })
-	border:SetBackdropBorderColor(oUF.colors.verydarkgray:GetRGB())
-	border:SetPoint("TOPLEFT", -6, 6)
-	border:SetPoint("BOTTOMRIGHT", 6, -6)
-	border:SetFrameLevel(button:GetFrameLevel() + 2)
-	button.Border = border
-
-	local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
-	cooldown:SetAllPoints()
-	cooldown:SetHideCountdownNumbers(true)
-	cooldown:SetDrawBling(false)
-	cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
-	button.Cooldown = cooldown
-
-	local time = border:CreateFontString(nil, "OVERLAY")
-	time:SetFontObject(GetFont(11, true))
-	time:SetPoint("CENTER", button, "TOPLEFT", 0, 0)
-	button.Time = time
-
-	button:SetSize(18, 18)
-	button:SetIcon(icon)
-	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
-end
-
 -- Unit comparison compatible with secrets
 local UnitIsUnit = function(unit1, unit2)
 	return unit1 and unit2 and C_Secrets.CanCompareUnitTokens(unit1, unit2) and _G.UnitIsUnit(unit1, unit2) -- use the global
@@ -649,7 +572,7 @@ local style = function(self, unit)
 			}
 		},
 		maxFrameCount = 4, -- blizz default
-		initializeFrame = AuraButton_Initialize,
+		initializeFrame = ns.AuraButton_InitializeNamePlateDebuff,
 		layout = {
 			elementSpacing = 4, -- horizontal gap between icons
 			lineSpacing = 4 -- vertical gap between rows
@@ -667,7 +590,7 @@ local style = function(self, unit)
 			excludeSpellIDs = {}
 		},
 		maxFrameCount = 2,
-		initializeFrame = AuraButton_InitializeSmall,
+		initializeFrame = ns.AuraButton_InitializeNamePlateBuff,
 		layout = {
 			elementSpacing = 4,
 			lineSpacing = 4
@@ -685,7 +608,7 @@ local style = function(self, unit)
 			}
 		},
 		maxFrameCount = 2,
-		initializeFrame = AuraButton_InitializeSmall,
+		initializeFrame = ns.AuraButton_InitializeNamePlateCC,
 		layout = {
 			elementSpacing = 4,
 			lineSpacing = 4,

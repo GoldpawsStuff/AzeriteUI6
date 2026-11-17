@@ -138,6 +138,16 @@ local createAlphaCurve = function(min, max)
 	return alphaCurve
 end
 
+-- Add an aura filter group and apply styling
+local Auras_AddGroup = function(element, filter, data)
+	if (string.find(filter, "HARM")) then
+		data.initializeFrame = ns.AuraButton_InitializeBigDebuff
+	else
+		data.initializeFrame = ns.AuraButton_InitializeBigBuff
+	end 
+	return element:AddGroup(filter, data)
+end
+
 -- Set the index of an aura group.
 local Auras_SetGroupIndex = function(element, groupKey, index)
 	element:SetAuraGroupLayout(groupKey, {
@@ -793,9 +803,6 @@ local style = function(self, unit)
 		auras:SetSize(40*8 - 4, 40*2 - 4)
 		auras:SetPoint("BOTTOMLEFT", 158, 91)
 
-		-- Custom style function
-		auras.PostCreateButton = ns.AuraButton_PostCreate
-		
 		-- Enable some sub-widgets
 		auras.durationBinding = binding
 		auras.showCount = true
@@ -821,37 +828,37 @@ local style = function(self, unit)
 		auras.Groups = {
 
 			-- Boss Auras, always top priority
-			HarmfulBoss = auras:AddGroup("HARMFUL", { layoutIndex = 1, candidateFilters = { isBossAura = true } }),
-			HelpfulBoss = auras:AddGroup("HELPFUL", { layoutIndex = 2, candidateFilters = { isBossAura = true } }),
+			HarmfulBoss = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 1, candidateFilters = { isBossAura = true } }),
+			HelpfulBoss = Auras_AddGroup(auras, "HELPFUL", { layoutIndex = 2, candidateFilters = { isBossAura = true } }),
 
 			-- Whitelisted buffs from anybody
-			HelpfulAllWhitelist = auras:AddGroup("HELPFUL", { layoutIndex = 10, candidateFilters = { includeSpellIDs = {
+			HelpfulAllWhitelist = Auras_AddGroup(auras, "HELPFUL", { layoutIndex = 10, candidateFilters = { includeSpellIDs = {
 				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
 				--[1328827] = true, -- Poised
 			}}}),
 
 			-- Whitelisted player selfbuffs
-			HelpfulPlayerWhitelist = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 11, candidateFilters = { includeSpellIDs = {
+			HelpfulPlayerWhitelist = Auras_AddGroup(auras, "HELPFUL|PLAYER", { layoutIndex = 11, candidateFilters = { includeSpellIDs = {
 
 			}}}),
 
 			-- Regular player selfbuffs, with spammy stuff blacklisted
-			HelpfulPlayer = auras:AddGroup("HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
+			HelpfulPlayer = Auras_AddGroup(auras, "HELPFUL|PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 60, excludeSpellIDs = {
 
 			}}}),
 
 			-- Whitelisted harmful auras
-			HarmfulAllWhitelist = auras:AddGroup("HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = { 
+			HarmfulAllWhitelist = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 100, candidateFilters = { includeSpellIDs = { 
 				-- limited to auras marked NotSecretEnum.SecrecyLevel.NeverSecret
 			}}}),
 
 			-- No duration harmful auras (lava on the floor, etc)
-			HarmfulAllDurationless = auras:AddGroup("HARMFUL", { layoutIndex = 101, candidateFilters = { maxDuration = 0, excludeSpellIDs = {
+			HarmfulAllDurationless = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 101, candidateFilters = { maxDuration = 0, excludeSpellIDs = {
 
 			}}}),
 
 			-- Regular harmful auras
-			HarmfulAllNotPlayer = auras:AddGroup("HARMFUL", { layoutIndex = 102, candidateFilters = { maxDuration = 600, excludeSpellIDs = { -- res sickness is 10 mins
+			HarmfulAllNotPlayer = Auras_AddGroup(auras, "HARMFUL", { layoutIndex = 102, candidateFilters = { maxDuration = 600, excludeSpellIDs = { -- res sickness is 10 mins
 
 			}}})
 		}
