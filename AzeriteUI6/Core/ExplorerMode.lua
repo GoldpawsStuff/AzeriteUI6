@@ -160,7 +160,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadePetBar = {
 				type = "toggle", width = "full",
-				name = L["Pet Bar"],
+				name = L["Action Bars: Pet Bar"],
 				desc = L["Fade out the Pet Bar."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -174,7 +174,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadeStanceBar = {
 				type = "toggle", width = "full",
-				name = L["Stance Bar"],
+				name = L["Action Bars: Stance Bar"],
 				desc = L["Fade out the Stance Bar."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -188,7 +188,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadePlayerFrame = {
 				type = "toggle", width = "full",
-				name = L["Player Frame"],
+				name = L["Unit Frame: Player"],
 				desc = L["Fade out the Player Frame."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -202,7 +202,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadePlayerClassPower = {
 				type = "toggle", width = "full",
-				name = L["Player Class Power"],
+				name = L["Unit Frame: Player Class Power"],
 				desc = L["Fade out the Player Class Power Frame."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -216,7 +216,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadePetFrame = {
 				type = "toggle", width = "full",
-				name = L["Pet Frame"],
+				name = L["Unit Frame: Player's Pet"],
 				desc = L["Fade out the Pet Frame."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -230,7 +230,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadeFocusFrame = not ns.WoWVanilla and {
 				type = "toggle", width = "full",
-				name = L["Focus Frame"],
+				name = L["Unit Frame: Focus"],
 				desc = L["Fade out the Focus Frame."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -768,18 +768,6 @@ ExplorerMode.UpdateSettings = function(self)
 			end
 		end
 	end
-
-	-- Objectives Tracker
-	--------------------------------------------
-	--local ObjectiveTracker = ns:GetModule("ObjectiveTracker", true)
-	--if (ObjectiveTracker) then
-	--	local fade = not self.FORCED and ObjectiveTracker:IsEnabled() and db.enabled and db.fadeTracker
-	--	if (fade) then
-	--		LFF:RegisterFrameForFading(ObjectiveTrackerFrame, ObjectiveTracker:GetName())
-	--	else
-	--		LFF:UnregisterFrameForFading(ObjectiveTrackerFrame)
-	--	end
-	--end
 
 	-- Chat Windows
 	--------------------------------------------

@@ -197,6 +197,34 @@ local style = function(self, unit)
 
 end
 
+ToT.GetDefaults = function(self)
+	return defaults
+end
+
+ToT.GetOptions = function(self)
+	return {
+		type = "group",
+		name = L["Unit Frame: Target of Target"],
+		arg = { menuName = L["UF: Target's Target"] },
+		order = 225,
+		args = {
+			enable = {
+				type = "toggle", width = "full",
+				name = L["Enable"],
+				desc = L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."],
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return self.db.profile.enabled end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.enabled = val 
+					self:UpdateSettings()
+				end,
+				order = 1
+			},
+		}
+	}
+end
+
 -- Return the unitframe
 ToT.GetFrame = function(self)
 	return self.frame

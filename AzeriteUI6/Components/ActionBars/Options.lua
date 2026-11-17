@@ -117,29 +117,47 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 	if (not mod or not mod:IsEnabled()) then return end
 
 	local order, name, numButtons
+	local menuName, title
 
 	local numBar = tonumber(barID)
 	if (numBar) then
 		order = 100 + numBar
-		name = L["Action Bar "..barID]
+		name = "Action Bar "..barID
 		numButtons = NUM_ACTIONBAR_BUTTONS or 12
+
+		if (numBar == 1) then
+			menuName = L["AB: Primary"] 
+			title = L["Primary Action Bar"]
+		else
+			menuName = string.format(L["AB: Multi Bar %d"], numBar - 1)
+			title = string.format(L["Multi Action Bar %d"], numBar - 1)
+		end
 
 	elseif (barID == "pet") then
 		order = 110
-		name = L["Pet Bar"]
+		name = "Pet Bar"
 		numButtons = NUM_PET_ACTION_SLOTS or 10
+
+		menuName = L["AB: Pet Bar"]
+		title = L["Pet Action Bar"]
+
 
 	elseif (barID == "stance") then
 		order = 120
-		name = L["Stance Bar"]
+		name = "Stance Bar"
 		numButtons = GetNumShapeshiftForms() or 10 
+
+		menuName = L["AB: Stance Bar"]
+		title = L["Stance Bar"]
+
 	end
 
 	if (not order) then return end
 
 	return {
 		type = "group",
-		name = name,
+		name = title or name,
+		arg = menuName and { menuName = menuName } or nil,
 		order = order;
 		args = {
 			-- unfinished settings:
@@ -151,6 +169,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of this Action Bar. Note that disabling this does not re-enable the game's default Action Bars."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return mod.db.profile.enabled end,
 				set = function(info, val) 

@@ -879,12 +879,14 @@ end
 Player.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Player Frame"],
+		name = L["Unit Frame: Player"],
+		arg = { menuName = L["UF: Player"] },
 		order = 200,
 		args = {
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
@@ -895,36 +897,36 @@ Player.GetOptions = function(self)
 				order = 1
 			},
 
-			aurastitle = {
-
-			},
+			--aurastitle = {
+			--
+			--},
 			aurasdescription = { 
 				type = "description", fontSize = "medium", name = " ", 
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
 				order = 29
 			},
-			enableauras = {
-				
-			},
-			enableBuffs = {
-
-			},
-			enableDebuffs = {
-
-			},
-			showLongAuras = {
-
-			},
-			showStaticAuras = {
-
-			},
-			showShort = {
-
-			},
-			showShort = {
-
-			},
+--			enableauras = {
+--				
+--			},
+--			enableBuffs = {
+--
+--			},
+--			enableDebuffs = {
+--
+--			},
+--			showLongAuras = {
+--
+--			},
+--			showStaticAuras = {
+--
+--			},
+--			showShort = {
+--
+--			},
+--			showShort = {
+--
+--			},
 
 
 		}

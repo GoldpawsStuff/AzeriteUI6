@@ -395,6 +395,7 @@ ChatFrames.UpdateTabAlpha = function(self, frame)
 	end
 end
 
+-- Doesn't really work anymore?
 ChatFrames.UpdateChatFading = function(self, frame)
 	if (not frame) then return end
 

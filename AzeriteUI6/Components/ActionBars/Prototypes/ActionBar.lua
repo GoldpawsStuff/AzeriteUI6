@@ -152,7 +152,7 @@ local bonusBarOffsets =
 		WARRIOR = { 1, 2, 3 } 		-- Battle Stance, Defensive Stance, Berserker Stance
 	})[playerClass] or 
 
-	-- Midnight (Retail)
+	-- Midnight
 	(ns.WoWMidnight or ns.WoWMainline) and ({ 
 		DRUID 	= { 1, 3, 4 }, 		-- Cat/Prowl, Bear, Moonkin
 		EVOKER 	= { 1 }, 			-- Soar

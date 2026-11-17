@@ -1023,12 +1023,14 @@ end
 Target.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Target Frame"],
+		name = L["Unit Frame: Target"], 
+		arg = { menuName = L["UF: Target"] },
 		order = 220,
 		args = {
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 

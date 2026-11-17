@@ -52,7 +52,11 @@ ns.WoWTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) -- TBC Class
 ns.WoWWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC) -- Wrath of the Lich King Classic
 ns.WoWCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC) -- Cataclysm Classic
 ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC) -- Mists of Pandaria Classic
+
+-- Only useful when moving from Midnight to the next expansion
 ns.WoWMidnight = (ns.WoW12 and not ns.WoW13) -- Retail changes, Midnight is a specific version
+
+-- Let's phase out the usage of these.
 ns.WoWForever = ns.WoWCamelot
 ns.WoWRetail = ns.WoWMainline
 
@@ -151,10 +155,12 @@ ns.GenerateOptions = function(self)
 		local module = subModules[name]
 		local moduleOptions = module:GetOptions()
 		moduleOptions.dialogHidden = true
+
+		local menuName = moduleOptions.arg and moduleOptions.arg.menuName or moduleOptions.name
 	
 		local moduleAppName = addonName .. "_" .. name
 		AceConfig:RegisterOptionsTable(moduleAppName, moduleOptions)
-		AceConfigDialog:AddToBlizOptions(moduleAppName, moduleOptions.name or name, addonTitle)
+		AceConfigDialog:AddToBlizOptions(moduleAppName,  menuName or name, addonTitle)
 	end
 
 	-- add profiles, etc.

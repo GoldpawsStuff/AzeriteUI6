@@ -147,12 +147,14 @@ end
 Pet.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Pet Frame"],
+		name = L["Unit Frame: Player's Pet"],
+		arg = { menuName = L["UF: Pet"] },
 		order = 210,
 		args = {
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 

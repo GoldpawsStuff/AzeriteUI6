@@ -504,12 +504,14 @@ end
 ClassPower.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Player Class Power"],
-		order = 205,
+		name = L["Unit Frame: Player Class Power"],
+		arg = { menuName = L["UF: Class Power"] },
+		order = 235,
 		args = {
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 

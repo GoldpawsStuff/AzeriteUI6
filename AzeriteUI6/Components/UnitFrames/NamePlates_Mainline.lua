@@ -873,12 +873,14 @@ end
 NamePlates.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Nameplates"],
+		name = L["Unit Frame: Name Plates"],
+		arg = { menuName = L["UF: Name Plates"] },
 		order = 300,
 		args = {
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of our Name Plates. Note that disabling this will force a user interface reload to re-enable the game's default Name Plates."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 

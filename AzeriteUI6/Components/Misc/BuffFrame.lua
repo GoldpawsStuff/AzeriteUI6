@@ -42,12 +42,14 @@ end
 PlayerAuras.GetOptions = function(self)
 	return {
 		type = "group",
-		name = HUD_EDIT_MODE_BUFFS_AND_DEBUFFS_LABEL, -- "Buffs and Debuffs"
+		name = L["Buffs & Debuffs"],
+		arg = { menuName = L["Buffs & Debuffs"] },
 		order = 500,
 		args = {
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of our Buff & Debuff Frames. Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
