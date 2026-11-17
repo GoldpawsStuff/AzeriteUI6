@@ -799,6 +799,11 @@ NamePlates.GetOptions = function(self)
 		arg = { menuName = L["UF: Name Plates"] },
 		order = 300,
 		args = {
+			important_message = {
+				type = "description", fontSize = "large",
+				name = "The Name Plate options are currently under construction.|nCheck back later to see if they're finished!",
+				order = 1
+			},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
@@ -810,7 +815,7 @@ NamePlates.GetOptions = function(self)
 					self.db.profile.enabled = val 
 					self:UpdateSettings()
 				end,
-				order = 1
+				order = 2
 			},
 			nameplateSize = {
 				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1,

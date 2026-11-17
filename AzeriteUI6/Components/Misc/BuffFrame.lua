@@ -46,6 +46,11 @@ PlayerAuras.GetOptions = function(self)
 		arg = { menuName = L["Buffs & Debuffs"] },
 		order = 500,
 		args = {
+			important_message = {
+				type = "description", fontSize = "large",
+				name = "The Player Aura frames are currently under construction.|nCheck back later to see if they're finished!|n|nIf you wish to see the default Buff & Debuff frames until that point in time, just uncheck the 'Enable' checkbutton below and see it done!|n|n",
+				order = 1
+			},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
@@ -57,7 +62,7 @@ PlayerAuras.GetOptions = function(self)
 					self.db.profile.enabled = val 
 					self:UpdateSettings()
 				end,
-				order = 1
+				order = 10
 			},
 		}
 	}

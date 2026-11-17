@@ -208,6 +208,11 @@ ToT.GetOptions = function(self)
 		arg = { menuName = L["UF: Target's Target"] },
 		order = 225,
 		args = {
+			important_message = {
+				type = "description", fontSize = "large",
+				name = "The Target of Target Unit Frame options are currently under construction.|nCheck back later to see if they're finished!",
+				order = 1
+			},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
@@ -219,7 +224,7 @@ ToT.GetOptions = function(self)
 					self.db.profile.enabled = val 
 					self:UpdateSettings()
 				end,
-				order = 1
+				order = 2
 			},
 		}
 	}
