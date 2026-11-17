@@ -561,6 +561,7 @@ local style = function(self, unit)
 	local aurasHarmful = self:CreateAuras()
 	aurasHarmful:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", -8, 10)
 	aurasHarmful:SetWidth(100)
+	aurasHarmful:SetFrameLevel(self:GetFrameLevel() + 15)
 	aurasHarmful:AddGroup("HARMFUL|PLAYER|INCLUDE_NAME_PLATE_ONLY|!CROWD_CONTROL", {
 		candidateFilters = {
 			nameplateShowPersonal = true,
@@ -580,6 +581,7 @@ local style = function(self, unit)
 	-- Right: Important buffs (nameplateShowAll)
 	local aurasHelpful = self:CreateAuras()
 	aurasHelpful:SetPoint("LEFT", self.Classification, "RIGHT", 4, 1)
+	aurasHelpful:SetFrameLevel(self:GetFrameLevel() + 15)
 	aurasHelpful:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY", {
 		candidateFilters = {
 			nameplateShowAll = true,
@@ -598,6 +600,7 @@ local style = function(self, unit)
 	-- Left: Crowd Control
 	local aurasCC = self:CreateAuras()
 	aurasCC:SetPoint("RIGHT", self.Health, "LEFT", -4, 0)
+	aurasCC:SetFrameLevel(self:GetFrameLevel() + 15)
 	aurasCC:AddGroup("HARMFUL|CROWD_CONTROL", {
 		candidateFilters = {
 			excludeSpellIDs = {

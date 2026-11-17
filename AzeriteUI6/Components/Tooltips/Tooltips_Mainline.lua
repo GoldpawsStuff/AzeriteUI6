@@ -58,21 +58,24 @@ end
 
 Tooltips.StyleGameTooltip = function(self)
 
-	-- Apply on show and after style resets
-	self:HookScript(GameTooltip, "OnShow", StyleTooltip)
-	self:HookScript(GameTooltip, "OnTooltipCleared", StyleTooltip)
+	-- We'd like a few more here, but secrecy made it all so hush-hush
+	for tooltipName in next,{
+		ItemRefTooltip = true,
+		ShoppingTooltip1 = true,
+		ShoppingTooltip2 = true,
+		GameTooltip = true
+	} do
+		-- Apply on show and after style resets
+		local tooltip = _G[tooltipName]
+		if (tooltip) then
+			self:HookScript(tooltip, "OnShow", StyleTooltip)
+			self:HookScript(tooltip, "OnTooltipCleared", StyleTooltip)
+		end
+	end
 
 	-- Also catch the common style reset path
 	if (SharedTooltip_SetBackdropStyle) then
 		self:SecureHook("SharedTooltip_SetBackdropStyle", StyleTooltip)
-	end
-
-	-- Shopping / compare tooltips if you want them matching
-	for _,tooltipName in ipairs({ "ShoppingTooltip1", "ShoppingTooltip2", "ItemRefTooltip" }) do
-		local tooltip = _G[tooltipName]
-		if (tooltip) then
-			self:HookScript(tooltip, "OnShow", StyleTooltip)
-		end
 	end
 
 	-- Put the statusbar inside the tooltip. It's cleaner. 
@@ -81,6 +84,20 @@ Tooltips.StyleGameTooltip = function(self)
 		GameTooltipStatusBar:ClearAllPoints()
 		GameTooltipStatusBar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT", 6, 5)
 		GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "BOTTOMRIGHT", -6, 5)
+	end
+
+	-- Style the Forever/Mainline unit frame aura tooltip
+	-- *tooltip is still hidden, we can't access methods directly, just this.
+	if (AuraContainerInbound and AuraContainerInbound.SetTooltipBackdrop) then 
+		AuraContainerInbound.SetTooltipBackdrop({
+			backdropInfo = {
+				bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
+				edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+				edgeSize = 12,
+			},
+			borderColor = CreateColor(.45, .45, .55, 1),
+			centerColor = CreateColor(.05, .05, .15, .96),
+		})
 	end
 end
 

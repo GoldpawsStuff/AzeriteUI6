@@ -82,9 +82,9 @@ local BAR_TO_ID = {
 	[3] = BOTTOMRIGHT_ACTIONBAR_PAGE, -- multibar 2
 	[4] = RIGHT_ACTIONBAR_PAGE, -- multibar 3
 	[5] = LEFT_ACTIONBAR_PAGE, -- multibar 4
-	[6] = (ns.WoW12 or ns.WoWCamelot) and MULTIBAR_5_ACTIONBAR_PAGE or nil, -- multibar 5
-	[7] = (ns.WoW12 or ns.WoWCamelot) and MULTIBAR_6_ACTIONBAR_PAGE or nil, -- multibar 6
-	[8] = (ns.WoW12 or ns.WoWCamelot) and MULTIBAR_7_ACTIONBAR_PAGE or nil -- multibar 7
+	[6] = (ns.WoWMainline or ns.WoWCamelot) and MULTIBAR_5_ACTIONBAR_PAGE or nil, -- multibar 5
+	[7] = (ns.WoWMainline or ns.WoWCamelot) and MULTIBAR_6_ACTIONBAR_PAGE or nil, -- multibar 6
+	[8] = (ns.WoWMainline or ns.WoWCamelot) and MULTIBAR_7_ACTIONBAR_PAGE or nil -- multibar 7
 }
 
 -- Return our bar number from blizzard barID.
@@ -262,7 +262,7 @@ ns.ActionBar.Create = function(self, barNum, config, name)
 		button.config.keyBoundTarget = keyBoundTarget
 	end
 
-	if (ns.WoW12) then
+	if (ns.WoWMainline) then
 		EventRegistry:RegisterCallback("HouseEditor.StateUpdated", function(_, state) bar:HousingStateChanged(state) end, bar)
 	end
 

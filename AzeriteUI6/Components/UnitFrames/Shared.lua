@@ -199,6 +199,27 @@ local Auras_CreateFourSlice = function(button, showWhenHarmful, showWhenHelpful)
 	button.DispelRing = ring
 end
 
+-- Set the tooltip anchor with blizzard's highly illogical anchor point names.
+-- 	
+-- 	ANCHOR_TOPLEFT 		Above the icon, growing right
+-- 	ANCHOR_TOP			Centered above
+-- 	ANCHOR_TOPRIGHT		Above, aligned to the icon's right edge
+-- 	ANCHOR_RIGHT		Up and to the right of the icon's top-right
+-- 	ANCHOR_BOTTOM		RIGHTBelow, growing right
+-- 	ANCHOR_BOTTOM		Centered below
+-- 	ANCHOR_BOTTOMLEFT	Below and to the left 
+-- 	ANCHOR_LEFT			Up and to the left
+-- 	ANCHOR_CURSOR		At the mouse
+-- 	
+local Auras_SetTooltipAnchor = function(button)
+	local unit = button:GetParent().__owner.__unit
+	if (unit == "player") then 
+		button:SetTooltipAnchorPoint("ANCHOR_RIGHT", 0, 4) -- tooltip's bottom left anchored to the icon's top right
+	else
+		button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
+	end
+end
+
 ns.AuraButton_InitializeBigBuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -240,6 +261,8 @@ ns.AuraButton_InitializeBigBuff = function(button)
 	button:SetIcon(icon)
 	button:SetDurationCooldown(cooldown)
 	button:SetDurationText(time, { textFormatter = timeFormatter })
+
+	Auras_SetTooltipAnchor(button)
 end
 
 ns.AuraButton_InitializeBigDebuff = function(button)
@@ -283,6 +306,7 @@ ns.AuraButton_InitializeBigDebuff = function(button)
 	button:SetDurationText(time, { textFormatter = timeFormatter })
 
 	Auras_CreateFourSlice(button, true, false)
+	Auras_SetTooltipAnchor(button)
 end
 
 -- NamePlate debuffs

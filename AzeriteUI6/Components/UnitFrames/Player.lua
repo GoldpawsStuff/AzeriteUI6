@@ -36,73 +36,6 @@ local defaults = { profile = {
 	enabled = true,
 	alwaysUseCrystal = false, -- always use crystal, never the mana orb
 	useIceCrystal = false, -- use the special wotlk ice crystal instead
-
-	-- modern aura settings
-	auras = (ns.WoW12 or ns.WoWCamelot) and {
-		enabled = true,
-		groups = {
-			helpful = {
-				boss = {
-					order = 100,
-					enabled = true,
-				},
-				whitelist = {
-					order = 100,
-					enabled = true,
-				},
-				noDuration = {
-					order = 100,
-					enabled = true,
-					showInCombat = false,
-					showOoC = true
-				},
-				shortDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 60, -- 1 minute
-					showInCombat = true,
-					showOoC = true
-				},
-				longDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 3600, -- 1 hour
-					showInCombat = false,
-					showOoC = true
-				}
-			},
-			harmful = {
-				boss = {
-					order = 100,
-					enabled = true,
-				},
-				whitelist = {
-					order = 100,
-					enabled = true,
-				},
-				noDuration = {
-					order = 100,
-					enabled = true,
-					showInCombat = false,
-					showOoC = true
-				},
-				shortDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 60, -- 1 minute
-					showInCombat = true,
-					showOoC = true
-				},
-				longDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 3600, -- 1 hour
-					showInCombat = false,
-					showOoC = true
-				}
-			},
-		}
-	} or nil,
 }}
 
 -- Custom API locals
@@ -790,7 +723,7 @@ local style = function(self, unit)
 	end
 
 	-- Modern Secrecy Auras
-	if (ns.WoW12 or ns.WoWCamelot) then
+	if (ns.WoWMainline or ns.WoWCamelot) then
 
 		-- Little hack to avoid "stuck" numbers on auras with no duration
 		local binding = C_DurationUtil.CreateDurationTextBinding()
@@ -819,9 +752,9 @@ local style = function(self, unit)
 		auras.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
 		auras.sortDirection = AuraContainerSortDirection.Normal
 		auras.sortMethod = AuraContainerSortMethod.ExpirationOnly 
-		auras.tooltipAnchor = "ANCHOR_TOPLEFT"
-		auras.tooltipOffsetX = 0
-		auras.tooltipOffsetY = 4
+		--auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT" -- doesn't obey this at all
+		--auras.tooltipOffsetX = 0
+		--auras.tooltipOffsetY = 4
 
 		-- Aura Groups
 		-- *named and referenced for easy enabling/disabling
@@ -903,111 +836,8 @@ Player.GetOptions = function(self)
 				end,
 				order = 1
 			},
-
-			--aurastitle = {
-			--
-			--},
-			aurasdescription = { 
-				type = "description", fontSize = "medium", name = " ", 
-				disabled = function() return InCombatLockdown() end,
-				hidden = function() return not self.db.profile.enabled end,
-				order = 29
-			},
---			enableauras = {
---				
---			},
---			enableBuffs = {
---
---			},
---			enableDebuffs = {
---
---			},
---			showLongAuras = {
---
---			},
---			showStaticAuras = {
---
---			},
---			showShort = {
---
---			},
---			showShort = {
---
---			},
-
-
 		}
 	}
-
-
-	--[[
-	-- modern aura settings
-	auras = (ns.WoW12 or ns.WoWCamelot) and {
-		enabled = true,
-		groups = {
-			helpful = {
-				boss = {
-					order = 100,
-					enabled = true,
-				},
-				whitelist = {
-					order = 100,
-					enabled = true,
-				},
-				noDuration = {
-					order = 100,
-					enabled = true,
-					showInCombat = false,
-					showOoC = true
-				},
-				shortDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 60, -- 1 minute
-					showInCombat = true,
-					showOoC = true
-				},
-				longDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 3600, -- 1 hour
-					showInCombat = false,
-					showOoC = true
-				}
-			},
-			harmful = {
-				boss = {
-					order = 100,
-					enabled = true,
-				},
-				whitelist = {
-					order = 100,
-					enabled = true,
-				},
-				noDuration = {
-					order = 100,
-					enabled = true,
-					showInCombat = false,
-					showOoC = true
-				},
-				shortDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 60, -- 1 minute
-					showInCombat = true,
-					showOoC = true
-				},
-				longDuration = {
-					order = 100,
-					enabled = true,
-					maxDuration = 3600, -- 1 hour
-					showInCombat = false,
-					showOoC = true
-				}
-			},
-		}
-	} or nil
-	]]	
 end
 
 -- Return the unitframe
@@ -1045,6 +875,9 @@ Player.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Just taking out the trash
+	self.db.profile.auras = nil
 end
 
 Player.OnEnable = function(self)

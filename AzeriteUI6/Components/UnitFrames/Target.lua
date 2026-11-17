@@ -817,7 +817,7 @@ local style = function(self, unit)
 	local portraitOverlayFrame = nil
 	portraitOverlayFrame = CreateFrame("Frame", nil, self, "PingReceiverAttributeTemplate")
 
-	if (ns.WoW12 or ns.WoWCamelot) then
+	if (ns.WoWMainline or ns.WoWCamelot) then
 		Mixin(portraitOverlayFrame, PingableTypeMixin)
 	end
 
@@ -902,7 +902,7 @@ local style = function(self, unit)
 
 	-- Auras
 	--------------------------------------------
-	if (ns.WoW12 or ns.WoWCamelot) then
+	if (ns.WoWMainline or ns.WoWCamelot) then
 
 		-- Little hack to avoid "stuck" numbers on auras with no duration
 		local binding = C_DurationUtil.CreateDurationTextBinding()
@@ -932,9 +932,9 @@ local style = function(self, unit)
 		auras.groupLineSpacing = 4 -- Spacing between each group row or column 
 		auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
 		auras.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
-		auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
-		auras.tooltipOffsetX = 0
-		auras.tooltipOffsetY = -4
+		--auras.tooltipAnchor = "ANCHOR_TOPRIGHT"
+		--auras.tooltipOffsetX = 0
+		--auras.tooltipOffsetY = -4
 
 		-- Aura Groups
 		-- *named and referenced for easy enabling/disabling
