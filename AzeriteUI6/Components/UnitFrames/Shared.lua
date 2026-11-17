@@ -412,56 +412,9 @@ ns.GetAuraWhitelistByKeywords = function(...)
 	return unpack(list)
 end
 
--- oUF Scripts
------------------------------------------
-local UpdateTooltip = function(self)
-	if (GameTooltip:IsForbidden()) then return end
-	GameTooltip:SetUnit(self.unit)
-end
-
-local OnEnter = function(self)
-	if (GameTooltip:IsForbidden()) then return end
-
-	local unit = self.__unit or self:GetAttribute("unit")
-	if (not unit or not UnitExists(unit)) then return end
-
-	GameTooltip_SetDefaultAnchor(GameTooltip, self)
-
-	if (GameTooltip:SetUnit(unit)) then
-		GameTooltip:Show()
-	end
-end
-
-local OnLeave = function(self)
-	if (GameTooltip:IsForbidden()) then return end
-	GameTooltip:Hide()
-end
-
-local RegisterMouseScripts = function(self)
-	self:RegisterForClicks("AnyUp")
-	self:EnableMouse(true) -- this isn't automatic anymore?
-	self:SetScript("OnEnter", OnEnter) 
-	self:SetScript("OnLeave", OnLeave)
-end
-
-oUF:RegisterMetaFunction("RegisterMouseScripts", RegisterMouseScripts)
-
--- Classic oUF parents new frames to its own frame, 
--- but that frame hasn't had its points set.
--- This messes up our movable frame system.
-local SetAllParentPoints = function(self)
-	local parent = self:GetParent()
-	if (parent ~= UIParent) then
-		parent:ClearAllPoints()
-		parent:SetAllPoints(UIParent)
-	end
-end
-
-oUF:RegisterMetaFunction("SetAllParentPoints", SetAllParentPoints)
-
 -- Note that we still need to replace this method because of our  
 -- slightly adjusted threat coloring which is incompatible with secret values.
-ns.UpdateHealthColor = function(self, event, unit)
+ns.Health_UpdateColor = function(self, event, unit)
 	if(not unit or self.__unit ~= unit) then return end
 	local element = self.Health
 
@@ -509,3 +462,45 @@ ns.UpdateHealthColor = function(self, event, unit)
 		element:PostUpdateColor(unit, color)
 	end
 end
+
+-- oUF Scripts
+-----------------------------------------
+local UnitFrame_OnEnter = function(self)
+	if (GameTooltip:IsForbidden()) then return end
+
+	local unit = self.__unit or self:GetAttribute("unit")
+	if (not unit or not UnitExists(unit)) then return end
+
+	GameTooltip_SetDefaultAnchor(GameTooltip, self)
+
+	if (GameTooltip:SetUnit(unit)) then
+		GameTooltip:Show()
+	end
+end
+
+local UnitFrame_OnLeave = function(self)
+	if (GameTooltip:IsForbidden()) then return end
+	GameTooltip:Hide()
+end
+
+local RegisterMouseScripts = function(self)
+	self:RegisterForClicks("AnyUp")
+	self:EnableMouse(true) -- this isn't automatic anymore?
+	self:SetScript("OnEnter", UnitFrame_OnEnter) 
+	self:SetScript("OnLeave", UnitFrame_OnLeave)
+end
+
+oUF:RegisterMetaFunction("RegisterMouseScripts", RegisterMouseScripts)
+
+-- Classic oUF parents new frames to its own frame, 
+-- but that frame hasn't had its points set.
+-- This messes up our movable frame system.
+local SetAllParentPoints = function(self)
+	local parent = self:GetParent()
+	if (parent ~= UIParent) then
+		parent:ClearAllPoints()
+		parent:SetAllPoints(UIParent)
+	end
+end
+
+oUF:RegisterMetaFunction("SetAllParentPoints", SetAllParentPoints)

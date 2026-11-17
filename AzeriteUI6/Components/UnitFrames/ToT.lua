@@ -134,7 +134,7 @@ local style = function(self, unit)
 	-- *threat appears to be a secret on this particular unit(?), 
 	--  and thus cannot be used to index the threat color table.
 	--  Is this an issue for all eventless units? 
-	self.Health.UpdateColor = ns.UpdateHealthColor
+	self.Health.UpdateColor = ns.Health_UpdateColor
 
 	-- Cast bar
 	--------------------------------------------

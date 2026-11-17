@@ -32,164 +32,7 @@ local Target = ns:NewModule("Target", nil, "LibMoreEvents-1.0", "LibMovableFrame
 
 -- Declare module defaults
 local defaults = { profile = {
-	enabled = true,
-
-	enableClassColorFriend = true,
-	enableClassColorEnemy = true,
-	auras = {
-		enemyNPC = {
-			mobBuffs = true, 
-			personalDebuffs = true,
-			sharedCC = true,
-		},
-		enemyPlayer = {
-			enemyBuffs = true, 
-			personalDebuffs = true, 
-			bigDebuffs = true,
-		},
-		friendlyPlayer = {
-			personalBuffs = true, 
-			enemyDebuffs = true,
-			bigDebuff = true,
-		},
-	}
-
-
-	--[[
-	-- modern aura settings
-	auras = (ns.WoW12 or ns.WoWCamelot) and {
-		enabled = true,
-		groups = {
-			-- when unit is friendly to the player
-			friendlyTarget = {
-				helpful = {
-					boss = {
-						order = 100,
-						enabled = true,
-					},
-					whitelist = {
-						order = 100,
-						enabled = true,
-					,
-					noDuration = {
-						order = 100,
-						enabled = true,
-						showInCombat = false,
-						showOoC = true
-					},
-					shortDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 60, -- 1 minute
-						showInCombat = true,
-						showOoC = true
-					},
-					longDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 3600, -- 1 hour
-						showInCombat = false,
-						showOoC = true
-					}
-				},
-				harmful = {
-					boss = {
-						order = 100,
-						enabled = true,
-					},
-					whitelist = {
-						order = 100,
-						enabled = true,
-					},
-					noDuration = {
-						order = 100,
-						enabled = true,
-						showInCombat = false,
-						showOoC = true
-					},
-					shortDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 60, -- 1 minute
-						showInCombat = true,
-						showOoC = true
-					},
-					longDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 3600, -- 1 hour
-						showInCombat = false,
-						showOoC = false
-					}
-				}
-			},
-			-- when the player can attack the unit
-			hostileTarget = {
-				helpful = {
-					boss = {
-						order = 100,
-						enabled = true,
-					},
-					whitelist = {
-						order = 100,
-						enabled = true,
-					},
-					noDuration = {
-						order = 100,
-						enabled = true,
-						showInCombat = false,
-						showOoC = true
-					},
-					shortDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 60, -- 1 minute
-						showInCombat = true,
-						showOoC = true
-					},
-					longDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 3600, -- 1 hour
-						showInCombat = false,
-						showOoC = true
-					}
-				},
-				harmful = {
-					boss = {
-						order = 100,
-						enabled = true,
-					},
-					whitelist = {
-						order = 100,
-						enabled = true,
-					},
-					noDuration = {
-						order = 100,
-						enabled = true,
-						showInCombat = false,
-						showOoC = true
-					},
-					shortDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 60, -- 1 minute
-						showInCombat = true,
-						showOoC = true
-					},
-					longDuration = {
-						order = 100,
-						enabled = true,
-						maxDuration = 3600, -- 1 hour
-						showInCombat = false,
-						showOoC = true
-					}
-				}
-			}
-		}
-	} or nil
-	]]
-
+	enabled = true
 }}
 
 -- Custom API locals
@@ -241,21 +84,6 @@ local Auras_PostUpdate = function(element, event)
 	elseif (event ~= "PLAYER_REGEN_ENABLED") then
 		inCombat = UnitAffectingCombat(unit)
 	end
-
-	--[[--
-
-	Hostile Units
-		In combat
-
-		Not in combat
-
-
-	Friendly Units
-		In combat
-
-		Not in combat
-
-	--]] --
 
 	local canAttack = UnitCanAttack("player", unit)
 
@@ -422,6 +250,160 @@ local Castbar_OnUpdate = function(element, elapsed)
 			element.Texture:Show()
 		else
 			return element.Texture:Hide()
+		end
+	end
+end
+
+if (not ns.WoWCamelot and not ns.WoWMainline) then 
+	Castbar_OnUpdate = function(self, elapsed)
+
+		local duration
+		if(self.casting or self.channeling or self.empowering) then
+
+			local isCasting = self.casting or self.empowering
+			if(isCasting) then
+
+				duration = self.duration + elapsed
+
+				self.duration = duration
+
+				if(duration >= self.max) then
+					local spellID = self.spellID
+
+					self.castID = nil
+					self.casting = nil
+					self.channeling = nil
+					self.empowering = nil
+					self.isTradeSkill = nil
+					self.notInterruptible = nil
+					self.spellID = nil
+					self.spellName = nil
+					self.tradeSkillCastID = nil
+
+					for _, pip in next, self.Pips do
+						pip:Hide()
+					end
+
+					self:Hide()
+
+					if(self.PostCastStop) then
+						self:PostCastStop(self.__owner.__unit, spellID)
+					end
+
+					return
+				end
+
+				local name, text, texture, startTime, endTime, isTradeSkill, castID, notInterruptible = UnitCastingInfo(self.__owner.__unit, spellID)
+				if (ns.WoWVanilla) then
+					notInterruptible = false
+				end
+
+				endTime = endTime * 0.001
+				startTime = startTime * 0.001
+
+				local delta
+				if(self.channeling) then
+					delta = self.startTime - startTime
+
+					self.duration = endTime - GetTime()
+				else
+					delta = startTime - self.startTime
+
+					self.duration = GetTime() - startTime
+				end
+
+				if(delta < 0) then
+					delta = 0
+				end	
+
+				local perc = self.duration / (endTime - startTime) -- cast
+
+				self.Texture:SetTexCoord(perc, 0, 0, 1)
+			else
+
+				duration = self.duration - elapsed
+
+				self.duration = duration
+
+				if(duration <= 0) then
+					local spellID = self.spellID
+
+					self.castID = nil
+					self.casting = nil
+					self.channeling = nil
+					self.empowering = nil
+					self.isTradeSkill = nil
+					self.notInterruptible = nil
+					self.spellID = nil
+					self.spellName = nil
+					self.tradeSkillCastID = nil
+
+					for _, pip in next, self.Pips do
+						pip:Hide()
+					end
+
+					self:Hide()
+
+					if(self.PostCastStop) then
+						self:PostCastStop(self.__owner.__unit, spellID)
+					end
+
+					return
+				end
+
+				local name, text, texture, startTime, endTime, isTradeSkill, notInterruptible, spellID = UnitChannelInfo(self.__owner.__unit, spellID)
+				if (ns.WoWVanilla) then
+					notInterruptible = false
+				end
+
+				endTime = endTime * 0.001
+				startTime = startTime * 0.001
+
+				local delta
+				if(self.channeling) then
+					delta = self.startTime - startTime
+
+					self.duration = endTime - GetTime()
+				else
+					delta = startTime - self.startTime
+
+					self.duration = GetTime() - startTime
+				end
+
+				if(delta < 0) then
+					delta = 0
+				end	
+
+				local perc = self.duration / (endTime - startTime) 
+
+				self.Texture:SetTexCoord(perc, 0, 0, 1)
+			end
+
+		elseif(self.holdTime > 0) then
+			self.holdTime = self.holdTime - elapsed
+
+			self:SetMinMaxValues(0, 1)
+			self:SetValue(1)
+
+			if(self.Time) then
+				self.Time:SetText('')
+			end
+		else
+			self.castID = nil
+			self.casting = nil
+			self.channeling = nil
+			self.empowering = nil
+			self.isTradeSkill = nil
+			self.notInterruptible = nil
+			self.spellID = nil
+			self.spellName = nil
+			self.tradeSkillCastID = nil
+
+			for _, pip in next, self.Pips do
+				pip:Hide()
+			end
+
+			self:Hide()
 		end
 	end
 end
@@ -703,7 +685,7 @@ local style = function(self, unit)
 	self.Health.Value = healthValue
 	self.Health.ValuePercent = healthPerc
 	self.Health.Texture = healthTex
-	self.Health.UpdateColor = ns.UpdateHealthColor
+	self.Health.UpdateColor = ns.Health_UpdateColor
 	self.Health.PostUpdateColor = Health_PostUpdateColor
 
 	-- Apply scripts that update our reversed bar texture.
@@ -773,9 +755,8 @@ local style = function(self, unit)
 	self.Castbar.Texture = castbarTex
 	self.Castbar.Text = castName
 	self.Castbar.Time = castbarTime
-	--self.Castbar.OnUpdate = Castbar_OnUpdate -- don't do this, we need oUFs code here
+	--self.Castbar.OnUpdate = (not ns.WoWCamelot and not ns.WoWMainline) and onUpdate
 	self.Castbar.PostCastInterruptible = Castbar_PostCastInterruptible
-
 
 	-- Power Crystal
 	--------------------------------------------
@@ -1089,6 +1070,13 @@ Target.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Every now and then we need a spring cleaning
+	for i in next,self.db.profile do
+		if (defaults.profile[i] == nil) then
+			self.db.profile[i] = nil
+		end
+	end
 end
 
 Target.OnEnable = function(self)
@@ -1107,7 +1095,6 @@ Target.OnEnable = function(self)
 
 		-- It's gotten increasingly hard to track a cast or update a castbar, 
 		-- and oUF have restricted external access to a lot of information. 
-		--Target.frame:EnableElement("Castbar") -- not needed?
 		Target.frame.Castbar:HookScript("OnUpdate", Castbar_OnUpdate) -- hook it after creation
 	end)
 end

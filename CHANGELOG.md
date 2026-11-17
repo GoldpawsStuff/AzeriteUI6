@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.34-Alpha] 2026-11-16
+## [Unreleased][1.0.34-Alpha] 2026-11-17
 - Working on aura- and nameplate options.
 
 ### Added
@@ -13,10 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Put the `GameTooltipStatusBar` inside the tooltip. Because it's cleaner. 
 - Toned down Forever's bright golden tooltip. Made it more fitting to OUR user interface.
+- Properly styled player and target debuff aura border colors and all aura timer displays in Forever/Retail. 
 
 ### Fixed
-- Fixed an issue where empty actionbuttons would have their background remain visible when hovered over during a stance/form change. 
 - The Objectives Tracker follows the fading settings from Explorer Mode properly now.
+- Fixed an issue where empty actionbuttons would have their background remain visible when hovered over during a stance/form change. 
+- Fixed the Classic Era player castbar.
 
 ## [1.0.31-RC]2026-11-11
 ### Changed

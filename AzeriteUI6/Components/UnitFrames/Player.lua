@@ -546,7 +546,7 @@ local style = function(self, unit)
 	-- Register it with oUF
 	self.Health = health
 	self.Health.Value = healthValue
-	self.Health.UpdateColor = ns.UpdateHealthColor -- work around secret bug in oUF
+	self.Health.UpdateColor = ns.Health_UpdateColor -- work around secret bug in oUF
 
 	-- CombatFeedback
 	--------------------------------------------
