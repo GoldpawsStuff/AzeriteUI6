@@ -72,8 +72,8 @@ local cVars = {
 
 	-- Scale
 	nameplateSize = 2, 										-- Scale slider in the UI (1-5) (Default 1)
-	nameplateMinScale = .6, 								-- Distance-based minimum scale. (Default .8) 
-	nameplateMaxScale = .9,									-- Distance-based maximum scale. (Default 1)
+	nameplateMinScale = .8, 								-- Distance-based minimum scale. (Default .8) 
+	nameplateMaxScale = .96,								-- Distance-based maximum scale. (Default 1)
 	nameplateSelectedScale = 1.1, 							-- Extra scale on current target. (Default 1.2)
 	nameplateGlobalScale = 1, 								-- Overall size multiplier. (Default 1) (Not really used anymore)
 	nameplateSimplifiedScale = .6, 							-- Scale used for simplified nameplates. (Default .3)
@@ -103,16 +103,17 @@ local cVars = {
 	nameplateShowClassColor = 1, 							-- Used to display the class color in enemy nameplate health bars (Default 1)
 	nameplateShowFriendlyClassColor = 1, 					-- Used to display the class color in friendly nameplate health bars (Default 1)
 	nameplateShowOnlyNameForFriendlyPlayerUnits = 1, 		-- Used to hide every part of the nameplate but the name for friendly player units. (Default 0)
-	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
 	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Used to display the class color in friendly player unit nameplate names. (Default 0)
-	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
 }
 
 -- Declare module defaults
 -- *some of these are overwritten by saved blizzard settings on first run,
 --  but the user can choose to restore "addon defaults" in the options menu. 
 local defaults = { profile = {
-	enabled = true
+	enabled = true,
+	nameplateShowOnlyNameScaleMultipler = 1.2, 				-- Scale multipler to the unit name when only showing unit name (NOT A CVAR!)
+	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
+	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
 }}
 -- Include our CVar listing
 for cvarName,value in next,cVars do 
@@ -365,13 +366,15 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 
 	local onlyShowName = isFriendlyPlayer and not isPriorityUnit and db.nameplateShowOnlyNameForFriendlyPlayerUnits
 	local onlyShowNPCName = isFriendlyNPC and not isPriorityUnit and db.nameplateShowOnlyNameForFriendlyNPCUnits
+	local scaleMultipler = db.nameplateShowOnlyNameScaleMultipler
 
 	local shouldClassColorName = db.nameplateUseClassColorForFriendlyPlayerUnitNames
 	local shouldClassColorNPCName = db.nameplateUseReactionColorForFriendlyNPCUnitNames
 
 	if (onlyShowName or onlyShowNPCName) then
 		self.Name:SetAlpha(1)
-		self.Name:SetFontObject(self.Name.fontObjectLarge)
+		--self.Name:SetFontObject(self.Name.fontObjectLarge)
+		self.Name:SetScale(scaleMultipler)
 		self.Health:Hide()
 		self.AurasHarmful:Hide()
 		self.AurasHelpful:Hide()
@@ -381,7 +384,8 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 		self:DisableElement("Castbar")
 	else
 		self.Name:SetAlpha(.75)
-		self.Name:SetFontObject(self.Name.fontObject)
+		--self.Name:SetFontObject(self.Name.fontObject)
+		self.Name:SetScale(1)
 		self.Health:Show()
 		self.AurasHarmful:Show()
 		self.AurasHelpful:Show()
@@ -675,7 +679,7 @@ end
 
 NamePlates.LoadSettingFromCVar = function(self, cvarName, value)
 	if (self.db.profile[cvarName]) then
-		self.db.profile[cvarName] = value or GetCVar(cvarName) or defaults.profile[cvarName] 
+		self.db.profile[cvarName] = tonumber(value) or value or GetCVar(cvarName) or defaults.profile[cvarName] 
 	end
 end
 
@@ -715,6 +719,13 @@ NamePlates.RestoreBlizzardDefaults = function(self)
 	self:SaveSettingsToCVars()
 end
 
+NamePlates.UpdateAllElements = function(self, event)
+	for nameplate in next,ActiveNamePlates do
+		nameplate:UpdateAllElements(event or "RefreshUnit")
+		NamePlate_PostUpdateElements(nameplate)
+	end
+end
+
 NamePlates.OnEvent = function(self, event, ...)
 	if (event == "VARIABLES_LOADED") then
 		self.variablesLoaded = true  -- flag to indicate variables now are loaded
@@ -737,11 +748,7 @@ NamePlates.OnEvent = function(self, event, ...)
 		if (not settingsName or not self.db.profile[settingsName]) then return end
 		
 		self:LoadSettingFromCVar(settingsName, value)
-
-		for nameplate in next,ActiveNamePlates do
-			nameplate:UpdateAllElements("CVAR_UPDATE")
-			NamePlate_PostUpdateElements(nameplate)
-		end
+		self:UpdateAllElements("CVAR_UPDATE")
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		IN_COMBAT = nil
@@ -851,6 +858,23 @@ NamePlates.GetOptions = function(self)
 			--nameplateShowAll = {},
 			--nameplateShowAll = {},
 
+			
+			nameplateShowOnlyNameScaleMultipler = {
+				type = "range", width = "full", min = 1, max = 1.6, step = .1, dialogControl = "ModernSlider",
+				name = "Name scale when only showing name.",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() 
+					return not self.db.profile.enabled or (not self.db.profile.nameplateShowOnlyNameForFriendlyNPCUnits and not self.db.profile.nameplateShowOnlyNameForFriendlyPlayerUnits)  
+				end,
+				get = function() return self.db.profile.nameplateShowOnlyNameScaleMultipler end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					self.db.profile.nameplateShowOnlyNameScaleMultipler = tonumber(value)
+					self:UpdateAllElements()
+				end,
+				order = 800,
+			},
 
 			nameplateSize = {
 				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1, dialogControl = "ModernSlider",
