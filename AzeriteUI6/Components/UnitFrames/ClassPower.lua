@@ -514,7 +514,7 @@ ClassPower.GetOptions = function(self)
 				order = 1
 			},
 			enable = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Enable"],
 				desc = L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."],
 				disabled = function() return InCombatLockdown() end,

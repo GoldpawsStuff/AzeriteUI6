@@ -42,15 +42,15 @@ local SoftEnemyNamePlate, SoftFriendNamePlate, SoftInteractNamePlate
 
 local IN_COMBAT
 
--- Declare module defaults
--- *some of these are overwritten by saved blizzard settings on first run,
---  but the user can choose to restore "addon defaults" in the options menu. 
-local defaults = { profile = {
-	enabled = true,
+-- Our CVar settings
+local cVars = {
 
-	nameplateMaxDistance = 20, 								-- Max display distance (yards). Practical hard cap 40-45. (Default 45)
+	-- Distance
+	nameplateMaxDistance = 20, 								-- The max distance to show nameplates. Practical hard cap 40-45. (Default 45)
+	nameplatePlayerMaxDistance = 20, 						-- The max distance to show player nameplates. (Default 60)
 	--nameplateMaxVerticalDistance = 0, 					-- Vertical cutoff (added in Forever beta). 0 disables the check. 
 
+	-- Screen Insets
 	nameplateOtherTopInset = .8, 							-- Screen-edge clamping. Set to -1 to disable.
 	nameplateOtherBottomInset = .1, 						-- Same for bottom.
 	nameplateLargeTopInset = .8, 							-- Same for larger plates
@@ -63,26 +63,61 @@ local defaults = { profile = {
 	--nameplateTargetBehindMaxDistance = .1, 				-- Target plate when behind camera.
 	--nameplateTargetRadialPosition = 0, 					-- Radial positioning of target plate.
 
+	-- Alpha
 	nameplateMinAlpha = .6,									-- Distance-based minimum alpha. (Default .6) (.45 super immersive)
 	nameplateMaxAlpha = .9,									-- Distance-based maximum alpha. (Default 1) (.75 very unintrusive)
 	nameplateSelectedAlpha = 1, 							-- Selected nameplate alpha. (Default 1)
 	nameplateNotSelectedAlpha = .6, 						-- Non-target alpha when having a target. (Default .6) (.4 for invisible ones)
 	nameplateOccludedAlphaMult = .4, 						-- Alpha of occluded nameplates. (Behind walls, etc) (Default .4) (.3 for invisible ones)
 
-	nameplateSize = 1, 										-- Scale slider in the UI (1-5)
+	-- Scale
+	nameplateSize = 2, 										-- Scale slider in the UI (1-5) (Default 1)
 	nameplateMinScale = .6, 								-- Distance-based minimum scale. (Default .8) 
 	nameplateMaxScale = .9,									-- Distance-based maximum scale. (Default 1)
 	nameplateSelectedScale = 1.1, 							-- Extra scale on current target. (Default 1.2)
 	nameplateGlobalScale = 1, 								-- Overall size multiplier. (Default 1) (Not really used anymore)
+	nameplateSimplifiedScale = .6, 							-- Scale used for simplified nameplates. (Default .3)
 
-	nameplateShowClassColor = 1, 							-- Class colored enemy nameplates
-	nameplateShowFriendlyClassColor = 0, 					-- Class colored friendly player nameplates
-	nameplateShowOnlyNameForFriendlyPlayerUnits = 1, 		-- Only show the unit name for friendly player units
+	-- Visibility
+	nameplateShowAll = 1, 									-- If true, nameplates are shown all the time. If false, nameplates are only shown in combat. (Default 0)
+
+	-- Units
+	nameplateShowEnemies = 1, 								-- Whether enemy nameplates are shown. (Default 1)
+	nameplateShowEnemyGuardians = 1, 						-- Whether enemy guardian nameplates are shown. (Default 0)
+	nameplateShowEnemyMinions = 1, 							-- Whether enemy minion nameplates are shown. (Default 0)
+	nameplateShowEnemyMinus = 1, 							-- Whether enemy nameplates for entities with a minus sign (indicating they are weaker than the player) are shown. (Default 1)
+	nameplateShowEnemyPets = 1, 							-- Whether enemy pet nameplates are shown. (Default 0)
+	nameplateShowEnemyTotems = 1, 							-- Whether enemy totem nameplates are shown. (Default 0)
+	nameplateShowFriendlyNpcs = 1, 							-- Whether nameplates are shown for friendly npcs. (Default 0)
+	nameplateShowFriendlyPlayerGuardians = 1, 				-- Whether friendly player guardian nameplates are shown. (Default 0)
+	nameplateShowFriendlyPlayerMinions = 1, 				-- Whether friendly player minion nameplates are shown. (Default 0)
+	nameplateShowFriendlyPlayerPets = 1, 					-- Whether friendly player pet nameplates are shown. (Default 0)
+	nameplateShowFriendlyPlayers = 1, 						-- Whether nameplates are shown for friendly players. (Default 0)
+	nameplateShowFriendlyPlayerTotems = 1, 					-- Whether friendly player totem nameplates are shown.  (Default 0)
+
+	-- Elements
+	nameplateShowCastBars = 1, 								-- Show cast bars for unit nameplates. (Default 1)
+	nameplateAuraScale = 1, 								-- Controls the size multiplier for buffs and debuffs on nameplates. (Default 1)
+
+	-- Coloring
+	nameplateShowClassColor = 1, 							-- Used to display the class color in enemy nameplate health bars (Default 1)
+	nameplateShowFriendlyClassColor = 1, 					-- Used to display the class color in friendly nameplate health bars (Default 1)
+	nameplateShowOnlyNameForFriendlyPlayerUnits = 1, 		-- Used to hide every part of the nameplate but the name for friendly player units. (Default 0)
 	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
-	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Class colored friendly player unitname
+	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Used to display the class color in friendly player unit nameplate names. (Default 0)
 	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
+}
 
+-- Declare module defaults
+-- *some of these are overwritten by saved blizzard settings on first run,
+--  but the user can choose to restore "addon defaults" in the options menu. 
+local defaults = { profile = {
+	enabled = true
 }}
+-- Include our CVar listing
+for cvarName,value in next,cVars do 
+	defaults.profile[cvarName] = value
+end
 
 -- Cache of current targets (target, focus, softenemy, softinteract, softfriend)
 local ActiveTargetPlates = {}
@@ -143,6 +178,15 @@ timeFormatter:SetBreakpoints({
 		format = ""
 	}
 })
+
+-- Convert CVar values to booleans for menu usage 
+local toboolean = function(a)
+	local n = tonumber(a)
+	if (n == 1) then return true
+	elseif (n == 0) then return false
+	else return not not n -- booleanify it
+	end
+end
 
 -- Return a CVar, convert to number when appropriate
 local GetCVar = function(cvar)
@@ -638,73 +682,25 @@ end
 NamePlates.LoadSettingsFromCVars = function(self)
 	if (InCombatLockdown()) then return end
 
-	self.db.profile.nameplateMaxDistance = GetCVar("nameplateMaxDistance") or defaults.profile.nameplateMaxDistance 
-	self.db.profile.nameplateOtherTopInset = GetCVar("nameplateOtherTopInset") or defaults.profile.nameplateOtherTopInset 
-	self.db.profile.nameplateOtherBottomInset = GetCVar("nameplateOtherBottomInset") or defaults.profile.nameplateOtherBottomInset 
-	self.db.profile.nameplateLargeTopInset = GetCVar("nameplateLargeTopInset") or defaults.profile.nameplateLargeTopInset 
-	self.db.profile.nameplateLargeBottomInset = GetCVar("nameplateLargeBottomInset") or defaults.profile.nameplateLargeBottomInset 
-	self.db.profile.nameplateOverlapH = GetCVar("nameplateOverlapH") or defaults.profile.nameplateOverlapH 
-	self.db.profile.nameplateOverlapV = GetCVar("nameplateOverlapV") or defaults.profile.nameplateOverlapV 
-	self.db.profile.nameplateMinAlpha = GetCVar("nameplateMinAlpha") or defaults.profile.nameplateMinAlpha 
-	self.db.profile.nameplateMaxAlpha = GetCVar("nameplateMaxAlpha") or defaults.profile.nameplateMaxAlpha 
-	self.db.profile.nameplateSelectedAlpha = GetCVar("nameplateSelectedAlpha") or defaults.profile.nameplateSelectedAlpha 
-	self.db.profile.nameplateNotSelectedAlpha = GetCVar("nameplateNotSelectedAlpha") or defaults.profile.nameplateNotSelectedAlpha 
-	self.db.profile.nameplateOccludedAlphaMult = GetCVar("nameplateOccludedAlphaMult") or defaults.profile.nameplateOccludedAlphaMult 
-	self.db.profile.nameplateMinScale = GetCVar("nameplateMinScale") or defaults.profile.nameplateMinScale 
-	self.db.profile.nameplateMaxScale = GetCVar("nameplateMaxScale") or defaults.profile.nameplateMaxScale 
-	self.db.profile.nameplateSelectedScale = GetCVar("nameplateSelectedScale") or defaults.profile.nameplateSelectedScale 
-	self.db.profile.nameplateGlobalScale = GetCVar("nameplateGlobalScale") or defaults.profile.nameplateGlobalScale 
-	self.db.profile.nameplateShowClassColor = GetCVar("nameplateShowClassColor") or defaults.profile.nameplateShowClassColor 
-	self.db.profile.nameplateShowFriendlyClassColor = GetCVar("nameplateShowFriendlyClassColor") or defaults.profile.nameplateShowFriendlyClassColor 
-	self.db.profile.nameplateUseClassColorForFriendlyPlayerUnitNames = GetCVar("nameplateUseClassColorForFriendlyPlayerUnitNames") or defaults.profile.nameplateUseClassColorForFriendlyPlayerUnitNames 
+	for cvarName,value in next,cVars do 
+		self.db.profile[cvarName] = GetCVar(cvarName) or defaults.profile[cvarName]
+	end
 end
 
 NamePlates.SaveSettingsToCVars = function(self)
 	if (InCombatLockdown()) then return end
 
-	C_CVar.SetCVar("nameplateMaxDistance", self.db.profile.nameplateMaxDistance)
-	C_CVar.SetCVar("nameplateOtherTopInset", self.db.profile.nameplateOtherTopInset)
-	C_CVar.SetCVar("nameplateOtherBottomInset", self.db.profile.nameplateOtherBottomInset)
-	C_CVar.SetCVar("nameplateLargeTopInset", self.db.profile.nameplateLargeTopInset)
-	C_CVar.SetCVar("nameplateLargeBottomInset", self.db.profile.nameplateLargeBottomInset)
-	C_CVar.SetCVar("nameplateOverlapH", self.db.profile.nameplateOverlapH)
-	C_CVar.SetCVar("nameplateOverlapV", self.db.profile.nameplateOverlapV)
-	C_CVar.SetCVar("nameplateMinAlpha", self.db.profile.nameplateMinAlpha)
-	C_CVar.SetCVar("nameplateMaxAlpha", self.db.profile.nameplateMaxAlpha)
-	C_CVar.SetCVar("nameplateSelectedAlpha", self.db.profile.nameplateSelectedAlpha)
-	C_CVar.SetCVar("nameplateNotSelectedAlpha", self.db.profile.nameplateNotSelectedAlpha)
-	C_CVar.SetCVar("nameplateOccludedAlphaMult", self.db.profile.nameplateOccludedAlphaMult)
-	C_CVar.SetCVar("nameplateMinScale", self.db.profile.nameplateMinScale)
-	C_CVar.SetCVar("nameplateMaxScale", self.db.profile.nameplateMaxScale)
-	C_CVar.SetCVar("nameplateSelectedScale", self.db.profile.nameplateSelectedScale)
-	C_CVar.SetCVar("nameplateGlobalScale", self.db.profile.nameplateGlobalScale)
-	C_CVar.SetCVar("nameplateShowClassColor", self.db.profile.nameplateShowClassColor)
-	C_CVar.SetCVar("nameplateShowFriendlyClassColor", self.db.profile.nameplateShowFriendlyClassColor)
-	C_CVar.SetCVar("nameplateUseClassColorForFriendlyPlayerUnitNames", self.db.profile.nameplateUseClassColorForFriendlyPlayerUnitNames)
+	for cvarName,value in next,cVars do 
+		C_CVar.SetCVar(cvarName, self.db.profile[cvarName])	
+	end
 end
 
 NamePlates.RestoreDefaults = function(self)
 	if (InCombatLockdown()) then return end
 
-	self.db.profile.nameplateMaxDistance = defaults.profile.nameplateMaxDistance
-	self.db.profile.nameplateOtherTopInset = defaults.profile.nameplateOtherTopInset
-	self.db.profile.nameplateOtherBottomInset = defaults.profile.nameplateOtherBottomInset
-	self.db.profile.nameplateLargeTopInset = defaults.profile.nameplateLargeTopInset
-	self.db.profile.nameplateLargeBottomInset = defaults.profile.nameplateLargeBottomInset
-	self.db.profile.nameplateOverlapH = defaults.profile.nameplateOverlapH
-	self.db.profile.nameplateOverlapV = defaults.profile.nameplateOverlapV
-	self.db.profile.nameplateMinAlpha = defaults.profile.nameplateMinAlpha
-	self.db.profile.nameplateMaxAlpha = defaults.profile.nameplateMaxAlpha
-	self.db.profile.nameplateSelectedAlpha = defaults.profile.nameplateSelectedAlpha
-	self.db.profile.nameplateNotSelectedAlpha = defaults.profile.nameplateNotSelectedAlpha
-	self.db.profile.nameplateOccludedAlphaMult = defaults.profile.nameplateOccludedAlphaMult
-	self.db.profile.nameplateMinScale = defaults.profile.nameplateMinScale
-	self.db.profile.nameplateMaxScale = defaults.profile.nameplateMaxScale
-	self.db.profile.nameplateSelectedScale = defaults.profile.nameplateSelectedScale
-	self.db.profile.nameplateGlobalScale = defaults.profile.nameplateGlobalScale
-	self.db.profile.nameplateShowClassColor = defaults.profile.nameplateShowClassColor 
-	self.db.profile.nameplateShowFriendlyClassColor = defaults.profile.nameplateShowFriendlyClassColor 
-	self.db.profile.nameplateUseClassColorForFriendlyPlayerUnitNames = defaults.profile.nameplateUseClassColorForFriendlyPlayerUnitNames 
+	for cvarName,value in next,cVars do 
+		self.db.profile[cvarName] = defaults.profile[cvarName]
+	end
 
 	self:SaveSettingsToCVars()
 end
@@ -712,25 +708,9 @@ end
 NamePlates.RestoreBlizzardDefaults = function(self)
 	if (InCombatLockdown()) then return end
 
-	self.db.profile.nameplateMaxDistance = GetCVarDefault("nameplateMaxDistance") or defaults.profile.nameplateMaxDistance 
-	self.db.profile.nameplateOtherTopInset = GetCVarDefault("nameplateOtherTopInset") or defaults.profile.nameplateOtherTopInset 
-	self.db.profile.nameplateOtherBottomInset = GetCVarDefault("nameplateOtherBottomInset") or defaults.profile.nameplateOtherBottomInset 
-	self.db.profile.nameplateLargeTopInset = GetCVarDefault("nameplateLargeTopInset") or defaults.profile.nameplateLargeTopInset 
-	self.db.profile.nameplateLargeBottomInset = GetCVarDefault("nameplateLargeBottomInset") or defaults.profile.nameplateLargeBottomInset 
-	self.db.profile.nameplateOverlapH = GetCVarDefault("nameplateOverlapH") or defaults.profile.nameplateOverlapH 
-	self.db.profile.nameplateOverlapV = GetCVarDefault("nameplateOverlapV") or defaults.profile.nameplateOverlapV 
-	self.db.profile.nameplateMinAlpha = GetCVarDefault("nameplateMinAlpha") or defaults.profile.nameplateMinAlpha 
-	self.db.profile.nameplateMaxAlpha = GetCVarDefault("nameplateMaxAlpha") or defaults.profile.nameplateMaxAlpha 
-	self.db.profile.nameplateSelectedAlpha = GetCVarDefault("nameplateSelectedAlpha") or defaults.profile.nameplateSelectedAlpha 
-	self.db.profile.nameplateNotSelectedAlpha = GetCVarDefault("nameplateNotSelectedAlpha") or defaults.profile.nameplateNotSelectedAlpha 
-	self.db.profile.nameplateOccludedAlphaMult = GetCVarDefault("nameplateOccludedAlphaMult") or defaults.profile.nameplateOccludedAlphaMult 
-	self.db.profile.nameplateMinScale = GetCVarDefault("nameplateMinScale") or defaults.profile.nameplateMinScale 
-	self.db.profile.nameplateMaxScale = GetCVarDefault("nameplateMaxScale") or defaults.profile.nameplateMaxScale 
-	self.db.profile.nameplateSelectedScale = GetCVarDefault("nameplateSelectedScale") or defaults.profile.nameplateSelectedScale 
-	self.db.profile.nameplateGlobalScale = GetCVarDefault("nameplateGlobalScale") or defaults.profile.nameplateGlobalScale 
-	self.db.profile.nameplateShowClassColor = GetCVarDefault("nameplateShowClassColor") or defaults.profile.nameplateShowClassColor 
-	self.db.profile.nameplateShowFriendlyClassColor = GetCVarDefault("nameplateShowFriendlyClassColor") or defaults.profile.nameplateShowFriendlyClassColor 
-	self.db.profile.nameplateUseClassColorForFriendlyPlayerUnitNames = GetCVarDefault("nameplateUseClassColorForFriendlyPlayerUnitNames") or defaults.profile.nameplateUseClassColorForFriendlyPlayerUnitNames 
+	for cvarName,value in next,cVars do 
+		self.db.profile[cvarName] = GetCVarDefault(cvarName) or defaults.profile[cvarName]
+	end
 
 	self:SaveSettingsToCVars()
 end
@@ -799,13 +779,8 @@ NamePlates.GetOptions = function(self)
 		arg = { menuName = L["UF: Name Plates"] },
 		order = 300,
 		args = {
-			important_message = {
-				type = "description", fontSize = "large",
-				name = "The Name Plate options are currently under construction.|nCheck back later to see if they're finished!",
-				order = 1
-			},
 			enable = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Enable"],
 				desc = L["Toggle the usage of our Name Plates. Note that disabling this will force a user interface reload to re-enable the game's default Name Plates."],
 				disabled = function() return InCombatLockdown() end,
@@ -815,11 +790,71 @@ NamePlates.GetOptions = function(self)
 					self.db.profile.enabled = val 
 					self:UpdateSettings()
 				end,
-				order = 2
+				order = 1
 			},
+
+			--nameplateShowAll = {
+			--	type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+			--},
+			nameplateShowEnemies = {
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				name = "Show Enemy Unit Nameplates",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				get = function(info) return toboolean(GetCVar("nameplateShowEnemies")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowEnemies", val and "1" or "0")
+				end,
+				order = 100,
+			},
+			nameplateShowEnemyMinions = {
+				type = "toggle", width = "full", dialogControl = "ModernIndentedCheckBox",
+				name = "Show Enemy Minions",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not toboolean(GetCVar("nameplateShowEnemies")) end,
+				get = function(info) return toboolean(GetCVar("nameplateShowEnemyMinions")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowEnemyMinions", val and "1" or "0")
+					SetCVar("nameplateShowEnemyPets", val and "1" or "0")
+					SetCVar("nameplateShowEnemyGuardians", val and "1" or "0")
+				end,
+				order = 101,
+			},
+			--nameplateShowEnemyPets = {
+			--},
+			--nameplateShowEnemyPets = 1, 							-- Whether enemy pet nameplates are shown. (Default 0)
+			--nameplateShowEnemyGuardians = 1, 						-- Whether enemy guardian nameplates are shown. (Default 0)
+			--nameplateShowEnemyMinions = 1, 							-- Whether enemy minion nameplates are shown. (Default 0)
+
+			--nameplateShowEnemyTotems = 1, 							-- Whether enemy totem nameplates are shown. (Default 0)
+
+			--nameplateShowEnemyMinus = 1, 							-- Whether enemy nameplates for entities with a minus sign (indicating they are weaker than the player) are shown. (Default 1)
+
+			--nameplateShowFriends = {
+			--},
+			
+			
+			
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+			--nameplateShowAll = {},
+
+
 			nameplateSize = {
-				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1,
-				name = UNIT_NAMEPLATES_GLOBAL_SCALE, -- "Size"
+				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1, dialogControl = "ModernSlider",
+				name = "General Size", -- UNIT_NAMEPLATES_GLOBAL_SCALE, "Size"
 				desc = UNIT_NAMEPLATES_GLOBAL_SCALE_TOOLTIP, -- "Controls the size nameplates are displayed on the screen."
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -830,9 +865,104 @@ NamePlates.GetOptions = function(self)
 					if (InCombatLockdown()) then return end
 					C_CVar.SetCVar(NamePlateConstants and NamePlateConstants.SIZE_CVAR or "nameplateSize", (math.floor(value + .5)))
 				end,
-				order = 100,
+				order = 1000,
+			},
+			nameplateSelectedScale = {
+				type = "range", width = "full", min = 1, max = 1.4, step = .05, dialogControl = "ModernSlider",
+				name = L["Selected NamePlate Scale"],
+				desc = L["Sets the scale of your current target."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function() return tonumber(C_CVar.GetCVar("nameplateSelectedScale")) end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					C_CVar.SetCVar("nameplateSelectedScale", value)
+				end,
+				order = 1001,
+			},
+			nameplateMinScale = {
+				type = "range", width = "full", min = .4, max = 1, step = .05, dialogControl = "ModernSlider",
+				name = L["Minimum Scale"],
+				desc = L["The minimum scale based on distance. Does not apply to current target."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function() return tonumber(C_CVar.GetCVar("nameplateMinScale")) end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					C_CVar.SetCVar("nameplateMinScale", value)
+				end,
+				order = 1002,
+			},
+			nameplateMaxScale = {
+				type = "range", width = "full", min = .6, max = 1, step = .05, dialogControl = "ModernSlider",
+				name = L["Maximum Scale"],
+				desc = L["The maximum scale based on distance. Does not apply to current target."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function() return tonumber(C_CVar.GetCVar("nameplateMaxScale")) end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					C_CVar.SetCVar("nameplateMaxScale", value)
+				end,
+				order = 1003,
+			},
+			nameplateSimplifiedScale = {
+				type = "range", width = "full", min = .3, max = 1, step = .05, dialogControl = "ModernSlider",
+				name = L["Simplified NamePlate Scale"],
+				desc = L["Sets the scale of simplified NamePlates. Simplified NamePlates refer to critters and various other unimportant NPCs and creatures. Does not apply to current target."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function() return tonumber(C_CVar.GetCVar("nameplateSimplifiedScale")) end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					C_CVar.SetCVar("nameplateSimplifiedScale", value)
+				end,
+				order = 1004,
+			},
+			nameplateMaxDistance = {
+				type = "range", width = "full", min = 5, max = (ns.WoWCamelot or ns.WoWVanilla) and 45 or 60, step = 1, bigStep = 1, dialogControl = "ModernSlider",
+				name = L["Max Visibility Distance."],
+				desc = (ns.WoWCamelot or ns.WoWVanilla) and L["Sets the maximum distance NamePlates are visible. Note that this has an effective cap of 20-45 in Forever and Classic Era."] or L["Sets the maximum distance NamePlates are visible. Note that this has an effective cap of 20-45 in Forever and Classic Era."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function() return tonumber(C_CVar.GetCVar("nameplateMaxDistance")) end,
+				set = function(_, value)
+					if (InCombatLockdown()) then return end
+					C_CVar.SetCVar("nameplateMaxDistance", (math.floor(value + .5)))
+					C_CVar.SetCVar("nameplatePlayerMaxDistance", (math.floor(value + .5)))
+				end,
+				order = 2000,
 			},
 
+
+			resetToGameDefaults = {
+				type = "execute", width = "1.3",
+				name = L["Game Defaults"],
+				desc = L["Reset the NamePlate settings to the Game Defaults. Note that your current settings are not backed up, and will be lost if you click this button."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				func = function(info) NamePlates:RestoreBlizzardDefaults() end,
+				order = 100002
+			},
+			resetToAddOnDefault = {
+				type = "execute", width = "1.3",
+				name = L["Azerite Defaults"],
+				desc = L["Reset the NamePlate settings to the Azerite UI Defaults. Note that your current settings are not backed up, and will be lost if you click this button."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				func = function(info) NamePlates:RestoreDefaults() end,
+				order = 100003
+			},
+
+			--[[--
+
+			- general settings (color, elements, etc)
+
+			- target nameplate specific settings
+			- other plates specific settings when having a target 
+			- all plates specific settings when not having a target
+
+			--]]--
 		}
 	}
 end

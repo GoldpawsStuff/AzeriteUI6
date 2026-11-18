@@ -77,7 +77,7 @@ ExplorerMode.GetOptions = function(self)
 		order = 9000,
 		args = {
 			enable = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Enable"],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
@@ -89,7 +89,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 1
 			},
 			delayOnLogin = {
-				type = "range", width = "full", min = 1, max = 15, step = 1,
+				type = "range", width = "full", min = 1, max = 15, step = 1, dialogControl = "ModernSlider",
 				name = L["Delay after login"],
 				desc = L["Sets the delay in seconds after the initial login on a character before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
@@ -103,7 +103,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 100
 			}, 
 			delayOnReload = {
-				type = "range", width = "full", min = 1, max = 15, step = 1,
+				type = "range", width = "full", min = 1, max = 15, step = 1, dialogControl = "ModernSlider",
 				name = L["Delay after reload"],
 				desc = L["Sets the delay in seconds after a manual user interface reload before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
@@ -117,7 +117,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 101
 			},
 			delayOnZoning = {
-				type = "range", width = "full", min = 1, max = 15, step = 1,
+				type = "range", width = "full", min = 1, max = 15, step = 1, dialogControl = "ModernSlider",
 				name = L["Delay after zoning"],
 				desc = L["Sets the delay in seconds after zoning through an instance portal before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
@@ -131,7 +131,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 102
 			},
 			delayOnCombatEnd = {
-				type = "range", width = "full", min = 1, max = 15, step = 1,
+				type = "range", width = "full", min = 1, max = 15, step = 1, dialogControl = "ModernSlider",
 				name = L["Delay after combat"],
 				desc = L["Sets the delay in seconds after combat ends before elements are faded out."],
 				disabled = function() return InCombatLockdown() end,
@@ -145,7 +145,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 103
 			},
 			fadeActionBars = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Action Bars"],
 				desc = L["Fade out the Action Bars."],
 				disabled = function() return InCombatLockdown() end,
@@ -159,7 +159,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 210
 			},
 			fadePetBar = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Action Bars: Pet Bar"],
 				desc = L["Fade out the Pet Bar."],
 				disabled = function() return InCombatLockdown() end,
@@ -173,7 +173,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 310
 			},
 			fadeStanceBar = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Action Bars: Stance Bar"],
 				desc = L["Fade out the Stance Bar."],
 				disabled = function() return InCombatLockdown() end,
@@ -187,7 +187,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 320
 			},
 			fadePlayerFrame = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Unit Frame: Player"],
 				desc = L["Fade out the Player Frame."],
 				disabled = function() return InCombatLockdown() end,
@@ -201,7 +201,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 340
 			},
 			fadePlayerClassPower = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Unit Frame: Player Class Power"],
 				desc = L["Fade out the Player Class Power Frame."],
 				disabled = function() return InCombatLockdown() end,
@@ -215,7 +215,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 350
 			},
 			fadePetFrame = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Unit Frame: Player's Pet"],
 				desc = L["Fade out the Pet Frame."],
 				disabled = function() return InCombatLockdown() end,
@@ -229,7 +229,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 360
 			},
 			fadeFocusFrame = not ns.WoWVanilla and {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Unit Frame: Focus"],
 				desc = L["Fade out the Focus Frame."],
 				disabled = function() return InCombatLockdown() end,
@@ -243,7 +243,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 370
 			} or nil,
 			fadeTracker = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Quest Objectives"],
 				desc = L["Fade out the Objectives Tracker."],
 				disabled = function() return InCombatLockdown() end,
@@ -266,7 +266,7 @@ ExplorerMode.GetOptions = function(self)
 				order = 410
 			},
 			--fadeTracker = {
-			--	type = "toggle", width = "full",
+			--	type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 			--	name = L["Quest Objectives"],
 			--	desc = L["Fade out the Objectives Tracker."],
 			--	disabled = function() return InCombatLockdown() end,
@@ -280,7 +280,7 @@ ExplorerMode.GetOptions = function(self)
 			--	order = 410
 			--},
 			fadeChatFrames = {
-				type = "toggle", width = "full",
+				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
 				name = L["Chat Windows"],
 				desc = L["Fade out the Chat Windows."],
 				disabled = function() return InCombatLockdown() end,

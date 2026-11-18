@@ -12,5 +12,6 @@
 	<Script file="EditMode.lua"/>
 	<Script file="ExplorerMode.lua"/>
 	<Script file="SharedMedia.lua"/>
+	<Script file="Widgets.lua"/>
 	
 </Ui>

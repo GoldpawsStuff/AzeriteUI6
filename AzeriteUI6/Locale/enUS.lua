@@ -83,3 +83,21 @@ L["Unit Frame: Target"] = true
 L["Unit Frame: Target of Target"] = true
 L["Which button to start the ZigZag pattern from"] = true
 L["ZigZag"] = true -- ActionBar layout option
+
+
+L["Azerite Defaults"] = true
+L["Game Defaults"] = true
+L["Max Visibility Distance."] = true 
+L["Maximum Scale"] = true
+L["Minimum Scale"] = true
+L["Reset the NamePlate settings to the Azerite UI Defaults. Note that your current settings are not backed up, and will be lost if you click this button."] = "Reset the NamePlate settings to the Azerite UI Defaults.|n|n|cffff4400Note that your current settings are not backed up, and will be lost if you click this button.|r"
+L["Reset the NamePlate settings to the Game Defaults. Note that your current settings are not backed up, and will be lost if you click this button."] = "Reset the NamePlate settings to the Game Defaults.|n|n|cffff4400Note that your current settings are not backed up, and will be lost if you click this button.|r"
+L["Selected NamePlate Scale"] = true
+L["Sets the maximum distance NamePlates are visible."] = true
+L["Sets the maximum distance NamePlates are visible. Note that this has an effective cap of 20-45 in Forever and Classic Era."] = "Sets the maximum distance NamePlates are visible.|n|n|cff4488ffNote that this has an effective cap of 20-45 in Forever and Classic Era.|r"
+L["Sets the scale of simplified NamePlates. Simplified NamePlates refer to critters and various other unimportant NPCs and creatures. Does not apply to current target."] = "Sets the scale of simplified NamePlates.|n|nSimplified NamePlates refer to critters and various other unimportant NPCs and creatures.|n|n|cff4488ffDoes not apply to current target.|r"
+L["Sets the scale of your current target."] = true
+L["Simplified NamePlate Scale"] = true
+L["The maximum scale based on distance. Does not apply to current target."] = "The maximum scale based on distance.|n|n|cff4488ffDoes not apply to current target.|r"
+L["The minimum scale based on distance. Does not apply to current target."] = "The minimum scale based on distance.|n|n|cff4488ffDoes not apply to current target.|r"
+
