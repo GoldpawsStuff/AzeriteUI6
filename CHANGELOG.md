@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][1.0.35-Alpha] 2026-11-18
 - Working on more aura-, nameplate- and unit frame options.
 
+### Added
+- Made the options menu a lot more modern in Forever/Retail.
+
 ## [1.0.34-Release] 2026-11-18
 ### Added
 - Added nameplates with health, name and basic aura displays, similar to what the default Blizzard nameplates do.
