@@ -46,8 +46,8 @@ local IN_COMBAT
 local cVars = {
 
 	-- Distance
-	nameplateMaxDistance = 60, 								-- The max distance to show nameplates. Practical hard cap 40-45. (Default 45)
-	nameplatePlayerMaxDistance = 60, 						-- The max distance to show player nameplates. (Default 60)
+	nameplateMaxDistance = 45, 								-- The max distance to show nameplates. Practical hard cap 40-45. (Default 45/60)
+	nameplatePlayerMaxDistance = 45, 						-- The max distance to show player nameplates. (Default 60)
 	--nameplateMaxVerticalDistance = 0, 					-- Vertical cutoff (added in Forever beta). 0 disables the check. 
 
 	-- Screen Insets
