@@ -620,7 +620,7 @@ ChatFrames.OnEvent = function(self, event, ...)
 						self:SetScript("OnUpdate", nil)
 						return
 					end
-					--ChatFrame1:Clear()
+					ChatFrame1:Clear()
 				end)
 			end
 		end
