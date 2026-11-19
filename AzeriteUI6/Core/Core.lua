@@ -206,6 +206,16 @@ ns.GenerateOptions = function(self)
 
 	self:RegisterOptionsTable(addonName .. "_Profiles", profiles)
 	self:AddToBlizOptions(addonName .. "_Profiles", "Profiles", addonTitle)
+
+	-- Debugging
+	--local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+	--for appName, groups in pairs(AceConfigDialog.BlizOptions or {}) do
+	--	print("app:", appName)
+	--	for key, group in pairs(groups) do
+	--		print("  key:", key, "title:", group.title and group.title:GetText())
+	--	end
+	--end
+
 end
 
 ns.RegisterOptionsTable = function(self, appName, options, slashcmd)

@@ -824,8 +824,8 @@ Player.GetOptions = function(self)
 		order = 200,
 		args = {
 			important_message = {
-				type = "description", fontSize = "large",
-				name = "The Player Unit Frame options are currently under construction.|nCheck back later to see if they're finished!",
+				type = "description", fontSize = "medium",
+				name = "The Player Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
 				order = 1
 			},
 			enable = {

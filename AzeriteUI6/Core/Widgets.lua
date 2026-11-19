@@ -31,9 +31,8 @@ local function IsModernClient()
 	return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
 end
 
+-- ModernCheckBox
 do 
-	local AceGUI = LibStub("AceGUI-3.0")
-
 	local Type = "ModernCheckBox"
 	local Version = 1
 
@@ -111,6 +110,7 @@ do
 
 end
 
+-- ModernIndentedCheckBox
 do 
 	local AceGUI = LibStub("AceGUI-3.0")
 
@@ -191,8 +191,8 @@ do
 
 end
 
+-- ModernSlider
 do
-
 	local Type = "ModernSlider"
 	local Version = 6
 
@@ -269,8 +269,8 @@ do
 	AceGUI:RegisterWidgetType(Type, Constructor, Version)
 end
 
+-- ModernDropdown
 do 
-
 	local Type = "ModernDropdown"
 	local Version = 16
 
@@ -539,3 +539,64 @@ do
 	AceGUI:RegisterWidgetType(Type, Constructor, Version)
 
 end
+
+local function ApplyHeader(group)
+	local frame = group.frame
+	local label = group.label
+	local content = group.content
+	if not (frame and label and content) then return end
+
+	label:SetFontObject("GameFontHighlightHuge")
+	label:SetTextColor(1, 1, 1)
+	label:SetJustifyH("LEFT")
+	label:SetJustifyV("TOP")
+	label:ClearAllPoints()
+	label:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -16)
+	label:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
+
+	local line = frame.azeriteDivider
+	if not line then
+		line = frame:CreateTexture(nil, "ARTWORK")
+		line:SetAtlas("Options_HorizontalDivider", true)
+		frame.azeriteDivider = line
+	end
+	line:ClearAllPoints()
+	line:SetPoint("TOP", frame, "TOP", 0, -46)
+
+	content:ClearAllPoints()
+	content:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -64)
+	content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
+end
+
+local hooked = {}
+
+local function EnsureHook(group)
+	if hooked[group] or type(group) ~= "table" or not group.SetTitle then return end
+	hooked[group] = true
+	hooksecurefunc(group, "SetTitle", ApplyHeader)
+	ApplyHeader(group)
+end
+
+local function HookOurGroups()
+	local AceConfigDialog = LibStub("AceConfigDialog-3.0", true)
+	local bliz = AceConfigDialog and AceConfigDialog.BlizOptions
+	if not bliz then return end
+
+	for appName, groups in pairs(bliz) do
+		if type(appName) == "string" and appName:find("AzeriteUI6", 1, true) then
+			for _, group in pairs(groups) do
+				EnsureHook(group)
+			end
+		end
+	end
+end
+
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+if not AceConfigDialog.modernTitleStyled then
+	-- SetTitle runs inside FeedGroup, still before the frame is painted
+	hooksecurefunc(AceConfigDialog, "FeedGroup", HookOurGroups)
+	hooksecurefunc(AceConfigDialog, "AddToBlizOptions", HookOurGroups)
+	AceConfigDialog.modernTitleStyled = true
+end
+
+HookOurGroups()

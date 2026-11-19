@@ -182,8 +182,8 @@ Focus.GetOptions = function(self)
 		order = 230,
 		args = {
 			important_message = {
-				type = "description", fontSize = "large",
-				name = "The Focus Unit Frame options are currently under construction.|nCheck back later to see if they're finished!",
+				type = "description", fontSize = "medium",
+				name = "The Focus Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
 				order = 1
 			},
 			enable = {

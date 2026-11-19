@@ -47,8 +47,8 @@ PlayerAuras.GetOptions = function(self)
 		order = 500,
 		args = {
 			important_message = {
-				type = "description", fontSize = "large",
-				name = "The Player Aura frames are currently under construction.|nCheck back later to see if they're finished!|n|nIf you wish to see the default Buff & Debuff frames until that point in time, just uncheck the 'Enable' checkbutton below and see it done!|n|n",
+				type = "description", fontSize = "medium",
+				name = "The Player Aura frames are currently under construction.|nCheck back later to see if they're finished!|n|nIf you wish to see the default Buff & Debuff frames until that point in time, just uncheck the 'Enable' checkbutton below and see it done!|n ",
 				order = 1
 			},
 			enable = {
