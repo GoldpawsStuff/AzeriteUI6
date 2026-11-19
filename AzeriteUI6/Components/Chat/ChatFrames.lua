@@ -671,22 +671,6 @@ ChatFrames.OnInitialize = function(self)
 			end
 		end
 	end)
-
-	-- Some might dislike this. 
-	-- I generally leave spam alone, consider it a user choice, 
-	-- but when I'm not really given a choice, or the choice is obfuscated, 
-	-- then I do things like this.
-	local AddMessage_Original
-	local function FilterQuestieTraceConsentMessage(self, text, r, g, b, id, ...)
-		if text and text:find("QuestieTrace") and text:find("/qlt consent") then
-			return
-		end
-		return AddMessage_Original(self, text, r, g, b, id, ...)
-	end
-	if (DEFAULT_CHAT_FRAME and not AddMessage_Original) then
-		AddMessage_Original = DEFAULT_CHAT_FRAME.AddMessage
-		DEFAULT_CHAT_FRAME.AddMessage = FilterQuestieTraceConsentMessage
-	end
 end
 
 ChatFrames.OnEnable = function(self)
