@@ -51,7 +51,7 @@ local defaults = { profile = {
 	fadeWithDeadTarget = true,
 	fadeWithFocusTarget = false,
 	fadeInVehicles = false,
-	--fadeWithLowHealth = false, -- doesn't work anymore because of secrets
+	fadeWithLowHealth = false, -- doesn't work anymore because of secrets
 
 	-- Which elements to fade out
 	-- while in Explorer Mode.
@@ -338,7 +338,7 @@ ExplorerMode.CheckForForcedState = function(self)
 	or (self.isDragonRiding and not db.fadeInVehicles)
 	or (self.inVehicle and not db.fadeInVehicles)
 	or (self.inInstance and not db.fadeInInstances)
-	--or (self.lowHealth and not db.fadeWithLowHealth)
+	or (self.lowHealth and not db.fadeWithLowHealth)
 	or (self.busyCursor) then
 		return true
 	end
@@ -367,31 +367,39 @@ ExplorerMode.CheckCursor = function(self)
 	self.busyCursor = nil
 end
 
---[[ExplorerMode.CheckHealth = function(self)
-	local current = UnitHealth("player")
-	local maxHealth = UnitHealthMax("player")
+ExplorerMode.StartHealthTimer = function(self)
+	if (not self.healthTimer) then
+		self.healthTimer = C_Timer.NewTicker(1/10, function() self:CheckHealth() end)
+	end
+end
 
-	-- this never fires?
-	if (issecretvalue(current) == issecretvalue(maxHealth)) then
-		if (current == maxHealth) then
-			self.lowHealth = nil
-		else
-			self.lowHealth = true
+-- Checks if the health has moved lately
+ExplorerMode.CheckHealth = function(self)
+	-- Always assume this when this method is called
+	self.lowHealth = true
+
+	-- Compare to when previous call occurred
+	local now = GetTime()
+	if ((now - self.lastHealthEvent) > 2.1) then 
+	
+		-- if it's been more than two seconds since the last health event, 
+		-- assume the health is no longer moving and we're not "safe".
+		self.lowHealth = nil
+
+		-- Cancel the timer now
+		if (self.healthTimer) then 
+			self.healthTimer:Cancel()
+			self.healthTimer = nil
 		end
-
-	-- this ALWAYS fires?
-	elseif (issecretvalue(current) or issecretvalue(maxHealth)) then
-		self.lowHealth = true
-
-	-- this never fires.
+	
+		self:UpdateSettings()
 	else
-		if (current == maxHealth) then
-			self.lowHealth = nil
-		else
-			self.lowHealth = true
+		-- if it hasn't been two seconds, assume we should start the timer.
+		if (not self.healthTimer) then
+			self:StartHealthTimer()
 		end
 	end
-end--]]
+end
 
 -- Checks if the player currently has a vehicle actionbar (or page)
 ExplorerMode.CheckVehicle = function(self)
@@ -561,16 +569,16 @@ ExplorerMode.OnEvent = function(self, event, ...)
 		self:CheckOverride()
 		self:CheckPossess()
 		self:CheckDragonRiding()
-		--self:CheckHealth()
+		--self:CheckHealth() -- only check this on health events or timer
 		self:CheckCursor()
 
 	elseif (event == "PLAYER_REGEN_DISABLED") then
 		self.inCombat = true
-		--self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
+		self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
 
 	elseif (event == "PLAYER_REGEN_ENABLED") then
 		self.inCombat = false
-		--self:RegisterUnitEvent("UNIT_HEALTH", "OnEvent", "player")
+		self:RegisterUnitEvent("UNIT_HEALTH", "OnEvent", "player")
 
 		if (self.db.profile.delayOnCombatEnd > 0) then
 			self:SetTimedForcedState(self.db.profile.delayOnCombatEnd)
@@ -604,8 +612,9 @@ ExplorerMode.OnEvent = function(self, event, ...)
 		or (event == "UPDATE_VEHICLE_ACTIONBAR") then
 		self:CheckVehicle()
 
-	--elseif (event == "UNIT_HEALTH") then
-	--	self:CheckHealth()
+	elseif (event == "UNIT_HEALTH") then
+		self.lastHealthEvent = GetTime() -- only update on health events
+		self:CheckHealth()
 
 	elseif (event == "ZONE_CHANGED_NEW_AREA") then
 		self:CheckInstance()
@@ -640,9 +649,9 @@ ExplorerMode.UpdateSettings = function(self)
 		self:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "OnEvent", "player")
 		self:RegisterUnitEvent("UNIT_EXITING_VEHICLE", "OnEvent", "player")
 
-		--if (not InCombatLockdown()) then
-		--	self:RegisterUnitEvent("UNIT_HEALTH", "OnEvent", "player")
-		--end
+		if (not InCombatLockdown()) then
+			self:RegisterUnitEvent("UNIT_HEALTH", "OnEvent", "player")
+		end
 
 		self.enabled = true
 		ns:Fire("ExplorerModeEnabled")
@@ -667,9 +676,9 @@ ExplorerMode.UpdateSettings = function(self)
 		self:UnregisterEvent("UNIT_EXITED_VEHICLE", "OnEvent", "player")
 		self:UnregisterEvent("UNIT_EXITING_VEHICLE", "OnEvent", "player")
 
-		--if (not InCombatLockdown()) then
-		--	self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
-		--end
+		if (not InCombatLockdown()) then
+			self:UnregisterEvent("UNIT_HEALTH", "OnEvent", "player")
+		end
 
 		self.enabled = nil
 		ns:Fire("ExplorerModeDisabled")
@@ -799,6 +808,7 @@ ExplorerMode.OnInitialize = function(self)
 end
 
 ExplorerMode.OnEnable = function(self)
+	self.lastHealthEvent = GetTime()
 	self:UpdateSettings()
 
 	ns.RegisterCallback(self, "MovableFrameAnchorsVisible", "OnMovableFrameAnchorsVisible")

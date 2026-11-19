@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibFadingFrames-1.0"
-local MINOR_VERSION = 46 -- 45
+local MINOR_VERSION = 47 -- 46
 
 assert(LibStub, MAJOR_VERSION .. " requires LibStub.")
 
