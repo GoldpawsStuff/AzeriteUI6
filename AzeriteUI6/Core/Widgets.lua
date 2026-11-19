@@ -277,7 +277,7 @@ do
 	local BUTTON_HEIGHT = 32
 	local BUTTON_WIDTH  = 220
 	local WIDGET_HEIGHT = 48
-	local LABEL_WIDTH   = 160
+	local LABEL_WIDTH   = 260 -- 160
 
 	local function ForcePulloutPosition(widget)
 		local pullout = widget.pullout

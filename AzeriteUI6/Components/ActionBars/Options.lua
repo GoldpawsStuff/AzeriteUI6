@@ -201,7 +201,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 16
 			},
 			primarygrowth = {
-				type = "select", style = "dropdown",
+				type = "select", style = "dropdown", width = "full",
 				name = L["Primary growth direction"],
 				desc = L["Sets which direction the Action Bar initially should expand in."],
 				disabled = function() return InCombatLockdown() end,
