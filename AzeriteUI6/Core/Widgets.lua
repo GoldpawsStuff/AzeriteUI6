@@ -272,7 +272,7 @@ end
 -- ModernDropdown
 do 
 	local Type = "ModernDropdown"
-	local Version = 16
+	local Version = 17
 
 	local BUTTON_HEIGHT = 32
 	local BUTTON_WIDTH  = 220
@@ -436,18 +436,21 @@ do
 
 		-- Hook the pullout as soon as it exists
 		local pullout = widget.pullout
-		if pullout and not pullout.modernHooked then
-			-- Override its Open so the first call is already correct
-			local originalPulloutOpen = pullout.Open
-			pullout.Open = function(self, point, rel, relPoint, x, y)
-				if widget.modernButton then
-					originalPulloutOpen(self, "TOPLEFT", widget.modernButton, "BOTTOMLEFT", 0, -2)
-				else
-					originalPulloutOpen(self, point, rel, relPoint, x, y)
+		if pullout then
+			pullout.modernOwner = widget
+			if not pullout.modernHooked then
+				local originalPulloutOpen = pullout.Open
+				pullout.Open = function(self, point, rel, relPoint, x, y)
+					local owner = self.modernOwner
+					if owner and owner.modernButton then
+						originalPulloutOpen(self, "TOPLEFT", owner.modernButton, "BOTTOMLEFT", 0, -2)
+						ForcePulloutPosition(owner)
+					else
+						originalPulloutOpen(self, point, rel, relPoint, x, y)
+					end
 				end
-				ForcePulloutPosition(widget)
+				pullout.modernHooked = true
 			end
-			pullout.modernHooked = true
 
 			if pullout.frame and not pullout.modernStyled then
 				local pf = pullout.frame
@@ -492,6 +495,17 @@ do
 			ApplyModernDropdown(self)
 		end
 
+		local originalOnRelease = widget.OnRelease
+		widget.OnRelease = function(self)
+			if self.pullout then
+				self.pullout.modernOwner = nil
+			end
+			self.modernHeightApplied = nil
+			if originalOnRelease then
+				originalOnRelease(self)
+			end
+		end
+
 		local originalSetText = widget.SetText
 		widget.SetText = function(self, text)
 			if originalSetText then originalSetText(self, text) end
@@ -512,6 +526,9 @@ do
 				end
 				self.disabled = disabled
 				UpdateDisabledState(self)
+				if self.button_cover then
+					self.button_cover:EnableMouse(false)
+				end
 			end	
 		end
 
