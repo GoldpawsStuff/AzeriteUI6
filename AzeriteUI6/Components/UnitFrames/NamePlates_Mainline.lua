@@ -787,7 +787,7 @@ NamePlates.GetOptions = function(self)
 		order = 300,
 		args = {
 			enable = {
-				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				type = "toggle", width = "full",
 				name = L["Enable"],
 				desc = L["Toggle the usage of our Name Plates. Note that disabling this will force a user interface reload to re-enable the game's default Name Plates."],
 				disabled = function() return InCombatLockdown() end,
@@ -801,10 +801,10 @@ NamePlates.GetOptions = function(self)
 			},
 
 			--nameplateShowAll = {
-			--	type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+			--	type = "toggle", width = "full",
 			--},
 			nameplateShowEnemies = {
-				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				type = "toggle", width = "full",
 				name = "Show Enemy Unit Nameplates",
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
@@ -816,7 +816,7 @@ NamePlates.GetOptions = function(self)
 				order = 100,
 			},
 			nameplateShowEnemyMinions = {
-				type = "toggle", width = "full", dialogControl = "ModernIndentedCheckBox",
+				type = "toggle", width = "full", indented = true,
 				name = "Show Enemy Minions",
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
@@ -860,7 +860,7 @@ NamePlates.GetOptions = function(self)
 
 			
 			nameplateShowOnlyNameScaleMultipler = {
-				type = "range", width = "full", min = 1, max = 1.6, step = .1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 1, max = 1.6, step = .1,
 				name = "Name scale when only showing name.",
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
@@ -877,7 +877,7 @@ NamePlates.GetOptions = function(self)
 			},
 
 			nameplateSize = {
-				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1,
 				name = "General Size", -- UNIT_NAMEPLATES_GLOBAL_SCALE, "Size"
 				desc = UNIT_NAMEPLATES_GLOBAL_SCALE_TOOLTIP, -- "Controls the size nameplates are displayed on the screen."
 				disabled = function() return InCombatLockdown() end,
@@ -892,7 +892,7 @@ NamePlates.GetOptions = function(self)
 				order = 1000,
 			},
 			nameplateSelectedScale = {
-				type = "range", width = "full", min = 1, max = 1.4, step = .05, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 1, max = 1.4, step = .05,
 				name = L["Selected NamePlate Scale"],
 				desc = L["Sets the scale of your current target."],
 				disabled = function() return InCombatLockdown() end,
@@ -905,7 +905,7 @@ NamePlates.GetOptions = function(self)
 				order = 1001,
 			},
 			nameplateMinScale = {
-				type = "range", width = "full", min = .4, max = 1, step = .05, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = .4, max = 1, step = .05,
 				name = L["Minimum Scale"],
 				desc = L["The minimum scale based on distance. Does not apply to current target."],
 				disabled = function() return InCombatLockdown() end,
@@ -918,7 +918,7 @@ NamePlates.GetOptions = function(self)
 				order = 1002,
 			},
 			nameplateMaxScale = {
-				type = "range", width = "full", min = .6, max = 1, step = .05, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = .6, max = 1, step = .05,
 				name = L["Maximum Scale"],
 				desc = L["The maximum scale based on distance. Does not apply to current target."],
 				disabled = function() return InCombatLockdown() end,
@@ -931,7 +931,7 @@ NamePlates.GetOptions = function(self)
 				order = 1003,
 			},
 			nameplateSimplifiedScale = {
-				type = "range", width = "full", min = .3, max = 1, step = .05, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = .3, max = 1, step = .05,
 				name = L["Simplified NamePlate Scale"],
 				desc = L["Sets the scale of simplified NamePlates. Simplified NamePlates refer to critters and various other unimportant NPCs and creatures. Does not apply to current target."],
 				disabled = function() return InCombatLockdown() end,
@@ -944,7 +944,7 @@ NamePlates.GetOptions = function(self)
 				order = 1004,
 			},
 			nameplateMaxDistance = {
-				type = "range", width = "full", min = 5, max = (ns.WoWCamelot or ns.WoWVanilla) and 45 or 60, step = 1, bigStep = 1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 5, max = (ns.WoWCamelot or ns.WoWVanilla) and 45 or 60, step = 1, bigStep = 1,
 				name = L["Max Visibility Distance."],
 				desc = (ns.WoWCamelot or ns.WoWVanilla) and L["Sets the maximum distance NamePlates are visible. Note that this has an effective cap of 20-45 in Forever and Classic Era."] or L["Sets the maximum distance NamePlates are visible. Note that this has an effective cap of 20-45 in Forever and Classic Era."],
 				disabled = function() return InCombatLockdown() end,

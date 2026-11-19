@@ -113,17 +113,52 @@ local options = {
 
 ns.exportableSettings, ns.exportableLayouts = {}, {}
 
+local seen = {}
+local function ApplyModernControls(tbl)
+	if (type(tbl) ~= "table") then return end
+	if (seen[tbl]) then return tbl end
+
+	seen[tbl] = true
+
+	if (tbl.type and not tbl.dialogControl) then
+		if (tbl.type == "toggle") then
+			if (tbl.indented) then
+				tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernIndentedCheckBox" or nil -- nil out for incompatible clients
+				tbl.indented = nil -- remove so Ace3 never sees it
+			else
+				tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernCheckBox" or nil
+			end
+		elseif (tbl.type == "range") then
+			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernSlider" or nil
+		elseif (tbl.type == "select") then
+			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernDropdown" or nil
+		end
+	end
+
+	for _, child in pairs(tbl) do
+		if (type(child) == "table") then
+			ApplyModernControls(child, seen)
+		end
+	end
+
+	return tbl
+end
+
 -- Generate the options menu
 ns.GenerateOptions = function(self)
 	local AceConfig = LibStub("AceConfig-3.0")
 	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 	local AceDBOptions = LibStub("AceDBOptions-3.0")
 
-	-- register the full options table
-	AceConfig:RegisterOptionsTable(addonName, options)
+	local modernControls = {
+		toggle = "ModernCheckBox",
+		range  = "ModernSlider",
+		select = "ModernDropdown",
+	}
 
-	local _, categoryID = AceConfigDialog:AddToBlizOptions(addonName, addonTitle)
-	self.categoryID = categoryID
+	-- register the full options table
+	self:RegisterOptionsTable(addonName, options)
+	self.categoryID = select(2, AceConfigDialog:AddToBlizOptions(addonName, addonTitle))
 
 	-- iterate submodules to get a list of titles
 	local subModules, subModuleNames = {}, {}
@@ -159,8 +194,9 @@ ns.GenerateOptions = function(self)
 		local menuName = moduleOptions.arg and moduleOptions.arg.menuName or moduleOptions.name
 	
 		local moduleAppName = addonName .. "_" .. name
-		AceConfig:RegisterOptionsTable(moduleAppName, moduleOptions)
-		AceConfigDialog:AddToBlizOptions(moduleAppName,  menuName or name, addonTitle)
+
+		self:RegisterOptionsTable(moduleAppName, moduleOptions)
+		self:AddToBlizOptions(moduleAppName,  menuName or name, addonTitle)
 	end
 
 	-- add profiles, etc.
@@ -168,9 +204,16 @@ ns.GenerateOptions = function(self)
 	profiles.dialogHidden = true
 	profiles.order = 10000 -- this doesn't really matter here, does it? Order is by registration, in our case.
 
-	AceConfig:RegisterOptionsTable(addonName .. "_Profiles", profiles)
-	AceConfigDialog:AddToBlizOptions(addonName .. "_Profiles", "Profiles", addonTitle)
+	self:RegisterOptionsTable(addonName .. "_Profiles", profiles)
+	self:AddToBlizOptions(addonName .. "_Profiles", "Profiles", addonTitle)
+end
 
+ns.RegisterOptionsTable = function(self, appName, options, slashcmd)
+	return LibStub("AceConfig-3.0"):RegisterOptionsTable(appName, ApplyModernControls(options), slashcmd)
+end
+
+ns.AddToBlizOptions = function(self, appName, name, parent, ...)
+	return LibStub("AceConfigDialog-3.0"):AddToBlizOptions(appName, name, parent, ...)
 end
 
 ns.OpenOptions = function(self)

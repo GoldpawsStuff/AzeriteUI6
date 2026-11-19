@@ -272,7 +272,7 @@ end
 do 
 
 	local Type = "ModernDropdown"
-	local Version = 15
+	local Version = 16
 
 	local BUTTON_HEIGHT = 32
 	local BUTTON_WIDTH  = 220
@@ -466,6 +466,19 @@ do
 		end
 	end
 
+	local function UpdateDisabledState(widget)
+		local btn = widget.modernButton
+		if not btn then return end
+		local disabled = widget.disabled
+		if btn.bg then
+			btn.bg:SetDesaturated(disabled)
+			btn.bg:SetAlpha(disabled and 0.5 or 1)
+		end
+		if btn.text then
+			btn.text:SetTextColor(disabled and 0.5 or 1, disabled and 0.5 or 1, disabled and 0.5 or 1)
+		end
+	end
+
 	local function Constructor()
 		local widget = AceGUI:Create("Dropdown")
 		widget.type = Type
@@ -489,6 +502,17 @@ do
 				self.text:Hide()
 				self.text:SetAlpha(0)
 			end
+		end
+
+		local originalSetDisabled = widget.SetDisabled
+		if originalSetDisabled then
+			widget.SetDisabled = function(self, disabled)
+				if originalSetDisabled then
+					originalSetDisabled(self, disabled)
+				end
+				self.disabled = disabled
+				UpdateDisabledState(self)
+			end	
 		end
 
 		local originalOpen = widget.Open

@@ -167,7 +167,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				layoutPaddingY
 			--]]--
 			enable = {
-				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				type = "toggle", width = "full", 
 				name = L["Enable"],
 				desc = L["Toggle the usage of this Action Bar. Note that disabling this does not re-enable the game's default Action Bars."],
 				disabled = function() return InCombatLockdown() end,
@@ -180,7 +180,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 1
 			},
 			layout = {
-				type = "select", style = "dropdown", dialogControl = "ModernDropdown",
+				type = "select", style = "dropdown",
 				name = L["Action Bar layout"],
 				desc = L["Sets the layout type of the Action Bar. Grid: Display the Action Bar as a standard row, column or retangular grid of buttons. ZigZag: Display the Action Bar as the ZigZag pattern seen on the default settings for the Primary Action Bar."],
 				values = { ["grid"] = L["Grid"], ["zigzag"] = L["ZigZag"] },
@@ -201,7 +201,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 16
 			},
 			primarygrowth = {
-				type = "select", style = "dropdown", dialogControl = "ModernDropdown",
+				type = "select", style = "dropdown",
 				name = L["Primary growth direction"],
 				desc = L["Sets which direction the Action Bar initially should expand in."],
 				disabled = function() return InCombatLockdown() end,
@@ -232,7 +232,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 20,
 			},
 			secondarygrowth = {
-				type = "select", style = "dropdown", dialogControl = "ModernDropdown",
+				type = "select", style = "dropdown",
 				name = L["Secondary growth direction"],
 				desc = L["Sets which direction the Action Bar should start a new line of buttons in."],
 				disabled = function() return InCombatLockdown() end,
@@ -269,7 +269,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 29
 			},
 			numbuttons = {
-				type = "range", width = "full", min = 1, max = numButtons, step = 1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 1, max = numButtons, step = 1,
 				name = L["Number of visible buttons"],
 				desc = L["Sets the number of visible buttons on the Action Bar."],
 				disabled = function() return InCombatLockdown() end,
@@ -283,7 +283,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 30
 			},
 			gridsize = {
-				type = "range", width = "full", min = 1, max = numButtons, step = 1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 1, max = numButtons, step = 1,
 				name = L["Number of buttons before line-break."],
 				desc = L["Sets the width of the Action Bar in number of buttons in its primary growth direction."],
 				disabled = function() return InCombatLockdown() end,
@@ -297,7 +297,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 40,
 			},
 			zigzagstart = {
-				type = "range", width = "full", min = 1, max = numButtons, step = 1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 1, max = numButtons, step = 1,
 				name = L["Which button to start the ZigZag pattern from"],
 				desc = L["Sets what button to start the ZigZag pattern from. This is the ID of the first button on the second row of the pattern."],
 				disabled = function() return InCombatLockdown() end,
@@ -317,7 +317,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 99 
 			},
 			enablebarfading = {
-				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				type = "toggle", width = "full",
 				name = L["Enable Action Bar fading."],
 				desc = L["Sets whether the Action Bar should fade out or not."],
 				disabled = function() return InCombatLockdown() end,
@@ -331,7 +331,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 100
 			},
 			fadeincombat = {
-				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				type = "toggle", width = "full",
 				name = L["Keep faded while engaged in combat."],
 				desc = L["Prevents the faded Action Buttons from automatically becoming visible when engaged in combat. Faded Action Buttons are still visible when moused over."],
 				disabled = function() return InCombatLockdown() end,
@@ -345,7 +345,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 				order = 110
 			},
 			fadefrom = {
-				type = "range", width = "full", min = 1, max = numButtons, step = 1, dialogControl = "ModernSlider",
+				type = "range", width = "full", min = 1, max = numButtons, step = 1,
 				name = L["Start fading from button ID"],
 				desc = L["Sets what button ID the fading begins at."],
 				disabled = function() return InCombatLockdown() end,

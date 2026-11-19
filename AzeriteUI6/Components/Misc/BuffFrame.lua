@@ -52,7 +52,7 @@ PlayerAuras.GetOptions = function(self)
 				order = 1
 			},
 			enable = {
-				type = "toggle", width = "full", dialogControl = "ModernCheckBox",
+				type = "toggle", width = "full",
 				name = L["Enable"],
 				desc = L["Toggle the usage of our Buff & Debuff Frames. Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames."],
 				disabled = function() return InCombatLockdown() end,
