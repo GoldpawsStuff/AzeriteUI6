@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.35-Alpha] 2026-11-19
+## [Unreleased][1.0.35-Alpha] 2026-11-20
 - Working on more aura-, nameplate- and unit frame options.
 
 ### Added
@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - The Explorer Mode once again watches your health, but in a different manner than before. The new Secrecy in Forever and Retail prevents us from actually reading the health or comparing it to anything, but what we CAN do is to monitor if the health changes at all, just without actually reading any values. We do this by simply listening for the `UNIT_HEALTH` event for the `player` unit. If this event fires, we fade in the user interface, if it hasn't fired for more than two seconds, than we can assume the health is full and we safely can fade out the user interface. Happy exploring! 
+
+### Fixed
+- Fixed an issue where your current `focus` target's NamePlate only would get highlighted with a blue border when you also targeted something else.
 
 ## [1.0.34-Release] 2026-11-18
 ### Added

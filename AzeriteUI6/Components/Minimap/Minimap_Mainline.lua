@@ -148,8 +148,8 @@ MinimapModule.StyleMinimap = function(self)
 	local borderTexture = borderFrame:CreateTexture(nil, "BORDER", nil, 5)
 	borderTexture:SetTexture(GetMedia("minimap-border"))
 	borderTexture:SetVertexColor(192/255, 192/255, 192/255)
-	borderTexture:SetPoint("CENTER", -2, -2)
-	borderTexture:SetSize(360,360)
+	borderTexture:SetPoint("CENTER", -2, 0)
+	borderTexture:SetSize(360,360) -- 404 actually, but that's big.
 
 	local hider = CreateFrame("Frame")
 	hider:Hide()

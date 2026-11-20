@@ -226,7 +226,7 @@ end
 local UpdateAllActiveTargets = function(event)
 
 	local hasTarget = UnitExists("target")
-	local hasFocus = UnitExists("target")
+	local hasFocus = UnitExists("focus")
 	local hasEnemy = UnitExists("softenemy")
 	local hasFriend = UnitExists("softfriend")
 	local hasInteract = UnitExists("softinteract")
