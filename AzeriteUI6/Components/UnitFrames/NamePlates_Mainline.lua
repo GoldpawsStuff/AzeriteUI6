@@ -202,6 +202,10 @@ local GetCVar = function(cvar)
 	return tonumber(value) or value
 end
 
+local GetCVarBool = function(cvar)
+	return C_CVar.GetCVarBool(cvar)
+end
+
 -- Return a CVar default, convert to number when appropriate
 local GetCVarDefault = function(cvar)
 	local value = C_CVar.GetCVarDefault(cvar)
@@ -371,12 +375,12 @@ local NamePlate_PostUpdateElements = function(self, event, unit)
 
 	local isPriorityUnit = self.isTarget or self.isFocus or self.isSoftInteract or self.isSoftEnemy or self.isSoftFriend
 
-	local onlyShowName = isFriendlyPlayer and not isPriorityUnit and db.nameplateShowOnlyNameForFriendlyPlayerUnits
-	local onlyShowNPCName = isFriendlyNPC and not isPriorityUnit and db.nameplateShowOnlyNameForFriendlyNPCUnits
-	local scaleMultipler = db.nameplateShowOnlyNameScaleMultipler
+	local onlyShowName = isFriendlyPlayer and not isPriorityUnit and toboolean(db.nameplateShowOnlyNameForFriendlyPlayerUnits)
+	local onlyShowNPCName = isFriendlyNPC and not isPriorityUnit and toboolean(db.nameplateShowOnlyNameForFriendlyNPCUnits)
+	local scaleMultipler = tonumber(db.nameplateShowOnlyNameScaleMultipler) or defaults.profile.nameplateShowOnlyNameScaleMultipler
 
-	local shouldClassColorName = db.nameplateUseClassColorForFriendlyPlayerUnitNames
-	local shouldClassColorNPCName = db.nameplateUseReactionColorForFriendlyNPCUnitNames
+	local shouldClassColorName = toboolean(db.nameplateUseClassColorForFriendlyPlayerUnitNames)
+	local shouldClassColorNPCName = toboolean(db.nameplateUseReactionColorForFriendlyNPCUnitNames)
 
 	if (onlyShowName or onlyShowNPCName) then
 		self.Name:SetAlpha(1)
@@ -685,8 +689,18 @@ local style = function(self, unit)
 end
 
 NamePlates.LoadSettingFromCVar = function(self, cvarName, value)
-	if (self.db.profile[cvarName]) then
-		self.db.profile[cvarName] = tonumber(value) or value or GetCVar(cvarName) or defaults.profile[cvarName] 
+
+	-- Avoid a nightmare of mismatching lower and upper caps
+	local settingsName
+	for setting in next,defaults.profile do 
+		if (string.lower(setting) == string.lower(cvarName)) then
+			settingsName = setting
+			break
+		end
+	end
+
+	if (self.db.profile[settingsName]) then
+		self.db.profile[settingsName] = tonumber(value) or value or GetCVar(settingsName) or defaults.profile[settingsName] 
 	end
 end
 
@@ -741,7 +755,7 @@ end
 NamePlates.UpdateAllElements = function(self, event)
 	for nameplate in next,ActiveNamePlates do
 		nameplate:UpdateAllElements(event or "RefreshUnit")
-		NamePlate_PostUpdateElements(nameplate)
+		NamePlate_PostUpdateElements(nameplate, event or "RefreshUnit", nameplate.__unit)
 	end
 end
 
@@ -765,7 +779,7 @@ NamePlates.OnEvent = function(self, event, ...)
 			end
 		end
 		if (not settingsName or not self.db.profile[settingsName]) then return end
-		
+
 		self:LoadSettingFromCVar(settingsName, value)
 		self:UpdateAllElements("CVAR_UPDATE")
 
@@ -829,9 +843,6 @@ NamePlates.GetOptions = function(self)
 				confirm = not (ns.WoWCamelot or ns.WoWMainline) and true or nil,
 				order = 1
 			},
-			--nameplateShowAll = {
-			--	type = "toggle", width = "full",
-			--},
 			nameplateShowEnemies = {
 				type = "toggle", width = "full",
 				name = "Show Enemy Unit Nameplates",
@@ -886,10 +897,6 @@ NamePlates.GetOptions = function(self)
 				end,
 				order = 102,
 			},
-
-
-			--nameplateShowFriendlyNpcs = 1, 							-- Whether nameplates are shown for friendly npcs. (Default 0)
-
 			nameplateShowFriendlyPlayers = {
 				type = "toggle", width = "full",
 				name = "Show Friendly Player Nameplates",
@@ -903,6 +910,35 @@ NamePlates.GetOptions = function(self)
 				end,
 				order = 200,
 			},
+			nameplateShowOnlyNameForFriendlyPlayerUnits = {
+				type = "toggle", width = "full", indented = true,
+				name = "Show only name for friendly Players",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayers")) end,
+				get = function(info) return toboolean(GetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits", val and "1" or "0") 
+				end,
+				order = 201,
+			},
+			nameplateUseClassColorForFriendlyPlayerUnitNames = {
+				type = "toggle", width = "full", indented = true,
+				name = "Use class coloring for friendly Player names.",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayers")) or not toboolean(GetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits")) end,
+				get = function(info) return toboolean(GetCVar("nameplateUseClassColorForFriendlyPlayerUnitNames")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateUseClassColorForFriendlyPlayerUnitNames", val and "1" or "0") 
+				end,
+				order = 202,
+			},
+
+
+
 			nameplateShowFriendlyPlayerMinions = {
 				type = "toggle", width = "full", 
 				name = "Show Friendly Player Minions",
@@ -914,7 +950,7 @@ NamePlates.GetOptions = function(self)
 					if (InCombatLockdown()) then return end
 					SetCVar("nameplateShowFriendlyPlayerMinions", val and "1" or "0") -- Whether friendly player minion nameplates are shown. (Default 0)
 				end,
-				order = 201,
+				order = 211,
 			},
 			nameplateShowFriendlyPlayerPets = {
 				type = "toggle", width = "full", indented = true,
@@ -927,7 +963,7 @@ NamePlates.GetOptions = function(self)
 					if (InCombatLockdown()) then return end
 					SetCVar("nameplateShowFriendlyPlayerPets", val and "1" or "0") -- Whether friendly player pet nameplates are shown. (Default 0)
 				end,
-				order = 202,
+				order = 212,
 			},
 			nameplateShowFriendlyPlayerGuardians = {
 				type = "toggle", width = "full", indented = true,
@@ -940,7 +976,7 @@ NamePlates.GetOptions = function(self)
 					if (InCombatLockdown()) then return end
 					SetCVar("nameplateShowFriendlyPlayerGuardians", val and "1" or "0") -- Whether friendly player guardian nameplates are shown. (Default 0)
 				end,
-				order = 203,
+				order = 213,
 			},
 			nameplateShowFriendlyPlayerTotems = {
 				type = "toggle", width = "full", indented = true,
@@ -953,8 +989,52 @@ NamePlates.GetOptions = function(self)
 					if (InCombatLockdown()) then return end
 					SetCVar("nameplateShowFriendlyPlayerTotems", val and "1" or "0") -- Whether friendly player totem nameplates are shown.  (Default 0)
 				end,
-				order = 204,
+				order = 214,
 			},
+			nameplateShowFriendlyNpcs = {
+				type = "toggle", width = "full", 
+				name = "Show Friendly NPCs",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return toboolean(GetCVar("nameplateShowFriendlyNpcs")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowFriendlyNpcs", val and "1" or "0") 
+				end,
+				order = 300,
+			},
+			nameplateShowOnlyNameForFriendlyNPCUnits = {
+				type = "toggle", width = "full", indented = true, 
+				name = "Show Only Name",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyNpcs")) end,
+				get = function(info) return toboolean(self.db.profile.nameplateShowOnlyNameForFriendlyNPCUnits) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					self.db.profile.nameplateShowOnlyNameForFriendlyNPCUnits = val and "1" or "0"
+					self:UpdateSettings()
+				end,
+				order = 301,
+			},
+			nameplateUseReactionColorForFriendlyNPCUnitNames = {
+				type = "toggle", width = "full", indented = true,
+				name = "Use reaction coloring for NPC name",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyNpcs")) or not self.db.profile.nameplateShowOnlyNameForFriendlyNPCUnits  end,
+				get = function(info) return toboolean(self.db.profile.nameplateUseReactionColorForFriendlyNPCUnitNames) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					self.db.profile.nameplateUseReactionColorForFriendlyNPCUnitNames = val and "1" or "0"
+					self:UpdateSettings()
+				end,
+				order = 302,
+			},
+
+			
+		
 
 			
 			nameplateShowOnlyNameScaleMultipler = {
@@ -968,7 +1048,7 @@ NamePlates.GetOptions = function(self)
 				get = function() return self.db.profile.nameplateShowOnlyNameScaleMultipler end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					self.db.profile.nameplateShowOnlyNameScaleMultipler = tonumber(value)
+					self.db.profile.nameplateShowOnlyNameScaleMultipler = tonumber(value) or self.db.profile.nameplateShowOnlyNameScaleMultipler
 					self:UpdateAllElements()
 				end,
 				order = 800,
@@ -1115,6 +1195,10 @@ end
 NamePlates.UpdateSettings = function(self)
 	if (not self.variablesLoaded) then return end
 
+	-- Is this a dumb idea? 
+	for nameplate in next,ActiveNamePlates do
+		NamePlate_PostUpdateElements(nameplate, event, nameplate.__unit)
+	end
 end
 
 -- This is called by the addon on full profile changes,
@@ -1134,6 +1218,13 @@ NamePlates.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Clean up some previous type mismatches
+	for setting,value in next,customSettings do
+		if (type(self.db.profile[setting]) ~= type(setting)) then
+			self.db.profile[setting] = value
+		end
+	end
 
 	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
 end
