@@ -608,63 +608,191 @@ do
 
 end
 
-local function ApplyHeader(group)
-	local frame = group.frame
-	local label = group.label
-	local content = group.content
-	if not (frame and label and content) then return end
+-- ModernPopup
+do
+	if IsModernClient() then
 
-	label:SetFontObject("GameFontHighlightHuge")
-	label:SetTextColor(1, 1, 1)
-	label:SetJustifyH("LEFT")
-	label:SetJustifyV("TOP")
-	label:ClearAllPoints()
-	label:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -16)
-	label:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
+		local Version = 4
 
-	local line = frame.azeriteDivider
-	if not line then
-		line = frame:CreateTexture(nil, "ARTWORK")
-		line:SetAtlas("Options_HorizontalDivider", true)
-		frame.azeriteDivider = line
-	end
-	line:ClearAllPoints()
-	line:SetPoint("TOP", frame, "TOP", 0, -46)
-
-	content:ClearAllPoints()
-	content:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -64)
-	content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
-end
-
-local hooked = {}
-
-local function EnsureHook(group)
-	if hooked[group] or type(group) ~= "table" or not group.SetTitle then return end
-	hooked[group] = true
-	hooksecurefunc(group, "SetTitle", ApplyHeader)
-	ApplyHeader(group)
-end
-
-local function HookOurGroups()
-	local AceConfigDialog = LibStub("AceConfigDialog-3.0", true)
-	local bliz = AceConfigDialog and AceConfigDialog.BlizOptions
-	if not bliz then return end
-
-	for appName, groups in pairs(bliz) do
-		if type(appName) == "string" and appName:find("AzeriteUI6", 1, true) then
-			for _, group in pairs(groups) do
-				EnsureHook(group)
+		local popup
+		local function GetPopup()
+			if popup then
+				return popup
 			end
+
+			local frame = CreateFrame("Frame", nil, UIParent)
+			frame:SetFrameStrata("DIALOG")
+			frame:SetToplevel(true)
+			frame:EnableMouse(true)
+			frame:SetSize(460, 160)
+			frame:SetPoint("CENTER")
+			frame:Hide()
+
+			local border = CreateFrame("Frame", nil, frame, "DialogBorderDarkTemplate")
+			border:SetAllPoints()
+
+			local header = CreateFrame("Frame", nil, frame, "DialogHeaderTemplate")
+			header:SetFrameLevel(border:GetFrameLevel() + 2)
+			frame.header = header
+
+			local text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+			text:SetPoint("TOP", frame, "TOP", 0, -48)
+			text:SetWidth(400)
+			text:SetJustifyH("CENTER")
+			text:SetJustifyV("TOP")
+			frame.text = text
+
+			frame.buttons = {}
+			for i = 1, 3 do
+				local button = CreateFrame("Button", nil, frame, "SharedButtonTemplate")
+				button:SetHeight(36)
+				button:SetNormalFontObject("GameFontHighlightMedium")
+				button:SetHighlightFontObject("GameFontHighlightMedium")
+				button:SetDisabledFontObject("GameFontDisable")
+				button:SetFrameLevel(border:GetFrameLevel() + 3)
+				button:SetScript("OnClick", function(self)
+					local handler = self.handler
+					if handler then
+						handler()
+					end
+					frame:Hide()
+				end)
+				frame.buttons[i] = button
+			end
+
+			frame.SetTitleText = function(self, title)
+				self.header:Setup(title or "")
+			end
+
+			frame:SetScript("OnKeyDown", function(self, key)
+				if key ~= "ESCAPE" then
+					self:SetPropagateKeyboardInput(true)
+					return
+				end
+				self:SetPropagateKeyboardInput(false)
+				local cancel = self.cancelButton
+				if cancel and cancel.handler then
+					cancel.handler()
+				end
+				self:Hide()
+			end)
+
+			frame:SetScript("OnShow", function(self)
+				if self.SetPropagateKeyboardInput then
+					self:SetPropagateKeyboardInput(false)
+				end
+			end)
+
+			popup = frame
+			return frame
+		end
+
+		function ns:ShowPrompt(title, text, buttons)
+			local frame = GetPopup()
+			frame:SetTitleText(title)
+			frame.text:SetText(text or "")
+
+			local count = math.min(#buttons, 3)
+			local gap = 12
+			local width = (frame:GetWidth() - 48 - gap * (count - 1)) / count
+			local previous
+
+			frame.cancelButton = nil
+			for i = 1, 3 do
+				local button = frame.buttons[i]
+				local info = buttons[i]
+				if i <= count and info then
+					button.handler = info.onClick
+					button:SetText(info.text or "")
+					button:SetWidth(width)
+					button:ClearAllPoints()
+					if not previous then
+						button:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 24, 20)
+					else
+						button:SetPoint("LEFT", previous, "RIGHT", gap, 0)
+					end
+					button:Show()
+					previous = button
+					if info.cancel then
+						frame.cancelButton = button
+					end
+				else
+					button.handler = nil
+					button:Hide()
+				end
+			end
+
+			frame:SetHeight(math.max(150, 108 + frame.text:GetStringHeight()))
+			frame:Show()
 		end
 	end
 end
 
-local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-if not AceConfigDialog.modernTitleStyled then
-	-- SetTitle runs inside FeedGroup, still before the frame is painted
-	hooksecurefunc(AceConfigDialog, "FeedGroup", HookOurGroups)
-	hooksecurefunc(AceConfigDialog, "AddToBlizOptions", HookOurGroups)
-	AceConfigDialog.modernTitleStyled = true
-end
+-- Modernize our menu headers
+do
+	if IsModernClient() then 
 
-HookOurGroups()
+		local Version = 1
+
+		local function ApplyHeader(group)
+			local frame = group.frame
+			local label = group.label
+			local content = group.content
+			if not (frame and label and content) then return end
+
+			label:SetFontObject("GameFontHighlightHuge")
+			label:SetTextColor(1, 1, 1)
+			label:SetJustifyH("LEFT")
+			label:SetJustifyV("TOP")
+			label:ClearAllPoints()
+			label:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -16)
+			label:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
+
+			local line = frame.azeriteDivider
+			if not line then
+				line = frame:CreateTexture(nil, "ARTWORK")
+				line:SetAtlas("Options_HorizontalDivider", true)
+				frame.azeriteDivider = line
+			end
+			line:ClearAllPoints()
+			line:SetPoint("TOP", frame, "TOP", 0, -46)
+
+			content:ClearAllPoints()
+			content:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -64)
+			content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
+		end
+
+		local hooked = {}
+
+		local function EnsureHook(group)
+			if hooked[group] or type(group) ~= "table" or not group.SetTitle then return end
+			hooked[group] = true
+			hooksecurefunc(group, "SetTitle", ApplyHeader)
+			ApplyHeader(group)
+		end
+
+		local function HookOurGroups()
+			local AceConfigDialog = LibStub("AceConfigDialog-3.0", true)
+			local bliz = AceConfigDialog and AceConfigDialog.BlizOptions
+			if not bliz then return end
+
+			for appName, groups in pairs(bliz) do
+				if type(appName) == "string" and appName:find("AzeriteUI6", 1, true) then
+					for _, group in pairs(groups) do
+						EnsureHook(group)
+					end
+				end
+			end
+		end
+
+		local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+		if not AceConfigDialog.modernTitleStyled then
+			-- SetTitle runs inside FeedGroup, still before the frame is painted
+			hooksecurefunc(AceConfigDialog, "FeedGroup", HookOurGroups)
+			hooksecurefunc(AceConfigDialog, "AddToBlizOptions", HookOurGroups)
+			AceConfigDialog.modernTitleStyled = true
+		end
+
+		HookOurGroups()
+	end
+end

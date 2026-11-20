@@ -813,12 +813,22 @@ NamePlates.GetOptions = function(self)
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
 					if (InCombatLockdown()) then return end
+					if (ns.WoWCamelot or ns.WoWMainline) then
+						ns:ShowPrompt("Reload UI", "Toggling this option requires a user interface reload.|n|nAre you sure?", {
+							{ text = ACCEPT, onClick = function() 
+								self.db.profile.enabled = val
+								ns.Reload()
+							end },
+							{ text = CANCEL, cancel = true, onClick = function() end },
+						})
+						return
+					end
 					self.db.profile.enabled = val 
-					self:UpdateSettings()
+					ns.Reload()
 				end,
+				confirm = not (ns.WoWCamelot or ns.WoWMainline) and true or nil,
 				order = 1
 			},
-
 			--nameplateShowAll = {
 			--	type = "toggle", width = "full",
 			--},
@@ -1036,13 +1046,6 @@ end
 NamePlates.UpdateSettings = function(self)
 	if (not self.variablesLoaded) then return end
 
-	-- These two only fires on manual settings changes
-	if (self.db.profile.enabled) and (not self:IsEnabled()) then
-		ReloadUI()
-	
-	elseif (not self.db.profile.enabled) and (self:IsEnabled()) then
-		ReloadUI()
-	end
 end
 
 -- This is called by the addon on full profile changes,

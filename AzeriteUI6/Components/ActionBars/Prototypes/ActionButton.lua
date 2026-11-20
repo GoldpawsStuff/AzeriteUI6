@@ -406,6 +406,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 		- *note to self, make compatible with MaxDPS if possible
 		- blue glow, next in rotation
 	--]]
+	
 	local ACH = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, 1)
 	ACH:SetSize(134.295081967, 134.295081967)
 	ACH:SetPoint("CENTER", 0, 0)
@@ -423,6 +424,11 @@ ns.ActionButton.Create = function(self, id, name, header)
 	}
 
 	--[[
+		LibActionButton build 171, updated functions and methods: 
+			lib:ShowSpellOverlayGlow(spellID)
+			lib:HideSpellOverlayGlow(spellID)
+			UpdateOverlayGlowForSpell(spellID, overlayed)
+
 		SpellActivationAlert 
 		- used when a reactive spell like a proc becomes available.
 		- yellow bright glow, activated spell
@@ -430,6 +436,7 @@ ns.ActionButton.Create = function(self, id, name, header)
 			- LBG.ShowOverlayGlow(button)
 			- LBG.HideOverlayGlow(button)
 	--]]
+
 	-- spell highlight
 	local spellActivationAlert = button.OverlayFrame:CreateTexture(nil, "ARTWORK", nil, -7)
 	spellActivationAlert:SetSize(134.295081967, 134.295081967)
@@ -473,30 +480,6 @@ ns.ActionButton.Create = function(self, id, name, header)
 			bar:UpdateFading()
 		end
 	end)
-
-	-- prevents empty hovering buttons from appearing on initial login
-	-- when currently mounted/dragonriding or when using another bar with 
-	-- less than the standard 12 buttons.
-	-- *think I fixed this elsewhere, but for some reason didn't document it here.
-	--button:SetAlpha(0)
-	--button.setAlpha = button.SetAlpha
-	--button.SetAlpha = function(self, alpha)
-	--	if (self.header.id == 1) then 
-	--		if (C_ActionBar.HasOverrideActionBar()) then
-	--			return self:setAlpha(self.id > NUM_OVERRIDE_BUTTONS and 0 or alpha)
-	--		elseif (C_ActionBar.HasBonusActionBar() and C_ActionBar.GetBonusBarOffset() == 5) then
-	--			if (IsMounted()) then 
-	--				return self:setAlpha(self.id > NUM_OVERRIDE_BUTTONS and 0 or alpha)
-	--			else
-	--				return self:setAlpha(self.id > NUM_OVERRIDE_BUTTONS and 0 or alpha)
-	--			end
-	--		else
-	--			return self:setAlpha(alpha)
-	--		end
-	--	else
-	--		return self:setAlpha(alpha)
-	--	end
-	--end
 
 	ns.ActionButtons[button] = true
 

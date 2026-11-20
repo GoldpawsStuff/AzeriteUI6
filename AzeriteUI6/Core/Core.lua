@@ -31,6 +31,7 @@ local LibDeflate = LibStub("LibDeflate") -- intended for profile sharing later o
 
 ns = LibStub("AceAddon-3.0"):NewAddon(ns, addonName, "AceConsole-3.0", "AceTimer-3.0", "LibMoreEvents-1.0", "AceSerializer-3.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0")
 ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns, nil, nil, false)
+ns.Reload = C_UI and C_UI.Reload or ReloadUI
 
 -- Changing this number forces a full settings reset.
 ns.SETTINGS_VERSION = -1 
@@ -44,7 +45,7 @@ ns.WoWVersion = interfaceVersion -- patch build version as number
 ns.WoW12 = (ns.WoWVersion >= 120000) -- secrecy expansion
 ns.WoW13 = (ns.WoWVersion >= 130000) -- future expansion
 
--- Flavor Flags
+-- Flavor Flags. Say that fifteen times fast. 
 ns.WoWMainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) -- Retail
 ns.WoWCamelot = (WOW_PROJECT_ID == WOW_PROJECT_CAMELOT) -- Forever
 ns.WoWVanilla = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- Classic Era, SoD, SoM and Hardcore versions
@@ -55,10 +56,6 @@ ns.WoWMists = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC) -- Mists of Pandaria
 
 -- Only useful when moving from Midnight to the next expansion
 ns.WoWMidnight = (ns.WoW12 and not ns.WoW13) -- Retail changes, Midnight is a specific version
-
--- Let's phase out the usage of these.
-ns.WoWForever = ns.WoWCamelot
-ns.WoWRetail = ns.WoWMainline
 
 -- Seasonal Classic Realm Flags
 local seasonID = C_Seasons and C_Seasons.GetActiveSeason()

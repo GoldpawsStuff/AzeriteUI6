@@ -101,3 +101,4 @@ L["Simplified NamePlate Scale"] = true
 L["The maximum scale based on distance. Does not apply to current target."] = "The maximum scale based on distance.|n|n|cff4488ffDoes not apply to current target.|r"
 L["The minimum scale based on distance. Does not apply to current target."] = "The minimum scale based on distance.|n|n|cff4488ffDoes not apply to current target.|r"
 
+L["Visibility"] = true
