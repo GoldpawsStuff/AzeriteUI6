@@ -106,18 +106,25 @@ local cVars = {
 	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Used to display the class color in friendly player unit nameplate names. (Default 0)
 }
 
+local customSettings = {
+	nameplateShowOnlyNameScaleMultipler = 1.2, 				-- Scale multipler to the unit name when only showing unit name (NOT A CVAR!)
+	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
+	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
+}
+
 -- Declare module defaults
 -- *some of these are overwritten by saved blizzard settings on first run,
 --  but the user can choose to restore "addon defaults" in the options menu. 
 local defaults = { profile = {
 	enabled = true,
-	nameplateShowOnlyNameScaleMultipler = 1.2, 				-- Scale multipler to the unit name when only showing unit name (NOT A CVAR!)
-	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
-	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
 }}
 -- Include our CVar listing
 for cvarName,value in next,cVars do 
 	defaults.profile[cvarName] = value
+end
+-- Include our custom values
+for customSetting,value in next,customSettings do 
+	defaults.profile[customSetting] = value
 end
 
 -- Cache of current targets (target, focus, softenemy, softinteract, softfriend)
@@ -702,8 +709,14 @@ end
 NamePlates.RestoreDefaults = function(self)
 	if (InCombatLockdown()) then return end
 
+	-- Restore our defaults for CVar settings
 	for cvarName,value in next,cVars do 
 		self.db.profile[cvarName] = defaults.profile[cvarName]
+	end
+
+	-- Restore our custom setting defaults
+	for customSetting,value in next,customSettings do 
+		self.db.profile[customSetting] = defaults.profile[customSetting]
 	end
 
 	self:SaveSettingsToCVars()
@@ -712,8 +725,14 @@ end
 NamePlates.RestoreBlizzardDefaults = function(self)
 	if (InCombatLockdown()) then return end
 
+	-- Restore blizzard's defaults for CVar settings
 	for cvarName,value in next,cVars do 
 		self.db.profile[cvarName] = GetCVarDefault(cvarName) or defaults.profile[cvarName]
+	end
+	
+	-- Restore our custom setting defaults
+	for customSetting,value in next,customSettings do 
+		self.db.profile[customSetting] = defaults.profile[customSetting]
 	end
 
 	self:SaveSettingsToCVars()

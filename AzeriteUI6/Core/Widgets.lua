@@ -34,7 +34,7 @@ end
 -- ModernCheckBox
 do 
 	local Type = "ModernCheckBox"
-	local Version = 1
+	local Version = 2
 
 	local function ApplyModernTextures(widget)
 		local checkbg   = widget.checkbg
@@ -87,6 +87,8 @@ do
 		-- Apply immediately
 		ApplyModernTextures(widget)
 
+		local TEXT_GAP = IsModernClient() and 4 or 2
+
 		-- Optional indent support
 		function widget:SetIndent(pixels)
 			pixels = pixels or 0
@@ -97,11 +99,34 @@ do
 			checkbg:ClearAllPoints()
 			checkbg:SetPoint("LEFT", frame, "LEFT", pixels, 0)
 			text:ClearAllPoints()
-			text:SetPoint("LEFT", checkbg, "RIGHT", IsModernClient() and 6 or 2, 0)
+			text:SetPoint("LEFT", checkbg, "RIGHT", TEXT_GAP, 0)
 			text:SetPoint("RIGHT", frame, "RIGHT")
 		end
 
 		widget:SetIndent(0)
+
+		local function PlaceText(self)
+			self.text:ClearAllPoints()
+			self.text:SetPoint("LEFT", self.checkbg, "RIGHT", TEXT_GAP, 0)
+			self.text:SetPoint("RIGHT", self.frame, "RIGHT")
+		end
+
+		local originalSetImage = widget.SetImage
+		widget.SetImage = function(self, ...)
+			if originalSetImage then
+				originalSetImage(self, ...)
+			end
+			PlaceText(self)
+		end
+
+		widget.frame:HookScript("OnMouseDown", function()
+			PlaceText(widget)
+		end)
+		widget.frame:HookScript("OnMouseUp", function()
+			PlaceText(widget)
+		end)
+
+		PlaceText(widget)
 
 		return AceGUI:RegisterAsWidget(widget)
 	end
@@ -115,7 +140,7 @@ do
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local Type = "ModernIndentedCheckBox"
-	local Version = 1
+	local Version = 2
 
 	local function ApplyModernTextures(widget)
 		local checkbg   = widget.checkbg
@@ -168,6 +193,8 @@ do
 		-- Apply immediately
 		ApplyModernTextures(widget)
 
+		local TEXT_GAP = IsModernClient() and 4 or 2
+
 		-- Optional indent support
 		function widget:SetIndent(pixels)
 			pixels = pixels or 0
@@ -178,11 +205,34 @@ do
 			checkbg:ClearAllPoints()
 			checkbg:SetPoint("LEFT", frame, "LEFT", pixels, 0)
 			text:ClearAllPoints()
-			text:SetPoint("LEFT", checkbg, "RIGHT", IsModernClient() and 6 or 2, 0)
+			text:SetPoint("LEFT", checkbg, "RIGHT", TEXT_GAP, 0)
 			text:SetPoint("RIGHT", frame, "RIGHT")
 		end
 
 		widget:SetIndent(32)
+
+		local function PlaceText(self)
+			self.text:ClearAllPoints()
+			self.text:SetPoint("LEFT", self.checkbg, "RIGHT", TEXT_GAP, 0)
+			self.text:SetPoint("RIGHT", self.frame, "RIGHT")
+		end
+
+		local originalSetImage = widget.SetImage
+		widget.SetImage = function(self, ...)
+			if originalSetImage then
+				originalSetImage(self, ...)
+			end
+			PlaceText(self)
+		end
+
+		widget.frame:HookScript("OnMouseDown", function()
+			PlaceText(widget)
+		end)
+		widget.frame:HookScript("OnMouseUp", function()
+			PlaceText(widget)
+		end)
+
+		PlaceText(widget)
 
 		return AceGUI:RegisterAsWidget(widget)
 	end
@@ -244,6 +294,7 @@ do
 			local current = widget.frame:GetHeight()
 			if current and current > 0 then
 				widget:SetHeight(current + EXTRA_BOTTOM_PADDING)
+				widget.frame:SetHeight(current + EXTRA_BOTTOM_PADDING)
 			end
 			widget.modernHeightApplied = true
 		end
