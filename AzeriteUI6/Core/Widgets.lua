@@ -625,11 +625,11 @@ do
 end
 
 -- ModernHeader
--- Version: 1
+-- Version: 2
 do
 	if IsModernClient() then 
 
-		local Version = 1
+		local Version = 2
 
 		local function ApplyHeader(group)
 			local frame = group.frame
@@ -659,6 +659,104 @@ do
 			content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
 		end
 
+		local function StyleScrollBar(bar)
+			if bar.azeriteStyled or not bar.GetThumbTexture then return end
+			local name = bar.GetName and bar:GetName()
+			local up = bar.ScrollUpButton or (name and _G[name .. "ScrollUpButton"])
+			local down = bar.ScrollDownButton or (name and _G[name .. "ScrollDownButton"])
+			if not (up and down) then return end
+			bar.azeriteStyled = true
+
+			local function HideButton(button)
+				button:SetAlpha(0)
+				button:Hide()
+				hooksecurefunc(button, "Show", function(self) self:Hide() end)
+			end
+			HideButton(up)
+			HideButton(down)
+
+			local parent = bar:GetParent()
+			bar:ClearAllPoints()
+			bar:SetPoint("TOPLEFT", parent, "TOPRIGHT", 4, 0)
+			bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMRIGHT", 4, 0)
+			bar:SetWidth(8)
+			bar:SetHitRectInsets(-6, -6, 0, 0)
+
+			local thumb = bar:GetThumbTexture()
+			if thumb then
+				thumb:SetAlpha(0)
+				thumb:SetWidth(8)
+			end
+			for _, region in ipairs({ bar:GetRegions() }) do
+				if region:IsObjectType("Texture") and region ~= thumb then
+					region:SetAlpha(0)
+				end
+			end
+
+			local function Slice(parentFrame, topAtlas, midAtlas, botAtlas, layer)
+				local top = parentFrame:CreateTexture(nil, layer)
+				top:SetAtlas(topAtlas, true)
+				top:SetPoint("TOPLEFT")
+				local bot = parentFrame:CreateTexture(nil, layer)
+				bot:SetAtlas(botAtlas, true)
+				bot:SetPoint("BOTTOMLEFT")
+				local mid = parentFrame:CreateTexture(nil, layer)
+				mid:SetAtlas(midAtlas, true)
+				mid:SetPoint("TOPLEFT", top, "BOTTOMLEFT")
+				mid:SetPoint("BOTTOMRIGHT", bot, "TOPRIGHT")
+			end
+
+			local track = CreateFrame("Frame", nil, bar)
+			track:SetAllPoints()
+			Slice(track, "minimal-scrollbar-track-top", "!minimal-scrollbar-track-middle", "minimal-scrollbar-track-bottom", "BACKGROUND")
+
+			local grip = CreateFrame("Frame", nil, bar)
+			grip:SetFrameLevel(bar:GetFrameLevel() + 2)
+			if thumb then
+				grip:SetPoint("TOPLEFT", thumb, "TOPLEFT")
+				grip:SetPoint("BOTTOMRIGHT", thumb, "BOTTOMRIGHT")
+			end
+			Slice(grip, "minimal-scrollbar-small-thumb-top", "minimal-scrollbar-small-thumb-middle", "minimal-scrollbar-small-thumb-bottom", "ARTWORK")
+
+			local function UpdateThumbSize(self)
+				if self.azeriteSizing then return end
+				local min, max = self:GetMinMaxValues()
+				local range = max - min
+				local track = self:GetHeight()
+				local thumbTex = self:GetThumbTexture()
+				if not thumbTex or track <= 0 then return end
+
+				local height = track
+				if range > 0 then
+					height = math.max(24, (track * track) / (track + range))
+					if height > track then
+						height = track
+					end
+				end
+
+				thumbTex:SetWidth(8)
+				thumbTex:SetHeight(height)
+
+				self.azeriteSizing = true
+				self:SetValue(self:GetValue())
+				self.azeriteSizing = false
+			end
+
+			bar:HookScript("OnMinMaxChanged", UpdateThumbSize)
+			bar:HookScript("OnSizeChanged", UpdateThumbSize)
+			UpdateThumbSize(bar)			
+		end
+
+		local function WalkScrollBars(frame)
+			if not frame or not frame.GetChildren then return end
+			for _, child in ipairs({ frame:GetChildren() }) do
+				if child.GetObjectType and child:GetObjectType() == "Slider" then
+					StyleScrollBar(child)
+				end
+				WalkScrollBars(child)
+			end
+		end
+
 		local hooked = {}
 
 		local function EnsureHook(group)
@@ -677,6 +775,9 @@ do
 				if type(appName) == "string" and appName:find("AzeriteUI6", 1, true) then
 					for _, group in pairs(groups) do
 						EnsureHook(group)
+						if group.frame then
+							WalkScrollBars(group.frame)
+						end
 					end
 				end
 			end
