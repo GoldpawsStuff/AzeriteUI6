@@ -79,6 +79,7 @@ ExplorerMode.GetOptions = function(self)
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
+				desc = L["Toggle the usage of the Explorer Mode. The Explorer Mode fades out the majority of the user interface when you're not currently in combat, don't have a target selected, nor have reduced health. The intention is to give a more immersive experience when traveling, walking around in cities or just exploring."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 

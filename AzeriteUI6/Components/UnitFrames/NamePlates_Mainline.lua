@@ -837,6 +837,7 @@ NamePlates.GetOptions = function(self)
 				name = "Show Enemy Unit Nameplates",
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end, 
 				get = function(info) return toboolean(GetCVar("nameplateShowEnemies")) end, 
 				set = function(info, val) 
 					if (InCombatLockdown()) then return end
@@ -849,43 +850,111 @@ NamePlates.GetOptions = function(self)
 				name = "Show Enemy Minions",
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
-				hidden = function() return not toboolean(GetCVar("nameplateShowEnemies")) end,
+				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return toboolean(GetCVar("nameplateShowEnemyMinions")) end, 
 				set = function(info, val) 
 					if (InCombatLockdown()) then return end
-					SetCVar("nameplateShowEnemyMinions", val and "1" or "0")
-					SetCVar("nameplateShowEnemyPets", val and "1" or "0")
-					SetCVar("nameplateShowEnemyGuardians", val and "1" or "0")
+					SetCVar("nameplateShowEnemyMinions", val and "1" or "0") -- Whether enemy minion nameplates are shown. (Default 0)
+					SetCVar("nameplateShowEnemyPets", val and "1" or "0") -- Whether enemy pet nameplates are shown. (Default 0)
+					SetCVar("nameplateShowEnemyGuardians", val and "1" or "0") -- Whether enemy guardian nameplates are shown. (Default 0)
 				end,
 				order = 101,
 			},
-			--nameplateShowEnemyPets = {
-			--},
-			--nameplateShowEnemyPets = 1, 							-- Whether enemy pet nameplates are shown. (Default 0)
-			--nameplateShowEnemyGuardians = 1, 						-- Whether enemy guardian nameplates are shown. (Default 0)
-			--nameplateShowEnemyMinions = 1, 							-- Whether enemy minion nameplates are shown. (Default 0)
+			nameplateShowEnemyMinus = {
+				type = "toggle", width = "full", indented = true,
+				name = "Show Enemy Minor",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return toboolean(GetCVar("nameplateShowEnemyMinus")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowEnemyMinus", val and "1" or "0") -- Whether enemy nameplates for entities with a minus sign (indicating they are weaker than the player) are shown. (Default 1)
+				end,
+				order = 102,
+			},
+			namePlateShowEnemyTotems = {
+				type = "toggle", width = "full", indented = true,
+				name = "Show Enemy Totems",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return toboolean(GetCVar("nameplateShowEnemyTotems")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowEnemyTotems", val and "1" or "0") -- -- Whether enemy totem nameplates are shown. (Default 0)
+				end,
+				order = 102,
+			},
 
-			--nameplateShowEnemyTotems = 1, 							-- Whether enemy totem nameplates are shown. (Default 0)
 
-			--nameplateShowEnemyMinus = 1, 							-- Whether enemy nameplates for entities with a minus sign (indicating they are weaker than the player) are shown. (Default 1)
+			--nameplateShowFriendlyNpcs = 1, 							-- Whether nameplates are shown for friendly npcs. (Default 0)
 
-			--nameplateShowFriends = {
-			--},
-			
-			
-			
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
-			--nameplateShowAll = {},
+			nameplateShowFriendlyPlayers = {
+				type = "toggle", width = "full",
+				name = "Show Friendly Player Nameplates",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return toboolean(GetCVar("nameplateShowFriendlyPlayers")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowFriendlyPlayers", val and "1" or "0") -- Whether nameplates are shown for friendly players. (Default 0)
+				end,
+				order = 200,
+			},
+			nameplateShowFriendlyPlayerMinions = {
+				type = "toggle", width = "full", 
+				name = "Show Friendly Player Minions",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowFriendlyPlayerMinions", val and "1" or "0") -- Whether friendly player minion nameplates are shown. (Default 0)
+				end,
+				order = 201,
+			},
+			nameplateShowFriendlyPlayerPets = {
+				type = "toggle", width = "full", indented = true,
+				name = "Show Friendly Player Pets",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end,
+				get = function(info) return toboolean(GetCVar("nameplateShowFriendlyPlayerPets")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowFriendlyPlayerPets", val and "1" or "0") -- Whether friendly player pet nameplates are shown. (Default 0)
+				end,
+				order = 202,
+			},
+			nameplateShowFriendlyPlayerGuardians = {
+				type = "toggle", width = "full", indented = true,
+				name = "Show Friendly Player Guardians",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end,
+				get = function(info) return toboolean(GetCVar("nameplateShowFriendlyPlayerGuardians")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowFriendlyPlayerGuardians", val and "1" or "0") -- Whether friendly player guardian nameplates are shown. (Default 0)
+				end,
+				order = 203,
+			},
+			nameplateShowFriendlyPlayerTotems = {
+				type = "toggle", width = "full", indented = true,
+				name = "Show Friendly Player Totems",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end,
+				get = function(info) return toboolean(GetCVar("nameplateShowFriendlyPlayerTotems")) end, 
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					SetCVar("nameplateShowFriendlyPlayerTotems", val and "1" or "0") -- Whether friendly player totem nameplates are shown.  (Default 0)
+				end,
+				order = 204,
+			},
 
 			
 			nameplateShowOnlyNameScaleMultipler = {

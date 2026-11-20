@@ -31,10 +31,99 @@ local function IsModernClient()
 	return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
 end
 
+-- ModernButton
+-- Version: 2
+do
+	local Type, Version = "ModernButton", 2
+
+	if (AceGUI:GetWidgetVersion(Type) or 0) < Version then
+		local function OnClick(frame, mouseButton)
+			AceGUI:ClearFocus()
+			PlaySound(SOUNDKIT and SOUNDKIT.IG_MAINMENU_OPTION or 852)
+			frame.obj:Fire("OnClick", mouseButton)
+		end
+
+		local function OnEnter(frame)
+			frame.obj:Fire("OnEnter")
+		end
+
+		local function OnLeave(frame)
+			frame.obj:Fire("OnLeave")
+		end
+
+		local methods = {
+			OnAcquire = function(self)
+				self:SetHeight(30)
+				self:SetWidth(200)
+				self:SetDisabled(false)
+				self:SetAutoWidth(false)
+				self:SetText()
+			end,
+
+			SetText = function(self, text)
+				self.text:SetText(text or "")
+				if self.autoWidth then
+					self:SetWidth(self.text:GetStringWidth() + 40)
+				end
+			end,
+
+			SetAutoWidth = function(self, autoWidth)
+				self.autoWidth = autoWidth
+				if autoWidth then
+					self:SetWidth(self.text:GetStringWidth() + 40)
+				end
+			end,
+
+			SetDisabled = function(self, disabled)
+				self.disabled = disabled
+				if disabled then
+					self.frame:Disable()
+				else
+					self.frame:Enable()
+				end
+			end,
+		}
+
+		local function Constructor()
+			local name = "AzeriteUIModernButton" .. AceGUI:GetNextWidgetNum(Type)
+			local template = IsModernClient() and "SharedButtonTemplate" or "UIPanelButtonTemplate"
+			local frame = CreateFrame("Button", name, UIParent, template)
+			frame:Hide()
+			frame:EnableMouse(true)
+			frame:SetScript("OnClick", OnClick)
+			frame:SetScript("OnEnter", OnEnter)
+			frame:SetScript("OnLeave", OnLeave)
+
+			if IsModernClient() then
+				frame:SetNormalFontObject("GameFontHighlightMedium")
+				frame:SetHighlightFontObject("GameFontHighlightMedium")
+				frame:SetDisabledFontObject("GameFontDisable")
+			end
+
+			local text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMedium")
+			text:SetPoint("CENTER")
+			frame:SetFontString(text)
+			frame:SetNormalFontObject(IsModernClient() and "GameFontHighlightMedium" or "GameFontNormal")
+			frame:SetHighlightFontObject(IsModernClient() and "GameFontHighlightMedium" or "GameFontHighlight")
+			frame:SetDisabledFontObject("GameFontDisable")
+
+			local widget = { frame = frame, type = Type }
+			for method, func in pairs(methods) do
+				widget[method] = func
+			end
+			widget.text = text
+
+			return AceGUI:RegisterAsWidget(widget)
+		end
+
+		AceGUI:RegisterWidgetType(Type, Constructor, Version)
+	end
+end
+
 -- ModernCheckBox
+-- Version: 2
 do 
-	local Type = "ModernCheckBox"
-	local Version = 2
+	local Type, Version = "ModernCheckBox", 2
 
 	local function ApplyModernTextures(widget)
 		local checkbg   = widget.checkbg
@@ -135,12 +224,10 @@ do
 
 end
 
--- ModernIndentedCheckBox
+-- ModernCheckBoxIndented
+-- Version: 2
 do 
-	local AceGUI = LibStub("AceGUI-3.0")
-
-	local Type = "ModernIndentedCheckBox"
-	local Version = 2
+	local Type, Version = "ModernCheckBoxIndented", 2
 
 	local function ApplyModernTextures(widget)
 		local checkbg   = widget.checkbg
@@ -241,89 +328,10 @@ do
 
 end
 
--- ModernSlider
-do
-	local Type = "ModernSlider"
-	local Version = 6
-
-	local EXTRA_BOTTOM_PADDING = 16
-
-	local function ApplyModernSlider(widget)
-		local slider = widget.slider
-		local editbox = widget.editbox
-		if not slider or not IsModernClient() then return end
-
-		-- Hide classic backdrop
-		if slider.SetBackdrop then
-			slider:SetBackdrop(nil)
-		end
-
-		-- Modern track
-		if not slider.modernLeft then
-			slider.modernLeft = slider:CreateTexture(nil, "BACKGROUND")
-			slider.modernLeft:SetAtlas("Minimal_SliderBar_Left", true)
-			slider.modernLeft:SetPoint("LEFT")
-
-			slider.modernRight = slider:CreateTexture(nil, "BACKGROUND")
-			slider.modernRight:SetAtlas("Minimal_SliderBar_Right", true)
-			slider.modernRight:SetPoint("RIGHT")
-
-			slider.modernMiddle = slider:CreateTexture(nil, "BACKGROUND")
-			slider.modernMiddle:SetAtlas("_Minimal_SliderBar_Middle", true)
-			slider.modernMiddle:SetPoint("LEFT", slider.modernLeft, "RIGHT")
-			slider.modernMiddle:SetPoint("RIGHT", slider.modernRight, "LEFT")
-			slider.modernMiddle:SetHeight(slider.modernLeft:GetHeight())
-		end
-
-		-- Diamond thumb
-		slider:SetThumbTexture("Minimal_SliderBar_Button")
-		local thumb = slider:GetThumbTexture()
-		if thumb then
-			thumb:SetAtlas("Minimal_SliderBar_Button", true)
-		end
-
-		-- Push the editbox down a bit for visual separation
-		if editbox and not editbox.modernPadded then
-			editbox:ClearAllPoints()
-			editbox:SetPoint("TOP", slider, "BOTTOM", 0, -4)
-			editbox.modernPadded = true
-		end
-
-		-- Tell AceGUI the widget is taller so the next element is pushed down
-		if not widget.modernHeightApplied then
-			local current = widget.frame:GetHeight()
-			if current and current > 0 then
-				widget:SetHeight(current + EXTRA_BOTTOM_PADDING)
-				widget.frame:SetHeight(current + EXTRA_BOTTOM_PADDING)
-			end
-			widget.modernHeightApplied = true
-		end
-	end
-
-	local function Constructor()
-		local widget = AceGUI:Create("Slider")
-		widget.type = Type
-
-		ApplyModernSlider(widget)
-
-		local originalOnAcquire = widget.OnAcquire
-		widget.OnAcquire = function(self)
-			if originalOnAcquire then originalOnAcquire(self) end
-			-- Reset the flag so height can be reapplied cleanly
-			self.modernHeightApplied = nil
-			ApplyModernSlider(self)
-		end
-
-		return AceGUI:RegisterAsWidget(widget)
-	end
-
-	AceGUI:RegisterWidgetType(Type, Constructor, Version)
-end
-
 -- ModernDropdown
+-- Version: 17
 do 
-	local Type = "ModernDropdown"
-	local Version = 17
+	local Type, Version = "ModernDropdown", 17
 
 	local BUTTON_HEIGHT = 32
 	local BUTTON_WIDTH  = 220
@@ -608,7 +616,78 @@ do
 
 end
 
+-- ModernHeader
+-- Version: 1
+do
+	if IsModernClient() then 
+
+		local Version = 1
+
+		local function ApplyHeader(group)
+			local frame = group.frame
+			local label = group.label
+			local content = group.content
+			if not (frame and label and content) then return end
+
+			label:SetFontObject("GameFontHighlightHuge")
+			label:SetTextColor(1, 1, 1)
+			label:SetJustifyH("LEFT")
+			label:SetJustifyV("TOP")
+			label:ClearAllPoints()
+			label:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -16)
+			label:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
+
+			local line = frame.azeriteDivider
+			if not line then
+				line = frame:CreateTexture(nil, "ARTWORK")
+				line:SetAtlas("Options_HorizontalDivider", true)
+				frame.azeriteDivider = line
+			end
+			line:ClearAllPoints()
+			line:SetPoint("TOP", frame, "TOP", 0, -46)
+
+			content:ClearAllPoints()
+			content:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -64)
+			content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
+		end
+
+		local hooked = {}
+
+		local function EnsureHook(group)
+			if hooked[group] or type(group) ~= "table" or not group.SetTitle then return end
+			hooked[group] = true
+			hooksecurefunc(group, "SetTitle", ApplyHeader)
+			ApplyHeader(group)
+		end
+
+		local function HookOurGroups()
+			local AceConfigDialog = LibStub("AceConfigDialog-3.0", true)
+			local bliz = AceConfigDialog and AceConfigDialog.BlizOptions
+			if not bliz then return end
+
+			for appName, groups in pairs(bliz) do
+				if type(appName) == "string" and appName:find("AzeriteUI6", 1, true) then
+					for _, group in pairs(groups) do
+						EnsureHook(group)
+					end
+				end
+			end
+		end
+
+		local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+		if not AceConfigDialog.modernTitleStyled then
+			-- SetTitle runs inside FeedGroup, still before the frame is painted
+			hooksecurefunc(AceConfigDialog, "FeedGroup", HookOurGroups)
+			hooksecurefunc(AceConfigDialog, "AddToBlizOptions", HookOurGroups)
+			AceConfigDialog.modernTitleStyled = true
+		end
+
+		HookOurGroups()
+	end
+end
+
 -- ModernPopup
+-- Version: 4
 do
 	if IsModernClient() then
 
@@ -728,71 +807,81 @@ do
 	end
 end
 
--- Modernize our menu headers
+-- ModernSlider
+-- Version: 16
 do
-	if IsModernClient() then 
+	local Type, Version = "ModernSlider", 6
 
-		local Version = 1
+	local EXTRA_BOTTOM_PADDING = 16
 
-		local function ApplyHeader(group)
-			local frame = group.frame
-			local label = group.label
-			local content = group.content
-			if not (frame and label and content) then return end
+	local function ApplyModernSlider(widget)
+		local slider = widget.slider
+		local editbox = widget.editbox
+		if not slider or not IsModernClient() then return end
 
-			label:SetFontObject("GameFontHighlightHuge")
-			label:SetTextColor(1, 1, 1)
-			label:SetJustifyH("LEFT")
-			label:SetJustifyV("TOP")
-			label:ClearAllPoints()
-			label:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -16)
-			label:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
+		-- Hide classic backdrop
+		if slider.SetBackdrop then
+			slider:SetBackdrop(nil)
+		end
 
-			local line = frame.azeriteDivider
-			if not line then
-				line = frame:CreateTexture(nil, "ARTWORK")
-				line:SetAtlas("Options_HorizontalDivider", true)
-				frame.azeriteDivider = line
+		-- Modern track
+		if not slider.modernLeft then
+			slider.modernLeft = slider:CreateTexture(nil, "BACKGROUND")
+			slider.modernLeft:SetAtlas("Minimal_SliderBar_Left", true)
+			slider.modernLeft:SetPoint("LEFT")
+
+			slider.modernRight = slider:CreateTexture(nil, "BACKGROUND")
+			slider.modernRight:SetAtlas("Minimal_SliderBar_Right", true)
+			slider.modernRight:SetPoint("RIGHT")
+
+			slider.modernMiddle = slider:CreateTexture(nil, "BACKGROUND")
+			slider.modernMiddle:SetAtlas("_Minimal_SliderBar_Middle", true)
+			slider.modernMiddle:SetPoint("LEFT", slider.modernLeft, "RIGHT")
+			slider.modernMiddle:SetPoint("RIGHT", slider.modernRight, "LEFT")
+			slider.modernMiddle:SetHeight(slider.modernLeft:GetHeight())
+		end
+
+		-- Diamond thumb
+		slider:SetThumbTexture("Minimal_SliderBar_Button")
+		local thumb = slider:GetThumbTexture()
+		if thumb then
+			thumb:SetAtlas("Minimal_SliderBar_Button", true)
+		end
+
+		-- Push the editbox down a bit for visual separation
+		if editbox and not editbox.modernPadded then
+			editbox:ClearAllPoints()
+			editbox:SetPoint("TOP", slider, "BOTTOM", 0, -4)
+			editbox.modernPadded = true
+		end
+
+		-- Tell AceGUI the widget is taller so the next element is pushed down
+		if not widget.modernHeightApplied then
+			local current = widget.frame:GetHeight()
+			if current and current > 0 then
+				widget:SetHeight(current + EXTRA_BOTTOM_PADDING)
+				widget.frame:SetHeight(current + EXTRA_BOTTOM_PADDING)
 			end
-			line:ClearAllPoints()
-			line:SetPoint("TOP", frame, "TOP", 0, -46)
-
-			content:ClearAllPoints()
-			content:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -64)
-			content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
+			widget.modernHeightApplied = true
 		end
-
-		local hooked = {}
-
-		local function EnsureHook(group)
-			if hooked[group] or type(group) ~= "table" or not group.SetTitle then return end
-			hooked[group] = true
-			hooksecurefunc(group, "SetTitle", ApplyHeader)
-			ApplyHeader(group)
-		end
-
-		local function HookOurGroups()
-			local AceConfigDialog = LibStub("AceConfigDialog-3.0", true)
-			local bliz = AceConfigDialog and AceConfigDialog.BlizOptions
-			if not bliz then return end
-
-			for appName, groups in pairs(bliz) do
-				if type(appName) == "string" and appName:find("AzeriteUI6", 1, true) then
-					for _, group in pairs(groups) do
-						EnsureHook(group)
-					end
-				end
-			end
-		end
-
-		local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-		if not AceConfigDialog.modernTitleStyled then
-			-- SetTitle runs inside FeedGroup, still before the frame is painted
-			hooksecurefunc(AceConfigDialog, "FeedGroup", HookOurGroups)
-			hooksecurefunc(AceConfigDialog, "AddToBlizOptions", HookOurGroups)
-			AceConfigDialog.modernTitleStyled = true
-		end
-
-		HookOurGroups()
 	end
+
+	local function Constructor()
+		local widget = AceGUI:Create("Slider")
+		widget.type = Type
+
+		ApplyModernSlider(widget)
+
+		local originalOnAcquire = widget.OnAcquire
+		widget.OnAcquire = function(self)
+			if originalOnAcquire then originalOnAcquire(self) end
+			-- Reset the flag so height can be reapplied cleanly
+			self.modernHeightApplied = nil
+			ApplyModernSlider(self)
+		end
+
+		return AceGUI:RegisterAsWidget(widget)
+	end
+
+	AceGUI:RegisterWidgetType(Type, Constructor, Version)
 end

@@ -65,6 +65,7 @@ L["Start fading from button ID"] = true
 L["to level %s"] = true -- Display text on the Minimap XP bar
 L["Toggle the usage of our Buff & Debuff Frames. Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames."] = "Toggle the usage of our Name Plates.|n|n|cffff4400Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames!|r"
 L["Toggle the usage of our Name Plates. Note that disabling this will force a user interface reload to re-enable the game's default Name Plates."] = "Toggle the usage of our Name Plates.|n|n|cffff4400Note that disabling this will force a user interface reload to re-enable the game's default Name Plates!|r"
+L["Toggle the usage of the Explorer Mode. The Explorer Mode fades out the majority of the user interface when you're not currently in combat, don't have a target selected, nor have reduced health. The intention is to give a more immersive experience when traveling, walking around in cities or just exploring."] = "Toggle the usage of the Explorer Mode.|n|nThe Explorer Mode fades out the majority of the user interface when you're not currently in combat, don't have a target selected, nor have reduced health.|n|nThe intention is to give a more immersive experience when traveling, walking around in cities or just exploring."
 L["Toggle the usage of this Action Bar. Note that disabling this does not re-enable the game's default Action Bars."] = "Toggle the usage of this Action Bar.|n|n|cffffd200Note that disabling this does not re-enable the game's default Action Bars!|r"
 L["Toggle the usage of this Unit Frame. Note that disabling this does not re-enable the game's default Unit Frames."] = "Toggle the usage of this Unit Frame.|n|n|cffffd200Note that disabling this does not re-enable the game's default Unit Frames!|r"
 L["UF: Class Power"] = "|cffffa040UF:|r Class Power"
@@ -84,6 +85,7 @@ L["Unit Frame: Target of Target"] = true
 L["Which button to start the ZigZag pattern from"] = true
 L["ZigZag"] = true -- ActionBar layout option
 
+-- Unfinished elements, not yet sorted.
 
 L["Azerite Defaults"] = true
 L["Game Defaults"] = true
@@ -102,3 +104,5 @@ L["The maximum scale based on distance. Does not apply to current target."] = "T
 L["The minimum scale based on distance. Does not apply to current target."] = "The minimum scale based on distance.|n|n|cff4488ffDoes not apply to current target.|r"
 
 L["Visibility"] = true
+
+

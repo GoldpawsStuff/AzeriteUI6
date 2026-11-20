@@ -120,7 +120,7 @@ local function ApplyModernControls(tbl)
 	if (tbl.type and not tbl.dialogControl) then
 		if (tbl.type == "toggle") then
 			if (tbl.indented) then
-				tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernIndentedCheckBox" or nil -- nil out for incompatible clients
+				tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernCheckBoxIndented" or nil -- nil out for incompatible clients
 				tbl.indented = nil -- remove so Ace3 never sees it
 			else
 				tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernCheckBox" or nil
@@ -129,6 +129,8 @@ local function ApplyModernControls(tbl)
 			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernSlider" or nil
 		elseif (tbl.type == "select") then
 			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernDropdown" or nil
+		elseif (tbl.type == "execute") then
+			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernButton" or nil
 		end
 	end
 
