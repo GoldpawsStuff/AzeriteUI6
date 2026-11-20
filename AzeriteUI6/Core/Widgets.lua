@@ -121,9 +121,9 @@ do
 end
 
 -- ModernCheckBox
--- Version: 2
+-- Version: 3
 do 
-	local Type, Version = "ModernCheckBox", 2
+	local Type, Version = "ModernCheckBox", 3
 
 	local function ApplyModernTextures(widget)
 		local checkbg   = widget.checkbg
@@ -171,6 +171,14 @@ do
 				originalSetType(self, type)
 			end
 			ApplyModernTextures(self)
+		end
+
+		local PAD = 4
+		local originalOnAcquire = widget.OnAcquire
+		widget.OnAcquire = function(self)
+			originalOnAcquire(self)
+			self:SetHeight(29 + PAD * 2)
+			self:SetIndent(0) -- 32 in ModernCheckBoxIndented
 		end
 
 		-- Apply immediately
@@ -808,16 +816,23 @@ do
 end
 
 -- ModernSlider
--- Version: 16
+-- Version: 7
 do
-	local Type, Version = "ModernSlider", 6
+	local Type, Version = "ModernSlider", 7
 
-	local EXTRA_BOTTOM_PADDING = 16
+	local EXTRA_BOTTOM_PADDING = 12
+	local EXTRA_TOP_PADDING = 10
 
 	local function ApplyModernSlider(widget)
 		local slider = widget.slider
 		local editbox = widget.editbox
 		if not slider or not IsModernClient() then return end
+
+		-- Add some air above the label
+		if widget.label then
+			widget.label:SetPoint("TOPLEFT", widget.frame, "TOPLEFT", 0, -EXTRA_TOP_PADDING)
+			widget.label:SetPoint("TOPRIGHT", widget.frame, "TOPRIGHT", 0, -EXTRA_TOP_PADDING)
+		end
 
 		-- Hide classic backdrop
 		if slider.SetBackdrop then
@@ -859,8 +874,8 @@ do
 		if not widget.modernHeightApplied then
 			local current = widget.frame:GetHeight()
 			if current and current > 0 then
-				widget:SetHeight(current + EXTRA_BOTTOM_PADDING)
-				widget.frame:SetHeight(current + EXTRA_BOTTOM_PADDING)
+				widget:SetHeight(current + EXTRA_BOTTOM_PADDING + EXTRA_TOP_PADDING)
+				widget.frame:SetHeight(current + EXTRA_BOTTOM_PADDING + EXTRA_TOP_PADDING)
 			end
 			widget.modernHeightApplied = true
 		end
