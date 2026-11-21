@@ -26,6 +26,7 @@
 local addonName, ns = ...
 
 local AceGUI = LibStub("AceGUI-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
 local function IsModernClient()
 	return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
@@ -337,19 +338,41 @@ do
 end
 
 -- ModernDropdown
--- Version: 19
+-- Version: 20
 do 
-	local Type, Version = "ModernDropdown", 19
+	local Type, Version = "ModernDropdown", 20
 
 	local BUTTON_HEIGHT = 32
 	local BUTTON_WIDTH  = 220
 	local WIDGET_HEIGHT = 48
 	local LABEL_WIDTH   = 260 
+	local ROW = 19
+
+	local function EnlargeItemText(item)
+		if item and item.text then
+			item.text:SetFontObject("GameFontHighlight")
+		end
+	end
 
 	local function FitPullout(pullout)
 		if not pullout or not pullout.frame then return end
-		local count = pullout.items and #pullout.items or 0
-		local content = 8 + count * 16
+		local items = pullout.items or {}
+		local count = #items
+
+		for i, item in ipairs(items) do
+			if item.frame then
+				item.frame:SetHeight(ROW)
+			end
+			if item.text then
+				item.text:SetJustifyV("TOP")
+				item.text:SetPoint("TOPLEFT", item.frame, "TOPLEFT", 18, -2)
+			end
+			if item.SetPoint and pullout.itemFrame then
+				item:SetPoint("TOP", pullout.itemFrame, "TOP", 0, -2 + (i - 1) * -ROW)
+			end
+		end
+
+		local content = 4 + count * ROW
 		local maxHeight = pullout.maxHeight or 600
 		if pullout.itemFrame then
 			pullout.itemFrame:SetHeight(content)
@@ -535,6 +558,19 @@ do
 				pullout.modernHooked = true
 			end
 
+			if not pullout.modernTextHooked then
+				local originalAddItem = pullout.AddItem
+				pullout.AddItem = function(self, item)
+					originalAddItem(self, item)
+					EnlargeItemText(item)
+				end
+				pullout.modernTextHooked = true
+			end
+
+			for _, item in pullout:IterateItems() do
+				EnlargeItemText(item)
+			end
+
 			if pullout.frame and not pullout.modernStyled then
 				local pf = pullout.frame
 				if pf.SetBackdrop then
@@ -569,7 +605,7 @@ do
 		if count == 0 then
 			return NONE
 		end
-		return count == 1 and "1 selected" or (count .. " selected")
+		return count == 1 and L["1 selected"] or string.format(L["%d selected"], count)
 	end
 
 	local function StripClose(self)

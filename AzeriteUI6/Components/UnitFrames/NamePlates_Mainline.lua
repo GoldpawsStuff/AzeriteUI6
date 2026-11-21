@@ -98,9 +98,6 @@ local gameSettings = {
 	-- Elements
 	nameplateShowCastBars = 1, 								-- Show cast bars for unit nameplates. (Default 1)
 	nameplateAuraScale = 1, 								-- Controls the size multiplier for buffs and debuffs on nameplates. (Default 1)
-	--nameplateEnemyNpcAuraDisplay
-	--nameplateEnemyPlayerAuraDisplay
-	--nameplateFriendlyPlayerAuraDisplay
 
 	-- Coloring
 	nameplateShowClassColor = 1, 							-- Used to display the class color in enemy nameplate health bars (Default 1)
@@ -114,7 +111,20 @@ local customSettings = {
 	nameplateShowOnlyNameScaleMultipler = 1.2, 				-- Scale multipler to the unit name when only showing unit name (NOT A CVAR!)
 	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
 	nameplateUseReactionColorForFriendlyNPCUnitNames = 1, 	-- Reaction colored friendly NPC unitname (NOT A CVAR!)
+
+	nameplateEnemyNpcAuraDisplayBuffs = true,
+	nameplateEnemyNpcAuraDisplayDebuffs = true,
+	nameplateEnemyNpcAuraDisplayCrowdControl = true,
+
+	nameplateEnemyPlayerAuraDisplayBuffs = true,
+	nameplateEnemyPlayerAuraDisplayDebuffs = true,
+	nameplateEnemyPlayerAuraDisplayLossOfControl = true,
+
+	nameplateFriendlyPlayerAuraDisplayBuffs = true,
+	nameplateFriendlyPlayerAuraDisplayDebuffs = true,
+	nameplateFriendlyPlayerAuraDisplayLossOfControl = true,
 }
+
 
 -- Declare module defaults
 -- *some of these are overwritten by saved blizzard settings on first run,
@@ -185,23 +195,6 @@ local GetNamePlateScale = function()
 	local entry = NamePlateConstants.NAME_PLATE_SCALES[(tonumber(C_CVar.GetCVar("nameplateSize")) or Enum.NamePlateSize.Small)]
 			   or NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small]
 	return entry.horizontal
-end
-
--- Check if unit is a player pet or minion
-local UnitIsPet = function(unit)
-	return UnitIsUnit(unit, "pet")          -- your own pet
-		or UnitIsOtherPlayersPet(unit)      -- other players' pets
-		or UnitIsMinion(unit)               -- minions / temporary summons (newer API)
-end
-
--- Unit is a friendly player or AI pretending to be one
-local UnitIsFriendlyPlayerUnit = function(unit)
-	return (UnitIsPlayer(unit) or UnitInPartyIsAI(unit)) and not UnitCanAttack("player", unit)
-end
-
--- Unit is a friendly NPC
-local UnitIsFriendlyNPC = function(unit)
-	return not UnitIsPlayer(unit) and not UnitCanAttack("player", unit)	
 end
 
 -- Update all target units
@@ -341,8 +334,12 @@ local NamePlate = {
 
 		local db = NamePlates.db.profile
 
-		local isFriendlyPlayer = UnitIsFriendlyPlayerUnit(unit)
-		local isFriendlyNPC = UnitIsFriendlyNPC(unit)
+		local isPlayer = UnitIsPlayer(unit)
+		local isHostile = UnitCanAttack("player", unit)
+		local isEnemyPlayer = isPlayer and isHostile
+		local isFriendlyPlayer = (isPlayer or UnitInPartyIsAI(unit)) and not isHostile
+		local isFriendlyNPC = not isPlayer and not isHostile
+		local isHostileNPC = not isPlayer and isHostile
 
 		local isPriorityUnit = self.isTarget or self.isFocus or self.isSoftInteract or self.isSoftEnemy or self.isSoftFriend
 
@@ -353,30 +350,51 @@ local NamePlate = {
 		local shouldClassColorName = toboolean(db.nameplateUseClassColorForFriendlyPlayerUnitNames)
 		local shouldClassColorNPCName = toboolean(db.nameplateUseReactionColorForFriendlyNPCUnitNames)
 
+		local shouldHideBuffs, shouldHideDebuffs, shouldHideCC
+
 		if (onlyShowName or onlyShowNPCName) then
 			self.Name:SetAlpha(1)
-			--self.Name:SetFontObject(self.Name.fontObjectLarge)
 			self.Name:SetScale(scaleMultipler)
 			self.Away:SetScale(scaleMultipler)
+
+			-- Hide or disabled most elements
 			self.Level:Hide()
 			self.Health:Hide()
+			self.Classification:Hide()
 			self.AurasHarmful:Hide()
 			self.AurasHelpful:Hide()
 			self.AurasCC:Hide()
-			self.Classification:Hide()
 
 			self:DisableElement("Castbar")
 		else
 			self.Name:SetAlpha(.75)
-			--self.Name:SetFontObject(self.Name.fontObject)
 			self.Name:SetScale(1)
 			self.Away:SetScale(1)
+
 			self.Level:Show()
 			self.Health:Show()
-			self.AurasHarmful:Show()
-			self.AurasHelpful:Show()
-			self.AurasCC:Show()
 			self.Classification:Show()
+
+			if (isEnemyPlayer) then
+				self.AurasHarmful:SetShown(db.nameplateEnemyPlayerAuraDisplayDebuffs)
+				self.AurasHelpful:SetShown(db.nameplateEnemyPlayerAuraDisplayBuffs)
+				self.AurasCC:SetShown(db.nameplateEnemyPlayerAuraDisplayLossOfControl)
+
+			elseif (isFriendlyPlayer) then
+				self.AurasHarmful:SetShown(db.nameplateFriendlyPlayerAuraDisplayBuffs)
+				self.AurasHelpful:SetShown(db.nameplateFriendlyPlayerAuraDisplayDebuffs)
+				self.AurasCC:SetShown(db.nameplateFriendlyPlayerAuraDisplayLossOfControl)
+
+			elseif (isHostileNPC) then
+				self.AurasHarmful:SetShown(db.nameplateEnemyNpcAuraDisplayBuffs)
+				self.AurasHelpful:SetShown(db.nameplateEnemyNpcAuraDisplayDebuffs)
+				self.AurasCC:SetShown(db.nameplateEnemyNpcAuraDisplayCrowdControl)
+			else
+				-- Friendly NPC. No settings for this. 
+				self.AurasHarmful:Hide()
+				self.AurasHelpful:Hide()
+				self.AurasCC:Hide()
+			end
 
 			self:EnableElement("Castbar")
 		end
@@ -768,10 +786,35 @@ NamePlates.OnEvent = function(self, event, ...)
 				break
 			end
 		end
-		if (not settingsName or not self.db.profile[settingsName]) then return end
 
-		self:LoadSettingFromCVar(settingsName, value)
-		self:UpdateAllElements("CVAR_UPDATE")
+		-- World record breaking clunkiness going on here
+		if (string.lower(cvarName) == string.lower("nameplateEnemyNpcAuraDisplay")) then 
+			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl)
+			
+			self:UpdateAllElements("CVAR_UPDATE")
+
+		elseif (string.lower(cvarName) == string.lower("nameplateEnemyPlayerAuraDisplay")) then 
+			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.CrowdControl)
+			
+			self:UpdateAllElements("CVAR_UPDATE")
+
+		elseif (string.lower(cvarName) == string.lower("nameplateFriendlyPlayerAura")) then 
+			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.CrowdControl)
+			
+			self:UpdateAllElements("CVAR_UPDATE")
+		else
+			if (not settingsName or not self.db.profile[settingsName]) then return end
+			
+			self:LoadSettingFromCVar(settingsName, value)
+			
+			self:UpdateAllElements("CVAR_UPDATE")
+		end
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		IN_COMBAT = nil
@@ -837,7 +880,7 @@ NamePlates.GetOptions = function(self)
 			-- plate visibility
 			nameplateShowEnemies = {
 				type = "toggle", width = "full",
-				name = "Show Enemy Unit Nameplates",
+				name = L["Show Enemy Unit Nameplates"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end, 
@@ -850,7 +893,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowEnemyMinions = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show Enemy Minions",
+				name = L["Show Enemy Minions"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -865,7 +908,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowEnemyMinus = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show Enemy Minor",
+				name = L["Show Enemy Minor"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -878,7 +921,7 @@ NamePlates.GetOptions = function(self)
 			},
 			namePlateShowEnemyTotems = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show Enemy Totems",
+				name = L["Show Enemy Totems"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -891,7 +934,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowFriendlyPlayers = {
 				type = "toggle", width = "full",
-				name = "Show Friendly Player Nameplates",
+				name = L["Show Friendly Player Nameplates"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -904,7 +947,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowOnlyNameForFriendlyPlayerUnits = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show only name for friendly Players",
+				name = L["Show Only Name for Friendly Players"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayers")) end,
@@ -917,7 +960,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateUseClassColorForFriendlyPlayerUnitNames = {
 				type = "toggle", width = "full", indented = true,
-				name = "Use class coloring for friendly Player names.",
+				name = L["Use class coloring for friendly Player Names"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayers")) or not toboolean(GetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits")) end,
@@ -930,7 +973,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowFriendlyPlayerMinions = {
 				type = "toggle", width = "full", 
-				name = "Show Friendly Player Minions",
+				name = L["Show Friendly Player Minions"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -943,7 +986,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowFriendlyPlayerPets = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show Friendly Player Pets",
+				name = L["Show Friendly Player Pets"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end,
@@ -956,7 +999,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowFriendlyPlayerGuardians = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show Friendly Player Guardians",
+				name = L["Show Friendly Player Guardians"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end,
@@ -969,7 +1012,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowFriendlyPlayerTotems = {
 				type = "toggle", width = "full", indented = true,
-				name = "Show Friendly Player Totems",
+				name = L["Show Friendly Player Totems"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyPlayerMinions")) end,
@@ -982,7 +1025,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowFriendlyNpcs = {
 				type = "toggle", width = "full", 
-				name = "Show Friendly NPCs",
+				name = L["Show Friendly NPCs"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -995,7 +1038,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateShowOnlyNameForFriendlyNPCUnits = {
 				type = "toggle", width = "full", indented = true, 
-				name = "Show Only Name",
+				name = L["Show Only Name"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyNpcs")) end,
@@ -1009,7 +1052,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateUseReactionColorForFriendlyNPCUnitNames = {
 				type = "toggle", width = "full", indented = true,
-				name = "Use reaction coloring for NPC name",
+				name = L["Use reaction coloring for NPC Names"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled or not toboolean(GetCVar("nameplateShowFriendlyNpcs")) or not self.db.profile.nameplateShowOnlyNameForFriendlyNPCUnits  end,
@@ -1025,12 +1068,12 @@ NamePlates.GetOptions = function(self)
 			-- auras
 			nameplateEnemyNpcAuraDisplay = {
 				type = "multiselect", style = "dropdown", width = "full",
-				name = "Enemy NPC Auras",
+				name = L["Enemy NPC Auras"],
 				desc = "",
 				values = {
-					help = "Mob Buffs",
-					harm = "Personal Debuffs",
-					cc = "Shared CC"
+					help = L["Mob Buffs"],
+					harm = L["Personal Debuffs"],
+					cc = L["Shared CC"]
 				},
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -1051,12 +1094,12 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateEnemyPlayerAuraDisplay = {
 				type = "multiselect", style = "dropdown", width = "full",
-				name = "Enemy Player Auras",
+				name = L["Enemy Player Auras"],
 				desc = "",
 				values = {
-					help = "Mob Buffs",
-					harm = "Personal Debuffs",
-					cc = "Shared CC"
+					help = L["Mob Buffs"],
+					harm = L["Personal Debuffs"],
+					cc = L["Shared CC"]
 				},
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -1077,12 +1120,12 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateFriendlyPlayerAuraDisplay = {
 				type = "multiselect", style = "dropdown", width = "full",
-				name = "Friendly Player Auras",
+				name = L["Friendly Player Auras"],
 				desc = "",
 				values = {
-					help = "Mob Buffs",
-					harm = "Personal Debuffs",
-					cc = "Shared CC"
+					help = L["Mob Buffs"],
+					harm = L["Personal Debuffs"],
+					cc = L["Shared CC"]
 				},
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
@@ -1102,30 +1145,10 @@ NamePlates.GetOptions = function(self)
 				order = 503,
 			},
 
-			--[[
-			-- cvars
-			nameplateEnemyNpcAuraDisplay
-			nameplateEnemyPlayerAuraDisplay
-			nameplateFriendlyPlayerAuraDisplay
-
-			-- bitfield enums
-			Enum.NamePlateEnemyNpcAuraDisplay.Buffs
-			Enum.NamePlateEnemyNpcAuraDisplay.Debuffs
-			Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl
-
-			Enum.NamePlateEnemyPlayerAuraDisplay.Buffs
-			Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs
-			Enum.NamePlateEnemyPlayerAuraDisplay.CrowdControl
-
-			Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs
-			Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs
-			Enum.NamePlateFriendlyPlayerAuraDisplay.CrowdControl
-			--]]
-
 			-- element scales
 			nameplateShowOnlyNameScaleMultipler = {
 				type = "range", width = "full", min = 1, max = 1.6, step = .1,
-				name = "Name scale when only showing name.",
+				name = L["Name scale when only showing Name"],
 				desc = "",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() 
@@ -1141,7 +1164,7 @@ NamePlates.GetOptions = function(self)
 			},
 			nameplateSize = {
 				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1,
-				name = "General Size", -- UNIT_NAMEPLATES_GLOBAL_SCALE, "Size"
+				name = L["General Size"], -- UNIT_NAMEPLATES_GLOBAL_SCALE, "Size"
 				desc = UNIT_NAMEPLATES_GLOBAL_SCALE_TOOLTIP, -- "Controls the size nameplates are displayed on the screen."
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
