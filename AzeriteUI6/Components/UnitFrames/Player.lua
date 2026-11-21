@@ -44,7 +44,7 @@ local GetMedia = ns.GetMedia
 
 -- We'll update this when entering world or changing specs
 local playerClass = UnitClassBase("player")
-local playerIsRetribution = playerClass == "PALADIN" and (GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
+local playerIsRetribution = playerClass == "PALADIN" and (C_SpecializationInfo.GetSpecialization() == SPEC_PALADIN_RETRIBUTION)
 
 -- These are powertypes that eventually will  
 -- go to zero when the player is out of combat.
@@ -405,9 +405,9 @@ end
 
 local UnitFrame_OnEvent = function(self, event, unit, ...)
 	if (event == "PLAYER_ENTERING_WORLD") then
-		playerIsRetribution = playerClass == "PALADIN" and GetSpecialization() == SPEC_PALADIN_RETRIBUTION
+		playerIsRetribution = playerClass == "PALADIN" and C_SpecializationInfo.GetSpecialization() == SPEC_PALADIN_RETRIBUTION
 	elseif (event == "PLAYER_SPECIALIZATION_CHANGED") then
-		playerIsRetribution = playerClass == "PALADIN" and GetSpecialization() == SPEC_PALADIN_RETRIBUTION
+		playerIsRetribution = playerClass == "PALADIN" and C_SpecializationInfo.GetSpecialization() == SPEC_PALADIN_RETRIBUTION
 	end
 
 	-- Update aura filters based on combat state

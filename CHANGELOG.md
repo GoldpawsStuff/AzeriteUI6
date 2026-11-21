@@ -4,10 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.36-Alpha] 2026-11-21
+## [Unreleased][1.0.37-Alpha] 2026-11-21
 - More options menu work.
 
-## [1.0.35-Release] 2026-11-21
+## [1.0.36-Release] 2026-11-21
 ### Added
 - Made the options menu a lot more modern in Forever/Retail.
 - Added a lot of NamePlate options. The majority of these are mirrors of the same options in the Game Menu, though some extra options like the ability to also show friendly NPCs as just names have been added.
@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed an issue where your current `focus` target's NamePlate only would get highlighted with a blue border when you also targeted something else. 
+- Fixed a wrong API call that caused the Player unit frame to simply not be there for Paladins. 
 
 ## [1.0.34-Release] 2026-11-18
 ### Added
