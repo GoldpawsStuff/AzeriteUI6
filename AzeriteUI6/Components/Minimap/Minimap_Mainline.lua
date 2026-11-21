@@ -37,7 +37,6 @@ local defaults = { profile = {
 }}
 
 -- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
@@ -430,7 +429,7 @@ MinimapModule.UpdateXP = function(self, event, ...)
 		self.XP.Rested:SetMinMaxValues(0, 1, true)
 	end
 	
-	self.XP.Value:SetFormattedText("%s", AbbreviateNumber(max-current))
+	self.XP.Value:SetFormattedText("%s", ns.AbbreviateNumbers(max-current))
 	self.XP.Description:SetFormattedText(L["to level %s"], self.playerLevel + 1)
 	self.XP.Value:SetTextColor(r, g, b)
 	self.Badge.Value:SetTextColor(rR, rG, rB)

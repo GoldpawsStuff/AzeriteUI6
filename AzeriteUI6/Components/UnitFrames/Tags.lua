@@ -79,7 +79,7 @@ oUF.Tags.Methods["azui:shorthealth"] = function(unit, realUnit)
 	elseif (UnitIsDead(unit)) then
 		return DEAD
 	else
-		return AbbreviateNumbers(UnitHealth(unit))
+		return ns.AbbreviateNumbers(UnitHealth(unit))
 	end
 end
 
@@ -99,11 +99,7 @@ oUF.Tags.Methods["azui:shortpower"] = function(unit, realUnit)
 		return ""
 	else
 		local val = UnitPower(unit)
-		if (val) then
-			return AbbreviateNumbers(val)
-		else
-			return ""
-		end
+		return val and ns.AbbreviateNumbers(val) or ""
 	end
 end
 
@@ -114,11 +110,7 @@ oUF.Tags.Methods["azui:shortmana"] = function(unit, realUnit)
 		return ""
 	else
 		local val = UnitPower(unit, Enum.PowerType.Mana)
-		if (val) then
-			return AbbreviateNumbers(val)
-		else
-			return ""
-		end
+		return val and ns.AbbreviateNumbers(val) or ""
 	end
 end
 

@@ -12,14 +12,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added a lot of NamePlate options. The majority of these are mirrors of the same options in the Game Menu, though some extra options like the ability to also show friendly NPCs as just names have been added.
 
 ### Changed
+- Cleaned up the number formatting quite a bit, and added in hopefully acceptable zhCN four digit formatting.
 - The Explorer Mode once again watches your health, but in a different manner than before. The new Secrecy in Forever and Retail prevents us from actually reading the health or comparing it to anything, but what we CAN do is to monitor if the health changes at all, just without actually reading any values. We do this by simply listening for the `UNIT_HEALTH` event for the `player` unit. If this event fires, we fade in the user interface, if it hasn't fired for more than two seconds, than we can assume the health is full and we safely can fade out the user interface. Happy exploring! 
 
 ### Fixed
-- Fixed an issue where your current `focus` target's NamePlate only would get highlighted with a blue border when you also targeted something else.
+- Fixed an issue where your current `focus` target's NamePlate only would get highlighted with a blue border when you also targeted something else. 
 
 ## [1.0.34-Release] 2026-11-18
 ### Added
-- Added NamePlates with health, name and basic aura displays, similar to what the default Blizzard nameplates do.
+- Added NamePlates with health, name and basic aura displays, similar to what the default Blizzard nameplates do. 
 
 ### Changed
 - Put the `GameTooltipStatusBar` inside the tooltip. Because it's cleaner. 

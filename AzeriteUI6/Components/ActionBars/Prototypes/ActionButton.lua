@@ -126,68 +126,11 @@ local exitButton = {
 	texture = [[Interface\Icons\achievement_bg_kill_carrier_opposing_flagroom]]
 }
 
-local cooldownFormatter = C_StringUtil.CreateNumericRuleFormatter()
-cooldownFormatter:SetBreakpoints({
-	-- ≥ 1 day
-	{
-		threshold = 86400,
-		format = "%.0fd",
-		components = {
-			{ div = 86400, rounding = Enum.NumericRuleFormatRounding.Down },
-		}
-	},
-	-- ≥ 1 hour
-	{
-		threshold = 3600,
-		format = "%.0fh",
-		components = {
-			{ div = 3600, rounding = Enum.NumericRuleFormatRounding.Down },
-		}
-	},
-	-- ≥ 1 minute
-	{
-		threshold = 60,
-		format = "%.0fm",
-		components = {
-			{ div = 60, rounding = Enum.NumericRuleFormatRounding.Down },
-		}
-	},
-	-- ≥ 5 seconds → whole seconds
-	{
-		threshold = 5.5,
-		format = "%.0f",
-		components = {
-			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- ≥ 1 second → whole seconds
-	{
-		threshold = .9,
-		format = "|cffff8800%.0f|r",
-		components = {
-			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- < 1 second, tenths of a second
-	{
-		threshold = .05,
-		format = "|cffff0000%.0f|r",
-		components = {
-			{ div = 0.1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- < 1/20 second
-	{
-		threshold = 0,
-		format = ""
-	}
-})
-
 local StyleCooldownText = function(button)
 	local cooldown = button.cooldown or button.Cooldown
 	if (not cooldown) then return end
 
-	cooldown:SetCountdownFormatter(cooldownFormatter)
+	cooldown:SetCountdownFormatter(ns:GetCountdownFormatter())
 	cooldown:SetHideCountdownNumbers(false)
 
 	local cooldownText = cooldown:GetCountdownFontString()

@@ -31,7 +31,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local NamePlates = ns:NewModule("NamePlates", nil, "LibMoreEvents-1.0", "AceTimer-3.0")
 
 -- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 local UnitIsUnit = ns.UnitIsUnit
@@ -107,6 +106,7 @@ local gameSettings = {
 	nameplateUseClassColorForFriendlyPlayerUnitNames = 1, 	-- Used to display the class color in friendly player unit nameplate names. (Default 0)
 }
 
+-- Custom settings to be merged into the saved profile settings
 local customSettings = {
 	nameplateShowOnlyNameScaleMultipler = 1.2, 				-- Scale multipler to the unit name when only showing unit name (NOT A CVAR!)
 	nameplateShowOnlyNameForFriendlyNPCUnits = 1, 			-- Only show the unit name for friendly NPC units (NOT A CVAR!)
@@ -119,74 +119,19 @@ local customSettings = {
 local defaults = { profile = {
 	enabled = true,
 }}
+
 -- Include our CVar listing
 for cvarName,value in next,gameSettings do 
 	defaults.profile[cvarName] = value
 end
--- Include our custom values
+
+-- Include our custom settings
 for customSetting,value in next,customSettings do 
 	defaults.profile[customSetting] = value
 end
 
 -- Cache of current targets (target, focus, softenemy, softinteract, softfriend)
 local ActiveTargetPlates = {}
-
-local timeFormatter = C_StringUtil.CreateNumericRuleFormatter()
-timeFormatter:SetBreakpoints({
-	-- ≥ 1 day
-	{
-		threshold = 86400,
-		format = "%.0fd",
-		components = {
-			{ div = 86400, rounding = Enum.NumericRuleFormatRounding.Down },
-		}
-	},
-	-- ≥ 1 hour
-	{
-		threshold = 3600,
-		format = "%.0fh",
-		components = {
-			{ div = 3600, rounding = Enum.NumericRuleFormatRounding.Down },
-		}
-	},
-	-- ≥ 1 minute
-	{
-		threshold = 60,
-		format = "%.0fm",
-		components = {
-			{ div = 60, rounding = Enum.NumericRuleFormatRounding.Down },
-		}
-	},
-	-- ≥ 5 seconds → whole seconds
-	{
-		threshold = 5.5,
-		format = "%.0f",
-		components = {
-			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- ≥ 1 second → whole seconds
-	{
-		threshold = .9,
-		format = "|cffff8800%.0f|r",
-		components = {
-			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- < 1 second, tenths of a second
-	{
-		threshold = .05,
-		format = "|cffff0000%.0f|r",
-		components = {
-			{ div = 0.1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- < 1/20 second
-	{
-		threshold = 0,
-		format = ""
-	}
-})
 
 -- Convert any values to booleans for menu usage 
 local toboolean = function(a)

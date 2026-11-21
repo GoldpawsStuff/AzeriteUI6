@@ -24,70 +24,79 @@
 
 --]]
 local _, ns = ...
+local oUF = ns.oUF or oUF
 
--- Shorten as much as possible.
-ns.AbbreviateNumber = function(value) -- do return end -- is it bugged from secrecy?
-	value = tonumber(value)
-	if (not value) then return "" end
-	if (value >= 1e9) then
-		return ("%.1fb"):format(value / 1e9):gsub("%.?0+([kmb])$", "%1")
-	elseif (value >= 1e6) then
-		return ("%.1fm"):format(value / 1e6):gsub("%.?0+([kmb])$", "%1")
-	elseif (value >= 1e3) or (value <= -1e3) then
-		return ("%.1fk"):format(value / 1e3):gsub("%.?0+([kmb])$", "%1")
-	elseif (value > 0) then
-		return ""..math.floor(value)
-	else
-		return ""
-	end
-end
+local rounding = Enum.NumericRuleFormatRounding.Up
+local formats = {
+	day = "%.0fd",
+	hour = "%.0fh",
+	minute = "%.0fm",
+	seconds = "%.0f",
+	haste = "|cffff8800%.0f|r",
+	critical = "|cffff0000%.0f|r"
+}
 
--- Aim at filling 3-5 digits or letters.
-ns.AbbreviateNumberBalanced = function(value)
-	value = tonumber(value)
-	if (not value) then return "" end
-	if (value >= 1e8) then
-		return string.format("%.0fm", value/1e6) -- 100m, 1000m, 2300m, etc
-	elseif (value >= 1e6) then
-		return string.format("%.1fm", value/1e6) -- 1.0m - 99.9m
-	elseif (value >= 1e5) then
-		return string.format("%.0fk", value/1e3) -- 100k - 999k
-	elseif (value >= 1e3) then
-		return string.format("%.1fk", value/1e3) -- 1.0k - 99.9k
-	elseif (value > 0) then
-		return ""..math.floor(value) -- 1 - 999
-	else
-		return ""
-	end
-end
+local countdownFormatter = C_StringUtil.CreateNumericRuleFormatter()
+countdownFormatter:SetBreakpoints({
+	{ threshold = 86400, 	format = formats.day, 		components = {{ div = 86400, 	rounding = rounding }} }, -- ≥ 1 day
+	{ threshold = 3540, 	format = formats.hour, 		components = {{ div = 3600, 	rounding = rounding }} }, -- ≥ 1 hour
+	{ threshold = 59, 		format = formats.minute, 	components = {{ div = 60, 		rounding = rounding }} }, -- ≥ 1 minute
+	{ threshold = 5.5, 		format = formats.seconds, 	components = {{ div = 1, 		rounding = rounding }} }, -- ≥ 5 seconds → whole seconds
+	{ threshold = .9, 		format = formats.haste, 	components = {{ div = 1, 		rounding = rounding }} }, -- ≥ 1 second → whole seconds
+	{ threshold = .05, 		format = formats.critical, 	components = {{ div = .1, 		rounding = rounding }} }, -- < 1 second, tenths of a second
+	{ threshold = 0, 		format = "" } 
+})
 
--- zhCN Exceptions
-if (GetLocale() == "zhCN") then
-	ns.AbbreviateNumber = function(value)
-		value = tonumber(value)
-		if (not value) then return "" end
-		if (value >= 1e8) then
-			return ("%.2f亿"):format(value / 1e8):gsub("%.?0+([km])$", "%1")
-		elseif (value >= 1e4) or (value <= -1e3) then
-			return ("%.2f万"):format(value / 1e4):gsub("%.?0+([km])$", "%1")
-		elseif (value > 0) then
-			return ""..math.floor(value)
-		else
-			return ""
-		end
-	end
+ns.GetCountdownFormatter = function() return countdownFormatter end
 
-	ns.AbbreviateNumberBalanced = function(value)
-		value = tonumber(value)
-		if (not value) then return "" end
-		if (value >= 1e8) then
-			return string.format("%.2f亿", value/1e8)
-		elseif (value >= 1e4) then
-			return string.format("%.2f万", value/1e4)
-		elseif (value > 0) then
-			return ""..math.floor(value)
-		else
-			return ""
-		end
-	end
+local breakPoints = {
+	breakpointData = {
+		{ breakpoint = 1e12,	abbreviation = "b", significandDivisor = 1e11,	fractionDivisor = 10, abbreviationIsGlobal = false },
+		{ breakpoint = 1e9,		abbreviation = "b", significandDivisor = 1e8,	fractionDivisor = 10, abbreviationIsGlobal = false },
+		{ breakpoint = 1e6,		abbreviation = "m", significandDivisor = 1e5,	fractionDivisor = 10, abbreviationIsGlobal = false },
+		{ breakpoint = 1e3,		abbreviation = "k", significandDivisor = 1e2,	fractionDivisor = 10, abbreviationIsGlobal = false },
+	}
+}
+
+local zhCNBreakpoints = {
+	breakpointData = {
+		-- 亿 with no decimals (from 1000亿 upward)
+		{
+			breakpoint = 1e11,-- 1000亿
+			abbreviation = "亿",
+			significandDivisor = 1e8,
+			fractionDivisor = 1,
+			abbreviationIsGlobal = false
+		},
+		-- 亿 with 2 decimals
+		{
+			breakpoint = 1e8,
+			abbreviation = "亿",
+			significandDivisor = 1e6,
+			fractionDivisor = 100,
+			abbreviationIsGlobal = false
+		},
+		-- 万 with no decimals (from 1000万 upward)
+		{
+			breakpoint = 1e7,-- 1000万
+			abbreviation = "万",
+			significandDivisor = 1e4,
+			fractionDivisor = 1,
+			abbreviationIsGlobal = false
+		},
+		-- 万 with 2 decimals
+		{
+			breakpoint = 1e4,
+			abbreviation = "万",
+			significandDivisor = 100,
+			fractionDivisor = 100,
+			abbreviationIsGlobal = false
+		}
+	}
+}
+
+local gameLocale = GetLocale()
+
+ns.AbbreviateNumbers = function(value)
+	return AbbreviateNumbers(value, gameLocale == "zhCN" and zhCNBreakpoints or breakPoints)
 end

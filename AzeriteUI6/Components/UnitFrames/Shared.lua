@@ -27,7 +27,6 @@ local _, ns = ...
 local oUF = ns.oUF or oUF
 
 -- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
@@ -58,63 +57,6 @@ local copy = function(source)
 		cache[auraID] = true
 	end
 end
-
-local timeFormatter = C_StringUtil.CreateNumericRuleFormatter()
-timeFormatter:SetBreakpoints({
-	-- ≥ 1 day
-	{
-		threshold = 86400,
-		format = "%.0fd",
-		components = {
-			{ div = 86400, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- ≥ 1 hour
-	{
-		threshold = 59*60,
-		format = "%.0fh",
-		components = {
-			{ div = 3600, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- ≥ 1 minute
-	{
-		threshold = 59,
-		format = "%.0fm",
-		components = {
-			{ div = 60, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- ≥ 5 seconds → whole seconds
-	{
-		threshold = 5.5,
-		format = "%.0f",
-		components = {
-			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- ≥ 1 second → whole seconds
-	{
-		threshold = .9,
-		format = "|cffff8800%.0f|r",
-		components = {
-			{ div = 1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- < 1 second, tenths of a second
-	{
-		threshold = .05,
-		format = "|cffff0000%.0f|r",
-		components = {
-			{ div = 0.1, rounding = Enum.NumericRuleFormatRounding.Up },
-		}
-	},
-	-- < 1/20 second
-	{
-		threshold = 0,
-		format = ""
-	}
-})
 
 local Auras_CreateFourSlice = function(button, showWhenHarmful, showWhenHelpful)
 
@@ -260,7 +202,7 @@ ns.AuraButton_InitializeBigBuff = function(button)
 	button:SetSize(36,36)
 	button:SetIcon(icon)
 	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 
 	Auras_SetTooltipAnchor(button)
 end
@@ -303,7 +245,7 @@ ns.AuraButton_InitializeBigDebuff = function(button)
 	button:SetSize(36,36)
 	button:SetIcon(icon)
 	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 
 	Auras_CreateFourSlice(button, true, false)
 	Auras_SetTooltipAnchor(button)
@@ -342,7 +284,7 @@ ns.AuraButton_InitializeNamePlateDebuff = function(button)
 	button:SetSize(22, 22)
 	button:SetIcon(icon)
 	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 end
 
 -- NamePlate CC
@@ -378,7 +320,7 @@ ns.AuraButton_InitializeNamePlateCC = function(button)
 	button:SetSize(18, 18)
 	button:SetIcon(icon)
 	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 end
 
 -- NamePlate Buffs
@@ -414,7 +356,7 @@ ns.AuraButton_InitializeNamePlateBuff = function(button)
 	button:SetSize(18, 18)
 	button:SetIcon(icon)
 	button:SetDurationCooldown(cooldown)
-	button:SetDurationText(time, { textFormatter = timeFormatter })
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 end
 
 -- Generates a sorted list of whitelisted auras by keywords, with no duplicates

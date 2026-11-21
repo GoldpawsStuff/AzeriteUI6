@@ -39,7 +39,6 @@ local defaults = { profile = {
 }}
 
 -- Custom API locals
-local AbbreviateNumber = ns.AbbreviateNumber
 local GetFont = ns.GetFont
 local GetMedia = ns.GetMedia
 
