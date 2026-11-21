@@ -4,9 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.35-Alpha] 2026-11-21
-- Working on more aura-, nameplate- and unit frame options.
-
+## [1.0.35-Release] 2026-11-21
 ### Added
 - Made the options menu a lot more modern in Forever/Retail.
 - Added a lot of NamePlate options. The majority of these are mirrors of the same options in the Game Menu, though some extra options like the ability to also show friendly NPCs as just names have been added.
