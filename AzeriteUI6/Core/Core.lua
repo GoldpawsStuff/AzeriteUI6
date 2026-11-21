@@ -211,6 +211,10 @@ ns.RegisterOptionsTable = function(self, appName, options, slashcmd)
 	return LibStub("AceConfig-3.0"):RegisterOptionsTable(appName, ApplyModernControls(options), slashcmd)
 end
 
+ns.RefreshOptionsTable = function(self, reason)
+	LibStub("AceConfigRegistry-3.0"):NotifyChange(addonName)
+end
+
 ns.AddToBlizOptions = function(self, appName, name, parent, ...)
 	return LibStub("AceConfigDialog-3.0"):AddToBlizOptions(appName, name, parent, ...)
 end

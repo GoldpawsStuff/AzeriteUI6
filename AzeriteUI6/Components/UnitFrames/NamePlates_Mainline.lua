@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local _, ns = ...
+local addonName, ns = ...
 local oUF = ns.oUF or oUF
 
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
@@ -439,6 +439,10 @@ local NamePlate = {
 
 		self:UpdateAlpha(event, unit or self.__unit)
 		self:PostUpdateElements(event, unit or self.__unit)
+
+		if (event == "CVAR_UPDATE") then
+			ns:RefreshOptionsTable(event)
+		end
 	end,
 
 	-- When a unit nameplate becomes visible on-screen.
@@ -812,7 +816,6 @@ NamePlates.OnEvent = function(self, event, ...)
 			if (not settingsName or not self.db.profile[settingsName]) then return end
 			
 			self:LoadSettingFromCVar(settingsName, value)
-			
 			self:UpdateAllElements("CVAR_UPDATE")
 		end
 
