@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.35-Alpha] 2026-11-20
+## [Unreleased][1.0.35-Alpha] 2026-11-21
 - Working on more aura-, nameplate- and unit frame options.
 
 ### Added
