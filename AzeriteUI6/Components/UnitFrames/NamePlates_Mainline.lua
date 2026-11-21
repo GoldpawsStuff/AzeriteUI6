@@ -42,8 +42,9 @@ local SoftEnemyNamePlate, SoftFriendNamePlate, SoftInteractNamePlate
 
 local IN_COMBAT
 
--- Our CVar settings
-local cVars = {
+-- Game settings we completely mirror. 
+-- Our own are just backup mirrors of these, nothing else.
+local gameSettings = {
 
 	-- Distance
 	nameplateMaxDistance = 45, 								-- The max distance to show nameplates. Practical hard cap 40-45. (Default 45/60)
@@ -119,7 +120,7 @@ local defaults = { profile = {
 	enabled = true,
 }}
 -- Include our CVar listing
-for cvarName,value in next,cVars do 
+for cvarName,value in next,gameSettings do 
 	defaults.profile[cvarName] = value
 end
 -- Include our custom values
@@ -187,7 +188,7 @@ timeFormatter:SetBreakpoints({
 	}
 })
 
--- Convert CVar values to booleans for menu usage 
+-- Convert any values to booleans for menu usage 
 local toboolean = function(a)
 	local n = tonumber(a)
 	if (n == 1) then return true
@@ -202,14 +203,22 @@ local GetCVar = function(cvar)
 	return tonumber(value) or value
 end
 
-local GetCVarBool = function(cvar)
-	return C_CVar.GetCVarBool(cvar)
-end
-
 -- Return a CVar default, convert to number when appropriate
 local GetCVarDefault = function(cvar)
 	local value = C_CVar.GetCVarDefault(cvar)
 	return tonumber(value) or value
+end
+
+-- Return a CVar as a boolean
+local GetCVarBool = function(cvar)
+	return C_CVar.GetCVarBool(cvar)
+end
+
+-- Return the user selected frame scale, converted from the CVar setting
+local GetNamePlateScale = function()
+	local entry = NamePlateConstants.NAME_PLATE_SCALES[(tonumber(C_CVar.GetCVar("nameplateSize")) or Enum.NamePlateSize.Small)]
+			   or NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small]
+	return entry.horizontal
 end
 
 -- Check if unit is a player pet or minion
@@ -227,10 +236,6 @@ end
 -- Unit is a friendly NPC
 local UnitIsFriendlyNPC = function(unit)
 	return not UnitIsPlayer(unit) and not UnitCanAttack("player", unit)	
-end
-
--- Do we need a single nameplate version? Isn't the problem flags not getting cleared on non-targets? 
-local UpdateActiveTargets = function(self, event, unit)
 end
 
 -- Update all target units
@@ -284,205 +289,204 @@ local UpdateAllActiveTargets = function(event)
 	ActiveTargetPlates.softinteract = hasInteract and interactUnit
 end
 
--- Update NPC classification badge for rares, elites and bosses.
-local Classification_Update = function(self, event, unit, ...)
-	if (event and unit ~= self.__unit) then return end -- when called as an event
-	unit = unit or self.__unit -- not always called by an event handler
+-- Flag to hook NamePlate alpha to UIParent
+local shouldHookAlpha = true
 
-	local element = self.Classification
+-- Method template with nameplate and element callbacks
+local NamePlate = {
 
-	if (UnitIsPlayer(unit) or not UnitCanAttack("player", unit)) then
-		element:SetTexture("")
-		element:SetWidth(.01)
-		return
-	end
+	-- Hook used to fade out nameplates along with UIParent. Not sure it's always a good idea.
+	UpdateAlpha = function(self)
+		if (not shouldHookAlpha) then return end
+		self:SetAlpha(UIParent:GetAlpha())
+	end,
 
-	local l = UnitEffectiveLevel(unit)
-	local c = (l and l < 1) and "worldboss" or UnitClassification(unit)
-	if (c == "boss" or c == "worldboss") then
-		element:SetWidth(40)
-		element:SetTexture(element.bossTexture)
+	-- Update NPC classification badge for rares, elites and bosses.
+	UpdateClassification = function(self, event, unit, ...)
+		if (event and unit ~= self.__unit) then return end -- when called as an event
+		unit = unit or self.__unit -- not always called by an event handler
 
-	elseif (c == "elite") then
-		element:SetWidth(40)
-		element:SetTexture(element.eliteTexture)
+		local element = self.Classification
 
-	elseif (c == "rare" or c == "rareelite") then
-		element:SetWidth(40)
-		element:SetTexture(element.rareTexture)
-	else
-		-- "minus"
-		element:SetTexture("")
-		element:SetWidth(.01)
-	end
-end
-
--- Update targeting highlight outline
--- *priority order is target, focus, softenemy, softinteract
-local TargetHighlight_Update = function(self, event, unit, ...)
-	if (unit ~= self.__unit) then return end
-
-	local element = self.TargetHighlight
-
-	if (self.isTarget) then
-		element:SetVertexColor(255/255, 239/255, 169/255)
-		element:Show()
-
-	elseif (self.isFocus) then
-		element:SetVertexColor(144/255, 195/255, 255/255)
-		element:Show()
-
-	elseif (self.isSoftEnemy) then
-		element:SetVertexColor(255/255, 250/255, 236/255)
-		element:Show()
-
-	elseif (self.isSoftInteract) then
-		element:SetVertexColor(185/255, 255/255, 182/255)
-		element:Show()
-	else
-		element:Hide()
-	end
-end
-
-local GetNamePlateScale = function()
-	local entry = NamePlateConstants.NAME_PLATE_SCALES[(tonumber(C_CVar.GetCVar("nameplateSize")) or Enum.NamePlateSize.Small)]
-				or NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small]
-
-	--return entry.horizontal / NamePlateConstants.NAME_PLATE_SCALES[Enum.NamePlateSize.Small].horizontal
-	return entry.horizontal
-end
-
--- Hook used to fade out nameplates along with UIParent. Not sure it's always a good idea.
-local NamePlate_UpdateAlpha = function(self)
-	--self:SetAlpha(UIParent:GetAlpha())
-end
-
-local NamePlate_UpdateScale = function(self)
-	self:SetScale(GetNamePlateScale() or 1)
-	self:ClearAllPoints()
-	self:SetPoint("BOTTOM")
-end
-
--- Update visibility and elements based on CVar changes
--- *todo: update on faction changes / quest mobs becoming attackable
-local NamePlate_PostUpdateElements = function(self, event, unit)
-	unit = unit or self.__unit
-
-	local db = NamePlates.db.profile
-
-	local isFriendlyPlayer = UnitIsFriendlyPlayerUnit(unit)
-	local isFriendlyNPC = UnitIsFriendlyNPC(unit)
-
-	local isPriorityUnit = self.isTarget or self.isFocus or self.isSoftInteract or self.isSoftEnemy or self.isSoftFriend
-
-	local onlyShowName = isFriendlyPlayer and not isPriorityUnit and toboolean(db.nameplateShowOnlyNameForFriendlyPlayerUnits)
-	local onlyShowNPCName = isFriendlyNPC and not isPriorityUnit and toboolean(db.nameplateShowOnlyNameForFriendlyNPCUnits)
-	local scaleMultipler = tonumber(db.nameplateShowOnlyNameScaleMultipler) or defaults.profile.nameplateShowOnlyNameScaleMultipler
-
-	local shouldClassColorName = toboolean(db.nameplateUseClassColorForFriendlyPlayerUnitNames)
-	local shouldClassColorNPCName = toboolean(db.nameplateUseReactionColorForFriendlyNPCUnitNames)
-
-	if (onlyShowName or onlyShowNPCName) then
-		self.Name:SetAlpha(1)
-		--self.Name:SetFontObject(self.Name.fontObjectLarge)
-		self.Name:SetScale(scaleMultipler)
-		self.Health:Hide()
-		self.AurasHarmful:Hide()
-		self.AurasHelpful:Hide()
-		self.AurasCC:Hide()
-		self.Classification:Hide()
-
-		self:DisableElement("Castbar")
-	else
-		self.Name:SetAlpha(.75)
-		--self.Name:SetFontObject(self.Name.fontObject)
-		self.Name:SetScale(1)
-		self.Health:Show()
-		self.AurasHarmful:Show()
-		self.AurasHelpful:Show()
-		self.AurasCC:Show()
-		self.Classification:Show()
-
-		self:EnableElement("Castbar")
-	end
-
-	-- Update name coloring
-	if (onlyShowName and shouldClassColorName) then
-		local color
-		local _, class = UnitClass(unit)
-		if(issecretvalue(class)) then
-			-- BUG: we can't use custom colors if the class is secret
-			-- https://github.com/oUF-wow/oUF/issues/873
-			color = C_ClassColor.GetClassColor(class)
-		else
-			color = self.colors.class[class]
+		if (UnitIsPlayer(unit) or not UnitCanAttack("player", unit)) then
+			element:SetTexture("")
+			element:SetWidth(.01)
+			return
 		end
-		if (color) then
-			self.Name:SetTextColor(color:GetRGB())
+
+		local l = UnitEffectiveLevel(unit)
+		local c = (l and l < 1) and "worldboss" or UnitClassification(unit)
+		if (c == "boss" or c == "worldboss") then
+			element:SetWidth(40)
+			element:SetTexture(element.bossTexture)
+
+		elseif (c == "elite") then
+			element:SetWidth(40)
+			element:SetTexture(element.eliteTexture)
+
+		elseif (c == "rare" or c == "rareelite") then
+			element:SetWidth(40)
+			element:SetTexture(element.rareTexture)
+		else
+			-- "minus"
+			element:SetTexture("")
+			element:SetWidth(.01)
+		end
+	end,
+
+	-- Update scale to match unitframe
+	UpdateScale = function(self)
+		self:SetScale(GetNamePlateScale() or 1)
+		self:ClearAllPoints()
+		self:SetPoint("BOTTOM")
+	end,
+
+	-- Update targeting highlight outline
+	-- *priority order is target, focus, softenemy, softinteract
+	UpdateTargetHighlight = function(self, event, unit, ...)
+		if (unit ~= self.__unit) then return end
+
+		local element = self.TargetHighlight
+
+		if (self.isTarget) then
+			element:SetVertexColor(255/255, 239/255, 169/255)
+			element:Show()
+
+		elseif (self.isFocus) then
+			element:SetVertexColor(144/255, 195/255, 255/255)
+			element:Show()
+
+		elseif (self.isSoftEnemy) then
+			element:SetVertexColor(255/255, 250/255, 236/255)
+			element:Show()
+
+		elseif (self.isSoftInteract) then
+			element:SetVertexColor(185/255, 255/255, 182/255)
+			element:Show()
+		else
+			element:Hide()
+		end
+	end,
+
+	-- Update visibility and elements based on CVar changes
+	-- *todo: update on faction changes / quest mobs becoming attackable
+	PostUpdateElements = function(self, event, unit)
+		unit = unit or self.__unit
+
+		local db = NamePlates.db.profile
+
+		local isFriendlyPlayer = UnitIsFriendlyPlayerUnit(unit)
+		local isFriendlyNPC = UnitIsFriendlyNPC(unit)
+
+		local isPriorityUnit = self.isTarget or self.isFocus or self.isSoftInteract or self.isSoftEnemy or self.isSoftFriend
+
+		local onlyShowName = isFriendlyPlayer and not isPriorityUnit and toboolean(db.nameplateShowOnlyNameForFriendlyPlayerUnits)
+		local onlyShowNPCName = isFriendlyNPC and not isPriorityUnit and toboolean(db.nameplateShowOnlyNameForFriendlyNPCUnits)
+		local scaleMultipler = tonumber(db.nameplateShowOnlyNameScaleMultipler) or defaults.profile.nameplateShowOnlyNameScaleMultipler
+
+		local shouldClassColorName = toboolean(db.nameplateUseClassColorForFriendlyPlayerUnitNames)
+		local shouldClassColorNPCName = toboolean(db.nameplateUseReactionColorForFriendlyNPCUnitNames)
+
+		if (onlyShowName or onlyShowNPCName) then
+			self.Name:SetAlpha(1)
+			--self.Name:SetFontObject(self.Name.fontObjectLarge)
+			self.Name:SetScale(scaleMultipler)
+			self.Health:Hide()
+			self.AurasHarmful:Hide()
+			self.AurasHelpful:Hide()
+			self.AurasCC:Hide()
+			self.Classification:Hide()
+
+			self:DisableElement("Castbar")
+		else
+			self.Name:SetAlpha(.75)
+			--self.Name:SetFontObject(self.Name.fontObject)
+			self.Name:SetScale(1)
+			self.Health:Show()
+			self.AurasHarmful:Show()
+			self.AurasHelpful:Show()
+			self.AurasCC:Show()
+			self.Classification:Show()
+
+			self:EnableElement("Castbar")
+		end
+
+		-- Update name coloring
+		if (onlyShowName and shouldClassColorName) then
+			local color
+			local _, class = UnitClass(unit)
+			if(issecretvalue(class)) then
+				-- BUG: we can't use custom colors if the class is secret
+				-- https://github.com/oUF-wow/oUF/issues/873
+				color = C_ClassColor.GetClassColor(class)
+			else
+				color = self.colors.class[class]
+			end
+			if (color) then
+				self.Name:SetTextColor(color:GetRGB())
+			else
+				self.Name:SetTextColor(self.colors.highlight:GetRGB())
+			end
+		elseif (onlyShowNPCName and shouldClassColorNPCName) then
+			if (UnitReaction(unit, "player")) then 
+				self.Name:SetTextColor(self.colors.reaction[UnitReaction(unit, "player")]:GetRGB())
+			else
+				self.Name:SetTextColor(self.colors.highlight:GetRGB())
+			end
 		else
 			self.Name:SetTextColor(self.colors.highlight:GetRGB())
 		end
-	elseif (onlyShowNPCName and shouldClassColorNPCName) then
-		if (UnitReaction(unit, "player")) then 
-			self.Name:SetTextColor(self.colors.reaction[UnitReaction(unit, "player")]:GetRGB())
-		else
-			self.Name:SetTextColor(self.colors.highlight:GetRGB())
-		end
-	else
-		self.Name:SetTextColor(self.colors.highlight:GetRGB())
-	end
 
-	NamePlate_UpdateScale(self)
-	Classification_Update(self, event, unit)
-	TargetHighlight_Update(self, event, unit)
-end
+		self:UpdateScale()
+		self:UpdateClassification(event, unit)
+		self:UpdateTargetHighlight(event, unit)
+	end,
 
--- This is called on UpdateAllElements,
--- which is called when a frame is shown or when its unit changed.
-local NamePlate_PostUpdate = function(self, event, unit)
-	-- Too spammy here? Will fire for ALL nameplates, on every nameplate update. 
-	-- Make a single nameplate version? Still have to do all the checks.
-	UpdateAllActiveTargets(event) 
+	-- When a frame is shown or when its unit changed.
+	-- func: UpdateAllElements
+	PostUpdate = function(self, event, unit)
+		-- Too spammy here? Will fire for ALL nameplates, on every nameplate update. 
+		-- Make a single nameplate version? Still have to do all the checks.
+		UpdateAllActiveTargets(event) 
 
-	NamePlate_UpdateAlpha(self, event, unit or self.__unit)
-	NamePlate_PostUpdateElements(self, event, unit or self.__unit)
-end
+		self:UpdateAlpha(event, unit or self.__unit)
+		self:PostUpdateElements(event, unit or self.__unit)
+	end,
 
--- When a unit nameplate becomes visible on-screen. (NAME_PLATE_UNIT_ADDED)
--- *not related to nameplate creation, as that only triggers once per plate.
-local NamePlate_OnShow = function(self, event, unit)
+	-- When a unit nameplate becomes visible on-screen.
+	-- *not related to nameplate creation, as that only triggers once per plate.
+	-- event: NAME_PLATE_UNIT_ADDED
+	OnShow = function(self, event, unit)
 
-	self.inCombat = IN_COMBAT
+		self.inCombat = IN_COMBAT
 
-	ActiveNamePlates[self] = true
-	InActiveNamePlates[self] = nil
+		ActiveNamePlates[self] = true
+		InActiveNamePlates[self] = nil
+	end,
 
-	-- NamePlate_PostUpdate fires after this.
-end
+	-- When a unit nameplate is removed from the screen.
+	-- event: NAME_PLATE_UNIT_REMOVED
+	OnHide = function(self, event, unit)
 
--- When a unit nameplate is removed from the screen. (NAME_PLATE_UNIT_REMOVED)
-local NamePlate_OnHide = function(self, event, unit)
+		self.inCombat = nil
 
-	self.inCombat = nil
+		ActiveNamePlates[self] = nil
+		InActiveNamePlates[self] = true
 
-	ActiveNamePlates[self] = nil
-	InActiveNamePlates[self] = true
+		-- Only called automatically when shown, not hidden
+		self:PostUpdate(event, unit)
+	end,
 
-	-- On hide we need to call this manually. 
-	NamePlate_PostUpdate(self, event, unit)
-end
-
-local NamePlate_OnEvent = function(self, event, unit, ...)
-	if (unit and unit ~= self.__unit) then return end
-
-	unit = unit or self.__unit
-
-	NamePlate_PostUpdateElements(self, event, unit, ...)
-end
+}
 
 local style = function(self, unit)
 
 	AllNamePlates[self] = true
+
+	-- Embed our template methods
+	for method,func in next,NamePlate do
+		self[method] = func
+	end
 
 	-- Looks dumb on most things, remove it for now? 
 	-- *one problem, amongst many, is that it can show an extra question mark for trivial quests 
@@ -573,7 +577,7 @@ local style = function(self, unit)
 	name.fontObject = GetFont(11, true)
 	name.fontObjectLarge = GetFont(13, true)
 
-	self:Tag(name, "[name]")
+	self:Tag(name, "[name][azui:away]")
 
 	self.Name = name
 
@@ -587,6 +591,7 @@ local style = function(self, unit)
 	self.TargetHighlight = targetHighlight
 
 	-- Level (right)
+	-- create backdrop from health backdrop, stitch it together!
 	--local level = health:CreateFontString(nil, "OVERLAY")
 	--level:SetPoint("LEFT", health, "RIGHT", 4, 0)
 	--level:SetFontObject(GetFont(11, true))
@@ -677,15 +682,12 @@ local style = function(self, unit)
 	self.AurasCC = aurasCC
 
 	-- Make our nameplates obey UIParent alpha and fade out when Dialogue UI and Immersion say so.
-	hooksecurefunc(UIParent, "SetAlpha", function() NamePlate_UpdateAlpha(self) end)
+	hooksecurefunc(UIParent, "SetAlpha", function() self:UpdateAlpha() end)
 
 	-- Callbacks
 	--------------------------------------------
-	self:RegisterEvent("UNIT_FACTION", NamePlate_OnEvent)
-	self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED", NamePlate_OnEvent)
-
-	-- General PostUpdate
-	self.PostUpdate = NamePlate_PostUpdate
+	self:RegisterEvent("UNIT_FACTION", self.PostUpdateElements)
+	self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED", self.PostUpdateElements)
 end
 
 NamePlates.LoadSettingFromCVar = function(self, cvarName, value)
@@ -707,7 +709,7 @@ end
 NamePlates.LoadSettingsFromCVars = function(self)
 	if (InCombatLockdown()) then return end
 
-	for cvarName,value in next,cVars do 
+	for cvarName,value in next,gameSettings do 
 		self.db.profile[cvarName] = GetCVar(cvarName) or defaults.profile[cvarName]
 	end
 end
@@ -715,7 +717,7 @@ end
 NamePlates.SaveSettingsToCVars = function(self)
 	if (InCombatLockdown()) then return end
 
-	for cvarName,value in next,cVars do 
+	for cvarName,value in next,gameSettings do 
 		C_CVar.SetCVar(cvarName, self.db.profile[cvarName])	
 	end
 end
@@ -724,7 +726,7 @@ NamePlates.RestoreDefaults = function(self)
 	if (InCombatLockdown()) then return end
 
 	-- Restore our defaults for CVar settings
-	for cvarName,value in next,cVars do 
+	for cvarName,value in next,gameSettings do 
 		self.db.profile[cvarName] = defaults.profile[cvarName]
 	end
 
@@ -740,7 +742,7 @@ NamePlates.RestoreBlizzardDefaults = function(self)
 	if (InCombatLockdown()) then return end
 
 	-- Restore blizzard's defaults for CVar settings
-	for cvarName,value in next,cVars do 
+	for cvarName,value in next,gameSettings do 
 		self.db.profile[cvarName] = GetCVarDefault(cvarName) or defaults.profile[cvarName]
 	end
 	
@@ -755,7 +757,7 @@ end
 NamePlates.UpdateAllElements = function(self, event)
 	for nameplate in next,ActiveNamePlates do
 		nameplate:UpdateAllElements(event or "RefreshUnit")
-		NamePlate_PostUpdateElements(nameplate, event or "RefreshUnit", nameplate.__unit)
+		nameplate:PostUpdateElements(event or "RefreshUnit", nameplate.__unit)
 	end
 end
 
@@ -803,7 +805,7 @@ NamePlates.OnEvent = function(self, event, ...)
 		UpdateAllActiveTargets(event)
 
 		for nameplate in next,ActiveNamePlates do
-			NamePlate_PostUpdateElements(nameplate, event, nameplate.__unit)
+			nameplate:PostUpdateElements(event, nameplate.__unit)
 		end
 	end
 end
@@ -1197,7 +1199,7 @@ NamePlates.UpdateSettings = function(self)
 
 	-- Is this a dumb idea? 
 	for nameplate in next,ActiveNamePlates do
-		NamePlate_PostUpdateElements(nameplate, event, nameplate.__unit)
+		nameplate:PostUpdateElements(event, nameplate.__unit)
 	end
 end
 
@@ -1238,8 +1240,8 @@ NamePlates.OnEnable = function(self)
 
 		local nameplates = self:SpawnNamePlates("AzeriteNamePlate")
 		nameplates:SetSize(90,32)
-		nameplates:SetAddedCallback(NamePlate_OnShow)
-		nameplates:SetRemovedCallback(NamePlate_OnHide)
+		nameplates:SetAddedCallback(NamePlate.OnShow)
+		nameplates:SetRemovedCallback(NamePlate.OnHide)
 	end)
 
 	self:RegisterEvent("CVAR_UPDATE", "OnEvent")

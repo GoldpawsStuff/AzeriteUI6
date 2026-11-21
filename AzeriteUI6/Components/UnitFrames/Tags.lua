@@ -122,9 +122,17 @@ oUF.Tags.Methods["azui:shortmana"] = function(unit, realUnit)
 	end
 end
 
+oUF.Tags.Events["azui:away"] = "PLAYER_FLAGS_CHANGED"
+oUF.Tags.Methods["azui:away"] = function(unit, realUnit, ...)
+	local isAFK = UnitIsAFK(realUnit or unit)
+	if (isAFK) then 
+		return " |cff666666<|r|cff888888"..AFK.."|r|cff666666>|r"
+	end
+end
+
 -- Name function that accepts max length
 -- self:Tag(fontString, "[azui:name(maxLength)]")
-oUF.Tags.Events["azui:name"] = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
+oUF.Tags.Events["azui:name"] = "UNIT_NAME_UPDATE"
 oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
 	local name = oUF.Tags.Methods["name"](unit, realUnit)
 	local length = tonumber(getargs(...))
@@ -136,7 +144,7 @@ oUF.Tags.Methods["azui:name"] = function(unit, realUnit, ...)
 end
 
 -- Name function that ignores Forever last names
-oUF.Tags.Events["azui:firstname"] = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
+oUF.Tags.Events["azui:firstname"] = "UNIT_NAME_UPDATE"
 oUF.Tags.Methods["azui:firstname"] = function(unit, realUnit, ...)
 	if (ns.WoWCamelot) then
 		return NameUtil.GetUnitFirstName(realUnit or unit)
