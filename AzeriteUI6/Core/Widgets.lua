@@ -337,14 +337,29 @@ do
 end
 
 -- ModernDropdown
--- Version: 17
+-- Version: 19
 do 
-	local Type, Version = "ModernDropdown", 17
+	local Type, Version = "ModernDropdown", 19
 
 	local BUTTON_HEIGHT = 32
 	local BUTTON_WIDTH  = 220
 	local WIDGET_HEIGHT = 48
-	local LABEL_WIDTH   = 260 -- 160
+	local LABEL_WIDTH   = 260 
+
+	local function FitPullout(pullout)
+		if not pullout or not pullout.frame then return end
+		local count = pullout.items and #pullout.items or 0
+		local content = 8 + count * 16
+		local maxHeight = pullout.maxHeight or 600
+		if pullout.itemFrame then
+			pullout.itemFrame:SetHeight(content)
+		end
+		local frameHeight = math.max(math.min(content + 28, maxHeight), 32)
+		pullout.frame:SetHeight(frameHeight)
+		if pullout.slider and content + 24 < frameHeight then
+			pullout.slider:Hide()
+		end
+	end
 
 	local function ForcePulloutPosition(widget)
 		local pullout = widget.pullout
@@ -515,6 +530,7 @@ do
 					else
 						originalPulloutOpen(self, point, rel, relPoint, x, y)
 					end
+					FitPullout(self)
 				end
 				pullout.modernHooked = true
 			end
@@ -549,11 +565,61 @@ do
 		end
 	end
 
+	local function MultiButtonText(count)
+		if count == 0 then
+			return NONE
+		end
+		return count == 1 and "1 selected" or (count .. " selected")
+	end
+
+	local function StripClose(self)
+		local pullout = self.pullout
+		if not pullout or not pullout.items then return end
+		local items = pullout.items
+		for i = #items, 1, -1 do
+			local item = items[i]
+			if item and item.type == "Dropdown-Item-Execute" then
+				table.remove(items, i)
+				AceGUI:Release(item)
+			end
+		end
+		self.hasClose = true
+	end
+
+	local function SelectedCount(self)
+		local count = 0
+		if not self.pullout or not self.pullout.IterateItems then
+			return 0
+		end
+		for _, item in self.pullout:IterateItems() do
+			if item.type == "Dropdown-Item-Toggle" and item.GetValue and item:GetValue() then
+				count = count + 1
+			end
+		end
+		return count
+	end
+
 	local function Constructor()
 		local widget = AceGUI:Create("Dropdown")
 		widget.type = Type
 
 		ApplyModernDropdown(widget)
+
+		local originalSetList = widget.SetList
+		widget.SetList = function(self, ...)
+			originalSetList(self, ...)
+			if self.multiselect then
+				StripClose(self)
+			end
+		end
+
+		local originalSetMultiselect = widget.SetMultiselect
+		widget.SetMultiselect = function(self, multi)
+			originalSetMultiselect(self, multi)
+			if multi then
+				StripClose(self)
+			end
+		end
 
 		local originalOnAcquire = widget.OnAcquire
 		widget.OnAcquire = function(self)
@@ -573,10 +639,13 @@ do
 			end
 		end
 
-		local originalSetText = widget.SetText
 		widget.SetText = function(self, text)
+			if self.multiselect then
+				text = MultiButtonText(SelectedCount(self))
+			end
 			if originalSetText then originalSetText(self, text) end
 			if self.modernButton then
+				self.modernButton.text:SetWordWrap(false)
 				self.modernButton.text:SetText(text or "")
 			end
 			if self.text then

@@ -98,6 +98,9 @@ local gameSettings = {
 	-- Elements
 	nameplateShowCastBars = 1, 								-- Show cast bars for unit nameplates. (Default 1)
 	nameplateAuraScale = 1, 								-- Controls the size multiplier for buffs and debuffs on nameplates. (Default 1)
+	--nameplateEnemyNpcAuraDisplay
+	--nameplateEnemyPlayerAuraDisplay
+	--nameplateFriendlyPlayerAuraDisplay
 
 	-- Coloring
 	nameplateShowClassColor = 1, 							-- Used to display the class color in enemy nameplate health bars (Default 1)
@@ -118,6 +121,9 @@ local customSettings = {
 --  but the user can choose to restore "addon defaults" in the options menu. 
 local defaults = { profile = {
 	enabled = true,
+	showLevel = true,
+	
+	
 }}
 
 -- Include our CVar listing
@@ -139,6 +145,21 @@ local toboolean = function(a)
 	if (n == 1) then return true
 	elseif (n == 0) then return false
 	else return not not n -- booleanify it
+	end
+end
+
+-- Check a bit (enum values are the bit positions used by GetCVarBitfield)
+local hasbit = function(value, bitfield)
+	return bit.band(value, bit.lshift(1, bitfield - 1)) ~= 0
+end
+
+-- Set or clear a bit
+local setbit = function(value, bitfield, enabled)
+	local mask = bit.lshift(1, bitfield - 1)
+	if enabled then
+		return bit.bor(value, mask)
+	else
+		return bit.band(value, bit.bnot(mask))
 	end
 end
 
@@ -336,6 +357,8 @@ local NamePlate = {
 			self.Name:SetAlpha(1)
 			--self.Name:SetFontObject(self.Name.fontObjectLarge)
 			self.Name:SetScale(scaleMultipler)
+			self.Away:SetScale(scaleMultipler)
+			self.Level:Hide()
 			self.Health:Hide()
 			self.AurasHarmful:Hide()
 			self.AurasHelpful:Hide()
@@ -347,6 +370,8 @@ local NamePlate = {
 			self.Name:SetAlpha(.75)
 			--self.Name:SetFontObject(self.Name.fontObject)
 			self.Name:SetScale(1)
+			self.Away:SetScale(1)
+			self.Level:Show()
 			self.Health:Show()
 			self.AurasHarmful:Show()
 			self.AurasHelpful:Show()
@@ -522,9 +547,38 @@ local style = function(self, unit)
 	name.fontObject = GetFont(11, true)
 	name.fontObjectLarge = GetFont(13, true)
 
-	self:Tag(name, "[name][azui:away]")
+	self:Tag(name, "[name]")
 
 	self.Name = name
+
+	-- AFK
+	local away = overlay:CreateFontString(nil, "OVERLAY")
+	away:SetPoint("LEFT", name, "RIGHT", 0, 0)
+	away:SetFontObject(GetFont(11, true))
+	away:SetTextColor(self.colors.highlight:GetRGB())
+	away:SetAlpha(.75)
+	away:SetJustifyH("CENTER")
+	away:SetJustifyV("MIDDLE")
+	away.fontObject = GetFont(11, true)
+	away.fontObjectLarge = GetFont(13, true)
+
+	self:Tag(away, "[azui:away]")
+
+	self.Away = away
+
+	-- Level
+	local level = overlay:CreateFontString(nil, "OVERLAY")
+	level:SetPoint("RIGHT", name, "LEFT", 4, 0)
+	level:SetFontObject(GetFont(11, true))
+	level:SetAlpha(.75)
+	level:SetJustifyH("CENTER")
+	level:SetJustifyV("MIDDLE")
+	level.fontObject = GetFont(11, true)
+	level.fontObjectLarge = GetFont(13, true)
+
+	self:Tag(level, "[azui:level(true, false, true)]")
+
+	self.Level = level
 
 	-- Target highlight
 	local targetHighlight = overlay:CreateTexture(nil, "BACKGROUND", nil, -2)
@@ -534,17 +588,6 @@ local style = function(self, unit)
 	targetHighlight:SetTexture(GetMedia("nameplate_outline"))
 
 	self.TargetHighlight = targetHighlight
-
-	-- Level (right)
-	-- create backdrop from health backdrop, stitch it together!
-	--local level = health:CreateFontString(nil, "OVERLAY")
-	--level:SetPoint("LEFT", health, "RIGHT", 4, 0)
-	--level:SetFontObject(GetFont(11, true))
-	--level:SetAlpha(.85)
-	--level:SetJustifyH("CENTER")
-	--level:SetJustifyV("MIDDLE")
-
-	--self:Tag(level, "[azui:level]")
 
 	local raidTarget = self:CreateTexture(nil, "OVERLAY", nil, 1)
 	raidTarget:SetSize(48, 48)
@@ -790,6 +833,8 @@ NamePlates.GetOptions = function(self)
 				confirm = not (ns.WoWCamelot or ns.WoWMainline) and true or nil,
 				order = 1
 			},
+
+			-- plate visibility
 			nameplateShowEnemies = {
 				type = "toggle", width = "full",
 				name = "Show Enemy Unit Nameplates",
@@ -883,9 +928,6 @@ NamePlates.GetOptions = function(self)
 				end,
 				order = 202,
 			},
-
-
-
 			nameplateShowFriendlyPlayerMinions = {
 				type = "toggle", width = "full", 
 				name = "Show Friendly Player Minions",
@@ -980,10 +1022,107 @@ NamePlates.GetOptions = function(self)
 				order = 302,
 			},
 
-			
-		
+			-- auras
+			nameplateEnemyNpcAuraDisplay = {
+				type = "multiselect", style = "dropdown", width = "full",
+				name = "Enemy NPC Auras",
+				desc = "",
+				values = {
+					help = "Mob Buffs",
+					harm = "Personal Debuffs",
+					cc = "Shared CC"
+				},
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info, key, value) 
+					if (key == "help") then 		return C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs)
+					elseif (key == "harm") then 	return C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs)
+					elseif (key == "cc") then 		return C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl)
+					end
+				end, 
+				set = function(info, key, value) 
+					if (InCombatLockdown()) then return end
+					if (key == "help") then 		C_CVar.SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs, value)
+					elseif (key == "harm") then 	C_CVar.SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs, value)
+					elseif (key == "cc") then 		C_CVar.SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl, value)
+					end
+				end,
+				order = 501,
+			},
+			nameplateEnemyPlayerAuraDisplay = {
+				type = "multiselect", style = "dropdown", width = "full",
+				name = "Enemy Player Auras",
+				desc = "",
+				values = {
+					help = "Mob Buffs",
+					harm = "Personal Debuffs",
+					cc = "Shared CC"
+				},
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info, key, value) 
+					if (key == "help") then 		return C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs)
+					elseif (key == "harm") then 	return C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs)
+					elseif (key == "cc") then 		return C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.LossOfControl)
+					end
+				end, 
+				set = function(info, key, value) 
+					if (InCombatLockdown()) then return end
+					if (key == "help") then 		C_CVar.SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs, value)
+					elseif (key == "harm") then 	C_CVar.SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs, value)
+					elseif (key == "cc") then 		C_CVar.SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.LossOfControl, value)
+					end
+				end,
+				order = 502,
+			},
+			nameplateFriendlyPlayerAuraDisplay = {
+				type = "multiselect", style = "dropdown", width = "full",
+				name = "Friendly Player Auras",
+				desc = "",
+				values = {
+					help = "Mob Buffs",
+					harm = "Personal Debuffs",
+					cc = "Shared CC"
+				},
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info, key, value) 
+					if (key == "help") then 		return C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs)
+					elseif (key == "harm") then 	return C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs)
+					elseif (key == "cc") then 		return C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.LossOfControl)
+					end
+				end, 
+				set = function(info, key, value) 
+					if (InCombatLockdown()) then return end
+					if (key == "help") then 		C_CVar.SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs, value)
+					elseif (key == "harm") then 	C_CVar.SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs, value)
+					elseif (key == "cc") then 		C_CVar.SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.LossOfControl, value)
+					end
+				end,
+				order = 503,
+			},
 
-			
+			--[[
+			-- cvars
+			nameplateEnemyNpcAuraDisplay
+			nameplateEnemyPlayerAuraDisplay
+			nameplateFriendlyPlayerAuraDisplay
+
+			-- bitfield enums
+			Enum.NamePlateEnemyNpcAuraDisplay.Buffs
+			Enum.NamePlateEnemyNpcAuraDisplay.Debuffs
+			Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl
+
+			Enum.NamePlateEnemyPlayerAuraDisplay.Buffs
+			Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs
+			Enum.NamePlateEnemyPlayerAuraDisplay.CrowdControl
+
+			Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs
+			Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs
+			Enum.NamePlateFriendlyPlayerAuraDisplay.CrowdControl
+			--]]
+
+			-- element scales
 			nameplateShowOnlyNameScaleMultipler = {
 				type = "range", width = "full", min = 1, max = 1.6, step = .1,
 				name = "Name scale when only showing name.",
@@ -998,9 +1137,8 @@ NamePlates.GetOptions = function(self)
 					self.db.profile.nameplateShowOnlyNameScaleMultipler = tonumber(value) or self.db.profile.nameplateShowOnlyNameScaleMultipler
 					self:UpdateAllElements()
 				end,
-				order = 800,
+				order = 1100,
 			},
-
 			nameplateSize = {
 				type = "range", width = "full", min = Enum.NamePlateSize.Small, max = Enum.NamePlateSize.Huge, step = 1, bigStep = 1,
 				name = "General Size", -- UNIT_NAMEPLATES_GLOBAL_SCALE, "Size"
@@ -1083,7 +1221,7 @@ NamePlates.GetOptions = function(self)
 				order = 2000,
 			},
 
-
+			-- profiling
 			resetToGameDefaults = {
 				type = "execute", width = "1.3",
 				name = L["Game Defaults"],
@@ -1102,16 +1240,6 @@ NamePlates.GetOptions = function(self)
 				func = function(info) NamePlates:RestoreDefaults() end,
 				order = 100003
 			},
-
-			--[[--
-
-			- general settings (color, elements, etc)
-
-			- target nameplate specific settings
-			- other plates specific settings when having a target 
-			- all plates specific settings when not having a target
-
-			--]]--
 		}
 	}
 end

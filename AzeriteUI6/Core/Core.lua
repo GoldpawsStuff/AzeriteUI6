@@ -127,7 +127,7 @@ local function ApplyModernControls(tbl)
 			end
 		elseif (tbl.type == "range") then
 			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernSlider" or nil
-		elseif (tbl.type == "select") then
+		elseif (tbl.type == "select" or tbl.type == "multiselect") then
 			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernDropdown" or nil
 		elseif (tbl.type == "execute") then
 			tbl.dialogControl = (ns.WoWMainline or ns.WoWCamelot) and "ModernButton" or nil

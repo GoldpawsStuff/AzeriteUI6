@@ -151,8 +151,13 @@ oUF.Tags.Events["azui:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_
 oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 	local level = UnitEffectiveLevel(realUnit or unit)
 	if (level and level > 0) then
+
 		local color = GetDifficultyColorForUnit(unit)
 		local levelText = color:GenerateHexColorMarkup() .. level .. "|r"
+
+		if (UnitLevel("player") >= GetMaxPlayerLevel() and UnitLevel(unit) >= GetMaxPlayerLevel()) then
+			return ""
+		end
 
 		local isPrefix, isSuffix, noBrackets = getargs(...)
 		if (isPrefix) then
@@ -167,11 +172,14 @@ oUF.Tags.Methods["azui:level"] = function(unit, realUnit, ...)
 			else
 				return " |cff666666[|r" .. levelText .. "|cff666666]|r"
 			end
+		else
+			if (noBrackets) then
+				return levelText
+			else
+				return " |cff666666[|r" .. levelText .. "|cff666666]|r"
+			end
 		end
-
-		return levelText
 	else
-		-- For bosses
-		return ""
+		return "" -- For bosses and very high levels
 	end
 end
