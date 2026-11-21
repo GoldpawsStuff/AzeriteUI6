@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased][1.0.36-Alpha] 2026-11-21
+- More options menu work.
+
 ## [1.0.35-Release] 2026-11-21
 ### Added
 - Made the options menu a lot more modern in Forever/Retail.
