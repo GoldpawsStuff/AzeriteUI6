@@ -851,8 +851,8 @@ end
 NamePlates.GetOptions = function(self)
 	return {
 		type = "group",
-		name = "Nameplate Unit Frames", --L["Unit Frame: Name Plates"],
-		arg = { menuName = "Nameplates" --[[ L["UF: Name Plates"] ]] },
+		name = L["Nameplate Unit Frames"],
+		arg = { menuName = L["Nameplates"] },
 		order = 300,
 		args = {
 			enable = {

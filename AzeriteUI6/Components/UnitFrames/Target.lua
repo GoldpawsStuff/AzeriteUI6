@@ -1013,15 +1013,10 @@ end
 Target.GetOptions = function(self)
 	return {
 		type = "group",
-		name = "Target Unit Frame", -- L["Unit Frame: Target"], 
-		arg = { menuName = "Target" --[[ L["UF: Target"] ]] },
+		name = L["Target Unit Frame"],
+		arg = { menuName = L["Target"] },
 		order = 220,
 		args = {
-			--important_message = {
-			--	type = "description", fontSize = "medium",
-			--	name = "The Target Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
-			--	order = 1
-			--},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],

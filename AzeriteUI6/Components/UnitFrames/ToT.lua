@@ -203,15 +203,10 @@ end
 ToT.GetOptions = function(self)
 	return {
 		type = "group",
-		name = "Target's Target Unit Frame", -- L["Unit Frame: Target of Target"],
-		arg = { menuName = "Target's Target" --[[ L["UF: Target's Target"] ]] },
+		name = L["Target's Target Unit Frame"],
+		arg = { menuName = L["Target's Target"] },
 		order = 225,
 		args = {
-			--important_message = {
-			--	type = "description", fontSize = "medium",
-			--	name = "The Target of Target Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
-			--	order = 1
-			--},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],

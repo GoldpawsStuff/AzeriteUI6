@@ -46,14 +46,9 @@ PlayerAuras.GetOptions = function(self)
 		arg = { menuName = L["Buffs & Debuffs"] },
 		order = 500,
 		args = {
-			--important_message = {
-			--	type = "description", fontSize = "medium",
-			--	name = "The Player Aura frames are currently under construction.|nCheck back later to see if they're finished!|n|nIf you wish to see the default Buff & Debuff frames until that point in time, just uncheck the 'Enable' checkbutton below and see it done!|n ",
-			--	order = 1
-			--},
 			enable = {
 				type = "toggle", width = "full",
-				name = "Disable Default Auras", -- L["Enable"],
+				name = L["Disable Default Auras"], -- L["Enable"],
 				desc = "", -- L["Toggle the usage of our Buff & Debuff Frames. Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,

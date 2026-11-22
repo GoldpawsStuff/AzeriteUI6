@@ -818,15 +818,10 @@ end
 Player.GetOptions = function(self)
 	return {
 		type = "group",
-		name = "Player Unit Frame", -- L["Unit Frame: Player"],
-		arg = { menuName = "Player" --[[ L["UF: Player"] ]] },
+		name = L["Player Unit Frame"],
+		arg = { menuName = L["Player"] },
 		order = 200,
 		args = {
-			--important_message = {
-			--	type = "description", fontSize = "medium",
-			--	name = "The Player Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
-			--	order = 1
-			--},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
