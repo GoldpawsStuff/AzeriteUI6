@@ -503,15 +503,15 @@ end
 ClassPower.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Unit Frame: Player Class Power"],
-		arg = { menuName = L["UF: Class Power"] },
+		name = (ns.WoWVanilla or ns.WoWCamelot) and "Combo Points" or "Class Power", -- L["Unit Frame: Player Class Power"],
+		arg = { menuName = (ns.WoWVanilla or ns.WoWCamelot) and "Combo Points" or "Class Power" --[[ L["UF: Class Power"] ]] },
 		order = 235,
 		args = {
-			important_message = {
-				type = "description", fontSize = "medium",
-				name = "The Player Class Power options are currently under construction.|nCheck back later to see if they're finished!|n ",
-				order = 1
-			},
+			--important_message = {
+			--	type = "description", fontSize = "medium",
+			--	name = "The Player Class Power options are currently under construction.|nCheck back later to see if they're finished!|n ",
+			--	order = 1
+			--},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],

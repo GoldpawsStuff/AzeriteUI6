@@ -203,7 +203,7 @@ ExplorerMode.GetOptions = function(self)
 			},
 			fadePlayerClassPower = {
 				type = "toggle", width = "full",
-				name = L["Unit Frame: Player Class Power"],
+				name = (ns.WoWVanilla or ns.WoWCamelot) and L["Unit Frame: Player Combo Points"] or L["Unit Frame: Player Class Power"],
 				desc = L["Fade out the Player Class Power Frame."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,

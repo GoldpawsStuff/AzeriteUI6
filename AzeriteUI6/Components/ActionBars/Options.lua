@@ -126,10 +126,10 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 		numButtons = NUM_ACTIONBAR_BUTTONS or 12
 
 		if (numBar == 1) then
-			menuName = L["AB: Primary"] 
+			menuName = "Action Bar "..barID -- L["AB: Primary"] 
 			title = L["Primary Action Bar"]
 		else
-			menuName = string.format(L["AB: Multi Bar %d"], numBar - 1)
+			menuName = "Action Bar "..barID -- string.format(L["AB: Multi Bar %d"], numBar - 1)
 			title = string.format(L["Multi Action Bar %d"], numBar - 1)
 		end
 
@@ -138,7 +138,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 		name = "Pet Bar"
 		numButtons = NUM_PET_ACTION_SLOTS or 10
 
-		menuName = L["AB: Pet Bar"]
+		menuName = "Pet Action Bar" --L["AB: Pet Bar"]
 		title = L["Pet Action Bar"]
 
 
@@ -147,7 +147,7 @@ ns.GenerateActionBarOptionsByBarID = function(barID)
 		name = "Stance Bar"
 		numButtons = GetNumShapeshiftForms() or 10 
 
-		menuName = L["AB: Stance Bar"]
+		menuName = "Stance Action Bar" -- L["AB: Stance Bar"]
 		title = L["Stance Bar"]
 
 	end

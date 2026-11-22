@@ -116,6 +116,7 @@ L["Unit Frame: Focus"] = true
 L["Unit Frame: Name Plates"] = true
 L["Unit Frame: Player"] = true
 L["Unit Frame: Player Class Power"] = true
+L["Unit Frame: Player Combo Points"] = true
 L["Unit Frame: Player's Pet"] = true
 L["Unit Frame: Target"] = true
 L["Unit Frame: Target of Target"] = true

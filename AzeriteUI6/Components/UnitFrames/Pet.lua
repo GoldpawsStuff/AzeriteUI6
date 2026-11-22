@@ -146,15 +146,15 @@ end
 Pet.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Unit Frame: Player's Pet"],
-		arg = { menuName = L["UF: Pet"] },
+		name = "Player's Pet Unit Frame", -- L["Unit Frame: Player's Pet"],
+		arg = { menuName = "Player's Pet" --[[ L["UF: Pet"] ]] },
 		order = 210,
 		args = {
-			important_message = {
-				type = "description", fontSize = "medium",
-				name = "The Pet Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
-				order = 1
-			},
+			--important_message = {
+			--	type = "description", fontSize = "medium",
+			--	name = "The Pet Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
+			--	order = 1
+			--},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],

@@ -176,15 +176,15 @@ end
 Focus.GetOptions = function(self)
 	return {
 		type = "group",
-		name = L["Unit Frame: Focus"],
-		arg = { menuName = L["UF: Focus"] },
+		name = "Focus Target Unit Frame", -- L["Unit Frame: Focus"],
+		arg = { menuName = "Focus Target" --[[ L["UF: Focus"] ]] },
 		order = 230,
 		args = {
-			important_message = {
-				type = "description", fontSize = "medium",
-				name = "The Focus Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
-				order = 1
-			},
+			--important_message = {
+			--	type = "description", fontSize = "medium",
+			--	name = "The Focus Unit Frame options are currently under construction.|nCheck back later to see if they're finished!|n ",
+			--	order = 1
+			--},
 			enable = {
 				type = "toggle", width = "full",
 				name = L["Enable"],
