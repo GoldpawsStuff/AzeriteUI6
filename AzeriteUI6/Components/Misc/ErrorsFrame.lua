@@ -211,10 +211,9 @@ ErrorsFrame.OnEvent = function(self, event, ...)
 			message = messageType
 			messageType = nil
 		end
-		message = msg
 
 		if (not message or message == "") then return end
-		if (tryFlashExisting(self.ErrorsFram, message)) then return end
+		if (tryFlashExisting(self.ErrorsFrame, message)) then return end
 
 		self.ErrorsFrame:AddMessage(message, 1, .1, .1, 1)
 
