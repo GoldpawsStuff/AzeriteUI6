@@ -145,7 +145,7 @@ end
 ErrorsFrame.GetOptions = function(self)
 	return {
 		type = "group",
-		name = "UI Error Messages",
+		name = "System Message Frames",
 		arg = { menuName = "Error Messages" },
 		order = 8000,
 		args = {
@@ -163,9 +163,9 @@ ErrorsFrame.GetOptions = function(self)
 			--	order = 1
 			--},
 			maxLines = {
-				type = "range", width = "full", min = 1, max = 3, step = 1,
-				name = "Number of visible message lines",
-				desc = "Sets the number of visible lines at once.",
+				type = "range", width = "double", min = 1, max = 3, step = 1,
+				name = "Number of visible error message lines",
+				desc = "Sets the number of visible error message lines at once. Error messages are the red messages below your character informing you that you have too little mana, rage, energy, facing the wrong direction, being too far away and similar.",
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return self.db.profile.maxLines end,
@@ -175,6 +175,20 @@ ErrorsFrame.GetOptions = function(self)
 					self:UpdateSettings()
 				end,
 				order = 100
+			},
+			maxLinesSysMsg = {
+				type = "range", width = "double", min = 1, max = 3, step = 1,
+				name = "Number of visible system message lines",
+				desc = "Sets the number of visible system message lines at once. System messages are the yellow messages on top of your screen informing you of completed quest objectives and similar.",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.maxLinesSysMsg end,
+				set = function(info,val)
+					if InCombatLockdown() then return end
+					self.db.profile.maxLinesSysMsg = tonumber(val)
+					self:UpdateSettings()
+				end,
+				order = 200
 			}
 		}
 	}
