@@ -198,9 +198,9 @@ end
 ErrorsFrame.OnEvent = function(self, event, ...)
 	if (event == "SYSMSG") then
 		local message, r, g, b = ...
-		if (not message or message == "") then return end
 
-		--if (tryFlashExisting(message)) then return end
+		if (not message or message == "") then return end
+		if (tryFlashExisting(self.SysMsgFrame, message)) then return end
 
 		self.SysMsgFrame:AddMessage(message, r or 1, g or 1, b or 1, 1)
 
@@ -214,7 +214,7 @@ ErrorsFrame.OnEvent = function(self, event, ...)
 		message = msg
 
 		if (not message or message == "") then return end
-		if (tryFlashExisting(message)) then return end
+		if (tryFlashExisting(self.ErrorsFram, message)) then return end
 
 		self.ErrorsFrame:AddMessage(message, 1, .1, .1, 1)
 
@@ -226,7 +226,8 @@ ErrorsFrame.OnEvent = function(self, event, ...)
 		end
 	
 		if (not message or message == "") then return end
-		
+		if (tryFlashExisting(self.SysMsgFrame, message)) then return end
+
 		self.SysMsgFrame:AddMessage(message, 1, 1, 0, 1)
 	end
 end
