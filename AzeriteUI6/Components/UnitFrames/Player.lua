@@ -403,6 +403,11 @@ local Power_UpdateColor = function(self, event, unit)
 	end
 end
 
+local UnitFrame_PostUpdate = function(self, event, unit, ...)
+	self.Power:ForceUpdate()
+	self.AdditionalPower:ForceUpdate()
+end
+
 local UnitFrame_OnEvent = function(self, event, unit, ...)
 	if (event == "PLAYER_ENTERING_WORLD") then
 		playerIsRetribution = playerClass == "PALADIN" and C_SpecializationInfo.GetSpecialization() == SPEC_PALADIN_RETRIBUTION
@@ -416,8 +421,7 @@ local UnitFrame_OnEvent = function(self, event, unit, ...)
 	end
 
 	-- Primarily needed to update orb/crystal visibilities
-	self.Power:ForceUpdate()
-	self.AdditionalPower:ForceUpdate()
+	UnitFrame_PostUpdate(self, event, unit, ...)
 end
 
 local style = function(self, unit)
@@ -800,6 +804,9 @@ local style = function(self, unit)
 		self.Auras.SetGroupIndex = Auras_SetGroupIndex
 	end
 
+	-- General post update
+	self.PostUpdate = UnitFrame_PostUpdate
+
 	-- Callbacks
 	--------------------------------------------
 	self:RegisterEvent("PLAYER_ALIVE", UnitFrame_OnEvent, true)
@@ -835,6 +842,35 @@ Player.GetOptions = function(self)
 				end,
 				order = 2
 			},
+			alwaysUseCrystal = {
+				type = "toggle", width = "full",
+				name = "Always use the Power Crystal",
+				desc = "Always use the Power Crystal to display your current Power, never enable the Mana Orb.",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.alwaysUseCrystal end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.alwaysUseCrystal = val 
+					self:UpdateSettings()
+				end,
+				order = 100
+			},
+			useIceCrystal = {
+				type = "toggle", width = "full",
+				name = "Use the Ice Crystal",
+				desc = "Enables the usage of the Ice Crystal for all Power Types, not just the \"slow\" types that start at zero and generates during combat.",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.useIceCrystal end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.useIceCrystal = val 
+					self:UpdateSettings()
+				end,
+				order = 101
+			},
+			
 		}
 	}
 end
@@ -861,6 +897,17 @@ Player.UpdateSettings = function(self)
 			frame:Disable()
 		end
 	end
+
+	if (self.db.profile.alwaysUseCrystal) then
+		self.frame:PostUpdate()
+	else
+		self.frame:PostUpdate()
+	end
+
+	if (self.db.profile.useIceCrystal) then
+	else
+	end
+
 end
 
 -- This is called by the addon on full profile changes,
