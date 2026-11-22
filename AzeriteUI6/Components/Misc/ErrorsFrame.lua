@@ -25,15 +25,24 @@
 --]]
 local _, ns = ...
 
-local ErrorsFrame = ns:NewModule("ErrorsFrame", nil, "LibMoreEvents-1.0")
+local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
-local FLASH_DURATION = 0.2
-local FLASH_STRENGTH = 0.4
+local ErrorsFrame = ns:NewModule("ErrorsFrame", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0")
+
+local FLASH_DURATION = .2
+local FLASH_STRENGTH = .4
 
 local flashing = {}
 
-local getTopFontString = function()
-	local regions = { UIErrorsFrame:GetRegions() }
+-- Declare module defaults
+local defaults = { profile = {
+	enabled = true,
+	maxLines = 1,
+	maxLinesSysMsg = 3,
+}}
+
+local getTopFontString = function(frame)
+	local regions = { frame:GetRegions() }
 	for i = #regions, 1, -1 do
 		local region = regions[i]
 		if (region and region:IsObjectType("FontString") and region:IsShown() and region:GetText()) then
@@ -70,7 +79,7 @@ local onFlashUpdate = function(self)
 	end
 end
 
-local flashFontString = function(fontString)
+local flashFontString = function(frame, fontString)
 	if (not fontString) then return end
 
 	local r, g, b = fontString:GetTextColor()
@@ -83,30 +92,107 @@ local flashFontString = function(fontString)
 		originalB = b
 	}
 
-	if (not UIErrorsFrame:GetScript("OnUpdate")) then
-		UIErrorsFrame:SetScript("OnUpdate", onFlashUpdate)
+	if (not frame:GetScript("OnUpdate")) then
+		frame:SetScript("OnUpdate", onFlashUpdate)
 	end
 end
 
-local tryFlashExisting = function(message)
+local tryFlashExisting = function(frame, message)
 	if (not message or message == "") then return end
 
-	local top = getTopFontString()
+	local top = getTopFontString(frame)
 	if (top and top:GetText() == message) then
-		flashFontString(top)
+		flashFontString(frame, top)
 		return true
 	end
+
+	return false
 end
 
-local hookedAddMessage = function(self, message, r, g, b, a, messageType)
-	if (tryFlashExisting(message)) then
+local addMessage = function(frame, message, r, g, b, a, messageType)
+	if (tryFlashExisting(frame, message)) then
 		return
 	end
 
 	-- fall through to original
-	if (ErrorsFrame.originalAddMessage) then
-		ErrorsFrame.originalAddMessage(self, message, r, g, b, a, messageType)
+	if (frame.__AddMessage) then
+		frame.__AddMessage(frame, message, r, g, b, a, messageType)
 	end
+end
+
+ErrorsFrame.SetMaxLines = function(self, maxLines)
+	maxLines = maxLines or defaults.profile.maxLines
+
+	local _, fontHeight = self.ErrorsFrame:GetFont()
+	local lineHeight = fontHeight or 16
+
+	self.ErrorsFrame:SetHeight(lineHeight * maxLines + 6)
+end
+
+ErrorsFrame.SetMaxSysLines = function(self, maxLines)
+	maxLines = maxLines or defaults.profile.maxLines
+
+	local _, fontHeight = UIErrorsFrame:GetFont()
+	local lineHeight = fontHeight or 16
+
+	UIErrorsFrame:SetHeight(lineHeight * maxLines + 6)
+end
+
+ErrorsFrame.GetDefaults = function(self)
+	return defaults
+end
+
+ErrorsFrame.GetOptions = function(self)
+	return {
+		type = "group",
+		name = "UI Error Messages",
+		arg = { menuName = "Error Messages" },
+		order = 8000,
+		args = {
+			--enable = {
+			--	type = "toggle", width = "full",
+			--	name = L["Enable"],
+			--	desc = "Toggle the usage of the UIErrorsFrame.",
+			--	disabled = function() return InCombatLockdown() end,
+			--	get = function(info) return self.db.profile.enabled end,
+			--	set = function(info, val) 
+			--		if InCombatLockdown() then return end
+			--		self.db.profile.enabled = val 
+			--		self:UpdateSettings()
+			--	end,
+			--	order = 1
+			--},
+			maxLines = {
+				type = "range", width = "full", min = 1, max = 3, step = 1,
+				name = "Number of visible message lines",
+				desc = "Sets the number of visible lines at once.",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.maxLines end,
+				set = function(info,val)
+					if InCombatLockdown() then return end
+					self.db.profile.maxLines = tonumber(val)
+					self:UpdateSettings()
+				end,
+				order = 100
+			}
+		}
+	}
+end
+
+ErrorsFrame.ResetToGameDefaults = function(self)
+	self:SetMaxLines(3)
+
+	self.SysMsgFrame:ClearAllPoints()
+	self.SysMsgFrame:SetPoint("TOP", 0, -122)
+end
+
+ErrorsFrame.ResetToDefaults = function(self)
+	self:SetMaxLines(self.db.profile.maxLines)
+
+	self.SysMsgFrame:ClearAllPoints()
+	self.SysMsgFrame:SetPoint("CENTER", 0, -180)
+
 end
 
 ErrorsFrame.OnEvent = function(self, event, ...)
@@ -114,45 +200,100 @@ ErrorsFrame.OnEvent = function(self, event, ...)
 		local message, r, g, b = ...
 		if (not message or message == "") then return end
 
+		--if (tryFlashExisting(message)) then return end
+
+		self.SysMsgFrame:AddMessage(message, r or 1, g or 1, b or 1, 1)
+
+	elseif (event == "UI_ERROR_MESSAGE") then
+
+		local messageType, message = ...
+		if (type(messageType) == "string") then
+			message = messageType
+			messageType = nil
+		end
+		message = msg
+
+		if (not message or message == "") then return end
 		if (tryFlashExisting(message)) then return end
 
-		UIErrorsFrame:AddMessage(message, r or 1, g or 1, b or 1, 1)
+		self.ErrorsFrame:AddMessage(message, 1, .1, .1, 1)
 
-		return
+	elseif (event == "UI_INFO_MESSAGE") then 
+		local messageType, message = ...
+		if (type(messageType) == "string") then
+			message = messageType
+			messageType = nil
+		end
+	
+		if (not message or message == "") then return end
+		
+		self.SysMsgFrame:AddMessage(message, 1, 1, 0, 1)
 	end
+end
 
-	-- UI_ERROR_MESSAGE / UI_INFO_MESSAGE
-	local messageType, message = ...
-	if (type(messageType) == "string") then
-		message = messageType
-		messageType = nil
-	end
+-- This is called by the options menu on settings changes,
+-- and by the modules themselves on enabling.
+ErrorsFrame.UpdateSettings = function(self)
+	self.SysMsgFrame:SetShown(self.db.profile.enabled)
+	self:SetMaxLines(self.db.profile.maxLines)
+end
 
-	if (not message or message == "") then return end
+-- This is called by the addon on full profile changes,
+-- and should call a full settings update.
+ErrorsFrame.RefreshConfig = function(self)
+	self:UpdateSettings()
+end
 
-	if (tryFlashExisting(message)) then return end
+ErrorsFrame.OnInitialize = function(self)
+	self.db = ns.db:RegisterNamespace("ErrorsFrame", defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
-	local r, g, b = 1, .1, .1
-	if (event == "UI_INFO_MESSAGE") then
-		r, g, b = 1, 1, 0
-	end
-
-	UIErrorsFrame:AddMessage(message, r, g, b, 1)
 end
 
 ErrorsFrame.OnEnable = function(self)
 
-	UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE")
-	UIErrorsFrame:UnregisterEvent("UI_INFO_MESSAGE")
-	UIErrorsFrame:UnregisterEvent("SYSMSG")
+	-- Remove only the spammy error event from the original frame.
+	-- SYSMSG and UI_INFO_MESSAGE stay on it so other addons keep working.
+	self.SysMsgFrame = UIErrorsFrame
+	self.SysMsgFrame:UnregisterEvent("UI_ERROR_MESSAGE")
+	self.SysMsgFrame:UnregisterEvent("UI_INFO_MESSAGE")
+	self.SysMsgFrame:UnregisterEvent("SYSMSG")
+
+	self.SysMsgFrame:SetMovable(true) -- needed for the next line
+	self.SysMsgFrame:SetUserPlaced(false) -- disable saving in the on-disk frame cache, it messes with our system
+	self.SysMsgFrame:SetMovable(false) -- disable it to prevent the cache from popping back up
+
+	self.SysMsgFrame:ClearAllPoints()
+	self.SysMsgFrame:SetPoint("TOP", 0, -122)
+
+	-- Our dedicated error frame
+	self.ErrorsFrame = CreateFrame("MessageFrame", "AZUI6_ErrorFrame", UIParent)
+	self.ErrorsFrame:SetSize(512, 22) -- single line by default
+	self.ErrorsFrame:SetPoint("CENTER", 0, -180)
+	self.ErrorsFrame:SetInsertMode("TOP")
+	self.ErrorsFrame:SetTimeVisible(2)
+	self.ErrorsFrame:SetFadeDuration(.5)
+	self.ErrorsFrame:SetFadePower(3)
+	self.ErrorsFrame:SetFontObject(self.SysMsgFrame:GetFontObject())
+	self.ErrorsFrame:SetJustifyH("CENTER")
+	self.ErrorsFrame:SetFrameStrata("DIALOG")
+	self.ErrorsFrame:SetFrameLevel(1)
+
+	self.SysMsgFrame.__AddMessage = self.SysMsgFrame.AddMessage
+	self.SysMsgFrame.AddMessage = addMessage
+
+	self.ErrorsFrame.__AddMessage = self.ErrorsFrame.AddMessage
+	self.ErrorsFrame.AddMessage = addMessage
+
+	self:SetMaxLines(self.db.profile.maxLines)
+	self:RegisterMovableFrameAnchor(self.SysMsgFrame, "info frame", "floater", AzeriteUI6_Positions_DB)
+	self:RegisterMovableFrameAnchor(self.ErrorsFrame, "error frame", "floater", AzeriteUI6_Positions_DB)
 
 	self:RegisterEvent("UI_ERROR_MESSAGE", "OnEvent")
 	self:RegisterEvent("UI_INFO_MESSAGE", "OnEvent")
 	self:RegisterEvent("SYSMSG", "OnEvent")
 
-	-- Hook AddMessage as a safety net for any direct calls
-	if (not self.originalAddMessage) then
-		self.originalAddMessage = UIErrorsFrame.AddMessage
-		UIErrorsFrame.AddMessage = hookedAddMessage
-	end
 end
+

@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibMovableFrames-1.0"
-local MINOR_VERSION = 2
+local MINOR_VERSION = 3
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")
@@ -106,15 +106,27 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 	local x, y = frame:GetCenter(); x = x * frameScale; y = y * frameScale
 	local point, offsetX, offsetY -- for the return values
 
+	-- horizontal dividers
+	local topLeftDivider = 1/3
+	local topRightDivider = 2/3
+	local bottomLeftDivider = 1/3
+	local bottomRightDivider = 2/3
+	local leftDivider = 1/4
+	local rightDivider = 3/4
+
+	-- vertical dividers
+	local topDivider = 3/4
+	local bottomDivider = 1/4 -- 1/3 
+
 	-- Top Row
-	if (y > uiHeight * 3/4) then
+	if (y > uiHeight * topDivider) then
 
 		-- Top Left
-		if (x < uiWidth * 1/3) then
+		if (x < uiWidth * topLeftDivider) then
 			point, offsetX, offsetY = "TOPLEFT", left, -top
 
 		-- Top Right
-		elseif (x > uiWidth * 2/3) then
+		elseif (x > uiWidth * topRightDivider) then
 			point, offsetX, offsetY = "TOPRIGHT", -right, -top
 
 		-- Top Center
@@ -125,10 +137,10 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 	-- Mid & Bottom Segments
 	else
 		-- Mid to Bottom Left Columns
-		if (x < uiWidth * 1/4) then
+		if (x < uiWidth * leftDivider) then
 
 			-- Mid Left
-			if (y > uiHeight * 1/3) then
+			if (y > uiHeight * bottomDivider) then
 				point, offsetX, offsetY = "LEFT", left, (y - uiHeight/2)
 
 			-- Bottom Left
@@ -137,10 +149,10 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 			end
 
 		-- Mid to Bottom Right Columns
-		elseif (x > uiWidth * 3/4) then
+		elseif (x > uiWidth * rightDivider) then
 
 			-- Mid Right
-			if (y > uiHeight * 1/3) then
+			if (y > uiHeight * bottomDivider) then
 				point, offsetX, offsetY = "RIGHT", -right, (y - uiHeight/2)
 
 			-- Bottom Right
@@ -151,17 +163,18 @@ local GetNormalizedCoords = function(frame, normalizeToUIParent)
 		-- Mid and Bottom Center Columns
 		else
 			-- Center
-			if (y > uiHeight * 1/3) then
-				point, offsetX, offsetY = "CENTER", (x - uiWidth/2), (y - uiHeight/2)
+			if (y > uiHeight * bottomDivider) then
+				--point, offsetX, offsetY = "CENTER", (x - uiWidth/2), (y - uiHeight/2) -- this feels off. what is wrong?
+				point, offsetX, offsetY = "CENTER", (x - uiWidth/2), (y - uiHeight/2) -- this feels off. what is wrong?
 
 			-- Bottom Center Segment
 			else
 				-- Bottom Left
-				if (x < uiWidth * 1/3) then
+				if (x < uiWidth * bottomLeftDivider) then
 					point, offsetX, offsetY = "BOTTOMLEFT", left, bottom
 
 				-- Bottom Right
-				elseif (x > uiWidth * 2/3) then
+				elseif (x > uiWidth * bottomRightDivider) then
 					point, offsetX, offsetY = "BOTTOMRIGHT", -right, bottom
 
 				-- Bottom Center

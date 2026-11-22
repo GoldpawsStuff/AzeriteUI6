@@ -381,7 +381,7 @@ ExplorerMode.CheckHealth = function(self)
 
 	-- Compare to when previous call occurred
 	local now = GetTime()
-	if ((now - self.lastHealthEvent) > 2.1) then 
+	if ((now - self.lastHealthEvent) > 5.1) then -- ticks are ≈ 2 secs, but some debuffs can make the  ticks so small they client skips the event.
 	
 		-- if it's been more than two seconds since the last health event, 
 		-- assume the health is no longer moving and we're not "safe".
