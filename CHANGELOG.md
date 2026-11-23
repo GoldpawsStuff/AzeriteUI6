@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Cleaned up the options menu a bit.
 
 ### Removed
-- Moved the red error messages out of the `UIErrorsFrame`.
+- Moved the red error messages out of the `UIErrorsFrame` and into an error display of its own. This is optional and can be toggled back to standard settings in the `/az` menu.
 
 ## [1.0.36-Release] 2026-11-21
 ### Added
