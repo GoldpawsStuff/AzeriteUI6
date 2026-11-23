@@ -6,13 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][1.0.39-Alpha] 2026-11-23
 ### Added
-- Added a custom red error message display below your character. This display is just like the regular error display, except it ONLY shows error messages, not quest objectives. The quest objectives and other system messages remain in the standard message frame.
+- Added a custom red error message display below your character. This display is just like the regular error display, except it ONLY shows error messages, not quest objectives. This frame by default only shows one single message at a time, but you can choose from 1-3 in the options menu. The quest objectives and other system messages remain in the standard message frame.
 
 ### Changed
 - Cleaned up the options menu a bit.
-
-### Removed
-- Moved the red error messages out of the `UIErrorsFrame` and into an error display of its own. This is optional and can be toggled back to standard settings in the `/az` menu.
+- The the red error messages in the `UIErrorsFrame` are now optional. The idea is to leave this frame as a system message / quest objective frame only, and move the error messages to our new message frame. Also added a the option to choose how many lines of messages are visible from 1-3.
 
 ## [1.0.36-Release] 2026-11-21
 ### Added
