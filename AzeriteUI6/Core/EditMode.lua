@@ -162,7 +162,7 @@ EditModePreset.ApplySystemSettings = function(self, target)
 
 	-- Loss of Control
 	local loc = self:GetSystem(target.systems, Enum.EditModeSystem.LossOfControl)
-	self:SetSystemAnchor(loc, "TOP", "TOP", 0, -220)
+	self:SetSystemAnchor(loc, "BOTTOM", "BOTTOM", 0, 240) 
 	-- self:SetSystemSetting(loc, 0, 5) -- Size if the setting exists
 
 	-- Raid Warning

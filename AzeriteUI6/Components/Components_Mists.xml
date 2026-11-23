@@ -24,6 +24,7 @@
 
 	<!-- Misc -->
 	<Script file="Misc\ErrorsFrame.lua"/>
+	<Script file="Misc\LossOfControl.lua"/>
 
 	<!-- Tooltips -->
 	<Script file="Tooltips\Tooltips_Classic.lua"/>
