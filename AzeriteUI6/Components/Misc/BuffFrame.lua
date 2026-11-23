@@ -75,6 +75,9 @@ PlayerAuras.GetOptions = function(self)
 end
 
 PlayerAuras.HideBlizzard = function(self)
+	local UIHider = CreateFrame("Frame")
+	UIHider:Hide()
+
 	if (BuffFrame) then
 		BuffFrame:UnregisterAllEvents()
 		BuffFrame:SetParent(UIHider)
