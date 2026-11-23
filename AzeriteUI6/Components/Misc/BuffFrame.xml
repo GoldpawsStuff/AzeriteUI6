@@ -1,0 +1,57 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Button name="AzeriteAuraButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
+		<Size x="30" y="40"/>
+		<Attributes>
+			<Attribute name="type2" type="string" value="cancelaura"/>
+		</Attributes>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon" file="Interface\ICONS\INV_Misc_QuestionMark.blp">
+					<Size x="30" y="30"/>
+					<Anchors>
+						<Anchor point="TOP"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="Duration" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.Icon" relativePoint="BOTTOM"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="DebuffBorder">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Icon"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="TempEnchantBorder" file="Interface\Buttons\UI-TempEnchant-Border">
+					<Size x="32" y="32"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Icon"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="Symbol" inherits="TextStatusBarText">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-2"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Count" inherits="NumberFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="-2" y="2"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("RightButtonUp")
+				self.DebuffBorder:Hide()
+				self.TempEnchantBorder:Hide()
+				self.Symbol:SetText("")
+				self.Count:SetText("")
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Script file="BuffFrame.lua"/>
+</Ui>

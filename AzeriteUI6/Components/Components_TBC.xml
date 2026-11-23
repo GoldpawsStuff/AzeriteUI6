@@ -20,6 +20,7 @@
 	<Script file="Chat\ChatFrames.lua"/>
 
 	<!-- Misc -->
+	<Include file="Misc\BuffFrame.xml"/>
 	<Script file="Misc\ErrorsFrame.lua"/>
 
 	<!-- Minimap -->

@@ -26,7 +26,7 @@
 	<Script file="Minimap\Minimap_Mainline.lua"/>
 
 	<!-- Misc -->
-	<Script file="Misc\BuffFrame.lua"/>
+	<Include file="Misc\BuffFrame.xml"/>
 	<Script file="Misc\ErrorsFrame.lua"/>
 	<Script file="Misc\LossOfControl.lua"/>
 

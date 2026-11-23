@@ -30,10 +30,164 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
 local PlayerAuras = ns:NewModule("PlayerAuras", nil, "LibMoreEvents-1.0", "AceHook-3.0")
 
+local UIHider = CreateFrame("Frame")
+UIHider:Hide()
+
 -- Declare module defaults
 local defaults = { profile = {
 	enabled = true,
 }}
+
+local function ShouldConsolidate()
+	-- Respect the same CVar Blizzard uses (Forever + Classic clients)
+	if ns.WoWMainline then return false end
+	return C_CVar.GetCVarBool("consolidateBuffs")
+end
+
+local function ShowDurations()
+	return C_CVar.GetCVarBool("buffDurations")
+end
+
+local function CreateAuraContainer(name, unit, filter)
+	local container = CreateFrame("AuraContainer", name, UIParent, "CustomAuraContainerTemplate")
+	container:SetUnit(unit)
+
+	container:AddAuraGroup(filter == "HELPFUL" and "buffs" or "debuffs", filter, {
+		maxFrameCount = filter == "HELPFUL" and 32 or 16,
+		sortMethod = AuraContainerSortMethod and AuraContainerSortMethod.Expiration or nil,
+		sortDirection = AuraContainerSortDirection and AuraContainerSortDirection.Reverse or nil,
+		layout = {
+			elementWidth = 30,
+			elementHeight = 40,
+			elementSpacing = 2,
+			groupSpacing = 4,
+		},
+		initializeFrame = function(button)
+			-- Match Blizzard’s AuraButtonArtTemplate look
+			local icon = button:CreateTexture(nil, "ARTWORK")
+			icon:SetSize(30, 30)
+			icon:SetPoint("TOP")
+			button:SetIcon(icon) -- or whatever the inbound setter is called on this build
+
+			local duration = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+			duration:SetPoint("TOP", icon, "BOTTOM")
+			-- bind duration via the button’s SetDuration* methods if available
+
+			local count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+			count:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+
+			-- DebuffBorder / TempEnchantBorder can be added the same way
+			-- and shown/hidden based on aura type inside the container’s update path
+		end,
+	})
+
+	-- Weapon enchants (if the API supports it on this build)
+	if container.AddItemEnchantment and AuraContainerItemEnchantmentSlot then
+		local enchantOptions = {
+			layout = { elementWidth = 30, elementHeight = 40 },
+			initializeFrame = function(button)
+				-- same visual setup + TempEnchantBorder
+			end,
+		}
+
+		container:AddItemEnchantment(AuraContainerItemEnchantmentSlot.MainHand, enchantOptions)
+		container:AddItemEnchantment(AuraContainerItemEnchantmentSlot.OffHand, enchantOptions)
+		-- container:AddItemEnchantment(AuraContainerItemEnchantmentSlot.Ranged, enchantOptions) -- only if you want it
+	end
+
+	return container
+end
+
+local function CreateSecureAuraHeader(name, filter)
+	local header = CreateFrame("Frame", name, UIParent, "SecureAuraHeaderTemplate")
+	header:SetAttribute("unit", "player")
+	header:SetAttribute("filter", filter)
+	header:SetAttribute("template", "AzeriteAuraButtonTemplate")
+	header:SetAttribute("weaponTemplate", "AzeriteAuraButtonTemplate")
+
+	-- Size & layout matching Blizzard defaults (30×40 buttons, ~2 px spacing)
+	header:SetAttribute("style-width", 30)
+	header:SetAttribute("style-height", 40)
+	header:SetAttribute("minWidth", 30)
+	header:SetAttribute("minHeight", 40)
+	header:SetAttribute("point", "TOPRIGHT")
+	header:SetAttribute("xOffset", -32)
+	header:SetAttribute("yOffset", 0)
+	header:SetAttribute("wrapAfter", 8)
+	header:SetAttribute("wrapXOffset", 0)
+	header:SetAttribute("wrapYOffset", -42)
+	header:SetAttribute("maxWraps", 4)
+	header:SetAttribute("sortMethod", "TIME")
+	header:SetAttribute("sortDirection", "+")
+	header:SetAttribute("separateOwn", 1)
+	header:SetAttribute("includeWeapons", 1)
+
+	-- Consolidation (only when the CVar is on, same thresholds Blizzard uses)
+	if ShouldConsolidate() then
+		header:SetAttribute("consolidateTo", 1)
+		header:SetAttribute("consolidateDuration", 30)
+		header:SetAttribute("consolidateThreshold", 10)
+		header:SetAttribute("consolidateFraction", 0.10)
+	else
+		header:SetAttribute("consolidateTo", 0)
+	end
+
+	-- Update visuals when the secure header changes an index
+	header:SetScript("OnAttributeChanged", function(self, attr, value)
+		if attr ~= "index" then return end
+		local button = self:GetAttribute("child"..value) or self:GetAttribute("tempEnchant"..value)
+		if not button then return end
+
+		local unit = self:GetAttribute("unit")
+		local filter = self:GetAttribute("filter")
+		local name, icon, count, debuffType, duration, expirationTime, _, _, _, _, _, _, _, _, isTempEnchant = UnitAura(unit, value, filter)
+
+		if icon then
+			button.Icon:SetTexture(icon)
+			button:Show()
+
+			-- Count
+			if count and count > 1 then
+				button.Count:SetText(count)
+				button.Count:Show()
+			else
+				button.Count:Hide()
+			end
+
+			-- Duration (respect buffDurations CVar)
+			if ShowDurations() and duration and duration > 0 and expirationTime then
+				button.Duration:Show()
+				-- simple remaining time; you can refine with your existing time formatter
+				local remaining = expirationTime - GetTime()
+				if remaining > 0 then
+					button.Duration:SetText(format("%.0f", remaining))
+				else
+					button.Duration:SetText("")
+				end
+			else
+				button.Duration:Hide()
+			end
+
+			-- Borders
+			if debuffType then
+				button.DebuffBorder:Show()
+				-- optional: color by type if you want the classic colored borders
+			else
+				button.DebuffBorder:Hide()
+			end
+
+			if isTempEnchant then
+				button.TempEnchantBorder:Show()
+			else
+				button.TempEnchantBorder:Hide()
+			end
+		else
+			button:Hide()
+		end
+	end)
+
+	return header
+end
 
 PlayerAuras.GetDefaults = function(self)
 	return defaults
@@ -75,14 +229,13 @@ PlayerAuras.GetOptions = function(self)
 end
 
 PlayerAuras.HideBlizzard = function(self)
-	local UIHider = CreateFrame("Frame")
-	UIHider:Hide()
+	if (BuffFrame) then
+		BuffFrame:UnregisterAllEvents()
+		BuffFrame:SetParent(UIHider)
 
-	BuffFrame:UnregisterAllEvents()
-	BuffFrame:SetParent(UIHider)
-
-	if (ns.WoWMainline or ns.WoWCamelot) then
-		BuffFrame.numHideableBuffs = 0 -- EditMode bug in Retail/Forever
+		if (ns.WoWMainline or ns.WoWCamelot) then
+			BuffFrame.numHideableBuffs = 0 -- EditMode bug in Retail/Forever
+		end
 	end
 
 	if (DebuffFrame) then
@@ -124,4 +277,20 @@ PlayerAuras.OnEnable = function(self)
 	if (not self.db.profile.enabled) then return self:Disable() end
 
 	self:HideBlizzard()
+
+	if (ns.WoWCamelot or ns.WoWMainline) then 
+		self.Buffs = CreateAuraContainer("AzeriteBuffs", "player", "HELPFUL")
+		self.Debuffs = CreateAuraContainer("AzeriteDebuffs", "player", "HARMFUL")
+	else
+		self.Buffs = CreateSecureAuraHeader("AzeriteBuffHeader", "HELPFUL")
+		self.Debuffs = CreateSecureAuraHeader("AzeriteDebuffHeader", "HARMFUL")
+	end
+
+	self.Buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -36, -36)
+	self.Debuffs:SetPoint("TOPRIGHT", buffs, "BOTTOMRIGHT", -15, -4)
+
+	local testbackdrop = self.Buffs:CreateTexture(nil, "BACKGROUND")
+	testbackdrop:SetAllPoints()
+	testbackdrop:SetColorTexture(0, .7, 0, .3)
+
 end
