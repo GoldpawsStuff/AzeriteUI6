@@ -129,3 +129,10 @@ L["Use class coloring for friendly Player Names"] = true
 L["Use reaction coloring for NPC Names"] = true
 L["Which button to start the ZigZag pattern from"] = true
 L["ZigZag"] = true -- ActionBar layout option
+
+L["Number of visible Error Messages"] = true
+L["Number of visible System Messages"] = true
+
+L["Sets the number of visible Error Message lines at once. Error Messages are the red messages below your character informing you that you have too little mana, rage, energy, facing the wrong direction, being too far away and similar."] = "Sets the number of visible Error Message lines at once.|n|n|cff4488ffError Messages are the red messages below your character informing you that you have too little mana, rage, energy, facing the wrong direction, being too far away and similar.|r"
+
+L["Sets the number of visible System Message lines at once. System Messages are the yellow messages on top of your screen informing you of completed quest objectives and similar."] = "Sets the number of visible System Message lines at once.|n|n|cff4488ffSystem Messages are the yellow messages on top of your screen informing you of completed quest objectives and similar.|r"

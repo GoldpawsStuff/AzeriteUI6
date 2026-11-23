@@ -39,6 +39,7 @@ local defaults = { profile = {
 	enabled = true,
 	maxLines = 1,
 	maxLinesSysMsg = 3,
+	useSeparateErrorFrame = true
 }}
 
 local getTopFontString = function(frame)
@@ -130,12 +131,12 @@ ErrorsFrame.SetMaxLines = function(self, maxLines)
 end
 
 ErrorsFrame.SetMaxSysLines = function(self, maxLines)
-	maxLines = maxLines or defaults.profile.maxLines
+	maxLines = maxLines or defaults.profile.maxLinesSysMsg
 
-	local _, fontHeight = UIErrorsFrame:GetFont()
+	local _, fontHeight = self.SysMsgFrame:GetFont()
 	local lineHeight = fontHeight or 16
 
-	UIErrorsFrame:SetHeight(lineHeight * maxLines + 6)
+	self.SysMsgFrame:SetHeight(lineHeight * maxLines + 6)
 end
 
 ErrorsFrame.GetDefaults = function(self)
@@ -146,27 +147,28 @@ ErrorsFrame.GetOptions = function(self)
 	return {
 		type = "group",
 		name = "System Message Frames",
-		arg = { menuName = "Error Messages" },
-		order = 8000,
+		arg = { menuName = "System Messages" },
+		order = 9100,
 		args = {
-			--enable = {
-			--	type = "toggle", width = "full",
-			--	name = L["Enable"],
-			--	desc = "Toggle the usage of the UIErrorsFrame.",
-			--	disabled = function() return InCombatLockdown() end,
-			--	get = function(info) return self.db.profile.enabled end,
-			--	set = function(info, val) 
-			--		if InCombatLockdown() then return end
-			--		self.db.profile.enabled = val 
-			--		self:UpdateSettings()
-			--	end,
-			--	order = 1
-			--},
-			maxLines = {
-				type = "range", width = "double", min = 1, max = 3, step = 1,
-				name = "Number of visible error message lines",
-				desc = "Sets the number of visible error message lines at once. Error messages are the red messages below your character informing you that you have too little mana, rage, energy, facing the wrong direction, being too far away and similar.",
+			useSeparateErrorFrame = {
+				type = "toggle", width = "full",
+				name = "Separate Error Messages Display",
+				desc = "Displays the red Error Messages separate from the yellow system messages.",
 				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.useSeparateErrorFrame end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.useSeparateErrorFrame = val 
+					self:UpdateSettings()
+				end,
+				order = 200
+			},
+			maxLines = {
+				type = "range", width = "full", min = 1, max = 3, step = 1,
+				name = L["Number of visible Error Messages"],
+				desc = L["Sets the number of visible Error Message lines at once. Error Messages are the red messages below your character informing you that you have too little mana, rage, energy, facing the wrong direction, being too far away and similar."],
+				disabled = function() return InCombatLockdown() or not self.db.profile.useSeparateErrorFrame end,
 				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return self.db.profile.maxLines end,
 				set = function(info,val)
@@ -174,12 +176,12 @@ ErrorsFrame.GetOptions = function(self)
 					self.db.profile.maxLines = tonumber(val)
 					self:UpdateSettings()
 				end,
-				order = 100
+				order = 210
 			},
 			maxLinesSysMsg = {
-				type = "range", width = "double", min = 1, max = 3, step = 1,
-				name = "Number of visible system message lines",
-				desc = "Sets the number of visible system message lines at once. System messages are the yellow messages on top of your screen informing you of completed quest objectives and similar.",
+				type = "range", width = "full", min = 1, max = 3, step = 1,
+				name = L["Number of visible System Messages"],
+				desc = L["Sets the number of visible System Message lines at once. System Messages are the yellow messages on top of your screen informing you of completed quest objectives and similar."],
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
 				get = function(info) return self.db.profile.maxLinesSysMsg end,
@@ -188,48 +190,67 @@ ErrorsFrame.GetOptions = function(self)
 					self.db.profile.maxLinesSysMsg = tonumber(val)
 					self:UpdateSettings()
 				end,
-				order = 200
-			}
+				order = 100
+			},
+
+			resetToGameDefaults = {
+				type = "execute", width = "1.3",
+				name = L["Game Defaults"],
+				desc = "Use the standard frame for both errors and system messages.",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				func = function(info) self:RestoreBlizzardDefaults() end,
+				order = 100002
+			},
+			resetToAddOnDefault = {
+				type = "execute", width = "1.3",
+				name = L["Azerite Defaults"],
+				desc = "Split the error messages into a separate frame.",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				func = function(info) self:RestoreDefaults() end,
+				order = 100003
+			},
 		}
 	}
 end
 
-ErrorsFrame.ResetToGameDefaults = function(self)
-	self:SetMaxLines(3)
-
-	self.SysMsgFrame:ClearAllPoints()
-	self.SysMsgFrame:SetPoint("TOP", 0, -122)
+ErrorsFrame.RestoreBlizzardDefaults = function(self)
+	self.db.profile.maxLines = 1
+	self.db.profile.maxLinesSysMsg = 3
+	self.db.profile.useSeparateErrorFrame = false
 end
 
-ErrorsFrame.ResetToDefaults = function(self)
-	self:SetMaxLines(self.db.profile.maxLines)
-
-	self.SysMsgFrame:ClearAllPoints()
-	self.SysMsgFrame:SetPoint("CENTER", 0, -180)
-
+ErrorsFrame.RestoreDefaults = function(self)
+	self.db.profile.maxLines = defaults.profile.maxLines
+	self.db.profile.maxLinesSysMsg = defaults.profile.maxLinesSysMsg
+	self.db.profile.useSeparateErrorFrame = defaults.profile.useSeparateErrorFrame
 end
 
 ErrorsFrame.OnEvent = function(self, event, ...)
 	if (event == "SYSMSG") then
 		local message, r, g, b = ...
-
 		if (not message or message == "") then return end
+
 		if (tryFlashExisting(self.SysMsgFrame, message)) then return end
 
 		self.SysMsgFrame:AddMessage(message, r or 1, g or 1, b or 1, 1)
 
 	elseif (event == "UI_ERROR_MESSAGE") then
-
 		local messageType, message = ...
 		if (type(messageType) == "string") then
 			message = messageType
 			messageType = nil
 		end
-
 		if (not message or message == "") then return end
+
 		if (tryFlashExisting(self.ErrorsFrame, message)) then return end
 
-		self.ErrorsFrame:AddMessage(message, 1, .1, .1, 1)
+		if (self.useSeparateErrorFrame) then 
+			self.ErrorsFrame:AddMessage(message, 1, .1, .1, 1)
+		else
+			self.SysMsgFrame:AddMessage(message, 1, .1, .1, 1)
+		end
 
 	elseif (event == "UI_INFO_MESSAGE") then 
 		local messageType, message = ...
@@ -237,8 +258,8 @@ ErrorsFrame.OnEvent = function(self, event, ...)
 			message = messageType
 			messageType = nil
 		end
-	
 		if (not message or message == "") then return end
+
 		if (tryFlashExisting(self.SysMsgFrame, message)) then return end
 
 		self.SysMsgFrame:AddMessage(message, 1, 1, 0, 1)
@@ -248,8 +269,19 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
 ErrorsFrame.UpdateSettings = function(self)
-	self.SysMsgFrame:SetShown(self.db.profile.enabled)
+	self.ErrorsFrame:SetShown(self.db.profile.useSeparateErrorFrame)
 	self:SetMaxLines(self.db.profile.maxLines)
+	self:SetMaxSysLines(self.db.profile.maxLinesSysMsg)
+
+	if (self.db.profile.useSeparateErrorFrame) then
+		if (not self:IsFrameRegisteredForMovement(self.ErrorsFrame)) then
+			self:RegisterMovableFrameAnchor(self.ErrorsFrame, "error frame", "floater", AzeriteUI6_Positions_DB)
+		end
+	else
+		if (self:IsFrameRegisteredForMovement(self.ErrorsFrame)) then
+			self:UnregisterMovableFrameAnchor(self.ErrorsFrame)
+		end
+	end
 end
 
 -- This is called by the addon on full profile changes,
@@ -284,6 +316,7 @@ ErrorsFrame.OnEnable = function(self)
 
 	-- Our dedicated error frame
 	self.ErrorsFrame = CreateFrame("MessageFrame", "AZUI6_ErrorFrame", UIParent)
+	self.ErrorsFrame:SetShown(self.db.profile.useSeparateErrorFrame)
 	self.ErrorsFrame:SetSize(512, 22) -- single line by default
 	self.ErrorsFrame:SetPoint("CENTER", 0, -180)
 	self.ErrorsFrame:SetInsertMode("TOP")
@@ -302,8 +335,12 @@ ErrorsFrame.OnEnable = function(self)
 	self.ErrorsFrame.AddMessage = addMessage
 
 	self:SetMaxLines(self.db.profile.maxLines)
+	self:SetMaxSysLines(self.db.profile.maxLinesSysMsg)
 	self:RegisterMovableFrameAnchor(self.SysMsgFrame, "info frame", "floater", AzeriteUI6_Positions_DB)
-	self:RegisterMovableFrameAnchor(self.ErrorsFrame, "error frame", "floater", AzeriteUI6_Positions_DB)
+
+	if (self.db.profile.useSeparateErrorFrame) then
+		self:RegisterMovableFrameAnchor(self.ErrorsFrame, "error frame", "floater", AzeriteUI6_Positions_DB)
+	end
 
 	self:RegisterEvent("UI_ERROR_MESSAGE", "OnEvent")
 	self:RegisterEvent("UI_INFO_MESSAGE", "OnEvent")

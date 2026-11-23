@@ -24,7 +24,7 @@
 
 --]]
 local MAJOR_VERSION = "LibMovableFrames-1.0"
-local MINOR_VERSION = 3
+local MINOR_VERSION = 4
 
 if (not LibStub) then
 	error(MAJOR_VERSION .. " requires LibStub.")
@@ -595,6 +595,16 @@ lib.UnregisterMovableFrameAnchor = function(_, frame)
 	Anchors[frame] = nil 
 end
 
+--[[ IsFrameRegisteredForMovement(self, frame)
+Query if a frame is registered for movement.
+
+* self      - the module registered for the event
+* frame     - <frame> handle of the frame to be queried
+--]]
+lib.IsFrameRegisteredForMovement = function(_, frame)
+	return (frame and Anchors[frame]) and true or false
+end
+
 --[[ RegisterMovableFrameGroup(self, group, r, g, b)
 Shows all registered and active movable frame anchors.
 
@@ -698,6 +708,7 @@ end
 local mixins = {
 	RegisterMovableFrameAnchor = true,
 	UnregisterMovableFrameAnchor = true,
+	IsFrameRegisteredForMovement = true,
 	ShowAllMovableFrameAnchors = true,
 	HideAllMovableFrameAnchors = true,
 	ToggleAllMovableFrameAnchors = true,
