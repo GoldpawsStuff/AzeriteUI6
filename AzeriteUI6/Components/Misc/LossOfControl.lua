@@ -29,7 +29,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
 local LossOfControl = ns:NewModule("LossOfControl", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0", "AceHook-3.0")
 
-
 -- Declare module defaults
 local defaults = { profile = {
 	enabled = true,
@@ -51,7 +50,7 @@ LossOfControl.StyleLossOfControlFrame = function(self, frame)
 		frame.RedLineBottom:Hide()
 	end
 
-	-- Adjust black backdrop opacity (0.0–1.0). Default is 0.6.
+	-- Adjust black backdrop opacity (0–1). Default is .6.
 	if (frame.blackBg) then
 		frame.blackBg:SetAlpha(.25)	
 	end
