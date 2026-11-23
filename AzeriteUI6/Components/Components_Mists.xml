@@ -23,7 +23,7 @@
 	<Script file="Minimap\Minimap_Classic.lua"/>
 
 	<!-- Misc -->
-	<Include file="Misc\BuffFrame.xml"/>
+	<Script file="Misc\BuffFrame.lua"/>
 	<Script file="Misc\ErrorsFrame.lua"/>
 	<Script file="Misc\LossOfControl.lua"/>
 
