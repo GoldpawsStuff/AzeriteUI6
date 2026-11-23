@@ -63,22 +63,31 @@ local function CreateAuraContainer(name, unit, filter)
 			groupSpacing = 4,
 		},
 		initializeFrame = function(button)
-			-- Match Blizzard’s AuraButtonArtTemplate look
+			-- Icon (required)
 			local icon = button:CreateTexture(nil, "ARTWORK")
 			icon:SetSize(30, 30)
 			icon:SetPoint("TOP")
-			button:SetIcon(icon) -- or whatever the inbound setter is called on this build
+			button:SetIcon(icon)					-- must call this
 
+			-- Duration (pick one)
 			local duration = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 			duration:SetPoint("TOP", icon, "BOTTOM")
-			-- bind duration via the button’s SetDuration* methods if available
+			button:SetDurationText(duration)		-- or SetDurationCooldown(cooldown)
 
+			-- Count
 			local count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
 			count:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+			button:SetApplicationCount(count)
 
-			-- DebuffBorder / TempEnchantBorder can be added the same way
-			-- and shown/hidden based on aura type inside the container’s update path
-		end,
+			-- Optional debuff border
+			local border = button:CreateTexture(nil, "OVERLAY")
+			border:SetSize(40, 40)
+			border:SetPoint("CENTER", icon)
+			button:AddDispelTypeTexture(border, {
+				style = Enum.CustomAuraButtonDispelTypeTextureStyle.PreserveAsset,
+				showWithoutDispelType = true,
+			})
+		end
 	})
 
 	-- Weapon enchants (if the API supports it on this build)
