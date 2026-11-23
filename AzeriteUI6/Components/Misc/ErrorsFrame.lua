@@ -246,7 +246,7 @@ ErrorsFrame.OnEvent = function(self, event, ...)
 
 		if (tryFlashExisting(self.ErrorsFrame, message)) then return end
 
-		if (self.useSeparateErrorFrame) then 
+		if (self.db.profile.useSeparateErrorFrame) then 
 			self.ErrorsFrame:AddMessage(message, 1, .1, .1, 1)
 		else
 			self.SysMsgFrame:AddMessage(message, 1, .1, .1, 1)
