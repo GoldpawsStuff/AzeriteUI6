@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.39-Alpha] 2026-11-23
+## [1.0.39-Release] 2026-11-24
 ### Added
 - Added a custom red error message display below your character. This display is just like the regular error display, except it ONLY shows error messages, not quest objectives. This frame by default only shows one single message at a time, but you can choose from 1-3 in the options menu. The quest objectives and other system messages remain in the standard message frame.
 
