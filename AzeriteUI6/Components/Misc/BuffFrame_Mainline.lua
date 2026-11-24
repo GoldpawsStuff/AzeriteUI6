@@ -28,7 +28,7 @@ local oUF = ns.oUF or oUF
 
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
-local PlayerAuras = ns:NewModule("PlayerAuras", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0", "AceHook-3.0")
+local PlayerAuras = ns:NewModule("PlayerAuras", nil, "AceHook-3.0", "LibMoreEvents-1.0", "LibMovableFrames-1.0", "LibFadingFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
@@ -205,6 +205,9 @@ PlayerAuras.OnEnable = function(self)
 	oUF:Factory(function(self)
 		self:SetActiveStyle("AzeritePlayerAuras")
 
+		local hider = CreateFrame("Frame", "AeriteUI6PlayerAuraHider", UIParent, "SecureHandlerStateTemplate")
+		hider:SetFrameStrata("LOW")
+
 		local frame = self:Spawn("player", "AzeritePlayerAuras")
 		frame:SetPoint("BOTTOM", UIParent, "TOP", 0, 100)
 
@@ -213,6 +216,7 @@ PlayerAuras.OnEnable = function(self)
 		buffAnchor:SetPoint("TOPRIGHT", -40, -40)
 
 		local buffs = frame.Buffs
+		buffs:SetParent(hider)
 		buffs:ClearAllPoints()
 		buffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
 
@@ -221,19 +225,15 @@ PlayerAuras.OnEnable = function(self)
 		debuffAnchor:SetPoint("TOPRIGHT", -40, -182)
 
 		local debuffs = frame.Debuffs
-		debuffs:ClearAllPoints()
-		debuffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
-
-		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)
-		PlayerAuras:RegisterMovableFrameAnchor(debuffAnchor, string.lower(L["Player Debuffs"]), "floater", AzeriteUI6_Positions_DB)
-
-		local hider = CreateFrame("Frame", "AeriteUI6PlayerAuraHider", UIParent, "SecureHandlerStateTemplate")
-		hider:SetFrameStrata("LOW")
-
-		buffs:SetParent(hider)
 		debuffs:SetParent(hider)
+		debuffs:ClearAllPoints()
+		debuffs:SetPoint("TOPRIGHT", debuffAnchor, "TOPRIGHT", 0, 0)
 
 		RegisterAttributeDriver(hider, "state-visibility", "[@target,exists]hide;show")
+
+		PlayerAuras:RegisterFrameForFading(hider, "floater")
+		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)
+		PlayerAuras:RegisterMovableFrameAnchor(debuffAnchor, string.lower(L["Player Debuffs"]), "floater", AzeriteUI6_Positions_DB)
 
 	end)
 end
