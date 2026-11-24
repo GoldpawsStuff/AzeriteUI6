@@ -116,7 +116,7 @@ end
 
 oUF.Tags.Events["azui:away"] = "PLAYER_FLAGS_CHANGED"
 oUF.Tags.Methods["azui:away"] = function(unit, realUnit, ...)
-	local isAFK = UnitIsAFK(realUnit or unit)
+	local isAFK = not C_ChatInfo.InChatMessagingLockdown() and UnitIsAFK(realUnit or unit)
 	if (isAFK) then 
 		return " |cff666666<|r|cff888888"..AFK.."|r|cff666666>|r"
 	end

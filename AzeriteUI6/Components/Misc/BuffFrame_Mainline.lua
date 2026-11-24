@@ -127,23 +127,6 @@ local style = function(self)
 	self.Debuffs = debuffs
 end
 
--- Hide Blizzard's floating aura frames
-PlayerAuras.HideBlizzard = function(self)
-	local UIHider = CreateFrame("Frame")
-	UIHider:Hide()
-
-	if (BuffFrame) then
-		BuffFrame:UnregisterAllEvents()
-		BuffFrame:SetParent(UIHider)
-		BuffFrame.numHideableBuffs = 0 -- EditMode bug in Retail/Forever
-	end
-
-	if (DebuffFrame) then
-		DebuffFrame:UnregisterAllEvents()
-		DebuffFrame:SetParent(UIHider)
-	end
-end
-
 PlayerAuras.GetDefaults = function(self)
 	return defaults
 end
@@ -176,6 +159,27 @@ PlayerAuras.GetOptions = function(self)
 			},
 		}
 	}
+end
+
+--PlayerAuras.GetFrame = function(self)
+--	return self.frame
+--end
+
+-- Hide Blizzard's floating aura frames
+PlayerAuras.HideBlizzard = function(self)
+	local UIHider = CreateFrame("Frame")
+	UIHider:Hide()
+
+	if (BuffFrame) then
+		BuffFrame:UnregisterAllEvents()
+		BuffFrame:SetParent(UIHider)
+		BuffFrame.numHideableBuffs = 0 -- EditMode bug in Retail/Forever
+	end
+
+	if (DebuffFrame) then
+		DebuffFrame:UnregisterAllEvents()
+		DebuffFrame:SetParent(UIHider)
+	end
 end
 
 -- This is called by the options menu on settings changes,
@@ -231,7 +235,10 @@ PlayerAuras.OnEnable = function(self)
 
 		RegisterAttributeDriver(hider, "state-visibility", "[@target,exists]hide;show")
 
-		PlayerAuras:RegisterFrameForFading(hider, "floater")
+		--PlayerAuras:RegisterFrameForFading(buffs, "floater")
+		--PlayerAuras:RegisterFrameForFading(debuffs, "floater")
+
+		--PlayerAuras.frame = hider
 		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)
 		PlayerAuras:RegisterMovableFrameAnchor(debuffAnchor, string.lower(L["Player Debuffs"]), "floater", AzeriteUI6_Positions_DB)
 

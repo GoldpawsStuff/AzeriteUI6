@@ -60,6 +60,7 @@ local defaults = { profile = {
 	fadeStanceBar = true,
 	fadePlayerFrame = true,
 	fadePlayerClassPower = true,
+	fadePlayerAuras = true,
 	fadePetFrame = true,
 	fadeFocusFrame = true,
 	fadeTracker = true,
@@ -187,6 +188,20 @@ ExplorerMode.GetOptions = function(self)
 				end,
 				order = 320
 			},
+			fadePlayerAuras = (ns.WoWCamelot or ns.WoWMainline) and {
+				type = "toggle", width = "full",
+				name = L["Player Buffs & Debuffs"],
+				desc = L["Fade out the floating Buff & Debuff Display."],
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.fadePlayerAuras end,
+				set = function(info, val) 
+					if InCombatLockdown() then return end
+					self.db.profile.fadePlayerAuras = val 
+					self:UpdateSettings()
+				end,
+				order = 330
+			} or nil,
 			fadePlayerFrame = {
 				type = "toggle", width = "full",
 				name = L["Unit Frame: Player"],
@@ -266,20 +281,6 @@ ExplorerMode.GetOptions = function(self)
 				end,
 				order = 410
 			},
-			--fadeTracker = {
-			--	type = "toggle", width = "full",
-			--	name = L["Quest Objectives"],
-			--	desc = L["Fade out the Objectives Tracker."],
-			--	disabled = function() return InCombatLockdown() end,
-			--	hidden = function() return not self.db.profile.enabled end,
-			--	get = function(info) return self.db.profile.fadeTracker end,
-			--	set = function(info, val) 
-			--		if InCombatLockdown() then return end
-			--		self.db.profile.fadeTracker = val 
-			--		self:UpdateSettings()
-			--	end,
-			--	order = 410
-			--},
 			fadeChatFrames = {
 				type = "toggle", width = "full",
 				name = L["Chat Windows"],
@@ -724,6 +725,21 @@ ExplorerMode.UpdateSettings = function(self)
 			--end
 		end
 	end
+
+	-- Player Auras
+	--------------------------------------------
+	--local PlayerAuras = ns:GetModule("PlayerAuras", true)
+	--if (PlayerAuras) then
+	--	local fade = not self.FORCED and PlayerAuras:IsEnabled() and db.enabled and db.fadePlayerAuras
+	--	local playerAurasFrame = PlayerAuras:GetFrame()
+	--	if (playerAurasFrame) then
+	--		if (fade) then
+	--			LFF:RegisterFrameForFading(playerAurasFrame, "PlayerAurasHUD")
+	--		else
+	--			LFF:UnregisterFrameForFading(playerAurasFrame)
+	--		end
+	--	end
+	--end
 
 	-- Unit Frames
 	--------------------------------------------
