@@ -28,20 +28,16 @@ local oUF = ns.oUF or oUF
 
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
-local PlayerAuras = ns:NewModule("PlayerAuras", nil, "LibMoreEvents-1.0", "AceHook-3.0")
+local PlayerAuras = ns:NewModule("PlayerAuras", nil, "LibMoreEvents-1.0", "LibMovableFrames-1.0", "AceHook-3.0")
 
 -- Declare module defaults
 local defaults = { profile = {
 	enabled = true,
 }}
 
--- Constants matching Forever/Retail BuffFrame
-local BUFF_MAX_DISPLAY = 32
-local DEBUFF_MAX_DISPLAY = 16
-
 local style = function(self)
 
-	self:SetSize(1, 1)
+	self:SetSize(.001, .001)
 	self:SetAlpha(0)
 	self:EnableMouse(false)
 
@@ -60,9 +56,9 @@ local style = function(self)
 		layoutLimit = 800, -- prevent wrapping on the 1x1 dummy frame
 	})
 
-	buffs:SetSize(30*math.floor(BUFF_MAX_DISPLAY/4) - 4, 30*math.ceil(BUFF_MAX_DISPLAY/(math.floor(BUFF_MAX_DISPLAY/4))) - 4)
-	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -40, -40)
 	buffs:SetParent(UIParent)
+	buffs:SetSize(272, 136)
+	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -40, -40)
 
 	buffs.durationBinding = binding
 	buffs.showCount = true
@@ -85,7 +81,7 @@ local style = function(self)
 
 	-- Buffs
 	buffs:AddGroup("HELPFUL", {
-		maxFrameCount = BUFF_MAX_DISPLAY,
+		maxFrameCount = 32,
 		sortMethod = AuraContainerSortMethod and AuraContainerSortMethod.Expiration or nil,
 		sortDirection = AuraContainerSortDirection and AuraContainerSortDirection.Reverse or nil,
 		initializeFrame = ns.AuraButton_InitializeFloatingBuff,
@@ -98,9 +94,10 @@ local style = function(self)
 		layout = AnchorUtil.FlowLayoutAxis.Horizontal,
 		layoutLimit = 800, -- prevent wrapping on the 1x1 dummy frame
 	})
-
-	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", 0, -(40 + buffs:GetHeight()) + 20)
+	
 	debuffs:SetParent(UIParent)
+	debuffs:SetSize(240, 60)
+	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -40, -182)
 
 	debuffs.durationBinding = binding
 	debuffs.showCount = true
@@ -120,10 +117,10 @@ local style = function(self)
 
 	-- Debuffs
 	debuffs:AddGroup("HARMFUL", {
-		maxFrameCount = DEBUFF_MAX_DISPLAY,
+		maxFrameCount = 16,
 		sortMethod = AuraContainerSortMethod and AuraContainerSortMethod.Expiration or nil,
 		sortDirection = AuraContainerSortDirection and AuraContainerSortDirection.Reverse or nil,
-		initializeFrame = ns.AuraButton_InitializeBigDebuff,
+		initializeFrame = ns.AuraButton_InitializeFloatingDebuff,
 	})
 
 	self.Buffs = buffs
@@ -160,8 +157,8 @@ PlayerAuras.GetOptions = function(self)
 		args = {
 			enable = {
 				type = "toggle", width = "full",
-				name = L["Disable Default Auras"], -- L["Enable"],
-				desc = "", -- L["Toggle the usage of our Buff & Debuff Frames. Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames."],
+				name = L["Enable"],
+				desc = L["Toggle the usage of our Buff & Debuff Frames. Note that disabling this will force a user interface reload to re-enable the game's default Buff- and Debuff Frames."],
 				disabled = function() return InCombatLockdown() end,
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
@@ -211,7 +208,32 @@ PlayerAuras.OnEnable = function(self)
 		local frame = self:Spawn("player", "AzeritePlayerAuras")
 		frame:SetPoint("BOTTOM", UIParent, "TOP", 0, 100)
 
-		self.Buffs = frame.Buffs
-		self.Debuffs = frame.Debuffs
+		local buffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerBuffs", UIParent)
+		buffAnchor:SetSize(272, 136)
+		buffAnchor:SetPoint("TOPRIGHT", -40, -40)
+
+		local buffs = frame.Buffs
+		buffs:ClearAllPoints()
+		buffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
+
+		local debuffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerDebuffs", UIParent)
+		debuffAnchor:SetSize(240, 60)
+		debuffAnchor:SetPoint("TOPRIGHT", -40, -182)
+
+		local debuffs = frame.Debuffs
+		debuffs:ClearAllPoints()
+		debuffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
+
+		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)
+		PlayerAuras:RegisterMovableFrameAnchor(debuffAnchor, string.lower(L["Player Debuffs"]), "floater", AzeriteUI6_Positions_DB)
+
+		local hider = CreateFrame("Frame", "AeriteUI6PlayerAuraHider", UIParent, "SecureHandlerStateTemplate")
+		hider:SetFrameStrata("LOW")
+
+		buffs:SetParent(hider)
+		debuffs:SetParent(hider)
+
+		RegisterAttributeDriver(hider, "state-visibility", "[@target,exists]hide;show")
+
 	end)
 end

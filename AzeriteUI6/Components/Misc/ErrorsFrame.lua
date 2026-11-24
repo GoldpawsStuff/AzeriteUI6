@@ -275,7 +275,7 @@ ErrorsFrame.UpdateSettings = function(self)
 
 	if (self.db.profile.useSeparateErrorFrame) then
 		if (not self:IsFrameRegisteredForMovement(self.ErrorsFrame)) then
-			self:RegisterMovableFrameAnchor(self.ErrorsFrame, "error frame", "floater", AzeriteUI6_Positions_DB)
+			self:RegisterMovableFrameAnchor(self.ErrorsFrame, string.lower(L["Error Frame"]), "floater", AzeriteUI6_Positions_DB)
 		end
 	else
 		if (self:IsFrameRegisteredForMovement(self.ErrorsFrame)) then
@@ -336,10 +336,10 @@ ErrorsFrame.OnEnable = function(self)
 
 	self:SetMaxLines(self.db.profile.maxLines)
 	self:SetMaxSysLines(self.db.profile.maxLinesSysMsg)
-	self:RegisterMovableFrameAnchor(self.SysMsgFrame, "info frame", "floater", AzeriteUI6_Positions_DB)
+	self:RegisterMovableFrameAnchor(self.SysMsgFrame, string.lower(L["Info Frame"]), "floater", AzeriteUI6_Positions_DB)
 
 	if (self.db.profile.useSeparateErrorFrame) then
-		self:RegisterMovableFrameAnchor(self.ErrorsFrame, "error frame", "floater", AzeriteUI6_Positions_DB)
+		self:RegisterMovableFrameAnchor(self.ErrorsFrame, string.lower(L["Error Frame"]), "floater", AzeriteUI6_Positions_DB)
 	end
 
 	self:RegisterEvent("UI_ERROR_MESSAGE", "OnEvent")

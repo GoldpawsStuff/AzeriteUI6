@@ -209,7 +209,7 @@ ns.AuraButton_InitializeFloatingBuff = function(button)
 end
 
 -- Floating Player Debuff Display
-ns.AuraButton_InitializeBigDebuff = function(button)
+ns.AuraButton_InitializeFloatingDebuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
 	icon:SetPoint("TOPLEFT", 2, -2)
