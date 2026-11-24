@@ -54,20 +54,12 @@ PlayerAuras.GetOptions = function(self)
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
 					if (InCombatLockdown()) then return end
-					if (ns.WoWCamelot or ns.WoWMainline) then
-						ns:ShowPrompt("Reload UI", "Toggling this option requires a user interface reload.|n|nAre you sure?", {
-							{ text = ACCEPT, onClick = function() 
-								self.db.profile.enabled = val
-								ns.Reload()
-							end },
-							{ text = CANCEL, cancel = true, onClick = function() end },
-						})
-						return
-					end
+
 					self.db.profile.enabled = val 
+
 					ns.Reload()
 				end,
-				confirm = not (ns.WoWCamelot or ns.WoWMainline) and true or nil,
+				confirm = true,
 				order = 10
 			},
 		}
@@ -81,10 +73,6 @@ PlayerAuras.HideBlizzard = function(self)
 	if (BuffFrame) then
 		BuffFrame:UnregisterAllEvents()
 		BuffFrame:SetParent(UIHider)
-
-		if (ns.WoWMainline or ns.WoWCamelot) then
-			BuffFrame.numHideableBuffs = 0 -- EditMode bug in Retail/Forever
-		end
 	end
 
 	if (DebuffFrame) then
@@ -106,7 +94,6 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
 PlayerAuras.UpdateSettings = function(self)
-
 end
 
 -- This is called by the addon on full profile changes,
