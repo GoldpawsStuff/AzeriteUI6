@@ -162,6 +162,99 @@ local Auras_SetTooltipAnchor = function(button)
 	end
 end
 
+-- Floating Player Buff Display
+ns.AuraButton_InitializeFloatingBuff = function(button)
+	local icon = button:CreateTexture(nil, "BORDER")
+	icon:SetMask(GetMedia("actionbutton-mask-square"))
+	icon:SetPoint("TOPLEFT", 2, -2)
+	icon:SetPoint("BOTTOMRIGHT", -2, 2)
+	icon:SetTexCoord(5/64, 59/64, 5/64, 59/64)
+	button.Icon = icon
+
+	local border = CreateFrame("Frame", nil, button, "BackdropTemplate")
+	border:SetBackdrop({ edgeFile = GetMedia("border-aura"), edgeSize = 12 })
+	border:SetBackdropBorderColor(oUF.colors.verydarkgray:GetRGB())
+	border:SetPoint("TOPLEFT", -6, 6)
+	border:SetPoint("BOTTOMRIGHT", 6, -6)
+	border:SetFrameLevel(button:GetFrameLevel() + 2)
+	button.Border = border
+
+	-- adjust the stack count
+	local count = border:CreateFontString(nil, "OVERLAY")
+	count:SetFontObject(GetFont(11,true))
+	count:SetTextColor(oUF.colors.offwhite:GetRGB())
+	count:ClearAllPoints()
+	count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 3)
+	button.Count = count
+
+	local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
+	cooldown:SetAllPoints(icon)
+	cooldown:SetHideCountdownNumbers(true)
+	cooldown:SetDrawBling(false)
+	cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
+	button.Cooldown = cooldown
+
+	local time = border:CreateFontString(nil, "OVERLAY")
+	time:SetFontObject(GetFont(12, true))
+	time:SetPoint("TOPLEFT", button, "TOPLEFT", -5, 5)
+	time:SetTextColor(oUF.colors.offwhite:GetRGB())
+	button.Time = time
+
+	button:SetSize(30,30)
+	button:SetIcon(icon)
+	button:SetDurationCooldown(cooldown)
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
+	button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
+
+end
+
+-- Floating Player Debuff Display
+ns.AuraButton_InitializeBigDebuff = function(button)
+	local icon = button:CreateTexture(nil, "BORDER")
+	icon:SetMask(GetMedia("actionbutton-mask-square"))
+	icon:SetPoint("TOPLEFT", 2, -2)
+	icon:SetPoint("BOTTOMRIGHT", -2, 2)
+	icon:SetTexCoord(5/64, 59/64, 5/64, 59/64)
+	button.Icon = icon
+
+	local border = CreateFrame("Frame", nil, button, "BackdropTemplate")
+	border:SetBackdrop({ edgeFile = GetMedia("border-aura"), edgeSize = 12 })
+	border:SetBackdropBorderColor(oUF.colors.debuff.none:GetRGB())
+	border:SetPoint("TOPLEFT", -6, 6)
+	border:SetPoint("BOTTOMRIGHT", 6, -6)
+	border:SetFrameLevel(button:GetFrameLevel() + 2)
+	button.Border = border
+
+	-- adjust the stack count
+	local count = border:CreateFontString(nil, "OVERLAY")
+	count:SetFontObject(GetFont(11,true))
+	count:SetTextColor(oUF.colors.offwhite:GetRGB())
+	count:ClearAllPoints()
+	count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 3)
+	button.Count = count
+
+	local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
+	cooldown:SetAllPoints(icon)
+	cooldown:SetHideCountdownNumbers(true)
+	cooldown:SetDrawBling(false)
+	cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
+	button.Cooldown = cooldown
+
+	local time = border:CreateFontString(nil, "OVERLAY")
+	time:SetFontObject(GetFont(11, true))
+	time:SetPoint("TOPLEFT", button, "TOPLEFT", -5, 5)
+	time:SetTextColor(oUF.colors.offwhite:GetRGB())
+	button.Time = time
+
+	button:SetSize(26,26)
+	button:SetIcon(icon)
+	button:SetDurationCooldown(cooldown)
+	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
+	button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
+
+end
+
+-- Player/Target Buffs
 ns.AuraButton_InitializeBigBuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -207,6 +300,7 @@ ns.AuraButton_InitializeBigBuff = function(button)
 	Auras_SetTooltipAnchor(button)
 end
 
+-- Player/Target Debuffs
 ns.AuraButton_InitializeBigDebuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -251,7 +345,7 @@ ns.AuraButton_InitializeBigDebuff = function(button)
 	Auras_SetTooltipAnchor(button)
 end
 
--- NamePlate debuffs
+-- NamePlate Debuffs
 ns.AuraButton_InitializeNamePlateDebuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))

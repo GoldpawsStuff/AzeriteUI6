@@ -632,7 +632,7 @@ local style = function(self, unit)
 
 
 	-- Top: The player's running DoTs and Debuffs (nameplateShowPersonal)
-	local aurasHarmful = self:CreateAuras()
+	local aurasHarmful = self:CreateAurasElement()
 	aurasHarmful:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", -8, 10)
 	aurasHarmful:SetWidth(100)
 	aurasHarmful:SetFrameLevel(self:GetFrameLevel() + 15)
@@ -653,7 +653,7 @@ local style = function(self, unit)
 	self.AurasHarmful = aurasHarmful
 
 	-- Right: Important buffs (nameplateShowAll)
-	local aurasHelpful = self:CreateAuras()
+	local aurasHelpful = self:CreateAurasElement()
 	aurasHelpful:SetPoint("LEFT", self.Classification, "RIGHT", 4, 1)
 	aurasHelpful:SetFrameLevel(self:GetFrameLevel() + 15)
 	aurasHelpful:AddGroup("HELPFUL|INCLUDE_NAME_PLATE_ONLY", {
@@ -672,7 +672,7 @@ local style = function(self, unit)
 	self.AurasHelpful = aurasHelpful
 
 	-- Left: Crowd Control
-	local aurasCC = self:CreateAuras()
+	local aurasCC = self:CreateAurasElement()
 	aurasCC:SetPoint("RIGHT", self.Health, "LEFT", -4, 0)
 	aurasCC:SetFrameLevel(self:GetFrameLevel() + 15)
 	aurasCC:AddGroup("HARMFUL|CROWD_CONTROL", {

@@ -910,13 +910,10 @@ local style = function(self, unit)
 		--binding:SetFormatter(...) -- if you want custom formatting
 		--binding:SetUpdateInterval(0.1) -- optional
 
-		local auras = self:CreateAuras()
+		local auras = self:CreateAurasElement()
 		auras:SetSize(316, 76)
 		auras:SetPoint("TOPRIGHT", -150, -126)
 
-		-- Custom style function
-		auras.PostCreateButton = ns.AuraButton_PostCreate
-		
 		-- Enable some sub-widgets
 		auras.durationBinding = binding
 		auras.showCount = true

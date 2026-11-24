@@ -735,7 +735,7 @@ local style = function(self, unit)
 		--binding:SetFormatter(...) -- if you want custom formatting
 		--binding:SetUpdateInterval(0.1) -- optional
 
-		local auras = self:CreateAuras()
+		local auras = self:CreateAurasElement()
 		auras:SetSize(40*8 - 4, 40*2 - 4)
 		auras:SetPoint("BOTTOMLEFT", 158, 91)
 

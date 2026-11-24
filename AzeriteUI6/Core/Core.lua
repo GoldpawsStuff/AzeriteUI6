@@ -200,6 +200,15 @@ ns.GenerateOptions = function(self)
 
 	-- add profiles, etc.
 	local profiles = AceDBOptions:GetOptionsTable(self.db)
+	local args = {}
+	for key, option in pairs(profiles.args) do
+		local copy = {}
+		for k, v in pairs(option) do
+			copy[k] = v
+		end
+		args[key] = copy
+	end
+	profiles.args = args
 	profiles.dialogHidden = true
 	profiles.order = 10000 -- this doesn't really matter here, does it? Order is by registration, in our case.
 
