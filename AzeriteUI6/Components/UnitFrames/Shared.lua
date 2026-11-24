@@ -205,7 +205,6 @@ ns.AuraButton_InitializeFloatingBuff = function(button)
 	button:SetDurationCooldown(cooldown)
 	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 	button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
-
 end
 
 -- Floating Player Debuff Display
@@ -251,7 +250,6 @@ ns.AuraButton_InitializeFloatingDebuff = function(button)
 	button:SetDurationCooldown(cooldown)
 	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 	button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
-
 end
 
 -- Player/Target Buffs
