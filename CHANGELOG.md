@@ -4,10 +4,12 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][1.0.41-Alpha] 2026-11-25
+## [1.0.41-Alpha] 2026-11-25
+- Use `/resetlayout` to reset the Azerite UI EditMode layout to the latest changes.
+
 ### Changed
+- The Player Buffs & Debuff display now properly follow the Explorer Mode.
 - The Player Buffs & Debuff display will now optionally be hidden when you have a Target selected.
-- The Player Buff & Debuff display now properly follow the Explorer Mode.
 
 ## [1.0.40-Release] 2026-11-25
 ### Fixed

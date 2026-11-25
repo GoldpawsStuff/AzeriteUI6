@@ -146,7 +146,7 @@ EditModePreset.ApplySystemSettings = function(self, target)
 
 	-- Group Finder Eye (primarily Forever / later clients)
 	local groupFinder = self:GetSystem(target.systems, Enum.EditModeSystem.GroupFinder)
-	self:SetSystemAnchor(groupFinder, "TOPLEFT", "TOPLEFT", 10, -10, "Minimap")
+	self:SetSystemAnchor(groupFinder, "TOPLEFT", "TOPLEFT", 4, -4, "Minimap")
 
 	-- Loot Window
 	local loot = self:GetSystem(target.systems, Enum.EditModeSystem.LootFrame)

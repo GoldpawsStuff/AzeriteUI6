@@ -335,10 +335,12 @@ local Power_UpdateVisibility = function(element, unit, cur, min, max)
 		element:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
 		element:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
 		element:SetStatusBarColor(1, 1, 1) 
+		element:GetStatusBarTexture():SetAlpha(.75)
 	else
 		element.Backdrop:SetTexture(GetMedia("power_crystal_back"))
 		element:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
 		element:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+		element:GetStatusBarTexture():SetAlpha(1)
 	end
 
 	-- power value visibility
@@ -553,15 +555,17 @@ local style = function(self, unit)
 	powerBg:SetSize(196, 196)
 	powerBg:SetPoint("CENTER", 0, 0)
 
-	if (Player.db.profile.useIceCrystal) then
+	if (zeroPowerTypes[powerType] or Player.db.profile.useIceCrystal) then
 		powerBg:SetTexture(GetMedia("power-crystal-ice-back"))
 		power:SetStatusBarTexture(GetMedia("power-crystal-ice-front-cropped"))
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
 		power:SetStatusBarColor(1, 1, 1) 
+		power:GetStatusBarTexture():SetAlpha(.75)
 	else
 		powerBg:SetTexture(GetMedia("power_crystal_back"))
 		power:SetStatusBarTexture(GetMedia("power_crystal_front_cropped"))
 		power:GetStatusBarTexture():SetDrawLayer("BACKGROUND", -6)
+		power:GetStatusBarTexture():SetAlpha(1)
 	end
 
 	-- Power Value
