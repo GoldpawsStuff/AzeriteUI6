@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.42-Alpha] 2026-11-25
+## [Unreleased][1.0.43-Alpha] 2026-11-25
 - Use `/resetlayout` to reset the Azerite UI EditMode layout to the latest changes.
 
 ### Changed
