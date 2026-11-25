@@ -129,111 +129,25 @@ local Badge_OnLeave = function(self)
 	end
 end
 
-local StyleQueueButton = function()
-	local button = QueueStatusButton or LFGMinimapFrame or QueueStatusMinimapButton
-	if (not button) then
-		return
-	end
-
-
-	-- Stop modern eye animations and hide the animated layers
-	if (button.Eye) then
-		if (button.Eye.StopAnimating) then
-			button.Eye:StopAnimating()
-		end
-
-		-- Hide the various animated sub-elements
-		local eye = button.Eye
-		local children = {
-			eye.EyeInitial,
-			eye.EyeMouseOver,
-			eye.EyeFoundInitial,
-			eye.EyeFoundLoop,
-			eye.EyePokeInitial,
-			eye.EyePokeLoop,
-			eye.EyePokeEnd,
-			eye.EyeSearchingLoop,
-			eye.GlowBackLoop,
-		}
-
-		for _, child in ipairs(children) do
-			if child then
-				child:Hide()
-				if child.StopAnimating then
-					child:StopAnimating()
-				end
-			end
-		end
-
-		-- Kill highlight animation if present
-		if button.EyeHighlightAnim then
-			button.EyeHighlightAnim:Stop()
-		end
-
-		-- Hook future animation starts so they stay stopped
-		if not eye.AzeriteHooked then
-			for k, v in pairs(eye) do
-				if type(v) == "function" and k:find("^Start") and k ~= "StartInitialAnimation" then
-					hooksecurefunc(eye, k, function(self)
-						if self.StopAnimating then
-							self:StopAnimating()
-						end
-					end)
-				end
-			end
-			eye.AzeriteHooked = true
-		end
-	end
-
-	if not true then 
-
-		-- Classic-style eye (LFGEyeTemplate)
-		if button.eye and button.eye.Texture then
-			button.eye.Texture:SetTexture(customTexture)
-			button.eye.Texture:SetTexCoord(0, 1, 0, 1)
-		end
-
-		-- Modern Icon path (QueueStatusButtonIcon or similar)
-		local icon = button.Icon or button.eye or _G[button:GetName() and (button:GetName() .. "Icon")]
-		if icon then
-			if icon.texture then
-				icon.texture:SetTexture(customTexture)
-				icon.texture:SetTexCoord(0, 1, 0, 1)
-			elseif icon.SetTexture then
-				icon:SetTexture(customTexture)
-				icon:SetTexCoord(0, 1, 0, 1)
-			end
-		end
-
-		-- Fallback: create our own overlay texture on the button
-		if not button.AzeriteQueueIcon then
-			local tex = button:CreateTexture(nil, "OVERLAY")
-			tex:SetAllPoints(button)
-			tex:SetTexture(customTexture)
-			tex:SetTexCoord(0, 1, 0, 1)
-			button.AzeriteQueueIcon = tex
-		end
-		button.AzeriteQueueIcon:Show()
-
-	end
-
-	-- Optional: hide any remaining border/highlight that Blizzard draws
-	if button.Border then
-		button.Border:Hide()
+-- Will this taint or create other problems now?
+local Minimap_OnMouseUp = function(self, button)
+	if (button == "MiddleButton") then
+		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
 	end
 end
 
-local function StyleQueueButton()
+local StyleQueueButton = function()
 	local button = QueueStatusButton or LFGMinimapFrame or QueueStatusMinimapButton
-	if not button then return end
+	if (not button) then return end
 
 	-- Flat static texture
 	local customTexture = GetMedia("group-finder-eye-orange")
 
 	-- Kill the animated eye system completely
 	local eye = button.Eye or button.eye
-	if eye then
-		if eye.StopAnimating then eye:StopAnimating() end
+	if (eye) then
+		if (eye.StopAnimating) then eye:StopAnimating() end
 
 		-- Hide every known eye state / glow / highlight
 		local children = {
@@ -242,25 +156,25 @@ local function StyleQueueButton()
 			eye.GlowBackLoop, eye.GlowFront, eye.CircShine
 		}
 		for _, child in ipairs(children) do
-			if child then
+			if (child) then
 				child:Hide()
-				if child.StopAnimating then child:StopAnimating() end
+				if (child.StopAnimating) then child:StopAnimating() end
 				-- also hide any nested textures that might still show
-				if child.GetRegions then
+				if (child.GetRegions) then
 					for _, region in ipairs({child:GetRegions()}) do
-						if region.Hide then region:Hide() end
+						if (region.Hide) then region:Hide() end
 					end
 				end
 			end
 		end
 
 		-- Stop highlight animation if present
-		if button.EyeHighlightAnim then
+		if (button.EyeHighlightAnim) then
 			button.EyeHighlightAnim:Stop()
 		end
 
 		-- Prevent Blizzard from restarting the animations
-		if not eye.AzeriteHooked then
+		if (not eye.AzeriteHooked) then
 			for k, v in pairs(eye) do
 				if type(v) == "function" and k:find("^Start") then
 					hooksecurefunc(eye, k, function(self)
@@ -275,7 +189,7 @@ local function StyleQueueButton()
 	end
 
 	-- Classic-style eye texture
-	if button.eye and button.eye.Texture then
+	if (button.eye and button.eye.Texture) then
 		button.eye.Texture:Hide()
 	end
 
@@ -286,7 +200,7 @@ local function StyleQueueButton()
 	end
 
 	-- Create (or reuse) our own static texture as the only visible art
-	if not button.AzeriteQueueIcon then
+	if (not button.AzeriteQueueIcon) then
 		local tex = button:CreateTexture(nil, "ARTWORK", nil, 2)
 		tex:SetPoint("CENTER", button, "CENTER")
 		tex:SetTexture(customTexture)
@@ -294,14 +208,6 @@ local function StyleQueueButton()
 		button.AzeriteQueueIcon = tex
 	end
 	button.AzeriteQueueIcon:Show()
-end
-
--- Will this taint or create other problems now?
-local Minimap_OnMouseUp = function(self, button)
-	if (button == "MiddleButton") then
-		MenuUtil.CreateContextMenu(self, MinimapCluster.Tracking.Button.menuGenerator)
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "SFX")
-	end
 end
 
 MinimapModule.StyleMinimap = function(self)
