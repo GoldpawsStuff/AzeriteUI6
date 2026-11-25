@@ -212,19 +212,8 @@ end
 
 MinimapModule.StyleMinimap = function(self)
 
-	-- create our custom border
-	local borderFrame = CreateFrame("Frame", nil, Minimap)
-	borderFrame:SetFrameLevel(Minimap:GetFrameLevel() + 10)
-	borderFrame:SetAllPoints(Minimap)
-
-	local borderTexture = borderFrame:CreateTexture(nil, "BORDER", nil, 5)
-	borderTexture:SetTexture(GetMedia("minimap-border"))
-	borderTexture:SetVertexColor(192/255, 192/255, 192/255)
-	borderTexture:SetPoint("CENTER", -2, 0)
-	borderTexture:SetSize(350,350) -- 404 actually, but that's big.
-
-	local hider = CreateFrame("Frame")
-	hider:Hide()
+	local UIHider = CreateFrame("Frame")
+	UIHider:Hide()
 
 	-- hide the clutter
 	for _,element in next, {
@@ -242,10 +231,11 @@ MinimapModule.StyleMinimap = function(self)
 		TimeManagerClockButton
 	} do
 		if (element) then 
-			element:SetParent(hider)
+			element:SetParent(UIHider)
 		end
 	end
 
+	-- Style the queue button
 	self:StyleQueueButton()
 	self:RegisterEvent("PLAYER_LOGIN", "StyleQueueButton")
 	self:RegisterEvent("LFG_UPDATE", "StyleQueueButton")
@@ -258,6 +248,17 @@ MinimapModule.StyleMinimap = function(self)
 	end
 
 	-- hide various banners and retail buttons too? figure out what they are!
+
+	-- create our custom border
+	local borderFrame = CreateFrame("Frame", nil, Minimap)
+	borderFrame:SetFrameLevel(Minimap:GetFrameLevel() + 10)
+	borderFrame:SetAllPoints(Minimap)
+
+	local borderTexture = borderFrame:CreateTexture(nil, "BORDER", nil, 5)
+	borderTexture:SetTexture(GetMedia("minimap-border"))
+	borderTexture:SetVertexColor(192/255, 192/255, 192/255)
+	borderTexture:SetPoint("CENTER", -2, 0)
+	borderTexture:SetSize(350,350) -- 404 actually, but that's big.
 
 	-- Readjust stock coordinate text to match classic azerite position and size
 	local coords = MinimapCluster.MinimapContainer.PlayerCoords -- Only in Forever (+Retail now)
