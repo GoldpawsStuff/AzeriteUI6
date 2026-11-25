@@ -28,7 +28,7 @@ local oUF = ns.oUF or oUF
 
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
 local LibSpinBar = LibStub("LibSpinBar-1.0")
-local MinimapModule = ns:NewModule("Minimap", nil, "LibMoreEvents-1.0", "LibFadingFrames-1.0")
+local MinimapModule = ns:NewModule("Minimap", nil, "AceHook-3.0", "LibMoreEvents-1.0", "LibFadingFrames-1.0")
 
 -- Declare module defaults
 local defaults = { profile = {
@@ -137,7 +137,7 @@ local Minimap_OnMouseUp = function(self, button)
 	end
 end
 
-local StyleQueueButton = function()
+MinimapModule.StyleQueueButton = function(self)
 	local button = QueueStatusButton or LFGMinimapFrame or QueueStatusMinimapButton
 	if (not button) then return end
 
@@ -246,15 +246,18 @@ MinimapModule.StyleMinimap = function(self)
 		end
 	end
 
-	StyleQueueButton()
+	self:StyleQueueButton()
+	self:RegisterEvent("PLAYER_LOGIN", "StyleQueueButton")
+	self:RegisterEvent("LFG_UPDATE", "StyleQueueButton")
+	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS", "StyleQueueButton")
+	self:RegisterEvent("LFG_QUEUE_STATUS_UPDATE", "StyleQueueButton")
 
 	-- Also hook the button’s own update if it exists
 	if (QueueStatusButton and QueueStatusButton.Update) then
-		hooksecurefunc(QueueStatusButton, "Update", StyleQueueButton)
+		self:SecureHook(QueueStatusButton, "Update", "StyleQueueButton")
 	end
 
 	-- hide various banners and retail buttons too? figure out what they are!
-	-- hide new retail coords, or move them inside the map
 
 	-- Readjust stock coordinate text to match classic azerite position and size
 	local coords = MinimapCluster.MinimapContainer.PlayerCoords -- Only in Forever (+Retail now)
