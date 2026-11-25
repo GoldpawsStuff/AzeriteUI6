@@ -910,8 +910,8 @@ local style = function(self, unit)
 		--binding:SetFormatter(...) -- if you want custom formatting
 		--binding:SetUpdateInterval(0.1) -- optional
 
-		local auras = self:CreateAurasElement()
-		auras:SetSize(316, 76)
+		local auras = self:CreateAurasElement({ layoutLimit = 316, growthX = "LEFT", growthY = "DOWN" })
+		auras:SetSize(316, 76) 
 		auras:SetPoint("TOPRIGHT", -150, -126)
 
 		-- Enable some sub-widgets

@@ -39,7 +39,6 @@ local style = function(self)
 
 	self:SetSize(.001, .001)
 	self:SetPoint("TOPRIGHT", -50, -50)
-	--self:SetAlpha(0)
 	self:EnableMouse(false)
 
 	-- Little hack to avoid "stuck" numbers on auras with no duration
@@ -49,8 +48,8 @@ local style = function(self)
 	--binding:SetFormatter(...) -- if you want custom formatting
 	--binding:SetUpdateInterval(0.1) -- optional
 
-	local buffs = self:CreateAurasElement()
-	buffs:SetSize(64, 136) -- Originally 272, trying smaller size to see if buffs linebreaks. They don't. 
+	local buffs = self:CreateAurasElement({ layoutLimit = 272 })
+	buffs:SetSize(272, 136) 
 	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -50)
 
 	buffs.durationBinding = binding
@@ -77,7 +76,7 @@ local style = function(self)
 		initializeFrame = ns.AuraButton_InitializeFloatingBuff,
 	})
 
-	local debuffs = self:CreateAurasElement()
+	local debuffs = self:CreateAurasElement({ layoutLimit = 240 })
 	debuffs:SetSize(240, 60)
 	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -192)
 
@@ -196,6 +195,7 @@ PlayerAuras.OnEnable = function(self)
 		buffAnchor:SetPoint("TOPRIGHT", -50, -50)
 
 		local buffs = frame.Buffs
+		buffs:SetParent(buffAnchor)
 		buffs:ClearAllPoints()
 		buffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
 
@@ -204,12 +204,15 @@ PlayerAuras.OnEnable = function(self)
 		debuffAnchor:SetPoint("TOPRIGHT", -50, -192)
 
 		local debuffs = frame.Debuffs
+		debuffs:SetParent(debuffAnchor)
 		debuffs:ClearAllPoints()
 		debuffs:SetPoint("TOPRIGHT", debuffAnchor, "TOPRIGHT", 0, 0)
 
-		frame:SetAllPoints(buffAnchor)
+		--frame:SetAllPoints(buffAnchor)
 
-		PlayerAuras:RegisterFrameForFading(frame, "floater")
+		--PlayerAuras:RegisterFrameForFading(frame, "floater")
+		PlayerAuras:RegisterFrameForFading(buffAnchor, "floater")
+		PlayerAuras:RegisterFrameForFading(debuffAnchor, "floater")
 
 		--PlayerAuras.frame = hider
 		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)

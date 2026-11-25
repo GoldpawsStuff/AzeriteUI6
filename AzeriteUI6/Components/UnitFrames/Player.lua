@@ -735,9 +735,12 @@ local style = function(self, unit)
 		--binding:SetFormatter(...) -- if you want custom formatting
 		--binding:SetUpdateInterval(0.1) -- optional
 
-		local auras = self:CreateAurasElement()
-		auras:SetSize(40*8 - 4, 40*2 - 4)
+		local auras = self:CreateAurasElement({ layoutLimit = 316, growthX = "RIGHT", growthY = "UP" })
+		auras:SetFrameLevel(self:GetFrameLevel() + 25)
+		auras:SetSize(316, 76)
 		auras:SetPoint("BOTTOMLEFT", 158, 91)
+		auras:EnableMouse(true)
+		auras:SetPropagateMouseClicks(false)
 
 		-- Enable some sub-widgets
 		auras.durationBinding = binding

@@ -205,6 +205,9 @@ ns.AuraButton_InitializeFloatingBuff = function(button)
 	button:SetDurationCooldown(cooldown)
 	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 	button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
+
+	button:EnableMouse(true)
+	button:SetCancelAuraButtons("RightButtonUp")
 end
 
 -- Floating Player Debuff Display
@@ -252,7 +255,7 @@ ns.AuraButton_InitializeFloatingDebuff = function(button)
 	button:SetTooltipAnchorPoint("ANCHOR_BOTTOMLEFT", 0, -4) -- tooltip's top right anchored to the icon's bottom left
 end
 
--- Player/Target Buffs
+-- Player/Target UnitFrame Buffs
 ns.AuraButton_InitializeBigBuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -296,9 +299,12 @@ ns.AuraButton_InitializeBigBuff = function(button)
 	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 
 	Auras_SetTooltipAnchor(button)
+
+	button:EnableMouse(true)
+	button:SetCancelAuraButtons("RightButtonUp")
 end
 
--- Player/Target Debuffs
+-- Player/Target UnitFrame Debuffs
 ns.AuraButton_InitializeBigDebuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -343,7 +349,7 @@ ns.AuraButton_InitializeBigDebuff = function(button)
 	Auras_SetTooltipAnchor(button)
 end
 
--- NamePlate Debuffs
+-- NamePlate UnitFrame Debuffs
 ns.AuraButton_InitializeNamePlateDebuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -379,7 +385,7 @@ ns.AuraButton_InitializeNamePlateDebuff = function(button)
 	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 end
 
--- NamePlate CC
+-- NamePlate UnitFrame CC
 ns.AuraButton_InitializeNamePlateCC = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
@@ -415,7 +421,7 @@ ns.AuraButton_InitializeNamePlateCC = function(button)
 	button:SetDurationText(time, { textFormatter = ns:GetCountdownFormatter() })
 end
 
--- NamePlate Buffs
+-- NamePlate UnitFrame Buffs
 ns.AuraButton_InitializeNamePlateBuff = function(button)
 	local icon = button:CreateTexture(nil, "BORDER")
 	icon:SetMask(GetMedia("actionbutton-mask-square"))
