@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.40-Release] 2026-11-25
+### Fixed
+- Removed a major source of taint and secrecy violations that cascaded down to both the ChatFrames and the NamePlates. Hopefully it'll be possible to do Battlegrounds with a little less crazy amounts of spam now. 
+
 ## [1.0.39-Release] 2026-11-24
 ### Added
 - Added a standard floating Buff & Debuff display. This is movable through `/lock`. 

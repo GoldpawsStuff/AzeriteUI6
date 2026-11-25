@@ -38,7 +38,7 @@ local defaults = { profile = {
 local style = function(self)
 
 	self:SetSize(.001, .001)
-	self:SetAlpha(0)
+	--self:SetAlpha(0)
 	self:EnableMouse(false)
 
 	-- Little hack to avoid "stuck" numbers on auras with no duration
@@ -56,9 +56,9 @@ local style = function(self)
 		layoutLimit = 800, -- prevent wrapping on the 1x1 dummy frame
 	})
 
-	buffs:SetParent(UIParent)
-	buffs:SetSize(272, 136)
-	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -40, -40)
+	--buffs:SetParent(UIParent)
+	buffs:SetSize(64, 136) -- 272
+	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -50)
 
 	buffs.durationBinding = binding
 	buffs.showCount = true
@@ -72,18 +72,15 @@ local style = function(self)
 	buffs.groupSpacing = 4 -- Spacing between each group (number) 
 	buffs.groupLineSpacing = 4 -- Spacing between each group row or column 
 	buffs.lineSpacing = 4 -- Spacing between each button row or column (number) 
-	buffs.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
-	buffs.sortDirection = AuraContainerSortDirection.Normal
-	buffs.sortMethod = AuraContainerSortMethod.ExpirationOnly 
+	buffs.maxFrameCount = 32 -- Number of buttons to display. Defaults to an infinite number (number)
+	buffs.sortDirection = AuraContainerSortDirection.Reverse
+	buffs.sortMethod = AuraContainerSortMethod.ExpirationOnly
 
 	-- Right-click to cancel (uses C_UnitAuras.CancelAuraByInstanceID)
 	buffs.cancelButton = "RightButtonUp"
 
 	-- Buffs
 	buffs:AddGroup("HELPFUL", {
-		maxFrameCount = 32,
-		sortMethod = AuraContainerSortMethod and AuraContainerSortMethod.Expiration or nil,
-		sortDirection = AuraContainerSortDirection and AuraContainerSortDirection.Reverse or nil,
 		initializeFrame = ns.AuraButton_InitializeFloatingBuff,
 	})
 
@@ -95,9 +92,9 @@ local style = function(self)
 		layoutLimit = 800, -- prevent wrapping on the 1x1 dummy frame
 	})
 	
-	debuffs:SetParent(UIParent)
+	--debuffs:SetParent(UIParent)
 	debuffs:SetSize(240, 60)
-	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -40, -182)
+	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -192)
 
 	debuffs.durationBinding = binding
 	debuffs.showCount = true
@@ -111,15 +108,12 @@ local style = function(self)
 	debuffs.groupSpacing = 4 -- Spacing between each group (number) 
 	debuffs.groupLineSpacing = 4 -- Spacing between each group row or column 
 	debuffs.lineSpacing = 4 -- Spacing between each button row or column (number) 
-	debuffs.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
-	debuffs.sortDirection = AuraContainerSortDirection.Normal
-	debuffs.sortMethod = AuraContainerSortMethod.ExpirationOnly 
+	debuffs.maxFrameCount = 16 -- Number of buttons to display. Defaults to an infinite number (number)
+	debuffs.sortDirection = AuraContainerSortDirection.Reverse
+	debuffs.sortMethod = AuraContainerSortMethod.ExpirationOnly
 
 	-- Debuffs
 	debuffs:AddGroup("HARMFUL", {
-		maxFrameCount = 16,
-		sortMethod = AuraContainerSortMethod and AuraContainerSortMethod.Expiration or nil,
-		sortDirection = AuraContainerSortDirection and AuraContainerSortDirection.Reverse or nil,
 		initializeFrame = ns.AuraButton_InitializeFloatingDebuff,
 	})
 
@@ -217,7 +211,7 @@ PlayerAuras.OnEnable = function(self)
 
 		local buffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerBuffs", UIParent)
 		buffAnchor:SetSize(272, 136)
-		buffAnchor:SetPoint("TOPRIGHT", -40, -40)
+		buffAnchor:SetPoint("TOPRIGHT", -50, -50)
 
 		local buffs = frame.Buffs
 		buffs:SetParent(hider)
@@ -226,7 +220,7 @@ PlayerAuras.OnEnable = function(self)
 
 		local debuffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerDebuffs", UIParent)
 		debuffAnchor:SetSize(240, 60)
-		debuffAnchor:SetPoint("TOPRIGHT", -40, -182)
+		debuffAnchor:SetPoint("TOPRIGHT", -50, -192)
 
 		local debuffs = frame.Debuffs
 		debuffs:SetParent(hider)

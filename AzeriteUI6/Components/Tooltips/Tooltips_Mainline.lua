@@ -31,6 +31,7 @@ local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0", "AceHook-3.0
 local defaults = { profile = {
 }}
 
+--[=[-- 
 local StyleTooltip = function(tooltip)
 	if (not tooltip or tooltip:IsForbidden()) then
 		return
@@ -55,7 +56,85 @@ local StyleTooltip = function(tooltip)
 		tooltip.BottomOverlay:Hide()
 	end
 end
+--]=]--
 
+local StyleTooltip = function(tooltip)
+	if (not tooltip or tooltip:IsForbidden()) then
+		return
+	end
+
+	-- Avoid touching geometry when the tooltip metrics are secret
+	if (issecretvalue(tooltip:GetWidth())) then
+		return
+	end
+
+	local nineSlice = tooltip.NineSlice
+	if (not nineSlice) then
+		return
+	end
+
+	-- Darker background (near-black with slight blue-gray)
+	nineSlice:SetCenterColor(.05, .05, .15, .96)
+
+	-- Darker, more neutral border (instead of the bright gold)
+	nineSlice:SetBorderColor(.45, .45, .55, 1)
+
+	-- Optional: hide any overlay textures Forever may add
+	if (tooltip.TopOverlay) then
+		tooltip.TopOverlay:Hide()
+	end
+	if (tooltip.BottomOverlay) then
+		tooltip.BottomOverlay:Hide()
+	end
+end
+
+Tooltips.StyleGameTooltip = function(self)
+
+	-- We'd like a few more here, but secrecy made it all so hush-hush
+	for tooltipName in next,{
+		ItemRefTooltip = true,
+		ShoppingTooltip1 = true,
+		ShoppingTooltip2 = true,
+		GameTooltip = true
+	} do
+		local tooltip = _G[tooltipName]
+		if (tooltip) then
+			-- Secure hooks run after the original and do not leave the
+			-- execution tainted for subsequent Blizzard work.
+			self:SecureHookScript(tooltip, "OnShow", StyleTooltip)
+			self:SecureHookScript(tooltip, "OnTooltipCleared", StyleTooltip)
+		end
+	end
+
+	-- Also catch the common style reset path
+	if (SharedTooltip_SetBackdropStyle) then
+		self:SecureHook("SharedTooltip_SetBackdropStyle", StyleTooltip)
+	end
+
+	-- Put the statusbar inside the tooltip. It's cleaner. 
+	if (GameTooltipStatusBar) then
+		GameTooltipStatusBar:SetHeight(2)
+		GameTooltipStatusBar:ClearAllPoints()
+		GameTooltipStatusBar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT", 6, 5)
+		GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "BOTTOMRIGHT", -6, 5)
+	end
+
+	-- Style the Forever/Mainline unit frame aura tooltip
+	-- *tooltip is still hidden, we can't access methods directly, just this.
+	if (AuraContainerInbound and AuraContainerInbound.SetTooltipBackdrop) then 
+		AuraContainerInbound.SetTooltipBackdrop({
+			backdropInfo = {
+				bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
+				edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+				edgeSize = 12,
+			},
+			borderColor = CreateColor(.45, .45, .55, 1),
+			centerColor = CreateColor(.05, .05, .15, .96),
+		})
+	end
+end
+
+--[=[-- 
 Tooltips.StyleGameTooltip = function(self)
 
 	-- We'd like a few more here, but secrecy made it all so hush-hush
@@ -100,6 +179,7 @@ Tooltips.StyleGameTooltip = function(self)
 		})
 	end
 end
+--]=]--
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.

@@ -491,4 +491,28 @@ ns.OnInitialize = function(self)
 	if (C_AddOns.GetAddOnEnableState("Ace3", UnitGUID("player")) == Enum.AddOnEnableState.None) then
 		self:RegisterChatCommand("rl", function() ReloadUI() end)
 	end
+
+
+	local secrets = {
+		[0] = "Combat",
+		[1] = "Encounter",
+		[2] = "ChallengeMode",
+		[3] = "PvPMatch",
+		[4] = "Map",
+		[5] = "Chat"
+	}
+	self:RegisterChatCommand("ls", function() 
+		local activesecrets = {}
+		for i = 0, 5 do
+			if (C_RestrictedActions.IsAddOnRestrictionActive(i)) then
+				activesecrets[#activesecrets + 1] = secrets[i]
+			end
+		end
+		if (next(activesecrets)) then
+			print("active secret modes:", unpack(activesecrets))
+		else
+			print("no secret modes currently active")
+		end
+	end)
+
 end

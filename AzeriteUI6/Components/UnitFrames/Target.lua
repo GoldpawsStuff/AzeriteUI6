@@ -928,9 +928,8 @@ local style = function(self, unit)
 		auras.groupLineSpacing = 4 -- Spacing between each group row or column 
 		auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
 		auras.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
-		--auras.tooltipAnchor = "ANCHOR_TOPRIGHT"
-		--auras.tooltipOffsetX = 0
-		--auras.tooltipOffsetY = -4
+		auras.sortDirection = AuraContainerSortDirection.Reverse
+		auras.sortMethod = AuraContainerSortMethod.ExpirationOnly 
 
 		-- Aura Groups
 		-- *named and referenced for easy enabling/disabling
@@ -963,7 +962,7 @@ local style = function(self, unit)
 			}}}),
 
 			-- Non-player buffs, with spammy stuff blacklisted
-			HelpfulNotPlayerLong = Auras_AddGroup(auras, "HELPFUL|!PLAYER", { layoutIndex = 12, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
+			HelpfulNotPlayerLong = Auras_AddGroup(auras, "HELPFUL|!PLAYER", { layoutIndex = 14, candidateFilters = { maxDuration = 3600, excludeSpellIDs = {
 
 			}}}),
 

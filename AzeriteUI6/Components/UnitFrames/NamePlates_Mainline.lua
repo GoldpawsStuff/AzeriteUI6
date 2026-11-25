@@ -26,6 +26,8 @@
 local addonName, ns = ...
 local oUF = ns.oUF or oUF
 
+--do return end
+
 local L = LibStub("AceLocale-3.0"):GetLocale((...))
 
 local NamePlates = ns:NewModule("NamePlates", nil, "LibMoreEvents-1.0", "AceTimer-3.0")
@@ -125,7 +127,6 @@ local customSettings = {
 	nameplateFriendlyPlayerAuraDisplayLossOfControl = true,
 }
 
-
 -- Declare module defaults
 -- *some of these are overwritten by saved blizzard settings on first run,
 --  but the user can choose to restore "addon defaults" in the options menu. 
@@ -158,25 +159,30 @@ local toboolean = function(a)
 	end
 end
 
--- Check a bit (enum values are the bit positions used by GetCVarBitfield)
-local hasbit = function(value, bitfield)
-	return bit.band(value, bit.lshift(1, bitfield - 1)) ~= 0
+local CanUpdateNamePlateCVars = function()
+	return not C_RestrictedActions.IsAddOnRestrictionActive(Enum.AddOnRestrictionType.PvPMatch)
+	   and not C_RestrictedActions.IsAddOnRestrictionActive(Enum.AddOnRestrictionType.Map)
+	   and not C_RestrictedActions.IsAddOnRestrictionActive(Enum.AddOnRestrictionType.Chat)
 end
 
--- Set or clear a bit
-local setbit = function(value, bitfield, enabled)
-	local mask = bit.lshift(1, bitfield - 1)
-	if enabled then
-		return bit.bor(value, mask)
-	else
-		return bit.band(value, bit.bnot(mask))
-	end
+local SetCVar = function(...)
+	if (not CanUpdateNamePlateCVars()) then return end
+	C_CVar.SetCVar(...)
+end
+
+local SetCVarBitfield = function(...)
+	if (not CanUpdateNamePlateCVars()) then return end
+	C_CVar.SetCVarBitfield(...)
 end
 
 -- Return a CVar, convert to number when appropriate
 local GetCVar = function(cvar)
 	local value = C_CVar.GetCVar(cvar)
 	return tonumber(value) or value
+end
+
+local GetCVarBitfield = function(...)
+	return C_CVar.GetCVarBitfield(...)
 end
 
 -- Return a CVar default, convert to number when appropriate
@@ -248,17 +254,8 @@ local UpdateAllActiveTargets = function(event)
 	ActiveTargetPlates.softinteract = hasInteract and interactUnit
 end
 
--- Flag to hook NamePlate alpha to UIParent
-local shouldHookAlpha = true
-
 -- Method template with nameplate and element callbacks
 local NamePlate = {
-
-	-- Hook used to fade out nameplates along with UIParent. Not sure it's always a good idea.
-	UpdateAlpha = function(self)
-		if (not shouldHookAlpha) then return end
-		self:SetAlpha(UIParent:GetAlpha())
-	end,
 
 	-- Update NPC classification badge for rares, elites and bosses.
 	UpdateClassification = function(self, event, unit, ...)
@@ -437,7 +434,6 @@ local NamePlate = {
 		-- Make a single nameplate version? Still have to do all the checks.
 		UpdateAllActiveTargets(event) 
 
-		self:UpdateAlpha(event, unit or self.__unit)
 		self:PostUpdateElements(event, unit or self.__unit)
 
 		if (event == "CVAR_UPDATE") then
@@ -691,9 +687,6 @@ local style = function(self, unit)
 
 	self.AurasCC = aurasCC
 
-	-- Make our nameplates obey UIParent alpha and fade out when Dialogue UI and Immersion say so.
-	hooksecurefunc(UIParent, "SetAlpha", function() self:UpdateAlpha() end)
-
 	-- Callbacks
 	--------------------------------------------
 	self:RegisterEvent("UNIT_FACTION", self.PostUpdateElements)
@@ -728,7 +721,7 @@ NamePlates.SaveSettingsToCVars = function(self)
 	if (InCombatLockdown()) then return end
 
 	for cvarName,value in next,gameSettings do 
-		C_CVar.SetCVar(cvarName, self.db.profile[cvarName])	
+		SetCVar(cvarName, self.db.profile[cvarName])	
 	end
 end
 
@@ -793,23 +786,23 @@ NamePlates.OnEvent = function(self, event, ...)
 
 		-- World record breaking clunkiness going on here
 		if (string.lower(cvarName) == string.lower("nameplateEnemyNpcAuraDisplay")) then 
-			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs)
-			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs)
-			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl)
+			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl)
 			
 			self:UpdateAllElements("CVAR_UPDATE")
 
 		elseif (string.lower(cvarName) == string.lower("nameplateEnemyPlayerAuraDisplay")) then 
-			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs)
-			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs)
-			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.CrowdControl)
+			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = GetCVarBitfield("nameplateEnemyPlayerAuraDisplayAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.CrowdControl)
 			
 			self:UpdateAllElements("CVAR_UPDATE")
 
 		elseif (string.lower(cvarName) == string.lower("nameplateFriendlyPlayerAura")) then 
-			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs)
-			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs)
-			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.CrowdControl)
+			self.db.profile.nameplateEnemyNpcAuraDisplayBuffs = GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayDebuffs = GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs)
+			self.db.profile.nameplateEnemyNpcAuraDisplayCrowdControl = GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.CrowdControl)
 			
 			self:UpdateAllElements("CVAR_UPDATE")
 		else
@@ -835,6 +828,8 @@ NamePlates.OnEvent = function(self, event, ...)
 		or (event == "PLAYER_SOFT_INTERACT_CHANGED") 
 		or (event == "NAME_PLATE_UNIT_ADDED") 
 		or (event == "NAME_PLATE_UNIT_REMOVED") then
+
+		--do return end -- debugging nameplate/raidframe taint in battleground waiting area. 
 
 		UpdateAllActiveTargets(event)
 
@@ -1081,16 +1076,16 @@ NamePlates.GetOptions = function(self)
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
 				get = function(info, key, value) 
-					if (key == "help") then 		return C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs)
-					elseif (key == "harm") then 	return C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs)
-					elseif (key == "cc") then 		return C_CVar.GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl)
+					if (key == "help") then 		return GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs)
+					elseif (key == "harm") then 	return GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs)
+					elseif (key == "cc") then 		return GetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl)
 					end
 				end, 
 				set = function(info, key, value) 
 					if (InCombatLockdown()) then return end
-					if (key == "help") then 		C_CVar.SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs, value)
-					elseif (key == "harm") then 	C_CVar.SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs, value)
-					elseif (key == "cc") then 		C_CVar.SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl, value)
+					if (key == "help") then 		SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Buffs, value)
+					elseif (key == "harm") then 	SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.Debuffs, value)
+					elseif (key == "cc") then 		SetCVarBitfield("nameplateEnemyNpcAuraDisplay", Enum.NamePlateEnemyNpcAuraDisplay.CrowdControl, value)
 					end
 				end,
 				order = 501,
@@ -1107,16 +1102,16 @@ NamePlates.GetOptions = function(self)
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
 				get = function(info, key, value) 
-					if (key == "help") then 		return C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs)
-					elseif (key == "harm") then 	return C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs)
-					elseif (key == "cc") then 		return C_CVar.GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.LossOfControl)
+					if (key == "help") then 		return GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs)
+					elseif (key == "harm") then 	return GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs)
+					elseif (key == "cc") then 		return GetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.LossOfControl)
 					end
 				end, 
 				set = function(info, key, value) 
 					if (InCombatLockdown()) then return end
-					if (key == "help") then 		C_CVar.SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs, value)
-					elseif (key == "harm") then 	C_CVar.SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs, value)
-					elseif (key == "cc") then 		C_CVar.SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.LossOfControl, value)
+					if (key == "help") then 		SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Buffs, value)
+					elseif (key == "harm") then 	SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.Debuffs, value)
+					elseif (key == "cc") then 		SetCVarBitfield("nameplateEnemyPlayerAuraDisplay", Enum.NamePlateEnemyPlayerAuraDisplay.LossOfControl, value)
 					end
 				end,
 				order = 502,
@@ -1133,16 +1128,16 @@ NamePlates.GetOptions = function(self)
 				disabled = function() return InCombatLockdown() end,
 				hidden = function() return not self.db.profile.enabled end,
 				get = function(info, key, value) 
-					if (key == "help") then 		return C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs)
-					elseif (key == "harm") then 	return C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs)
-					elseif (key == "cc") then 		return C_CVar.GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.LossOfControl)
+					if (key == "help") then 		return GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs)
+					elseif (key == "harm") then 	return GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs)
+					elseif (key == "cc") then 		return GetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.LossOfControl)
 					end
 				end, 
 				set = function(info, key, value) 
 					if (InCombatLockdown()) then return end
-					if (key == "help") then 		C_CVar.SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs, value)
-					elseif (key == "harm") then 	C_CVar.SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs, value)
-					elseif (key == "cc") then 		C_CVar.SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.LossOfControl, value)
+					if (key == "help") then 		SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Buffs, value)
+					elseif (key == "harm") then 	SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.Debuffs, value)
+					elseif (key == "cc") then 		SetCVarBitfield("nameplateFriendlyPlayerAuraDisplay", Enum.NamePlateFriendlyPlayerAuraDisplay.LossOfControl, value)
 					end
 				end,
 				order = 503,
@@ -1176,7 +1171,7 @@ NamePlates.GetOptions = function(self)
 				end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					C_CVar.SetCVar(NamePlateConstants and NamePlateConstants.SIZE_CVAR or "nameplateSize", (math.floor(value + .5)))
+					SetCVar(NamePlateConstants and NamePlateConstants.SIZE_CVAR or "nameplateSize", (math.floor(value + .5)))
 				end,
 				order = 1000,
 			},
@@ -1189,7 +1184,7 @@ NamePlates.GetOptions = function(self)
 				get = function() return tonumber(C_CVar.GetCVar("nameplateSelectedScale")) end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					C_CVar.SetCVar("nameplateSelectedScale", value)
+					SetCVar("nameplateSelectedScale", value)
 				end,
 				order = 1001,
 			},
@@ -1202,7 +1197,7 @@ NamePlates.GetOptions = function(self)
 				get = function() return tonumber(C_CVar.GetCVar("nameplateMinScale")) end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					C_CVar.SetCVar("nameplateMinScale", value)
+					SetCVar("nameplateMinScale", value)
 				end,
 				order = 1002,
 			},
@@ -1215,7 +1210,7 @@ NamePlates.GetOptions = function(self)
 				get = function() return tonumber(C_CVar.GetCVar("nameplateMaxScale")) end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					C_CVar.SetCVar("nameplateMaxScale", value)
+					SetCVar("nameplateMaxScale", value)
 				end,
 				order = 1003,
 			},
@@ -1228,7 +1223,7 @@ NamePlates.GetOptions = function(self)
 				get = function() return tonumber(C_CVar.GetCVar("nameplateSimplifiedScale")) end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					C_CVar.SetCVar("nameplateSimplifiedScale", value)
+					SetCVar("nameplateSimplifiedScale", value)
 				end,
 				order = 1004,
 			},
@@ -1241,8 +1236,8 @@ NamePlates.GetOptions = function(self)
 				get = function() return tonumber(C_CVar.GetCVar("nameplateMaxDistance")) end,
 				set = function(_, value)
 					if (InCombatLockdown()) then return end
-					C_CVar.SetCVar("nameplateMaxDistance", (math.floor(value + .5)))
-					C_CVar.SetCVar("nameplatePlayerMaxDistance", (math.floor(value + .5)))
+					SetCVar("nameplateMaxDistance", (math.floor(value + .5)))
+					SetCVar("nameplatePlayerMaxDistance", (math.floor(value + .5)))
 				end,
 				order = 2000,
 			},

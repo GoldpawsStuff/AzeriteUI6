@@ -755,9 +755,6 @@ local style = function(self, unit)
 		auras.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
 		auras.sortDirection = AuraContainerSortDirection.Normal
 		auras.sortMethod = AuraContainerSortMethod.ExpirationOnly 
-		--auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT" -- doesn't obey this at all
-		--auras.tooltipOffsetX = 0
-		--auras.tooltipOffsetY = 4
 
 		-- Aura Groups
 		-- *named and referenced for easy enabling/disabling
