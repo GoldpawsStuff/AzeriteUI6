@@ -910,7 +910,7 @@ local style = function(self, unit)
 		--binding:SetFormatter(...) -- if you want custom formatting
 		--binding:SetUpdateInterval(0.1) -- optional
 
-		local auras = self:CreateAurasElement({ layoutLimit = 316, growthX = "LEFT", growthY = "DOWN" })
+		local auras = self:CreateAurasElement({ layoutLimit = 316, initialAnchor = "TOPRIGHT", growthX = "LEFT", growthY = "DOWN" })
 		auras:SetSize(316, 76) 
 		auras:SetPoint("TOPRIGHT", -150, -126)
 
@@ -924,8 +924,8 @@ local style = function(self, unit)
 		auras.size = 36
 		auras.elementSpacing = 4 -- Spacing between each button (number) 
 		auras.forceNewLine = false -- Whether to force a new row or column between each group (boolean)
-		auras.groupSpacing = 4 -- Spacing between each group (number) 
-		auras.groupLineSpacing = 4 -- Spacing between each group row or column 
+		auras.groupSpacing = 0 -- Spacing between each group (number) 
+		auras.groupLineSpacing = 0 -- Spacing between each group row or column 
 		auras.lineSpacing = 4 -- Spacing between each button row or column (number) 
 		auras.maxFrameCount = 8 -- Number of buttons to display. Defaults to an infinite number (number)
 		auras.sortDirection = AuraContainerSortDirection.Reverse

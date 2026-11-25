@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The Player Buffs & Debuff display now properly follow the Explorer Mode.
 - The Player Buffs & Debuff display will now optionally be hidden when you have a Target selected.
 
+### Fixed
+- Fixed some fully wonky anchoring issues with the auras on the Player- and Target Unit Frames.
+
 ## [1.0.40-Release] 2026-11-25
 ### Fixed
 - Removed a major source of taint and secrecy violations that cascaded down to both the ChatFrames and the NamePlates. Hopefully it'll be possible to do Battlegrounds with a little less crazy amounts of spam now. 
