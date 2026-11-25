@@ -38,6 +38,7 @@ local defaults = { profile = {
 local style = function(self)
 
 	self:SetSize(.001, .001)
+	self:SetPoint("TOPRIGHT", -50, -50)
 	--self:SetAlpha(0)
 	self:EnableMouse(false)
 
@@ -48,16 +49,8 @@ local style = function(self)
 	--binding:SetFormatter(...) -- if you want custom formatting
 	--binding:SetUpdateInterval(0.1) -- optional
 
-	local buffs = self:CreateAurasElement({
-		initialAnchor = "TOPRIGHT",
-		growthX = "LEFT",
-		growthY = "DOWN",
-		layout = AnchorUtil.FlowLayoutAxis.Horizontal,
-		layoutLimit = 800, -- prevent wrapping on the 1x1 dummy frame
-	})
-
-	--buffs:SetParent(UIParent)
-	buffs:SetSize(64, 136) -- 272
+	local buffs = self:CreateAurasElement()
+	buffs:SetSize(64, 136) -- Originally 272, trying smaller size to see if buffs linebreaks. They don't. 
 	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -50)
 
 	buffs.durationBinding = binding
@@ -73,26 +66,18 @@ local style = function(self)
 	buffs.groupLineSpacing = 4 -- Spacing between each group row or column 
 	buffs.lineSpacing = 4 -- Spacing between each button row or column (number) 
 	buffs.maxFrameCount = 32 -- Number of buttons to display. Defaults to an infinite number (number)
-	buffs.sortDirection = AuraContainerSortDirection.Reverse
+	buffs.sortDirection = AuraContainerSortDirection.Normal
 	buffs.sortMethod = AuraContainerSortMethod.ExpirationOnly
 
 	-- Right-click to cancel (uses C_UnitAuras.CancelAuraByInstanceID)
-	buffs.cancelButton = "RightButtonUp"
+	buffs.cancelButton = "RightButtonUp" -- does not work?
 
 	-- Buffs
 	buffs:AddGroup("HELPFUL", {
 		initializeFrame = ns.AuraButton_InitializeFloatingBuff,
 	})
 
-	local debuffs = self:CreateAurasElement({
-		initialAnchor = "TOPRIGHT",
-		growthX = "LEFT",
-		growthY = "DOWN",
-		layout = AnchorUtil.FlowLayoutAxis.Horizontal,
-		layoutLimit = 800, -- prevent wrapping on the 1x1 dummy frame
-	})
-	
-	--debuffs:SetParent(UIParent)
+	local debuffs = self:CreateAurasElement()
 	debuffs:SetSize(240, 60)
 	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -192)
 
@@ -109,7 +94,7 @@ local style = function(self)
 	debuffs.groupLineSpacing = 4 -- Spacing between each group row or column 
 	debuffs.lineSpacing = 4 -- Spacing between each button row or column (number) 
 	debuffs.maxFrameCount = 16 -- Number of buttons to display. Defaults to an infinite number (number)
-	debuffs.sortDirection = AuraContainerSortDirection.Reverse
+	debuffs.sortDirection = AuraContainerSortDirection.Normal
 	debuffs.sortMethod = AuraContainerSortMethod.ExpirationOnly
 
 	-- Debuffs
@@ -203,9 +188,6 @@ PlayerAuras.OnEnable = function(self)
 	oUF:Factory(function(self)
 		self:SetActiveStyle("AzeritePlayerAuras")
 
-		local hider = CreateFrame("Frame", "AeriteUI6PlayerAuraHider", UIParent, "SecureHandlerStateTemplate")
-		hider:SetFrameStrata("LOW")
-
 		local frame = self:Spawn("player", "AzeritePlayerAuras")
 		frame:SetPoint("BOTTOM", UIParent, "TOP", 0, 100)
 
@@ -214,7 +196,6 @@ PlayerAuras.OnEnable = function(self)
 		buffAnchor:SetPoint("TOPRIGHT", -50, -50)
 
 		local buffs = frame.Buffs
-		buffs:SetParent(hider)
 		buffs:ClearAllPoints()
 		buffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
 
@@ -223,14 +204,12 @@ PlayerAuras.OnEnable = function(self)
 		debuffAnchor:SetPoint("TOPRIGHT", -50, -192)
 
 		local debuffs = frame.Debuffs
-		debuffs:SetParent(hider)
 		debuffs:ClearAllPoints()
 		debuffs:SetPoint("TOPRIGHT", debuffAnchor, "TOPRIGHT", 0, 0)
 
-		RegisterAttributeDriver(hider, "state-visibility", "[@target,exists]hide;show")
+		frame:SetAllPoints(buffAnchor)
 
-		--PlayerAuras:RegisterFrameForFading(buffs, "floater")
-		--PlayerAuras:RegisterFrameForFading(debuffs, "floater")
+		PlayerAuras:RegisterFrameForFading(frame, "floater")
 
 		--PlayerAuras.frame = hider
 		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)
