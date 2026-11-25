@@ -492,7 +492,7 @@ ns.OnInitialize = function(self)
 		self:RegisterChatCommand("rl", function() ReloadUI() end)
 	end
 
-
+	-- Just a dev tool
 	local secrets = {
 		[0] = "Combat",
 		[1] = "Encounter",
@@ -503,7 +503,7 @@ ns.OnInitialize = function(self)
 	}
 	self:RegisterChatCommand("ls", function() 
 		local activesecrets = {}
-		for i = 0, 5 do
+		for i = 0,5 do
 			if (C_RestrictedActions.IsAddOnRestrictionActive(i)) then
 				activesecrets[#activesecrets + 1] = secrets[i]
 			end
