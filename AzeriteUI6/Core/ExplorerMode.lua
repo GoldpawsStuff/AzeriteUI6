@@ -60,7 +60,6 @@ local defaults = { profile = {
 	fadeStanceBar = true,
 	fadePlayerFrame = true,
 	fadePlayerClassPower = true,
-	fadePlayerAuras = true,
 	fadePetFrame = true,
 	fadeFocusFrame = true,
 	fadeTracker = true,
@@ -193,12 +192,21 @@ ExplorerMode.GetOptions = function(self)
 				name = L["Player Buffs & Debuffs"],
 				desc = L["Fade out the floating Buff & Debuff Display."],
 				disabled = function() return InCombatLockdown() end,
-				hidden = function() return not self.db.profile.enabled end,
-				get = function(info) return self.db.profile.fadePlayerAuras end,
+				hidden = function() 
+					local auras = ns:GetModule("PlayerAuras", true)
+					return not auras.db.profile.enabled 
+				end,
+				get = function(info) 
+					local auras = ns:GetModule("PlayerAuras", true)
+					if (not auras ) then return end
+					return auras.db.profile.fadePlayerAuras 
+				end,
 				set = function(info, val) 
 					if InCombatLockdown() then return end
-					self.db.profile.fadePlayerAuras = val 
-					self:UpdateSettings()
+					local auras = ns:GetModule("PlayerAuras", true)
+					if (not auras ) then return end
+					auras.db.profile.fadePlayerAuras = val 
+					auras:UpdateSettings()
 				end,
 				order = 330
 			} or nil,
@@ -726,21 +734,6 @@ ExplorerMode.UpdateSettings = function(self)
 		end
 	end
 
-	-- Player Auras
-	--------------------------------------------
-	--local PlayerAuras = ns:GetModule("PlayerAuras", true)
-	--if (PlayerAuras) then
-	--	local fade = not self.FORCED and PlayerAuras:IsEnabled() and db.enabled and db.fadePlayerAuras
-	--	local playerAurasFrame = PlayerAuras:GetFrame()
-	--	if (playerAurasFrame) then
-	--		if (fade) then
-	--			LFF:RegisterFrameForFading(playerAurasFrame, "PlayerAurasHUD")
-	--		else
-	--			LFF:UnregisterFrameForFading(playerAurasFrame)
-	--		end
-	--	end
-	--end
-
 	-- Unit Frames
 	--------------------------------------------
 	local Player = ns:GetModule("Player", true)
@@ -822,6 +815,11 @@ ExplorerMode.OnInitialize = function(self)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+	-- Clean away deprecated settings
+	if (self.db.profile.fadePlayerAuras) then
+		self.db.profile.fadePlayerAuras = nil
+	end
 end
 
 ExplorerMode.OnEnable = function(self)

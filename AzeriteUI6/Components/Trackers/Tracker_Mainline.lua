@@ -41,12 +41,8 @@ end
 Trackers.UpdateObjectiveTrackerFading = function(self)
 	local ExplorerMode = ns:GetModule("ExplorerMode", true)
 	if (ExplorerMode) then
-		if (ExplorerMode.db.profile.enabled) then 
-			if (self.db.profile.fadeOutTracker) then
-				self:RegisterFrameForFading(ObjectiveTrackerFrame, "Trackers")
-			else
-				self:UnregisterFrameForFading(ObjectiveTrackerFrame)
-			end
+		if (ExplorerMode.db.profile.enabled and self.db.profile.fadeOutTracker) then 
+			self:RegisterFrameForFading(ObjectiveTrackerFrame, "Trackers")
 		else
 			self:UnregisterFrameForFading(ObjectiveTrackerFrame)
 		end

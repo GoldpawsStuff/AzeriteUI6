@@ -583,7 +583,9 @@ ChatFrames.OnEvent = function(self, event, ...)
 						self:SetScript("OnUpdate", nil)
 						return
 					end
-					ChatFrame1:Clear()
+					if (not IsControlKeyDown()) then
+						ChatFrame1:Clear()
+					end
 				end)
 			end
 		end

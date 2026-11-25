@@ -33,6 +33,8 @@ local PlayerAuras = ns:NewModule("PlayerAuras", nil, "AceHook-3.0", "LibMoreEven
 -- Declare module defaults
 local defaults = { profile = {
 	enabled = true,
+	fadePlayerAuras = true,
+	hideWithTarget = true
 }}
 
 local style = function(self)
@@ -124,7 +126,6 @@ PlayerAuras.GetOptions = function(self)
 				get = function(info) return self.db.profile.enabled end,
 				set = function(info, val) 
 					if (InCombatLockdown()) then return end
-
 					ns:ShowPrompt("Reload UI", "Toggling this option requires a user interface reload.|n|nAre you sure?", {
 						{ text = ACCEPT, onClick = function() 
 							self.db.profile.enabled = val
@@ -135,13 +136,77 @@ PlayerAuras.GetOptions = function(self)
 				end,
 				order = 10
 			},
+			hideWithTarget = {
+				type = "toggle", width = "full",
+				name = "Hide with Target",
+				desc = "",
+				disabled = function() return InCombatLockdown() end,
+				hidden = function() return not self.db.profile.enabled end,
+				get = function(info) return self.db.profile.hideWithTarget end,
+				set = function(info, val) 
+					if (InCombatLockdown()) then return end
+					self.db.profile.hideWithTarget = val
+					self:UpdateSettings()
+				end,
+				order = 100
+			},
 		}
 	}
 end
 
---PlayerAuras.GetFrame = function(self)
---	return self.frame
---end
+PlayerAuras.GetFrame = function(self)
+	return self.BuffAnchor, self.DebuffAnchor
+end
+
+PlayerAuras.UpdatePlayerAuraFading = function(self)
+	local ExplorerMode = ns:GetModule("ExplorerMode", true)
+	if (ExplorerMode) then
+		if (ExplorerMode.db.profile.enabled and self.db.profile.fadePlayerAuras) then 
+			self:RegisterFrameForFading(self.BuffAnchor, "PlayerAurasHUD")
+			self:RegisterFrameForFading(self.DebuffAnchor, "PlayerAurasHUD")
+		else
+			self:UnregisterFrameForFading(self.BuffAnchor)
+			self:UnregisterFrameForFading(self.DebuffAnchor)
+		end
+		return
+	end
+	if (self.db.profile.fadePlayerAuras) then
+		self:RegisterFrameForFading(self.BuffAnchor, "PlayerAurasHUD")
+		self:RegisterFrameForFading(self.DebuffAnchor, "PlayerAurasHUD")
+	else
+		self:UnregisterFrameForFading(self.BuffAnchor)
+		self:UnregisterFrameForFading(self.DebuffAnchor)
+	end
+end
+
+PlayerAuras.UpdateVisibilityDriver = function(self)
+	if (InCombatLockdown()) then return end
+
+	local driver
+	if (self.db.profile.hideWithTarget) then
+		if (ns.WoWMainline) then
+			driver = "[petbattle]hide;[@target,exists]hide;show"
+		else
+			driver = "[@target,exists]hide;show"
+		end
+	else
+		if (ns.WoWMainline) then
+			driver = "[petbattle]hide;show"
+		else
+			driver = "show"
+		end
+	end
+
+	if (self.BuffAnchor) then
+		UnregisterStateDriver(self.BuffAnchor, "visibility")
+		RegisterStateDriver(self.BuffAnchor, "visibility", driver)
+	end
+
+	if (self.DebuffAnchor) then
+		UnregisterStateDriver(self.DebuffAnchor, "visibility")
+		RegisterStateDriver(self.DebuffAnchor, "visibility", driver)
+	end
+end
 
 -- Hide Blizzard's floating aura frames
 PlayerAuras.HideBlizzard = function(self)
@@ -163,6 +228,8 @@ end
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
 PlayerAuras.UpdateSettings = function(self)
+	self:UpdateVisibilityDriver()
+	self:UpdatePlayerAuraFading()
 end
 
 -- This is called by the addon on full profile changes,
@@ -187,36 +254,43 @@ PlayerAuras.OnEnable = function(self)
 	oUF:Factory(function(self)
 		self:SetActiveStyle("AzeritePlayerAuras")
 
+		local buffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerBuffs", UIParent, "SecureHandlerStateTemplate")
+		buffAnchor:SetSize(272, 136)
+		buffAnchor:SetPoint("TOPRIGHT", -50, -50)
+		buffAnchor.__prevent_alpha_reset = true
+
+		PlayerAuras.BuffAnchor = buffAnchor
+
+		local debuffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerDebuffs", UIParent, "SecureHandlerStateTemplate")
+		debuffAnchor:SetSize(240, 60)
+		debuffAnchor:SetPoint("TOPRIGHT", -50, -192)
+		debuffAnchor.__prevent_alpha_reset = true
+
+		PlayerAuras.DebuffAnchor = debuffAnchor
+
 		local frame = self:Spawn("player", "AzeritePlayerAuras")
 		frame:SetPoint("BOTTOM", UIParent, "TOP", 0, 100)
 
-		local buffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerBuffs", UIParent)
-		buffAnchor:SetSize(272, 136)
-		buffAnchor:SetPoint("TOPRIGHT", -50, -50)
+		PlayerAuras.UnitFrame = frame
 
 		local buffs = frame.Buffs
 		buffs:SetParent(buffAnchor)
 		buffs:ClearAllPoints()
 		buffs:SetPoint("TOPRIGHT", buffAnchor, "TOPRIGHT", 0, 0)
 
-		local debuffAnchor = CreateFrame("Frame", "AzeriteUI6PlayerDebuffs", UIParent)
-		debuffAnchor:SetSize(240, 60)
-		debuffAnchor:SetPoint("TOPRIGHT", -50, -192)
+		PlayerAuras.Buffs = buffs
 
 		local debuffs = frame.Debuffs
 		debuffs:SetParent(debuffAnchor)
 		debuffs:ClearAllPoints()
 		debuffs:SetPoint("TOPRIGHT", debuffAnchor, "TOPRIGHT", 0, 0)
 
-		--frame:SetAllPoints(buffAnchor)
+		PlayerAuras.Debuffs = debuffs
 
-		--PlayerAuras:RegisterFrameForFading(frame, "floater")
-		PlayerAuras:RegisterFrameForFading(buffAnchor, "floater")
-		PlayerAuras:RegisterFrameForFading(debuffAnchor, "floater")
-
-		--PlayerAuras.frame = hider
 		PlayerAuras:RegisterMovableFrameAnchor(buffAnchor, string.lower(L["Player Buffs"]), "floater", AzeriteUI6_Positions_DB)
 		PlayerAuras:RegisterMovableFrameAnchor(debuffAnchor, string.lower(L["Player Debuffs"]), "floater", AzeriteUI6_Positions_DB)
 
+		PlayerAuras:UpdateVisibilityDriver()
+		PlayerAuras:UpdatePlayerAuraFading()
 	end)
 end
