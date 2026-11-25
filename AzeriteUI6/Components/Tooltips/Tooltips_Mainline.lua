@@ -29,34 +29,66 @@ local Tooltips = ns:NewModule("Tooltips", nil, "LibMoreEvents-1.0", "AceHook-3.0
 
 -- Declare module defaults
 local defaults = { profile = {
+	enable = true,
+	classColorNames = true,
+	classColorHealthBar = true
 }}
 
---[=[-- 
-local StyleTooltip = function(tooltip)
-	if (not tooltip or tooltip:IsForbidden()) then
+-- Set once. Stops Blizzard from overwriting the color with green.
+if (GameTooltipStatusBar) then
+	GameTooltipStatusBar.lockColor = true
+end
+
+local GetUnitNameColor = function(unit)
+	if (UnitIsPlayer(unit)) then
+		local _, class = UnitClass(unit)
+		if (class) then
+			local color
+			if (C_ClassColor and C_ClassColor.GetClassColor) then
+				color = C_ClassColor.GetClassColor(class)
+			elseif (not issecretvalue or not issecretvalue(class)) then
+				color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
+			end
+			if (color) then
+				if (color.GetRGB) then
+					return color:GetRGB()
+				else
+					return color.r, color.g, color.b
+				end
+			end
+		end
+	end
+
+	local r, g, b = UnitSelectionColor(unit, true)
+	if (r) then
+		return r, g, b
+	end
+
+	return 0, 1, 0
+end
+
+local ColorTooltipHealthBar = function(tooltip)
+	local _, unit = tooltip:GetUnit()
+	if (not unit or (issecretvalue and issecretvalue(unit))) then
 		return
 	end
 
-	local nineSlice = tooltip.NineSlice
-	if (not nineSlice) then
+	local r, g, b = GetUnitNameColor(unit)
+	if (not r) then
 		return
 	end
 
-	-- Darker background (near-black with slight blue-gray)
-	nineSlice:SetCenterColor(.05, .05, .15, .96)
+	-- Health bar
+	GameTooltipStatusBar:SetStatusBarColor(r, g, b)
 
-	-- Darker, more neutral border (instead of the bright gold)
-	nineSlice:SetBorderColor(.45, .45, .55, 1)
-
-	-- Optional: hide any overlay textures Forever may add
-	if (tooltip.TopOverlay) then
-		tooltip.TopOverlay:Hide()
-	end
-	if (tooltip.BottomOverlay) then
-		tooltip.BottomOverlay:Hide()
+	-- Name (line 1) — only override for players; NPCs are already reaction-colored by Blizzard
+	if (UnitIsPlayer(unit)) then
+		local nameText = _G[tooltip:GetName().."TextLeft1"]
+		if (nameText) then
+			nameText:SetTextColor(r, g, b)
+		end
 	end
 end
---]=]--
 
 local StyleTooltip = function(tooltip)
 	if (not tooltip or tooltip:IsForbidden()) then
@@ -86,6 +118,14 @@ local StyleTooltip = function(tooltip)
 	if (tooltip.BottomOverlay) then
 		tooltip.BottomOverlay:Hide()
 	end
+
+	-- Modern (Retail / Forever / most current Classic clients)
+	if (TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall) then
+		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, ColorTooltipHealthBar)
+	else
+		GameTooltip:HookScript("OnTooltipSetUnit", ColorTooltipHealthBar)
+	end
+
 end
 
 Tooltips.StyleGameTooltip = function(self)
@@ -133,53 +173,6 @@ Tooltips.StyleGameTooltip = function(self)
 		})
 	end
 end
-
---[=[-- 
-Tooltips.StyleGameTooltip = function(self)
-
-	-- We'd like a few more here, but secrecy made it all so hush-hush
-	for tooltipName in next,{
-		ItemRefTooltip = true,
-		ShoppingTooltip1 = true,
-		ShoppingTooltip2 = true,
-		GameTooltip = true
-	} do
-		-- Apply on show and after style resets
-		local tooltip = _G[tooltipName]
-		if (tooltip) then
-			self:HookScript(tooltip, "OnShow", StyleTooltip)
-			self:HookScript(tooltip, "OnTooltipCleared", StyleTooltip)
-		end
-	end
-
-	-- Also catch the common style reset path
-	if (SharedTooltip_SetBackdropStyle) then
-		self:SecureHook("SharedTooltip_SetBackdropStyle", StyleTooltip)
-	end
-
-	-- Put the statusbar inside the tooltip. It's cleaner. 
-	if (GameTooltipStatusBar) then
-		GameTooltipStatusBar:SetHeight(2)
-		GameTooltipStatusBar:ClearAllPoints()
-		GameTooltipStatusBar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT", 6, 5)
-		GameTooltipStatusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "BOTTOMRIGHT", -6, 5)
-	end
-
-	-- Style the Forever/Mainline unit frame aura tooltip
-	-- *tooltip is still hidden, we can't access methods directly, just this.
-	if (AuraContainerInbound and AuraContainerInbound.SetTooltipBackdrop) then 
-		AuraContainerInbound.SetTooltipBackdrop({
-			backdropInfo = {
-				bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
-				edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-				edgeSize = 12,
-			},
-			borderColor = CreateColor(.45, .45, .55, 1),
-			centerColor = CreateColor(.05, .05, .15, .96),
-		})
-	end
-end
---]=]--
 
 -- This is called by the options menu on settings changes,
 -- and by the modules themselves on enabling.
