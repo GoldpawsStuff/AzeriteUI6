@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][1.0.43-Alpha] 2026-11-25
 - Use `/resetlayout` to reset the Azerite UI EditMode layout to the latest changes.
 
+### Added
+- Player tooltips now have class colored names and health bars. 
+
 ### Changed
 - The Player Buffs & Debuff display now properly follow the Explorer Mode.
 - The Player Buffs & Debuff display will now optionally be hidden when you have a Target selected.
