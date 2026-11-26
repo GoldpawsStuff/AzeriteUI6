@@ -73,19 +73,35 @@ local ColorTooltipHealthBar = function(tooltip)
 		return
 	end
 
-	local r, g, b = GetUnitNameColor(unit)
-	if (not r) then
-		return
-	end
+	local r, g, b
 
-	-- Health bar
-	GameTooltipStatusBar:SetStatusBarColor(r, g, b)
-
-	-- Name (line 1) — only override for players; NPCs are already reaction-colored by Blizzard
 	if (UnitIsPlayer(unit)) then
+		-- Players: force class color on both name and bar
+		r, g, b = GetUnitNameColor(unit)
+		if (r) then
+			local nameText = _G[tooltip:GetName().."TextLeft1"]
+			if (nameText) then
+				nameText:SetTextColor(r, g, b)
+			end
+			GameTooltipStatusBar:SetStatusBarColor(r, g, b)
+		end
+	else
+		-- NPCs: copy the color Blizzard already applied to the name
 		local nameText = _G[tooltip:GetName().."TextLeft1"]
 		if (nameText) then
-			nameText:SetTextColor(r, g, b)
+			local nr, ng, nb = nameText:GetTextColor()
+			if (nr and not (issecretvalue and issecretvalue(nr))) then
+				r, g, b = nr, ng, nb
+			end
+		end
+
+		-- Fallback if name color is unavailable or secret
+		if (not r) then
+			r, g, b = GetUnitNameColor(unit)
+		end
+
+		if (r) then
+			GameTooltipStatusBar:SetStatusBarColor(r, g, b)
 		end
 	end
 end
