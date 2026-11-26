@@ -49,6 +49,6 @@
 	<!--<Script file="UnitFrames\Party.lua"/>-->
 	<!--<Script file="UnitFrames\Raid.lua"/>-->
 	<!--<Script file="UnitFrames\ArenaPrep.lua"/>-->
-	<!--<Script file="UnitFrames\ArenaEnemy.lua"/>-->
+	<Script file="UnitFrames\ArenaEnemy.lua"/>
 
 </Ui>

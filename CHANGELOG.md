@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased][1.0.44-Alpha] 2026-11-26
+### Added
+- Started work on Arena Enemy / BG Flag Carrier Unit Frames. 
+
 ## [1.0.43-Release] 2026-11-26
 - Use `/resetlayout` to reset the Azerite UI EditMode layout to the latest changes.
 
