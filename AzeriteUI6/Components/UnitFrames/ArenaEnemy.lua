@@ -115,7 +115,7 @@ local style = function(self, unit)
 	health.colorClass = true
 	health.colorReaction = true
 	health.colorHealth = true
-	--health.frequentUpdates = true
+	health.frequentUpdates = true
 
 	local healthBg = health:CreateTexture(nil, "BACKGROUND", nil, -1)
 	healthBg:SetPoint("CENTER", 1, -2)
@@ -146,7 +146,7 @@ local style = function(self, unit)
 	power:SetStatusBarTexture([[Interface\ChatFrame\ChatFrameBackground]])
 	power:SetAlpha(.65)
 	power.colorPower = true
-	--power.frequentUpdates = true
+	power.frequentUpdates = true
 
 	local powerBg = power:CreateTexture(nil, "BACKGROUND", nil, -1)
 	powerBg:SetPoint("CENTER", 0, 0)
