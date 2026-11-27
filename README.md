@@ -58,7 +58,7 @@ Setup the primary action bar as the default AzeriteUI layout:
   - 🔳 Boss Frames  
   - 🔳 Party Frames   
   - 🔳 Raid  
-  - 🔳 Arena Enemy  
+  - 🔁 Arena Enemy / BG Flag Carrier  
 - 🔁 ActionBars  
   - ✅ Primary Bar  
   - ✅ MultiBar 1  
