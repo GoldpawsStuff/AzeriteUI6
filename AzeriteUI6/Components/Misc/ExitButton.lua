@@ -137,31 +137,39 @@ VehicleExit.OnEnable = function(self)
 	container:SetPoint("BOTTOMRIGHT", -220, 200)
 
 	local secure = CreateFrame("Button", "$parentSecureButton", container, "SecureActionButtonTemplate")
-	secure:SetFrameLevel(secure:GetFrameLevel() + 1)
 	secure:SetAllPoints(container)
 	secure:SetAttribute("macrotext", "/dismount [mounted]\n/leavevehicle [canexitvehicle]")
 	secure:SetAttribute("type", "macro")
-	secure:SetScript("OnMouseDown", ExitButton_OnClick)
 	secure:SetScript("OnEnter", ExitButton_OnEnter)
 	secure:SetScript("OnLeave", ExitButton_OnLeave)
+	secure:RegisterForClicks("AnyDown")
 
-	local texture = secure:CreateTexture(nil, "ARTWORK", nil, 1)
-	texture:SetPoint("CENTER", 0, 0)
-	texture:SetSize(80, 80)
-	texture:SetTexture(GetMedia("icon_exit_flight"))
+	secure.texture = secure:CreateTexture(nil, "ARTWORK", nil, 1)
+	secure.texture:SetPoint("CENTER", 0, 0)
+	secure.texture:SetSize(80, 80)
+	secure.texture:SetTexture(GetMedia("icon_exit_flight"))
 
 	RegisterStateDriver(secure, "visibility", "[canexitvehicle][mounted]show;hide")
 
 	local notsecure = CreateFrame("Button", "$parentButton", container)
 	notsecure:SetAllPoints(container)
+	notsecure:SetFrameLevel(secure:GetFrameLevel() + 1) -- put this one above the secure layer
+	notsecure:SetPropagateMouseClicks(true) -- pass the clicks through to the secure one
 	notsecure:SetScript("OnMouseDown", ExitButton_OnClick)
 	notsecure:SetScript("OnEnter", ExitButton_OnEnter)
 	notsecure:SetScript("OnLeave", ExitButton_OnLeave)
+	notsecure:RegisterForClicks("AnyDown")
 
-	local texture = notsecure:CreateTexture(nil, "ARTWORK", nil, 1)
-	texture:SetPoint("CENTER", 0, 0)
-	texture:SetSize(80, 80)
-	texture:SetTexture(GetMedia("icon_exit_flight"))
+	notsecure.texture = notsecure:CreateTexture(nil, "ARTWORK", nil, 1)
+	notsecure.texture:SetPoint("CENTER", 0, 0)
+	notsecure.texture:SetSize(80, 80)
+	notsecure.texture:SetTexture(GetMedia("icon_exit_flight"))
+
+	-- For some reason, the secure button becomes visible on taxis. 
+	-- It's not a conflict, but it does lead to double textures and shades.
+	-- Note that we're not hiding the button, just the texture. It's a visual fix.
+	secure:HookScript("OnShow", function() notsecure.texture:Hide() end)	
+	secure:HookScript("OnHide", function() notsecure.texture:Show() end)	
 
 	self.TaxiExitButton = notsecure
 
