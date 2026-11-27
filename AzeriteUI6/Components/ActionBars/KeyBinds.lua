@@ -25,7 +25,6 @@
 --]]
 local _, ns = ...
 
-local LFF = LibStub("LibFadingFrames-1.0")
 local KeyBound = LibStub("LibKeyBound-1.0")
 
 local KeyBinds = ns:NewModule("KeyBinds", nil, "AceConsole-3.0", "LibMoreEvents-1.0")

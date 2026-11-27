@@ -135,13 +135,6 @@ local StyleTooltip = function(tooltip)
 		tooltip.BottomOverlay:Hide()
 	end
 
-	-- Modern (Retail / Forever / most current Classic clients)
-	if (TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall) then
-		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, ColorTooltipHealthBar)
-	else
-		GameTooltip:HookScript("OnTooltipSetUnit", ColorTooltipHealthBar)
-	end
-
 end
 
 Tooltips.StyleGameTooltip = function(self)
@@ -187,6 +180,13 @@ Tooltips.StyleGameTooltip = function(self)
 			borderColor = CreateColor(.45, .45, .55, 1),
 			centerColor = CreateColor(.05, .05, .15, .96),
 		})
+	end
+
+	-- Modern (Retail / Forever / most current Classic clients)
+	if (TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall) then
+		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, ColorTooltipHealthBar)
+	else
+		GameTooltip:HookScript("OnTooltipSetUnit", ColorTooltipHealthBar)
 	end
 end
 
