@@ -113,18 +113,18 @@ local defaults = {
 	}
 }
 
--- custom exit button for vehicle/overridebars
-local exitButton = {
-	func = function(button)
-		if (UnitExists("vehicle")) then
-			VehicleExit()
-		else
-			PetDismiss()
-		end
-	end,
-	tooltip = LEAVE_VEHICLE,
-	texture = [[Interface\Icons\achievement_bg_kill_carrier_opposing_flagroom]]
-}
+---- custom exit button for vehicle/overridebars
+--local exitButton = {
+--	func = function(button)
+--		if (UnitExists("vehicle")) then
+--			VehicleExit()
+--		else
+--			PetDismiss()
+--		end
+--	end,
+--	tooltip = LEAVE_VEHICLE,
+--	texture = [[Interface\Icons\achievement_bg_kill_carrier_opposing_flagroom]]
+--}
 
 local StyleCooldownText = function(button)
 	local cooldown = button.cooldown or button.Cooldown

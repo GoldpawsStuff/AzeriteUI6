@@ -25,6 +25,7 @@
 	<!-- Misc -->
 	<Script file="Misc\BuffFrame_Classic.lua"/>
 	<Script file="Misc\ErrorsFrame.lua"/>
+	<Script file="Misc\ExitButton.lua"/>
 	<Script file="Misc\LossOfControl.lua"/>
 
 	<!-- Tooltips -->
