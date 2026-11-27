@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][1.0.44-Alpha] 2026-11-26
 ### Added
+- Added a vehicle exit / dismount / taxi stop button to the Minimap.
 - Started work on Arena Enemy / BG Flag Carrier Unit Frames. 
 
 ## [1.0.43-Release] 2026-11-26

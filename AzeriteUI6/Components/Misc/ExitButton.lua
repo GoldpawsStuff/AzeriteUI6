@@ -140,6 +140,7 @@ VehicleExit.OnEnable = function(self)
 	secure:SetAllPoints(container)
 	secure:SetAttribute("macrotext", "/dismount [mounted]\n/leavevehicle [canexitvehicle]")
 	secure:SetAttribute("type", "macro")
+	secure:SetScript("OnMouseDown", ExitButton_OnClick)
 	secure:SetScript("OnEnter", ExitButton_OnEnter)
 	secure:SetScript("OnLeave", ExitButton_OnLeave)
 
@@ -152,7 +153,7 @@ VehicleExit.OnEnable = function(self)
 
 	local notsecure = CreateFrame("Button", "$parentSecure", container)
 	notsecure:SetAllPoints(container)
-	notsecure:SetScript("OnClick", ExitButton_OnClick)
+	notsecure:SetScript("OnMouseDown", ExitButton_OnClick)
 	notsecure:SetScript("OnEnter", ExitButton_OnEnter)
 	notsecure:SetScript("OnLeave", ExitButton_OnLeave)
 
