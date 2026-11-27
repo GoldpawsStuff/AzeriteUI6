@@ -149,6 +149,7 @@ VehicleExit.OnEnable = function(self)
 	secure.texture:SetSize(80, 80)
 	secure.texture:SetTexture(GetMedia("icon_exit_flight"))
 
+	-- Believe it or not, but this somehow makes the button appear on taxis. 
 	RegisterStateDriver(secure, "visibility", "[canexitvehicle][mounted]show;hide")
 
 	local notsecure = CreateFrame("Button", "$parentButton", container)
