@@ -23,7 +23,7 @@
 	SOFTWARE.
 
 --]]
-local _, ns = ...
+local addonName, ns = ...
 local oUF = ns.oUF or oUF
 
 local VehicleExit = ns:NewModule("VehicleExit", nil, "LibMoreEvents-1.0", "AceHook-3.0")
@@ -130,13 +130,14 @@ end
 
 VehicleExit.OnEnable = function(self)
 
-	local container = CreateFrame("Frame", "AzeriteUI6ExitButton", UIParent)
+	local container = CreateFrame("Frame", addonName.."VehicleExit", UIParent)
 	container:SetSize(32,32)
 	container:SetFrameStrata("MEDIUM")
 	container:SetFrameLevel(100)
 	container:SetPoint("BOTTOMRIGHT", -220, 200)
 
-	local secure = CreateFrame("Button", "$parentSecure", container, "SecureActionButtonTemplate")
+	local secure = CreateFrame("Button", "$parentSecureButton", container, "SecureActionButtonTemplate")
+	secure:SetFrameLevel(secure:GetFrameLevel() + 1)
 	secure:SetAllPoints(container)
 	secure:SetAttribute("macrotext", "/dismount [mounted]\n/leavevehicle [canexitvehicle]")
 	secure:SetAttribute("type", "macro")
@@ -151,7 +152,7 @@ VehicleExit.OnEnable = function(self)
 
 	RegisterStateDriver(secure, "visibility", "[canexitvehicle][mounted]show;hide")
 
-	local notsecure = CreateFrame("Button", "$parentSecure", container)
+	local notsecure = CreateFrame("Button", "$parentButton", container)
 	notsecure:SetAllPoints(container)
 	notsecure:SetScript("OnMouseDown", ExitButton_OnClick)
 	notsecure:SetScript("OnEnter", ExitButton_OnEnter)
