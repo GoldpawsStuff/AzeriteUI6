@@ -50,15 +50,15 @@ Setup the primary action bar as the default AzeriteUI layout:
 
 ## Development Status
 - 🔁 UnitFrames  
-  - 🔁 Player  
+  - ✅ Player  
   - ✅ Pet  
-  - 🔁 Target  
+  - ✅ Target  
   - ✅ Target of Target  
   - ✅ Focus *(Not in Classic Era)*  
   - 🔳 Boss Frames  
   - 🔳 Party Frames   
-  - 🚫 ~~Raid~~ *(will split into separate addon, or cancel)*  
-  - 🚫 ~~Arena Enemy~~ *(will split into separate addon, or cancel)*  
+  - 🔳 Raid  
+  - 🔳 Arena Enemy  
 - 🔁 ActionBars  
   - ✅ Primary Bar  
   - ✅ MultiBar 1  
@@ -74,30 +74,30 @@ Setup the primary action bar as the default AzeriteUI layout:
   - 🔳 Zone Abilities Bar  
   - 🔳 Encounter Bar  
   - 🔳 Micro Menu  
-- 🔳 Player Buffs & Debuffs  
-- 🔁 Chat Frames *(styling)*  
+- ✅ Player Buffs & Debuffs  
+- ✅ Chat Frames *(styling)*  
   - ✅ Background removal/transparency  
   - ✅ Hover functionality for clutter  
 - 🔁 Minimap  
   - ✅ Border  
   - 🔳 Compass North tag  
-  - 🔳 Groupfinder eye  
+  - ✅ Groupfinder eye  
   - 🔳 Grouptype banners  
   - 🔳 Mail Frame
-  - 🔳 Exit Flight Button  
+  - ✅ Exit Flight Button  
 - 🔁 Chat Commands  
   - ✅ ActionBar toggles  
   - 🔳 UnitFrame toggles  
   - ✅ Full positions reset ***/resetpositions***  
   - ✅ Full settings reset ***/resetsettings***  
-- 🔳 Explorer Mode  
-  - 🔳 Chat Frames  
-  - 🔳 ActionBars  
-  - 🔳 UnitFrames  
-    - 🔳 Player UnitFrame  
-    - 🔳 Pet UnitFrame  
+- ✅ Explorer Mode  
+  - ✅ Chat Frames  
+  - ✅ ActionBars  
+  - ✅ UnitFrames  
+    - ✅ Player UnitFrame  
+    - ✅ Pet UnitFrame  
 	- 🔳 Group/Raid Tool  
-- 🔁 Options Menu  
+- ✅ Options Menu  
 
 ✅ = Finished  
 🔁 = In progress  
