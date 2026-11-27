@@ -50,7 +50,7 @@ local style = function(self)
 	--binding:SetFormatter(...) -- if you want custom formatting
 	--binding:SetUpdateInterval(0.1) -- optional
 
-	local buffs = self:CreateAurasElement({ layoutLimit = 272 })
+	local buffs = self:CreateAurasElement({ layoutLimit = 272, initialAnchor = "TOPRIGHT", growthX = "LEFT", growthY = "DOWN" })
 	buffs:SetSize(272, 136) 
 	buffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -50)
 
@@ -78,7 +78,7 @@ local style = function(self)
 		initializeFrame = ns.AuraButton_InitializeFloatingBuff,
 	})
 
-	local debuffs = self:CreateAurasElement({ layoutLimit = 240 })
+	local debuffs = self:CreateAurasElement({ layoutLimit = 240, initialAnchor = "TOPRIGHT", growthX = "LEFT", growthY = "DOWN" })
 	debuffs:SetSize(240, 60)
 	debuffs:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -50, -192)
 

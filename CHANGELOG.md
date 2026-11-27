@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file. Be aware th
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.45-Release] 2026-11-27
+## [1.0.46-Release] 2026-11-28
 ### Added
 - Added a vehicle exit / dismount / taxi stop button to the Minimap. 
 - Started work on Arena Enemy / BG Flag Carrier Unit Frames. 
 
 ### Fixed
 - Fixed a bug that would hook extra function calls to mouseover events indefinitely.
+- Fixed the anchoring of the second row of Auras in the Floating Buff & Debuff displays.
 
 ## [1.0.43-Release] 2026-11-26
 - Use `/resetlayout` to reset the Azerite UI EditMode layout to the latest changes.
